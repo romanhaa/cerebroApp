@@ -114,7 +114,7 @@ server <- function(input, output, session) {
   ##--------------------------------------------------------------------------##
   sample_data <- reactive({
     if ( is.null(input$RDS_file) || is.na(input$RDS_file) ) {
-      sample_data <- readRDS(system.file("example.rds", package = "cerebroApp"))
+      sample_data <- readRDS(system.file("resources/example.rds", package = "cerebroApp"))
     } else {
       req(input$RDS_file)
       sample_data <- readRDS(input$RDS_file$datapath)

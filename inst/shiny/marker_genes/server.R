@@ -45,24 +45,6 @@ output[["marker_genes_by_sample_table_present"]] <- DT::renderDataTable(server =
       "% cells in other samples" = formattable::color_bar("pink"),
       "present on cell surface" = formattable::formatter("span", style=x~style(color=ifelse(x, "green", "red")))
     ))
-  } else if ( tolower(sample_data()$experiment$organism) %in% c("hg","mm") ) {
-    if ( !exists("genes_surface") ) {
-      genes_surface <- read.table(paste0("resources/genes_surface_", tolower(sample_data()$experiment$organism), ".txt"), sep="\t", header=FALSE, stringsAsFactors=FALSE)[,1]
-    }
-    table <- sample_data()$marker_genes$by_sample[ which(sample_data()$marker_genes$by_sample$sample == input[["marker_genes_by_sample_input"]]) , c(2,4,5,6,7) ]
-    table$surface <- table$gene %in% genes_surface
-    colnames(table) <- c("Gene", "avg. logFC", "% cells in this sample", "% cells in other samples", "adj. p-value", "present on cell surface")
-    table$"avg. logFC" <- round(table$"avg. logFC", digits=3)
-    table$"% cells in this sample" <- formattable::percent(table$"% cells in this sample")
-    table$"% cells in other samples" <- formattable::percent(table$"% cells in other samples")
-    table <- table %>%
-    mutate("adj. p-value"=formatC(table$"adj. p-value", format="e", digits=3)) %>%
-    formattable::formattable(list(
-      "avg. logFC" = formattable::color_tile("white", "orange"),
-      "% cells in this sample" = formattable::color_bar("pink"),
-      "% cells in other samples" = formattable::color_bar("pink"),
-      "present on cell surface" = formattable::formatter("span", style=x~style(color=ifelse(x, "green", "red")))
-    ))
   } else {
     table <- sample_data()$marker_genes$by_sample[ which(sample_data()$marker_genes$by_sample$sample == input[["marker_genes_by_sample_input"]]) , c(2,4,5,6,7) ]
     colnames(table) <- c("Gene", "avg. logFC", "% cells in this sample", "% cells in other samples", "adj. p-value")
@@ -175,24 +157,6 @@ output[["marker_genes_by_cluster_table_present"]] <- DT::renderDataTable(server 
     table$"% cells in this cluster" <- formattable::percent(table$"% cells in this cluster")
     table$"% cells in other clusters" <- formattable::percent(table$"% cells in other clusters")
     table <- table %>% mutate("adj. p-value"=formatC(table$"adj. p-value", format="e", digits=3)) %>%
-    formattable::formattable(list(
-      "avg. logFC" = formattable::color_tile("white", "orange"),
-      "% cells in this cluster" = formattable::color_bar("pink"),
-      "% cells in other clusters" = formattable::color_bar("pink"),
-      "present on cell surface" = formattable::formatter("span", style=x~style(color=ifelse(x, "green", "red")))
-    ))
-  } else if ( tolower(sample_data()$experiment$organism) %in% c("hg","mm") ) {
-    if ( !exists("genes_surface") ) {
-      genes_surface <- read.table(paste0("resources/genes_surface_", tolower(sample_data()$experiment$organism), ".txt"), sep="\t", header=FALSE, stringsAsFactors=FALSE)[,1]
-    }
-    table <- sample_data()$marker_genes$by_cluster[ which(sample_data()$marker_genes$by_cluster$cluster == input[["marker_genes_by_cluster_input"]]) , c(2,4,5,6,7) ]
-    table$surface <- table$gene %in% genes_surface
-    colnames(table) <- c("Gene", "avg. logFC", "% cells in this cluster", "% cells in other clusters", "adj. p-value", "present on cell surface")
-    table$"avg. logFC" <- round(table$"avg. logFC", digits=3)
-    table$"% cells in this cluster" <- formattable::percent(table$"% cells in this cluster")
-    table$"% cells in other clusters" <- formattable::percent(table$"% cells in other clusters")
-    table <- table %>%
-    mutate("adj. p-value"=formatC(table$"adj. p-value", format="e", digits=3)) %>%
     formattable::formattable(list(
       "avg. logFC" = formattable::color_tile("white", "orange"),
       "% cells in this cluster" = formattable::color_bar("pink"),
