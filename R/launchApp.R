@@ -32,14 +32,14 @@ launchApp <- function() {
   ##----------------------------------------------------------------------------##
   ##
   ##----------------------------------------------------------------------------##
-  source(system.file("extdata", "shiny/overview/info.R", package = "cerebroApp"))
-  source(system.file("extdata", "shiny/samples/info.R", package = "cerebroApp"))
-  source(system.file("extdata", "shiny/clusters/info.R", package = "cerebroApp"))
-  source(system.file("extdata", "shiny/most_expressed_genes/info.R", package = "cerebroApp"))
-  source(system.file("extdata", "shiny/marker_genes/info.R", package = "cerebroApp"))
-  source(system.file("extdata", "shiny/enriched_pathways/info.R", package = "cerebroApp"))
-  source(system.file("extdata", "shiny/gene_expression/info.R", package = "cerebroApp"))
-  source(system.file("extdata", "shiny/gene_set_expression/info.R", package = "cerebroApp"))
+  source(system.file("shiny/overview/info.R", package = "cerebroApp"))
+  source(system.file("shiny/samples/info.R", package = "cerebroApp"))
+  source(system.file("shiny/clusters/info.R", package = "cerebroApp"))
+  source(system.file("shiny/most_expressed_genes/info.R", package = "cerebroApp"))
+  source(system.file("shiny/marker_genes/info.R", package = "cerebroApp"))
+  source(system.file("shiny/enriched_pathways/info.R", package = "cerebroApp"))
+  source(system.file("shiny/gene_expression/info.R", package = "cerebroApp"))
+  source(system.file("shiny/gene_set_expression/info.R", package = "cerebroApp"))
 
   ##----------------------------------------------------------------------------##
   ## Allow upload of files up to 800 MB.
@@ -49,8 +49,8 @@ launchApp <- function() {
   ##----------------------------------------------------------------------------##
   ## Load server and UI functions.
   ##----------------------------------------------------------------------------##
-  source(system.file("extdata", "shiny/shiny_UI.R", package = "cerebroApp"), local = TRUE)
-  source(system.file("extdata", "shiny/shiny_server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/shiny_UI.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/shiny_server.R", package = "cerebroApp"), local = TRUE)
 
   ##----------------------------------------------------------------------------##
   ## Launch app.
