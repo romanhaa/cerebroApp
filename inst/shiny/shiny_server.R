@@ -127,17 +127,17 @@ server <- function(input, output, session) {
   ##--------------------------------------------------------------------------##
   ## Tabs.
   ##--------------------------------------------------------------------------##
-  source("shiny/load_data/server.R", local = TRUE)
-  source("shiny/overview/server.R", local = TRUE)
-  source("shiny/samples/server.R", local = TRUE)
-  source("shiny/clusters/server.R", local = TRUE)
-  source("shiny/most_expressed_genes/server.R", local = TRUE)
-  source("shiny/marker_genes/server.R", local = TRUE)
-  source("shiny/enriched_pathways/server.R", local = TRUE)
-  source("shiny/gene_expression/server.R", local = TRUE)
-  source("shiny/gene_set_expression/server.R", local = TRUE)
-  source("shiny/gene_id_conversion/server.R", local = TRUE)
-  source("shiny/analysis_info/server.R", local = TRUE)
-  source("shiny/about/server.R", local = TRUE)
+  source(system.file("shiny/load_data/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/overview/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/samples/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/clusters/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/most_expressed_genes/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/marker_genes/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/enriched_pathways/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/gene_expression/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/gene_set_expression/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/gene_id_conversion/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/analysis_info/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/about/server.R", package = "cerebroApp"), local = TRUE)
 
 }

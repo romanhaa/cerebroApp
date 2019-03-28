@@ -29,18 +29,18 @@ boxTitle <- function(title) {
 ##----------------------------------------------------------------------------##
 ##
 ##----------------------------------------------------------------------------##
-source("shiny/load_data/UI.R", local = TRUE)
-source("shiny/overview/UI.R", local = TRUE)
-source("shiny/samples/UI.R", local = TRUE)
-source("shiny/clusters/UI.R", local = TRUE)
-source("shiny/most_expressed_genes/UI.R", local = TRUE)
-source("shiny/marker_genes/UI.R", local = TRUE)
-source("shiny/enriched_pathways/UI.R", local = TRUE)
-source("shiny/gene_expression/UI.R", local = TRUE)
-source("shiny/gene_set_expression/UI.R", local = TRUE)
-source("shiny/gene_id_conversion/UI.R", local = TRUE)
-source("shiny/analysis_info/UI.R", local = TRUE)
-source("shiny/about/UI.R", local = TRUE)
+source(system.file("shiny/load_data/UI.R", package = "cerebroApp"), local = TRUE)
+source(system.file("shiny/overview/UI.R", package = "cerebroApp"), local = TRUE)
+source(system.file("shiny/samples/UI.R", package = "cerebroApp"), local = TRUE)
+source(system.file("shiny/clusters/UI.R", package = "cerebroApp"), local = TRUE)
+source(system.file("shiny/most_expressed_genes/UI.R", package = "cerebroApp"), local = TRUE)
+source(system.file("shiny/marker_genes/UI.R", package = "cerebroApp"), local = TRUE)
+source(system.file("shiny/enriched_pathways/UI.R", package = "cerebroApp"), local = TRUE)
+source(system.file("shiny/gene_expression/UI.R", package = "cerebroApp"), local = TRUE)
+source(system.file("shiny/gene_set_expression/UI.R", package = "cerebroApp"), local = TRUE)
+source(system.file("shiny/gene_id_conversion/UI.R", package = "cerebroApp"), local = TRUE)
+source(system.file("shiny/analysis_info/UI.R", package = "cerebroApp"), local = TRUE)
+source(system.file("shiny/about/UI.R", package = "cerebroApp"), local = TRUE)
 
 ##----------------------------------------------------------------------------##
 ##
