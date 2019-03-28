@@ -55,6 +55,6 @@ launchApp <- function() {
   ##----------------------------------------------------------------------------##
   ## Launch app.
   ##----------------------------------------------------------------------------##
-  shinyApp(ui = shinyAppUI, server = shinyAppServer)
+  shinyApp(ui = ui, server = server)
 
 }
