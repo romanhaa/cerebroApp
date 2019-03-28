@@ -32,14 +32,14 @@ launchApp <- function() {
   ##----------------------------------------------------------------------------##
   ##
   ##----------------------------------------------------------------------------##
-  source(system.file("shiny/overview/info.R", package = "cerebroApp"))
-  source(system.file("shiny/samples/info.R", package = "cerebroApp"))
-  source(system.file("shiny/clusters/info.R", package = "cerebroApp"))
-  source(system.file("shiny/most_expressed_genes/info.R", package = "cerebroApp"))
-  source(system.file("shiny/marker_genes/info.R", package = "cerebroApp"))
-  source(system.file("shiny/enriched_pathways/info.R", package = "cerebroApp"))
-  source(system.file("shiny/gene_expression/info.R", package = "cerebroApp"))
-  source(system.file("shiny/gene_set_expression/info.R", package = "cerebroApp"))
+  source(system.file("shiny/overview/info.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/samples/info.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/clusters/info.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/most_expressed_genes/info.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/marker_genes/info.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/enriched_pathways/info.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/gene_expression/info.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/gene_set_expression/info.R", package = "cerebroApp"), local = TRUE)
 
   ##----------------------------------------------------------------------------##
   ## Allow upload of files up to 800 MB.
