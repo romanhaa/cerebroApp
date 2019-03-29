@@ -17,17 +17,16 @@ output[["clusters_tree_UI"]] <- renderUI({
 
 # plot
 output[["clusters_tree_plot"]] <- renderPlot({
-  library("ggtree")
   tree <- sample_data()$clusters$tree
   tree$tip.label <- paste0("Cluster ", tree$tip.label)
   colors_tree <- colors[1:length(tree$tip.label)]
   ggplot(tree, aes(x, y)) + 
-    ggplot2::scale_y_reverse() +
+    scale_y_reverse() +
     xlim(0, max(tree$edge.length * 1.1)) +
-    geom_tree() +
-    theme_tree() +
-    geom_tiplab(size = 5, hjust = -0.2) +
-    geom_tippoint(color = colors_tree, shape = 16, size = 6)
+    ggtree::geom_tree() +
+    ggtree::theme_tree() +
+    ggtree::geom_tiplab(size = 5, hjust = -0.2) +
+    ggtree::geom_tippoint(color = colors_tree, shape = 16, size = 6)
 })
 
 # alternative text

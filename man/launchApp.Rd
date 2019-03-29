@@ -4,10 +4,13 @@
 \alias{launchApp}
 \title{Launch Cerebro app.}
 \usage{
-launchApp()
+launchApp(maxFileSize = 800)
+}
+\arguments{
+\item{maxFileSize}{Maximum size of input file; defaults to 800 MB.}
 }
 \value{
-shiny application object
+Cerebro application object
 }
 \description{
 Launch Cerebro app.

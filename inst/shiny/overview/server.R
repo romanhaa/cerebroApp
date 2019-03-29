@@ -474,7 +474,7 @@ observeEvent(input[["overview_projection_export"]], {
         ) +
         geom_point(
           shape = 21,
-          size = 3,
+          size = input[["overview_dot_size"]]/3,
           stroke = 0.2,
           color = "#c4c4c4",
           alpha = input[["overview_dot_opacity"]]
