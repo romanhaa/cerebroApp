@@ -5,6 +5,7 @@
 #' @import dplyr
 #' @importFrom formattable proportion
 #' @import ggplot2
+#' @importFrom ggtree geom_tree geom_tiplab geom_tippoint theme_tree
 #' @import Matrix
 #' @import shiny
 #' @import shinydashboard
