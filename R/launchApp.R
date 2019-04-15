@@ -18,9 +18,11 @@ launchApp <- function(
   ##--------------------------------------------------------------------------##
   ##
   ##--------------------------------------------------------------------------##
-  if (grepl(tolower(Sys.info()['sysname']), pattern='^win')) {
+  if ( grepl(tolower(Sys.info()['sysname']), pattern = '^win') ) {
     .libPaths(paste0(getwd(), "/R-Portable-Win/library"))
     plot_export_path <- paste0(Sys.getenv("USERPROFILE"), "\\Desktop\\")
+  } else if ( "DOCKER" %in% names(Sys.info()) ) {
+    plot_export_path <- "/plots"
   } else {
     .libPaths(paste0(getwd(), "/R-Portable-Mac/library"))
     plot_export_path <- "~/Desktop/"
