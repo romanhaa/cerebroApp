@@ -141,6 +141,7 @@ server <- function(input, output, session) {
   source(system.file("shiny/gene_expression/server.R", package = "cerebroApp"), local = TRUE)
   source(system.file("shiny/gene_set_expression/server.R", package = "cerebroApp"), local = TRUE)
   source(system.file("shiny/gene_id_conversion/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/trajectory/server.R", package = "cerebroApp"), local = TRUE)
   source(system.file("shiny/analysis_info/server.R", package = "cerebroApp"), local = TRUE)
   source(system.file("shiny/about/server.R", package = "cerebroApp"), local = TRUE)
 
