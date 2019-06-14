@@ -32,3 +32,8 @@ output[["about"]] <- renderText({
     </ul>'
   )
 })
+
+# Add to your server
+observeEvent(input$browser,{
+  browser()
+})

@@ -95,6 +95,10 @@ server <- function(input, output, session) {
         icon = icon("list")
       ),
       menuItem(
+        "Trajectory", tabName = "trajectory",
+        icon = icon("random")
+      ),
+      menuItem(
         "Gene ID conversion", tabName = "geneIdConversion",
         icon = icon("barcode")
       ),
