@@ -31,36 +31,21 @@ output[["about"]] <- renderText({
       <li>Sample and cluster color palettes taken from <a href="https://flatuicolors.com/" title="Flat UI Colors 2" target="_blank">https://flatuicolors.com/</a></li>
     </ul>
     <br>
-    <b>Options:</b>'
+    <b>Preferences:</b>'
   )
 })
 
-output[["webgl_switch_and_indicator"]] <- renderUI({
+output[["preferences"]] <- renderUI({
   tagList(
-    actionButton("webgl_switch", label = "Switch WebGL on/off", width = "150px"),
-    htmlOutput("webgl_indicator", inline = TRUE)
+    checkboxInput("webgl_checkbox", label = "Use WebGL", value = TRUE)
   )
 })
 
-output[["webgl_indicator"]] <- renderText({
-  if ( options$use_webgl == TRUE ) {
-    paste0("WebGL is currently switched ", "<font color=\"#27ae60\"><b>ON</b></font>")
-  } else {
-    paste0("WebGL is currently switched ", "<font color=\"#e74c3c\"><b>OFF</b></font>")
-  }
+observeEvent(input[["webgl_checkbox"]], {
+  preferences$use_webgl <- input[["webgl_checkbox"]]
+  print(paste0("WebGL status is now: ", preferences$use_webgl))
 })
 
-observeEvent(input[["webgl_switch"]], {
-  if ( options$use_webgl == TRUE ) {
-    options$use_webgl <- FALSE
-    print(paste0("WebGL status is now: ", options$use_webgl))
-  } else {
-    options$use_webgl <- TRUE
-    print(paste0("WebGL status is now: ", options$use_webgl))
-  }
-})
-
-# Add to your server
 observeEvent(input[["browser"]], {
   browser()
 })

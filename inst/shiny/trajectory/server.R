@@ -56,7 +56,7 @@ output[["trajectory_UI"]] <- renderUI({
       cerebroBox(
         title = "Distribution along pseudotime",
         tagList(
-          shiny::plotOutput("trajectory_density"),
+#          shiny::plotOutput("trajectory_density"),
           plotly::plotlyOutput("trajectory_density_plotly")
         )
       )
@@ -231,7 +231,9 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
         "<b>Sample</b>: ", to_plot[ , "sample" ], "<br>",
         "<b>Cluster</b>: ", to_plot[ , "cluster" ], "<br>",
         "<b>Transcripts</b>: ", formatC(to_plot[ , "nUMI" ], format = "f", big.mark = ",", digits = 0), "<br>",
-        "<b>Expressed genes</b>: ", formatC(to_plot[ , "nGene" ], format = "f", big.mark = ",", digits = 0)
+        "<b>Expressed genes</b>: ", formatC(to_plot[ , "nGene" ], format = "f", big.mark = ",", digits = 0), "<br>",
+        "<b>State</b>: ", to_plot[ , "state" ], "<br>",
+        "<b>Pseudotime</b>: ", round(to_plot[ , "pseudotime" ], 3)
       )
     ) %>%
     plotly::layout(
@@ -250,7 +252,7 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
       ),
       hoverlabel = list(font = list(size = 11))
     )
-    if ( options$use_webgl == TRUE ) {
+    if ( preferences$use_webgl == TRUE ) {
       plot %>% plotly::toWebGL()
     } else {
       plot
@@ -282,7 +284,9 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
         "<b>Sample</b>: ", to_plot[ , "sample" ], "<br>",
         "<b>Cluster</b>: ", to_plot[ , "cluster" ], "<br>",
         "<b>Transcripts</b>: ", formatC(to_plot[ , "nUMI" ], format = "f", big.mark = ",", digits = 0), "<br>",
-        "<b>Expressed genes</b>: ", formatC(to_plot[ , "nGene" ], format = "f", big.mark = ",", digits = 0)
+        "<b>Expressed genes</b>: ", formatC(to_plot[ , "nGene" ], format = "f", big.mark = ",", digits = 0), "<br>",
+        "<b>State</b>: ", to_plot[ , "state" ], "<br>",
+        "<b>Pseudotime</b>: ", round(to_plot[ , "pseudotime" ], 3)
       )
     ) %>%
     plotly::layout(
@@ -303,7 +307,7 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
       ),
       hoverlabel = list(font = list(size = 11))
     )
-    if ( options$use_webgl == TRUE ) {
+    if ( preferences$use_webgl == TRUE ) {
       plotly::toWebGL(plot)
     } else {
       plot
@@ -328,59 +332,59 @@ observeEvent(input[["trajectory_projection_info"]], {
 ##----------------------------------------------------------------------------##
 ## Distribution along pseudotime.
 ##----------------------------------------------------------------------------##
-output[["trajectory_density"]] <- shiny::renderPlot({
-  # don't do anything before these inputs are selected
-  req(
-    input[["trajectory_to_display"]],
-    input[["trajectory_samples_to_display"]],
-    input[["trajectory_clusters_to_display"]],
-    input[["trajectory_dot_color"]]
-  )
+# output[["trajectory_density"]] <- shiny::renderPlot({
+#   # don't do anything before these inputs are selected
+#   req(
+#     input[["trajectory_to_display"]],
+#     input[["trajectory_samples_to_display"]],
+#     input[["trajectory_clusters_to_display"]],
+#     input[["trajectory_dot_color"]]
+#   )
 
-  trajectory_to_display <- input[["trajectory_to_display"]]
-  samples_to_display <- input[["trajectory_samples_to_display"]]
-  clusters_to_display <- input[["trajectory_clusters_to_display"]]
-  cells_to_display <- which(
-      grepl(
-        sample_data()$cells$sample,
-        pattern = paste0("^", samples_to_display, "$", collapse="|")
-      ) &
-      grepl(
-        sample_data()$cells$cluster,
-        pattern = paste0("^", clusters_to_display, "$", collapse="|")
-      )
-    )
+#   trajectory_to_display <- input[["trajectory_to_display"]]
+#   samples_to_display <- input[["trajectory_samples_to_display"]]
+#   clusters_to_display <- input[["trajectory_clusters_to_display"]]
+#   cells_to_display <- which(
+#       grepl(
+#         sample_data()$cells$sample,
+#         pattern = paste0("^", samples_to_display, "$", collapse="|")
+#       ) &
+#       grepl(
+#         sample_data()$cells$cluster,
+#         pattern = paste0("^", clusters_to_display, "$", collapse="|")
+#       )
+#     )
 
-  # extract cells to plot
-  to_plot <- base::cbind(
-      sample_data()$trajectory[[ trajectory_to_display ]][["meta"]][ cells_to_display , ],
-      sample_data()$cells[ cells_to_display , ]
-    )
-  to_plot <- to_plot[ sample(1:nrow(to_plot)) , ]
+#   # extract cells to plot
+#   to_plot <- base::cbind(
+#       sample_data()$trajectory[[ trajectory_to_display ]][["meta"]][ cells_to_display , ],
+#       sample_data()$cells[ cells_to_display , ]
+#     )
+#   to_plot <- to_plot[ sample(1:nrow(to_plot)) , ]
 
-  color_variable <- input[["trajectory_dot_color"]]
+#   color_variable <- input[["trajectory_dot_color"]]
 
-  colors <- if ( color_variable == "sample" ) {
-    sample_data()$samples$colors
-  } else if ( color_variable == "cluster" ) {
-    sample_data()$clusters$colors
-  } else if ( color_variable == "state" ) {
-    sample_data()$clusters$colors
-  } else if ( color_variable %in% c("cell_cycle_seurat","cell_cycle_cyclone") ) {
-    cell_cycle_colorset
-  } else if ( is.factor(to_plot[[ color_variable ]]) ) {
-    setNames(colors[1:length(levels(to_plot[[ color_variable ]]))], levels(to_plot[[ color_variable ]]))
-  } else {
-    colors
-  }
+#   colors <- if ( color_variable == "sample" ) {
+#     sample_data()$samples$colors
+#   } else if ( color_variable == "cluster" ) {
+#     sample_data()$clusters$colors
+#   } else if ( color_variable == "state" ) {
+#     sample_data()$clusters$colors
+#   } else if ( color_variable %in% c("cell_cycle_seurat","cell_cycle_cyclone") ) {
+#     cell_cycle_colorset
+#   } else if ( is.factor(to_plot[[ color_variable ]]) ) {
+#     setNames(colors[1:length(levels(to_plot[[ color_variable ]]))], levels(to_plot[[ color_variable ]]))
+#   } else {
+#     colors
+#   }
 
-  ggplot(to_plot, aes_string(x = "pseudotime", fill = color_variable)) +
-    geom_density(alpha = 0.4) +
-    theme_bw() +
-    labs(x = "Pseudotime", y = "Density") +
-    scale_fill_manual(values = colors) +
-    guides(fill = guide_legend(override.aes = list(alpha = 1)))
-})
+#   ggplot(to_plot, aes_string(x = "pseudotime", fill = color_variable)) +
+#     geom_density(alpha = 0.4) +
+#     theme_bw() +
+#     labs(x = "Pseudotime", y = "Density") +
+#     scale_fill_manual(values = colors) +
+#     guides(fill = guide_legend(override.aes = list(alpha = 1)))
+# })
 
 output[["trajectory_density_plotly"]] <- plotly::renderPlotly({
   # don't do anything before these inputs are selected
@@ -415,11 +419,9 @@ output[["trajectory_density_plotly"]] <- plotly::renderPlotly({
   color_variable <- input[["trajectory_dot_color"]]
 
   if ( is.factor(to_plot[[ color_variable ]]) || is.character(to_plot[[ color_variable ]]) ) {
-    colors <- if ( color_variable == "sample" ) {
+    cols <- if ( color_variable == "sample" ) {
       sample_data()$samples$colors
     } else if ( color_variable == "cluster" ) {
-      sample_data()$clusters$colors
-    } else if ( color_variable == "state" ) {
       sample_data()$clusters$colors
     } else if ( color_variable %in% c("cell_cycle_seurat","cell_cycle_cyclone") ) {
       cell_cycle_colorset
@@ -429,25 +431,64 @@ output[["trajectory_density_plotly"]] <- plotly::renderPlotly({
       colors
     }
     p <- ggplot(to_plot, aes_string(x = "pseudotime", fill = color_variable)) +
-      geom_density(alpha = 0.4) +
+      geom_density(alpha = 0.4, color = "black") +
       theme_bw() +
       labs(x = "Pseudotime", y = "Density") +
-      scale_fill_manual(values = colors) +
+      scale_fill_manual(values = cols) +
       guides(fill = guide_legend(override.aes = list(alpha = 1)))
+    plotly::ggplotly(p, tooltip = "text") %>%
+    plotly::style(
+      hoveron = "fill"
+    )
   } else {
-    p <- ggplot(to_plot, aes_string(x = "pseudotime", y = color_variable, fill = "state")) +
-      geom_point(
-        shape = 21,
-        size = input[["trajectory_dot_size"]]/3,
-        stroke = 0.2,
-        color = "#c4c4c4",
-        alpha = input[["trajectory_dot_opacity"]]
-      ) +
-      scale_fill_manual(values = colors) +
-      theme_bw() +
-      labs(x = "Pseudotime", y = color_variable)
+    plot <- plotly::plot_ly(
+      data = to_plot,
+      x = ~pseudotime,
+      y = ~to_plot[[ color_variable ]],
+      type = "scatter",
+      mode = "markers",
+      color = ~state,
+      colors = colors,
+      marker = list(
+        opacity = input[["trajectory_dot_opacity"]],
+        line = list(
+          color = "rgb(196,196,196)",
+          width = 1
+        ),
+        size = input[["trajectory_dot_size"]]
+      ),
+      hoverinfo = "text",
+      text = ~paste(
+        "<b>Cell</b>: ", to_plot[ , "cell_barcode" ], "<br>",
+        "<b>Sample</b>: ", to_plot[ , "sample" ], "<br>",
+        "<b>Cluster</b>: ", to_plot[ , "cluster" ], "<br>",
+        "<b>Transcripts</b>: ", formatC(to_plot[ , "nUMI" ], format = "f", big.mark = ",", digits = 0), "<br>",
+        "<b>Expressed genes</b>: ", formatC(to_plot[ , "nGene" ], format = "f", big.mark = ",", digits = 0), "<br>",
+        "<b>State</b>: ", to_plot[ , "state" ], "<br>",
+        "<b>Pseudotime</b>: ", round(to_plot[ , "pseudotime" ], 3)
+      )
+    ) %>%
+    plotly::layout(
+      xaxis = list(
+        title = "Pseudotime",
+        mirror = TRUE,
+        showline = TRUE,
+        zeroline = FALSE
+      ),
+      yaxis = list(
+        title = color_variable,
+        mirror = TRUE,
+        showline = TRUE,
+        zeroline = FALSE
+      ),
+      hoverlabel = list(font = list(size = 11))
+    )
+    if ( preferences$use_webgl == TRUE ) {
+      plotly::toWebGL(plot)
+    } else {
+      plot
+    }
   }
-  plotly::ggplotly(p)
 })
 
 ##----------------------------------------------------------------------------##

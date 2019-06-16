@@ -318,7 +318,7 @@ output[["expression_projection_plotly"]] <- plotly::renderPlotly({
         bgcolor = "lightgrey"
       )
     )
-    if ( options$use_webgl == TRUE ) {
+    if ( preferences$use_webgl == TRUE ) {
       plot %>% plotly::toWebGL()
     } else {
       plot

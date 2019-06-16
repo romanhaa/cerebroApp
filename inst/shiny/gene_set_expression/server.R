@@ -338,7 +338,7 @@ output[["geneSetExpression_projection"]] <- plotly::renderPlotly({
         bgcolor = "lightgrey"
       )
     )
-    if ( options$use_webgl == TRUE ) {
+    if ( preferences$use_webgl == TRUE ) {
       plot %>% plotly::toWebGL()
     } else {
       plot

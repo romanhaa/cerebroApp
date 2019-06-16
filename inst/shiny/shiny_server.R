@@ -53,7 +53,7 @@ server <- function(input, output, session) {
     default = 100
   )
 
-  options <- reactiveValues(use_webgl = TRUE)
+  preferences <- reactiveValues(use_webgl = TRUE)
 
   ##--------------------------------------------------------------------------##
   ## Sidebar menu.
