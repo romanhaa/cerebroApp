@@ -65,7 +65,7 @@ output[["overview_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 output[["overview_scales"]] <- renderUI({
   projection_to_display <- if ( is.null(input[["overview_projection_to_display"]]) || is.na(input[["overview_projection_to_display"]]) ) {
-    names(sample_data()$projections)[1] 
+    names(sample_data()$projections)[1]
   } else {
     input[["overview_projection_to_display"]]
   }
@@ -116,7 +116,7 @@ output[["overview_projection"]] <- plotly::renderPlotly({
       grepl(
         sample_data()$cells$sample,
         pattern = paste0("^", samples_to_display, "$", collapse="|")
-      ) & 
+      ) &
       grepl(
         sample_data()$cells$cluster,
         pattern = paste0("^", clusters_to_display, "$", collapse="|")
@@ -271,7 +271,7 @@ output[["overview_projection"]] <- plotly::renderPlotly({
     }
   } else {
     if ( is.numeric(to_plot[ , input[["overview_dot_color"]] ]) ) {
-      plotly::plot_ly(
+      plot <- plotly::plot_ly(
         to_plot,
         x = ~to_plot[,1],
         y = ~to_plot[,2],
@@ -316,10 +316,14 @@ output[["overview_projection"]] <- plotly::renderPlotly({
           range = input[["overview_scale_y_manual_range"]]
         ),
         hoverlabel = list(font = list(size = 11))
-      ) %>%
-      plotly::toWebGL()
+      )
+      if ( options$use_webgl == TRUE ) {
+        plot %>% plotly::toWebGL()
+      } else {
+        plot
+      }
     } else {
-      plotly::plot_ly(
+      plot <- plotly::plot_ly(
         to_plot,
         x = ~to_plot[,1],
         y = ~to_plot[,2],
@@ -362,8 +366,12 @@ output[["overview_projection"]] <- plotly::renderPlotly({
           range = input[["overview_scale_y_manual_range"]]
         ),
         hoverlabel = list(font = list(size = 11))
-      ) %>%
-      plotly::toWebGL()
+      )
+      if ( options$use_webgl == TRUE ) {
+        plot %>% plotly::toWebGL()
+      } else {
+        plot
+      }
     }
   }
 })

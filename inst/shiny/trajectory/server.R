@@ -180,20 +180,27 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
 
   color_variable <- input[["trajectory_dot_color"]]
 
-  p <- ggplot(to_plot) +
-    geom_segment(
-      data = sample_data()$trajectory[[ trajectory_to_display ]]$edges,
-      aes(source_dim_1, source_dim_2, xend = target_dim_1, yend = target_dim_2),
-      size = 0.75, linetype = "solid", na.rm = TRUE
-    ) +
-    theme_bw()
+  # convert edges of trajectory into list format to plot with plotly
+  trajectory_edges <- sample_data()$trajectory[[trajectory_to_display]][["edges"]]
+  trajectory_lines <- list()
+  for (i in 1:nrow(trajectory_edges) ) {
+    line = list(
+      type = "line",
+      line = list(color = "black"),
+      xref = "x",
+      yref = "y",
+      x0 = trajectory_edges$source_dim_1[i],
+      y0 = trajectory_edges$source_dim_2[i],
+      x1 = trajectory_edges$target_dim_1[i],
+      y1 = trajectory_edges$target_dim_2[i]
+    )
+    trajectory_lines <- c(trajectory_lines, list(line))
+  }
 
   if ( is.factor(to_plot[[ color_variable ]]) || is.character(to_plot[[ color_variable ]]) ) {
-    colors <- if ( color_variable == "sample" ) {
+    cols <- if ( color_variable == "sample" ) {
       sample_data()$samples$colors
     } else if ( color_variable == "cluster" ) {
-      sample_data()$clusters$colors
-    } else if ( color_variable == "state" ) {
       sample_data()$clusters$colors
     } else if ( color_variable %in% c("cell_cycle_seurat","cell_cycle_cyclone") ) {
       cell_cycle_colorset
@@ -202,13 +209,12 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
     } else {
       colors
     }
-    plotly::ggplotly(p) %>%
-    plotly::add_trace(
-      data = to_plot,
+    plot <- plotly::plot_ly(
+      to_plot,
       x = ~DR_1,
       y = ~DR_2,
       color = ~to_plot[[ color_variable ]],
-      colors = colors,
+      colors = cols,
       type = "scatter",
       mode = "markers",
       marker = list(
@@ -229,15 +235,14 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
       )
     ) %>%
     plotly::layout(
+      shapes = trajectory_lines,
       xaxis = list(
-        title = colnames(to_plot)[1],
         mirror = TRUE,
         showline = TRUE,
         zeroline = FALSE,
         range = range(to_plot$DR_1) * 1.1
       ),
       yaxis = list(
-        title = colnames(to_plot)[2],
         mirror = TRUE,
         showline = TRUE,
         zeroline = FALSE,
@@ -245,9 +250,13 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
       ),
       hoverlabel = list(font = list(size = 11))
     )
+    if ( options$use_webgl == TRUE ) {
+      plot %>% plotly::toWebGL()
+    } else {
+      plot
+    }
   } else {
-    plotly::ggplotly(p) %>%
-    plotly::add_trace(
+    plot <- plotly::plot_ly(
       data = to_plot,
       x = ~DR_1,
       y = ~DR_2,
@@ -277,6 +286,7 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
       )
     ) %>%
     plotly::layout(
+      shapes = trajectory_lines,
       xaxis = list(
         title = colnames(to_plot)[1],
         mirror = TRUE,
@@ -293,6 +303,11 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
       ),
       hoverlabel = list(font = list(size = 11))
     )
+    if ( options$use_webgl == TRUE ) {
+      plotly::toWebGL(plot)
+    } else {
+      plot
+    }
   }
 })
 

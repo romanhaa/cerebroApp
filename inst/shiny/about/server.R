@@ -29,11 +29,38 @@ output[["about"]] <- renderText({
     <ul>
       <li>App icon made by <a href="https://www.flaticon.com/authors/kiranshastry" title="Kiranshastry" target="_blank">Kiranshastry</a> from <a href="https://www.flaticon.com/" title="Flaticon" target="_blank">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></li>
       <li>Sample and cluster color palettes taken from <a href="https://flatuicolors.com/" title="Flat UI Colors 2" target="_blank">https://flatuicolors.com/</a></li>
-    </ul>'
+    </ul>
+    <br>
+    <b>Options:</b>'
   )
 })
 
+output[["webgl_switch_and_indicator"]] <- renderUI({
+  tagList(
+    actionButton("webgl_switch", label = "Switch WebGL on/off", width = "150px"),
+    htmlOutput("webgl_indicator", inline = TRUE)
+  )
+})
+
+output[["webgl_indicator"]] <- renderText({
+  if ( options$use_webgl == TRUE ) {
+    paste0("WebGL is currently switched ", "<font color=\"#27ae60\"><b>ON</b></font>")
+  } else {
+    paste0("WebGL is currently switched ", "<font color=\"#e74c3c\"><b>OFF</b></font>")
+  }
+})
+
+observeEvent(input[["webgl_switch"]], {
+  if ( options$use_webgl == TRUE ) {
+    options$use_webgl <- FALSE
+    print(paste0("WebGL status is now: ", options$use_webgl))
+  } else {
+    options$use_webgl <- TRUE
+    print(paste0("WebGL status is now: ", options$use_webgl))
+  }
+})
+
 # Add to your server
-observeEvent(input$browser,{
+observeEvent(input[["browser"]], {
   browser()
 })
