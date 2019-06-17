@@ -54,20 +54,92 @@ output[["trajectory_UI"]] <- renderUI({
         )
       ),
       cerebroBox(
-        title = "Distribution along pseudotime",
-        tagList(
-#          shiny::plotOutput("trajectory_density"),
-          plotly::plotlyOutput("trajectory_density_plotly")
-        )
+        title = tagList(
+          boxTitle("Distribution along pseudotime"),
+          actionButton(
+            inputId = "trajectory_density_info",
+            label = "info",
+            icon = NULL,
+            class = "btn-xs",
+            title = "Show additional information for this panel.",
+            style = "margin-right: 5px"
+          )
+        ),
+        plotly::plotlyOutput("trajectory_density_plot")
+      ),
+      cerebroBox(
+        title = tagList(
+          boxTitle("States by sample"),
+          actionButton(
+            inputId = "states_by_sample_info",
+            label = "info",
+            icon = NULL,
+            class = "btn-xs",
+            title = "Show additional information for this panel.",
+            style = "margin-right: 5px"
+          )
+        ),
+        plotly::plotlyOutput("states_by_sample_plot")
+      ),
+      cerebroBox(
+        title = tagList(
+          boxTitle("States by cluster"),
+          actionButton(
+            inputId = "states_by_cluster_info",
+            label = "info",
+            icon = NULL,
+            class = "btn-xs",
+            title = "Show additional information for this panel.",
+            style = "margin-right: 5px"
+          )
+        ),
+        plotly::plotlyOutput("states_by_cluster_plot")
+      ),
+      cerebroBox(
+        title = tagList(
+          boxTitle("States by cell cycle (Seurat)"),
+          actionButton(
+            inputId = "states_by_cell_cycle_seurat_info",
+            label = "info",
+            icon = NULL,
+            class = "btn-xs",
+            title = "Show additional information for this panel.",
+            style = "margin-right: 5px"
+          )
+        ),
+        shiny::uiOutput("states_by_cell_cycle_seurat_UI")
+      ),
+      cerebroBox(
+        title = tagList(
+          boxTitle("Number of transcripts by state"),
+          actionButton(
+            inputId = "states_nUMI_info",
+            label = "info",
+            icon = NULL,
+            class = "btn-xs",
+            title = "Show additional information for this panel.",
+            style = "margin-right: 5px"
+          )
+        ),
+        plotly::plotlyOutput("states_nUMI_plot")
+      ),
+      cerebroBox(
+        title = tagList(
+          boxTitle("Number of expressed genes by state"),
+          actionButton(
+            inputId = "states_nGene_info",
+            label = "info",
+            icon = NULL,
+            class = "btn-xs",
+            title = "Show additional information for this panel.",
+            style = "margin-right: 5px"
+          )
+        ),
+        plotly::plotlyOutput("states_nGene_plot")
       )
     )
   } else {
-    cerebroBox(
-      title = "Trajectory",
-      tagList(
-        textOutput("trajectory_missing")
-      )
-    )
+    cerebroBox(title = "Trajectory", textOutput("trajectory_missing"))
   }
 })
 
@@ -330,168 +402,6 @@ observeEvent(input[["trajectory_projection_info"]], {
 })
 
 ##----------------------------------------------------------------------------##
-## Distribution along pseudotime.
-##----------------------------------------------------------------------------##
-# output[["trajectory_density"]] <- shiny::renderPlot({
-#   # don't do anything before these inputs are selected
-#   req(
-#     input[["trajectory_to_display"]],
-#     input[["trajectory_samples_to_display"]],
-#     input[["trajectory_clusters_to_display"]],
-#     input[["trajectory_dot_color"]]
-#   )
-
-#   trajectory_to_display <- input[["trajectory_to_display"]]
-#   samples_to_display <- input[["trajectory_samples_to_display"]]
-#   clusters_to_display <- input[["trajectory_clusters_to_display"]]
-#   cells_to_display <- which(
-#       grepl(
-#         sample_data()$cells$sample,
-#         pattern = paste0("^", samples_to_display, "$", collapse="|")
-#       ) &
-#       grepl(
-#         sample_data()$cells$cluster,
-#         pattern = paste0("^", clusters_to_display, "$", collapse="|")
-#       )
-#     )
-
-#   # extract cells to plot
-#   to_plot <- base::cbind(
-#       sample_data()$trajectory[[ trajectory_to_display ]][["meta"]][ cells_to_display , ],
-#       sample_data()$cells[ cells_to_display , ]
-#     )
-#   to_plot <- to_plot[ sample(1:nrow(to_plot)) , ]
-
-#   color_variable <- input[["trajectory_dot_color"]]
-
-#   colors <- if ( color_variable == "sample" ) {
-#     sample_data()$samples$colors
-#   } else if ( color_variable == "cluster" ) {
-#     sample_data()$clusters$colors
-#   } else if ( color_variable == "state" ) {
-#     sample_data()$clusters$colors
-#   } else if ( color_variable %in% c("cell_cycle_seurat","cell_cycle_cyclone") ) {
-#     cell_cycle_colorset
-#   } else if ( is.factor(to_plot[[ color_variable ]]) ) {
-#     setNames(colors[1:length(levels(to_plot[[ color_variable ]]))], levels(to_plot[[ color_variable ]]))
-#   } else {
-#     colors
-#   }
-
-#   ggplot(to_plot, aes_string(x = "pseudotime", fill = color_variable)) +
-#     geom_density(alpha = 0.4) +
-#     theme_bw() +
-#     labs(x = "Pseudotime", y = "Density") +
-#     scale_fill_manual(values = colors) +
-#     guides(fill = guide_legend(override.aes = list(alpha = 1)))
-# })
-
-output[["trajectory_density_plotly"]] <- plotly::renderPlotly({
-  # don't do anything before these inputs are selected
-  req(
-    input[["trajectory_to_display"]],
-    input[["trajectory_samples_to_display"]],
-    input[["trajectory_clusters_to_display"]],
-    input[["trajectory_dot_color"]]
-  )
-
-  trajectory_to_display <- input[["trajectory_to_display"]]
-  samples_to_display <- input[["trajectory_samples_to_display"]]
-  clusters_to_display <- input[["trajectory_clusters_to_display"]]
-  cells_to_display <- which(
-      grepl(
-        sample_data()$cells$sample,
-        pattern = paste0("^", samples_to_display, "$", collapse="|")
-      ) &
-      grepl(
-        sample_data()$cells$cluster,
-        pattern = paste0("^", clusters_to_display, "$", collapse="|")
-      )
-    )
-
-  # extract cells to plot
-  to_plot <- base::cbind(
-      sample_data()$trajectory[[ trajectory_to_display ]][["meta"]][ cells_to_display , ],
-      sample_data()$cells[ cells_to_display , ]
-    )
-  to_plot <- to_plot[ sample(1:nrow(to_plot)) , ]
-
-  color_variable <- input[["trajectory_dot_color"]]
-
-  if ( is.factor(to_plot[[ color_variable ]]) || is.character(to_plot[[ color_variable ]]) ) {
-    cols <- if ( color_variable == "sample" ) {
-      sample_data()$samples$colors
-    } else if ( color_variable == "cluster" ) {
-      sample_data()$clusters$colors
-    } else if ( color_variable %in% c("cell_cycle_seurat","cell_cycle_cyclone") ) {
-      cell_cycle_colorset
-    } else if ( is.factor(to_plot[[ color_variable ]]) ) {
-      setNames(colors[1:length(levels(to_plot[[ color_variable ]]))], levels(to_plot[[ color_variable ]]))
-    } else {
-      colors
-    }
-    p <- ggplot(to_plot, aes_string(x = "pseudotime", fill = color_variable)) +
-      geom_density(alpha = 0.4, color = "black") +
-      theme_bw() +
-      labs(x = "Pseudotime", y = "Density") +
-      scale_fill_manual(values = cols) +
-      guides(fill = guide_legend(override.aes = list(alpha = 1)))
-    plotly::ggplotly(p, tooltip = "text") %>%
-    plotly::style(
-      hoveron = "fill"
-    )
-  } else {
-    plot <- plotly::plot_ly(
-      data = to_plot,
-      x = ~pseudotime,
-      y = ~to_plot[[ color_variable ]],
-      type = "scatter",
-      mode = "markers",
-      color = ~state,
-      colors = colors,
-      marker = list(
-        opacity = input[["trajectory_dot_opacity"]],
-        line = list(
-          color = "rgb(196,196,196)",
-          width = 1
-        ),
-        size = input[["trajectory_dot_size"]]
-      ),
-      hoverinfo = "text",
-      text = ~paste(
-        "<b>Cell</b>: ", to_plot[ , "cell_barcode" ], "<br>",
-        "<b>Sample</b>: ", to_plot[ , "sample" ], "<br>",
-        "<b>Cluster</b>: ", to_plot[ , "cluster" ], "<br>",
-        "<b>Transcripts</b>: ", formatC(to_plot[ , "nUMI" ], format = "f", big.mark = ",", digits = 0), "<br>",
-        "<b>Expressed genes</b>: ", formatC(to_plot[ , "nGene" ], format = "f", big.mark = ",", digits = 0), "<br>",
-        "<b>State</b>: ", to_plot[ , "state" ], "<br>",
-        "<b>Pseudotime</b>: ", round(to_plot[ , "pseudotime" ], 3)
-      )
-    ) %>%
-    plotly::layout(
-      xaxis = list(
-        title = "Pseudotime",
-        mirror = TRUE,
-        showline = TRUE,
-        zeroline = FALSE
-      ),
-      yaxis = list(
-        title = color_variable,
-        mirror = TRUE,
-        showline = TRUE,
-        zeroline = FALSE
-      ),
-      hoverlabel = list(font = list(size = 11))
-    )
-    if ( preferences$use_webgl == TRUE ) {
-      plotly::toWebGL(plot)
-    } else {
-      plot
-    }
-  }
-})
-
-##----------------------------------------------------------------------------##
 ## Export projection.
 ##----------------------------------------------------------------------------##
 observeEvent(input[["trajectory_projection_export"]], {
@@ -620,4 +530,476 @@ observeEvent(input[["trajectory_projection_export"]], {
       type = "error"
     )
   }
+})
+
+##----------------------------------------------------------------------------##
+## Distribution along pseudotime.
+##----------------------------------------------------------------------------##
+
+output[["trajectory_density_plot"]] <- plotly::renderPlotly({
+  # don't do anything before these inputs are selected
+  req(
+    input[["trajectory_to_display"]],
+    input[["trajectory_samples_to_display"]],
+    input[["trajectory_clusters_to_display"]],
+    input[["trajectory_dot_color"]]
+  )
+
+  trajectory_to_display <- input[["trajectory_to_display"]]
+  samples_to_display <- input[["trajectory_samples_to_display"]]
+  clusters_to_display <- input[["trajectory_clusters_to_display"]]
+  cells_to_display <- which(
+      grepl(
+        sample_data()$cells$sample,
+        pattern = paste0("^", samples_to_display, "$", collapse="|")
+      ) &
+      grepl(
+        sample_data()$cells$cluster,
+        pattern = paste0("^", clusters_to_display, "$", collapse="|")
+      )
+    )
+
+  # extract cells to plot
+  to_plot <- base::cbind(
+      sample_data()$trajectory[[ trajectory_to_display ]][["meta"]][ cells_to_display , ],
+      sample_data()$cells[ cells_to_display , ]
+    )
+  to_plot <- to_plot[ sample(1:nrow(to_plot)) , ]
+
+  color_variable <- input[["trajectory_dot_color"]]
+
+  if ( is.factor(to_plot[[ color_variable ]]) || is.character(to_plot[[ color_variable ]]) ) {
+    cols <- if ( color_variable == "sample" ) {
+      sample_data()$samples$colors
+    } else if ( color_variable == "cluster" ) {
+      sample_data()$clusters$colors
+    } else if ( color_variable %in% c("cell_cycle_seurat","cell_cycle_cyclone") ) {
+      cell_cycle_colorset
+    } else if ( is.factor(to_plot[[ color_variable ]]) ) {
+      setNames(colors[1:length(levels(to_plot[[ color_variable ]]))], levels(to_plot[[ color_variable ]]))
+    } else {
+      colors
+    }
+    p <- ggplot(to_plot, aes_string(x = "pseudotime", fill = color_variable)) +
+      geom_density(alpha = 0.4, color = "black") +
+      theme_bw() +
+      labs(x = "Pseudotime", y = "Density") +
+      scale_fill_manual(values = cols) +
+      guides(fill = guide_legend(override.aes = list(alpha = 1)))
+    plotly::ggplotly(p, tooltip = "text") %>%
+    plotly::style(
+      hoveron = "fill"
+    )
+  } else {
+    colorset <- setNames(
+      colors[1:length(levels(sample_data()$trajectory[[ input[["trajectory_to_display"]] ]][["meta"]]$state))],
+      levels(sample_data()$trajectory[[ input[["trajectory_to_display"]] ]][["meta"]]$state)
+    )
+    plot <- plotly::plot_ly(
+      data = to_plot,
+      x = ~pseudotime,
+      y = ~to_plot[[ color_variable ]],
+      type = "scatter",
+      mode = "markers",
+      color = ~state,
+      colors = colorset,
+      marker = list(
+        opacity = input[["trajectory_dot_opacity"]],
+        line = list(
+          color = "rgb(196,196,196)",
+          width = 1
+        ),
+        size = input[["trajectory_dot_size"]]
+      ),
+      hoverinfo = "text",
+      text = ~paste(
+        "<b>Cell</b>: ", to_plot[ , "cell_barcode" ], "<br>",
+        "<b>Sample</b>: ", to_plot[ , "sample" ], "<br>",
+        "<b>Cluster</b>: ", to_plot[ , "cluster" ], "<br>",
+        "<b>Transcripts</b>: ", formatC(to_plot[ , "nUMI" ], format = "f", big.mark = ",", digits = 0), "<br>",
+        "<b>Expressed genes</b>: ", formatC(to_plot[ , "nGene" ], format = "f", big.mark = ",", digits = 0), "<br>",
+        "<b>State</b>: ", to_plot[ , "state" ], "<br>",
+        "<b>Pseudotime</b>: ", round(to_plot[ , "pseudotime" ], 3)
+      )
+    ) %>%
+    plotly::layout(
+      xaxis = list(
+        title = "Pseudotime",
+        mirror = TRUE,
+        showline = TRUE,
+        zeroline = FALSE
+      ),
+      yaxis = list(
+        title = color_variable,
+        mirror = TRUE,
+        showline = TRUE,
+        zeroline = FALSE
+      ),
+      hoverlabel = list(font = list(size = 11))
+    )
+    if ( preferences$use_webgl == TRUE ) {
+      plotly::toWebGL(plot)
+    } else {
+      plot
+    }
+  }
+})
+
+# info button
+observeEvent(input[["trajectory_density_info"]], {
+  showModal(
+    modalDialog(
+      trajectory_density_info[["text"]],
+      title = trajectory_density_info[["title"]],
+      easyClose = TRUE,
+      footer = NULL
+    )
+  )
+})
+
+##----------------------------------------------------------------------------##
+## States by sample.
+##----------------------------------------------------------------------------##
+
+# bar plot
+output[["states_by_sample_plot"]] <- plotly::renderPlotly({
+  req(input[["trajectory_to_display"]])
+  # merge meta data with trajectory info
+  cell_count_by_state_total <- cbind(
+      sample_data()$trajectory[[ input[["trajectory_to_display"]] ]][["meta"]],
+      sample_data()$cells
+    ) %>%
+    dplyr::group_by(state) %>%
+    dplyr::summarize(total = n()) %>%
+    dplyr::ungroup()
+  # make plot
+  cbind(
+    sample_data()$trajectory[[ input[["trajectory_to_display"]] ]][["meta"]],
+    sample_data()$cells
+  ) %>%
+  dplyr::group_by(state, sample) %>%
+  dplyr::summarize(count = n()) %>%
+  tidyr::spread(sample, count, fill = 0) %>%
+  dplyr::ungroup() %>%
+  reshape2::melt(id.vars = "state") %>%
+  dplyr::left_join(., cell_count_by_state_total, by = "state") %>%
+  dplyr::rename(sample = variable, cells = value) %>%
+  dplyr::mutate(pct = cells / total * 100) %>%
+  plotly::plot_ly(
+    x = ~state,
+    y = ~pct,
+    type = "bar",
+    color = ~sample,
+    colors = sample_data()$samples$colors,
+    hoverinfo = "text",
+    text = ~paste0("<b>Sample ", .$sample, ": </b>", format(round(.$pct, 1), nsmall = 1), "%")
+  ) %>%
+  plotly::layout(
+    xaxis = list(
+      title = "",
+      mirror = TRUE,
+      showline = TRUE
+    ),
+    yaxis = list(
+      title = "Percentage (%)",
+      range = c(0,100),
+      hoverformat = ".2f",
+      mirror = TRUE,
+      zeroline = FALSE,
+      showline = TRUE
+    ),
+    barmode = "stack",
+    hovermode = "closest"
+  )
+})
+
+# info button
+observeEvent(input[["states_by_sample_info"]], {
+  showModal(
+    modalDialog(
+      states_by_sample_info[["text"]],
+      title = states_by_sample_info[["title"]],
+      easyClose = TRUE,
+      footer = NULL
+    )
+  )
+})
+
+# ##----------------------------------------------------------------------------##
+# ## States by cluster.
+# ##----------------------------------------------------------------------------##
+
+# bar plot
+output[["states_by_cluster_plot"]] <- plotly::renderPlotly({
+  req(input[["trajectory_to_display"]])
+  # merge meta data with trajectory info
+  cell_count_by_state_total <- cbind(
+      sample_data()$trajectory[[ input[["trajectory_to_display"]] ]][["meta"]],
+      sample_data()$cells
+    ) %>%
+    dplyr::group_by(state) %>%
+    dplyr::summarize(total = n()) %>%
+    dplyr::ungroup()
+  # make plot
+  cbind(
+    sample_data()$trajectory[[ input[["trajectory_to_display"]] ]][["meta"]],
+    sample_data()$cells
+  ) %>%
+  dplyr::group_by(state, cluster) %>%
+  dplyr::summarize(count = n()) %>%
+  tidyr::spread(cluster, count, fill = 0) %>%
+  dplyr::ungroup() %>%
+  reshape2::melt(id.vars = "state") %>%
+  dplyr::left_join(., cell_count_by_state_total, by = "state") %>%
+  dplyr::rename(cluster = variable, cells = value) %>%
+  dplyr::mutate(pct = cells / total * 100) %>%
+  plotly::plot_ly(
+    x = ~state,
+    y = ~pct,
+    type = "bar",
+    color = ~cluster,
+    colors = sample_data()$clusters$colors,
+    hoverinfo = "text",
+    text = ~paste0("<b>Cluster ", .$cluster, ": </b>", format(round(.$pct, 1), nsmall = 1), "%")
+  ) %>%
+  plotly::layout(
+    xaxis = list(
+      title = "",
+      mirror = TRUE,
+      showline = TRUE
+    ),
+    yaxis = list(
+      title = "Percentage (%)",
+      range = c(0,100),
+      hoverformat = ".2f",
+      mirror = TRUE,
+      zeroline = FALSE,
+      showline = TRUE
+    ),
+    barmode = "stack",
+    hovermode = "closest"
+  )
+})
+
+# info button
+observeEvent(input[["states_by_cluster_info"]], {
+  showModal(
+    modalDialog(
+      states_by_cluster_info[["text"]],
+      title = states_by_cluster_info[["title"]],
+      easyClose = TRUE,
+      footer = NULL
+    )
+  )
+})
+
+# ##----------------------------------------------------------------------------##
+# ## States by cell cycle status (Seurat).
+# ##----------------------------------------------------------------------------##
+
+# UI element
+output[["states_by_cell_cycle_seurat_UI"]] <- renderUI({
+  if ( !is.null(sample_data()$cells$cell_cycle_seurat) ) {
+    plotly::plotlyOutput("states_by_cell_cycle_seurat_plot")
+  } else {
+    textOutput("states_by_cell_cycle_seurat_text")
+  }
+})
+
+output[["states_by_cell_cycle_seurat_plot"]] <- plotly::renderPlotly({
+  req(input[["trajectory_to_display"]])
+  # merge meta data with trajectory info
+  cell_count_by_state_total <- cbind(
+      sample_data()$trajectory[[ input[["trajectory_to_display"]] ]][["meta"]],
+      sample_data()$cells
+    ) %>%
+    dplyr::group_by(state) %>%
+    dplyr::summarize(total = n()) %>%
+    dplyr::ungroup()
+  # make plot
+  cbind(
+    sample_data()$trajectory[[ input[["trajectory_to_display"]] ]][["meta"]],
+    sample_data()$cells
+  ) %>%
+  dplyr::group_by(state, cell_cycle_seurat) %>%
+  dplyr::summarize(count = n()) %>%
+  tidyr::spread(cell_cycle_seurat, count, fill = 0) %>%
+  dplyr::ungroup() %>%
+  reshape2::melt(id.vars = "state") %>%
+  dplyr::left_join(., cell_count_by_state_total, by = "state") %>%
+  dplyr::rename(cell_cycle_seurat = variable, cells = value) %>%
+  dplyr::mutate(pct = cells / total * 100) %>%
+  plotly::plot_ly(
+    x = ~state,
+    y = ~pct,
+    type = "bar",
+    color = ~cell_cycle_seurat,
+    colors = cell_cycle_colorset,
+    hoverinfo = "text",
+    text = ~paste0("<b>", .$cell_cycle_seurat, ": </b>", format(round(.$pct, 1), nsmall = 1), "%")
+  ) %>%
+  plotly::layout(
+    xaxis = list(
+      title = "",
+      mirror = TRUE,
+      showline = TRUE
+    ),
+    yaxis = list(
+      title = "Percentage (%)",
+      range = c(0,100),
+      hoverformat = ".2f",
+      mirror = TRUE,
+      zeroline = FALSE,
+      showline = TRUE
+    ),
+    barmode = "stack",
+    hovermode = "closest"
+  )
+})
+
+# alternative text
+output[["states_by_cell_cycle_seurat_text"]] <- renderText({
+  "Data not available."
+})
+
+# info button
+observeEvent(input[["states_by_cell_cycle_seurat_info"]], {
+  showModal(
+    modalDialog(
+      states_by_cell_cycle_seurat_info[["text"]],
+      title = states_by_cell_cycle_seurat_info[["title"]],
+      easyClose = TRUE,
+      footer = NULL
+    )
+  )
+})
+
+##----------------------------------------------------------------------------##
+## nUMI by state.
+##----------------------------------------------------------------------------##
+
+# violin plot
+output[["states_nUMI_plot"]] <- plotly::renderPlotly({
+  req(input[["trajectory_to_display"]])
+  colorset <- setNames(
+    colors[1:length(levels(sample_data()$trajectory[[ input[["trajectory_to_display"]] ]][["meta"]]$state))],
+    levels(sample_data()$trajectory[[ input[["trajectory_to_display"]] ]][["meta"]]$state)
+  )
+  cbind(
+    sample_data()$trajectory[[ input[["trajectory_to_display"]] ]][["meta"]],
+    sample_data()$cells
+  ) %>%
+  plotly::plot_ly(
+    x = ~state,
+    y = ~nUMI,
+    type = "violin",
+    box = list(
+      visible = TRUE
+    ),
+    meanline = list(
+      visible = TRUE
+    ),
+    color = ~state,
+    colors = colorset,
+    source = "subset",
+    showlegend = FALSE,
+    hoverinfo = "y",
+    marker = list(
+      size = 5
+    )
+  ) %>%
+  plotly::layout(
+    title = "",
+    xaxis = list(
+      title = "",
+      mirror = TRUE,
+      showline = TRUE
+    ),
+    yaxis = list(
+      title = "Number of UMIs",
+      type = "log",
+      hoverformat = ".0f",
+      mirror = TRUE,
+      showline = TRUE
+    ),
+    dragmode = "select",
+    hovermode = "compare"
+  )
+})
+
+# info button
+observeEvent(input[["states_nUMI_info"]], {
+  showModal(
+    modalDialog(
+      states_nUMI_info[["text"]],
+      title = states_nUMI_info[["title"]],
+      easyClose = TRUE,
+      footer = NULL
+    )
+  )
+})
+
+##----------------------------------------------------------------------------##
+## nGene by state.
+##----------------------------------------------------------------------------##
+
+# violin plot
+output[["states_nGene_plot"]] <- plotly::renderPlotly({
+  req(input[["trajectory_to_display"]])
+  colorset <- setNames(
+    colors[1:length(levels(sample_data()$trajectory[[ input[["trajectory_to_display"]] ]][["meta"]]$state))],
+    levels(sample_data()$trajectory[[ input[["trajectory_to_display"]] ]][["meta"]]$state)
+  )
+  cbind(
+    sample_data()$trajectory[[ input[["trajectory_to_display"]] ]][["meta"]],
+    sample_data()$cells
+  ) %>%
+  plotly::plot_ly(
+    x = ~state,
+    y = ~nGene,
+    type = "violin",
+    box = list(
+      visible = TRUE
+    ),
+    meanline = list(
+      visible = TRUE
+    ),
+    color = ~state,
+    colors = colorset,
+    source = "subset",
+    showlegend = FALSE,
+    hoverinfo = "y",
+    marker = list(
+      size = 5
+    )
+  ) %>%
+  plotly::layout(
+    title = "",
+    xaxis = list(
+      title = "",
+      mirror = TRUE,
+      showline = TRUE
+    ),
+    yaxis = list(
+      title = "Number of expressed genes",
+      type = "log",
+      hoverformat = ".0f",
+      mirror = TRUE,
+      showline = TRUE
+    ),
+    dragmode = "select",
+    hovermode = "compare"
+  )
+})
+
+# info button
+observeEvent(input[["states_nGene_info"]], {
+  showModal(
+    modalDialog(
+      states_nGene_info[["text"]],
+      title = states_nGene_info[["title"]],
+      easyClose = TRUE,
+      footer = NULL
+    )
+  )
 })

@@ -119,11 +119,11 @@ server <- function(input, output, session) {
   ## Sample data.
   ##--------------------------------------------------------------------------##
   sample_data <- reactive({
-    if ( is.null(input$RDS_file) || is.na(input$RDS_file) ) {
+    if ( is.null(input[["input_file"]]) || is.na(input[["input_file"]]) ) {
       sample_data <- readRDS(system.file("resources/example.rds", package = "cerebroApp"))
     } else {
-      req(input$RDS_file)
-      sample_data <- readRDS(input$RDS_file$datapath)
+      req(input[["input_file"]])
+      sample_data <- readRDS(input[["input_file"]]$datapath)
     }
     sample_data$sample_names <- levels(sample_data$cells$sample)
     sample_data$cluster_names <- levels(sample_data$cells$cluster)
