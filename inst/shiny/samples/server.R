@@ -142,7 +142,6 @@ output[["samples_nUMI_plot"]] <- plotly::renderPlotly({
     ),
     yaxis = list(
       title = "Number of UMIs",
-      type = "log",
       hoverformat = ".0f",
       mirror = TRUE,
       showline = TRUE
@@ -213,7 +212,6 @@ output[["samples_nGene_plot"]] <- plotly::renderPlotly({
     ),
     yaxis = list(
       title = "Number of expressed genes",
-      type = "log",
       hoverformat = ".0f",
       mirror = TRUE,
       showline = TRUE
@@ -433,7 +431,7 @@ output[["samples_by_cell_cycle_seurat_plot"]] <- plotly::renderPlotly({
     ),
     barmode = "stack",
     hovermode = "compare"
-  ) 
+  )
 })
 
 # alternative text
@@ -506,7 +504,7 @@ output[["samples_by_cell_cycle_cyclone_plot"]] <- plotly::renderPlotly({
     ),
     barmode = "stack",
     hovermode = "compare"
-  ) 
+  )
 })
 
 # alternative text
@@ -524,4 +522,4 @@ observeEvent(input[["samples_by_cell_cycle_cyclone_info"]], {
       footer = NULL
     )
   )
-}) 
+})

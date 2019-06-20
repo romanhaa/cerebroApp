@@ -51,91 +51,152 @@ output[["trajectory_UI"]] <- renderUI({
               height = "85vh"
             )
           )
+        # cerebroBox(
+        #   title = tagList(
+        #     boxTitle("Trajectory"),
+        #     actionButton(
+        #       inputId = "trajectory_projection_info",
+        #       label = "info",
+        #       icon = NULL,
+        #       class = "btn-xs",
+        #       title = "Show additional information for this panel.",
+        #       style = "margin-right: 5px"
+        #     ),
+        #     actionButton(
+        #       inputId = "trajectory_projection_export",
+        #       label = "export to PDF",
+        #       icon = NULL,
+        #       class = "btn-xs",
+        #       title = "Export trajectory to PDF file."
+        #     )
+        #   ),
+        #   tagList(
+        #     column(width = 3, offset = 0, style = "padding: 0px;",
+        #       tagList(
+        #         uiOutput("trajectory_input")
+        #       )
+        #     ),
+        #     column(width = 9, offset = 0, style = "padding: 0px;",
+        #       plotly::plotlyOutput(
+        #         "trajectory_projection",
+        #         width = "auto",
+        #         height = "85vh"
+        #       )
+        #     )
+        #   )
         )
       ),
-      cerebroBox(
-        title = tagList(
-          boxTitle("Distribution along pseudotime"),
-          actionButton(
-            inputId = "trajectory_density_info",
-            label = "info",
-            icon = NULL,
-            class = "btn-xs",
-            title = "Show additional information for this panel.",
-            style = "margin-right: 5px"
-          )
-        ),
-        plotly::plotlyOutput("trajectory_density_plot")
+      fluidRow(
+        cerebroBox(
+          title = tagList(
+            boxTitle("Distribution along pseudotime"),
+            actionButton(
+              inputId = "trajectory_density_info",
+              label = "info",
+              icon = NULL,
+              class = "btn-xs",
+              title = "Show additional information for this panel.",
+              style = "margin-right: 5px"
+            )
+          ),
+          plotly::plotlyOutput("trajectory_density_plot")
+        )
       ),
-      cerebroBox(
-        title = tagList(
-          boxTitle("States by sample"),
-          actionButton(
-            inputId = "states_by_sample_info",
-            label = "info",
-            icon = NULL,
-            class = "btn-xs",
-            title = "Show additional information for this panel.",
-            style = "margin-right: 5px"
-          )
-        ),
-        plotly::plotlyOutput("states_by_sample_plot")
+      fluidRow(
+        cerebroBox(
+          title = tagList(
+            boxTitle("Number of cells by state"),
+            actionButton(
+              inputId = "trajectory_cells_by_state_info",
+              label = "info",
+              icon = NULL,
+              class = "btn-xs",
+              title = "Show additional information for this panel.",
+              style = "margin-right: 5px"
+            )
+          ),
+          DT::dataTableOutput("trajectory_number_of_cells_by_state_table")
+        )
       ),
-      cerebroBox(
-        title = tagList(
-          boxTitle("States by cluster"),
-          actionButton(
-            inputId = "states_by_cluster_info",
-            label = "info",
-            icon = NULL,
-            class = "btn-xs",
-            title = "Show additional information for this panel.",
-            style = "margin-right: 5px"
-          )
-        ),
-        plotly::plotlyOutput("states_by_cluster_plot")
+      fluidRow(
+        cerebroBox(
+          title = tagList(
+            boxTitle("States by sample"),
+            actionButton(
+              inputId = "states_by_sample_info",
+              label = "info",
+              icon = NULL,
+              class = "btn-xs",
+              title = "Show additional information for this panel.",
+              style = "margin-right: 5px"
+            )
+          ),
+          plotly::plotlyOutput("states_by_sample_plot")
+        )
       ),
-      cerebroBox(
-        title = tagList(
-          boxTitle("States by cell cycle (Seurat)"),
-          actionButton(
-            inputId = "states_by_cell_cycle_seurat_info",
-            label = "info",
-            icon = NULL,
-            class = "btn-xs",
-            title = "Show additional information for this panel.",
-            style = "margin-right: 5px"
-          )
-        ),
-        shiny::uiOutput("states_by_cell_cycle_seurat_UI")
+      fluidRow(
+        cerebroBox(
+          title = tagList(
+            boxTitle("States by cluster"),
+            actionButton(
+              inputId = "states_by_cluster_info",
+              label = "info",
+              icon = NULL,
+              class = "btn-xs",
+              title = "Show additional information for this panel.",
+              style = "margin-right: 5px"
+            )
+          ),
+          plotly::plotlyOutput("states_by_cluster_plot")
+        )
       ),
-      cerebroBox(
-        title = tagList(
-          boxTitle("Number of transcripts by state"),
-          actionButton(
-            inputId = "states_nUMI_info",
-            label = "info",
-            icon = NULL,
-            class = "btn-xs",
-            title = "Show additional information for this panel.",
-            style = "margin-right: 5px"
-          )
-        ),
-        plotly::plotlyOutput("states_nUMI_plot")
+      fluidRow(
+        cerebroBox(
+          title = tagList(
+            boxTitle("States by cell cycle (Seurat)"),
+            actionButton(
+              inputId = "states_by_cell_cycle_seurat_info",
+              label = "info",
+              icon = NULL,
+              class = "btn-xs",
+              title = "Show additional information for this panel.",
+              style = "margin-right: 5px"
+            )
+          ),
+          shiny::uiOutput("states_by_cell_cycle_seurat_UI")
+        )
       ),
-      cerebroBox(
-        title = tagList(
-          boxTitle("Number of expressed genes by state"),
-          actionButton(
-            inputId = "states_nGene_info",
-            label = "info",
-            icon = NULL,
-            class = "btn-xs",
-            title = "Show additional information for this panel.",
-            style = "margin-right: 5px"
-          )
-        ),
-        plotly::plotlyOutput("states_nGene_plot")
+      fluidRow(
+        cerebroBox(
+          title = tagList(
+            boxTitle("Number of transcripts by state"),
+            actionButton(
+              inputId = "states_nUMI_info",
+              label = "info",
+              icon = NULL,
+              class = "btn-xs",
+              title = "Show additional information for this panel.",
+              style = "margin-right: 5px"
+            )
+          ),
+          plotly::plotlyOutput("states_nUMI_plot")
+        )
+      ),
+      fluidRow(
+        cerebroBox(
+          title = tagList(
+            boxTitle("Number of expressed genes by state"),
+            actionButton(
+              inputId = "states_nGene_info",
+              label = "info",
+              icon = NULL,
+              class = "btn-xs",
+              title = "Show additional information for this panel.",
+              style = "margin-right: 5px"
+            )
+          ),
+          plotly::plotlyOutput("states_nGene_plot")
+        )
       )
     )
   } else {
@@ -244,10 +305,11 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
   }
 
   # extract cells to plot
-  to_plot <- base::cbind(
+  to_plot <- cbind(
       sample_data()$trajectory[[ trajectory_to_display ]][["meta"]][ cells_to_display , ],
       sample_data()$cells[ cells_to_display , ]
-    )
+    ) %>%
+    dplyr::filter(!is.na(pseudotime))
   to_plot <- to_plot[ sample(1:nrow(to_plot)) , ]
 
   color_variable <- input[["trajectory_dot_color"]]
@@ -430,9 +492,10 @@ observeEvent(input[["trajectory_projection_export"]], {
       )
     )
     to_plot <- cbind(
-      sample_data()$trajectory[[ trajectory_to_display ]][[ "meta" ]][ cells_to_display , ],
-      sample_data()$cells[ cells_to_display , ]
-    )
+        sample_data()$trajectory[[ trajectory_to_display ]][[ "meta" ]][ cells_to_display , ],
+        sample_data()$cells[ cells_to_display , ]
+      ) %>%
+      dplyr::filter(!is.na(pseudotime))
     to_plot <- to_plot[ sample(1:nrow(to_plot)) , ]
 
     color_variable <- input[["trajectory_dot_color"]]
@@ -560,10 +623,11 @@ output[["trajectory_density_plot"]] <- plotly::renderPlotly({
     )
 
   # extract cells to plot
-  to_plot <- base::cbind(
+  to_plot <- cbind(
       sample_data()$trajectory[[ trajectory_to_display ]][["meta"]][ cells_to_display , ],
       sample_data()$cells[ cells_to_display , ]
-    )
+    ) %>%
+    dplyr::filter(!is.na(pseudotime))
   to_plot <- to_plot[ sample(1:nrow(to_plot)) , ]
 
   color_variable <- input[["trajectory_dot_color"]]
@@ -658,6 +722,82 @@ observeEvent(input[["trajectory_density_info"]], {
 })
 
 ##----------------------------------------------------------------------------##
+## Table of cells by state.
+##----------------------------------------------------------------------------##
+
+# table
+output[["trajectory_number_of_cells_by_state_table"]] <- DT::renderDataTable(server = FALSE, {
+  req(,
+    input[["trajectory_to_display"]],
+    input[["trajectory_dot_color"]]
+  )
+  if ( is.numeric(sample_data()$cells[[ input[["trajectory_dot_color"]] ]]) || input[["trajectory_dot_color"]] == "state" || input[["trajectory_dot_color"]] == "pseudotime" ) {
+    table <- sample_data()$trajectory[[ input[["trajectory_to_display"]] ]][["meta"]] %>%
+      dplyr::filter(!is.na(pseudotime)) %>%
+      dplyr::group_by(state) %>%
+      dplyr::summarize(total_cell_count = n())
+  } else {
+    table <- cbind(
+        sample_data()$trajectory[[ input[["trajectory_to_display"]] ]][["meta"]],
+        sample_data()$cells[[ input[["trajectory_dot_color"]] ]]
+      ) %>%
+      dplyr::filter(!is.na(pseudotime)) %>%
+      dplyr::rename(selected_group = 5) %>%
+      dplyr::group_by(state, selected_group) %>%
+      dplyr::summarize(count = n()) %>%
+      tidyr::spread(selected_group, count, fill = 0) %>%
+      dplyr::ungroup() %>%
+      dplyr::mutate(total_cell_count = rowSums(.[,2:ncol(.)])) %>%
+      dplyr::select(state,total_cell_count,everything())
+  }
+  DT::datatable(
+    table,
+    filter = "none",
+    selection = "none",
+    escape = FALSE,
+    autoHideNavigation = TRUE,
+    rownames = FALSE,
+    extensions = c("Buttons"),
+    class = "cell-border stripe",
+    options = list(
+      dom = "Brti",
+      pageLength = 100,
+      buttons = list(
+        "colvis",
+        list(
+          extend = "collection",
+          text = "Download",
+          buttons = list(
+            list(
+              extend = "csv",
+              filename = "cells_by_state",
+              title = "Cells by state"
+            ),
+            list(
+              extend = "excel",
+              filename = "cells_by_state",
+              title = "Cells by state"
+            )
+          )
+        )
+      )
+    )
+  )
+})
+
+# info button
+observeEvent(input[["trajectory_number_of_cells_by_state_info"]], {
+  showModal(
+    modalDialog(
+      trajectory_number_of_cells_by_state_info[["text"]],
+      title = trajectory_number_of_cells_by_state_info[["title"]],
+      easyClose = TRUE,
+      footer = NULL
+    )
+  )
+})
+
+##----------------------------------------------------------------------------##
 ## States by sample.
 ##----------------------------------------------------------------------------##
 
@@ -669,6 +809,7 @@ output[["states_by_sample_plot"]] <- plotly::renderPlotly({
       sample_data()$trajectory[[ input[["trajectory_to_display"]] ]][["meta"]],
       sample_data()$cells
     ) %>%
+    dplyr::filter(!is.na(pseudotime)) %>%
     dplyr::group_by(state) %>%
     dplyr::summarize(total = n()) %>%
     dplyr::ungroup()
@@ -677,6 +818,7 @@ output[["states_by_sample_plot"]] <- plotly::renderPlotly({
     sample_data()$trajectory[[ input[["trajectory_to_display"]] ]][["meta"]],
     sample_data()$cells
   ) %>%
+  dplyr::filter(!is.na(pseudotime)) %>%
   dplyr::group_by(state, sample) %>%
   dplyr::summarize(count = n()) %>%
   tidyr::spread(sample, count, fill = 0) %>%
@@ -737,6 +879,7 @@ output[["states_by_cluster_plot"]] <- plotly::renderPlotly({
       sample_data()$trajectory[[ input[["trajectory_to_display"]] ]][["meta"]],
       sample_data()$cells
     ) %>%
+    dplyr::filter(!is.na(pseudotime)) %>%
     dplyr::group_by(state) %>%
     dplyr::summarize(total = n()) %>%
     dplyr::ungroup()
@@ -745,6 +888,7 @@ output[["states_by_cluster_plot"]] <- plotly::renderPlotly({
     sample_data()$trajectory[[ input[["trajectory_to_display"]] ]][["meta"]],
     sample_data()$cells
   ) %>%
+  dplyr::filter(!is.na(pseudotime)) %>%
   dplyr::group_by(state, cluster) %>%
   dplyr::summarize(count = n()) %>%
   tidyr::spread(cluster, count, fill = 0) %>%
@@ -813,6 +957,7 @@ output[["states_by_cell_cycle_seurat_plot"]] <- plotly::renderPlotly({
       sample_data()$trajectory[[ input[["trajectory_to_display"]] ]][["meta"]],
       sample_data()$cells
     ) %>%
+    dplyr::filter(!is.na(pseudotime)) %>%
     dplyr::group_by(state) %>%
     dplyr::summarize(total = n()) %>%
     dplyr::ungroup()
@@ -821,6 +966,7 @@ output[["states_by_cell_cycle_seurat_plot"]] <- plotly::renderPlotly({
     sample_data()$trajectory[[ input[["trajectory_to_display"]] ]][["meta"]],
     sample_data()$cells
   ) %>%
+  dplyr::filter(!is.na(pseudotime)) %>%
   dplyr::group_by(state, cell_cycle_seurat) %>%
   dplyr::summarize(count = n()) %>%
   tidyr::spread(cell_cycle_seurat, count, fill = 0) %>%
@@ -889,6 +1035,7 @@ output[["states_nUMI_plot"]] <- plotly::renderPlotly({
     sample_data()$trajectory[[ input[["trajectory_to_display"]] ]][["meta"]],
     sample_data()$cells
   ) %>%
+  dplyr::filter(!is.na(pseudotime)) %>%
   plotly::plot_ly(
     x = ~state,
     y = ~nUMI,
@@ -917,7 +1064,6 @@ output[["states_nUMI_plot"]] <- plotly::renderPlotly({
     ),
     yaxis = list(
       title = "Number of UMIs",
-      type = "log",
       hoverformat = ".0f",
       mirror = TRUE,
       showline = TRUE
@@ -954,6 +1100,7 @@ output[["states_nGene_plot"]] <- plotly::renderPlotly({
     sample_data()$trajectory[[ input[["trajectory_to_display"]] ]][["meta"]],
     sample_data()$cells
   ) %>%
+  dplyr::filter(!is.na(pseudotime)) %>%
   plotly::plot_ly(
     x = ~state,
     y = ~nGene,
@@ -982,7 +1129,6 @@ output[["states_nGene_plot"]] <- plotly::renderPlotly({
     ),
     yaxis = list(
       title = "Number of expressed genes",
-      type = "log",
       hoverformat = ".0f",
       mirror = TRUE,
       showline = TRUE

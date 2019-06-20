@@ -12,6 +12,11 @@ trajectory_density_info <- list(
   text = p("This plot shows the distribution of the variable selected above to color cells by along pseudotime. If this is a categorical variable, e.g. 'sample' or 'cluster', you will see a density plot. In contrast, if you have selected a continuous variable, e.g. nUMI or nGene, cells will be colored by the state they belong to.")
 )
 
+trajectory_number_of_cells_by_state_info <- list(
+  title = "Number of cells by state",
+  text = p("This table shows how many cells are assigned to each state. If the variable selected to color the cells in the projection is categorical, e.g. 'sample' or 'cluster', the number of cells in each state is also split into the subgroups.")
+)
+
 states_by_sample_info <- list(
   title = "Composition of states by sample",
   text = p("Percentage bar plot representation of the composition of states by sample. Allows to see which samples contribute most strongly to each state. Samples can be removed from the plot by clicking on them in the legend.")

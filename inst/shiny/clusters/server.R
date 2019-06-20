@@ -20,7 +20,7 @@ output[["clusters_tree_plot"]] <- renderPlot({
   tree <- sample_data()$clusters$tree
   tree$tip.label <- paste0("Cluster ", tree$tip.label)
   colors_tree <- colors[1:length(tree$tip.label)]
-  ggplot(tree, aes(x, y)) + 
+  ggplot(tree, aes(x, y)) +
     scale_y_reverse() +
     xlim(0, max(tree$edge.length * 1.1)) +
     ggtree::geom_tree() +
@@ -181,10 +181,9 @@ output[["clusters_nUMI_plot"]] <- plotly::renderPlotly({
       title = "",
       mirror = TRUE,
       showline = TRUE
-    ), 
+    ),
     yaxis = list(
       title = "Number of UMIs",
-      type = "log",
       hoverformat = ".0f",
       mirror = TRUE,
       showline = TRUE
@@ -228,7 +227,7 @@ output[["clusters_nGene_UI"]] <- renderUI({
 output[["clusters_nGene_plot"]] <- plotly::renderPlotly({
   plotly::plot_ly(
     sample_data()$cells,
-    x = ~cluster, 
+    x = ~cluster,
     y = ~nGene,
     type = "violin",
     box = list(
@@ -255,7 +254,6 @@ output[["clusters_nGene_plot"]] <- plotly::renderPlotly({
     ),
     yaxis = list(
       title = "Number of expressed genes",
-      type = "log",
       hoverformat = ".0f",
       mirror = TRUE,
       showline = TRUE
@@ -477,7 +475,7 @@ output[["clusters_by_cell_cycle_seurat_plot"]] <- plotly::renderPlotly({
     ),
     barmode = "stack",
     hovermode = "compare"
-  ) 
+  )
 })
 
 # alternative text
@@ -525,7 +523,7 @@ output[["clusters_by_cell_cycle_cyclone_plot"]] <- plotly::renderPlotly({
     by = "cluster"
   ) %>%
   mutate(pct = cells / total_cell_count * 100) %>%
-  plotly::plot_ly( 
+  plotly::plot_ly(
     x = ~cluster,
     y = ~pct,
     type = "bar",
@@ -547,7 +545,7 @@ output[["clusters_by_cell_cycle_cyclone_plot"]] <- plotly::renderPlotly({
       mirror = TRUE,
       zeroline = FALSE,
       showline = TRUE
-    ), 
+    ),
     barmode = "stack",
     hovermode = "compare"
   )
