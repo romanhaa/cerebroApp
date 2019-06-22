@@ -386,7 +386,7 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
       ),
       hoverlabel = list(font = list(size = 11))
     )
-    if ( preferences$use_webgl == TRUE ) {
+    if ( preferences[["use_webgl"]] == TRUE ) {
       plot %>% plotly::toWebGL()
     } else {
       plot
@@ -1063,7 +1063,7 @@ output[["states_nUMI_plot"]] <- plotly::renderPlotly({
       showline = TRUE
     ),
     yaxis = list(
-      title = "Number of UMIs",
+      title = "Number of transcripts",
       hoverformat = ".0f",
       mirror = TRUE,
       showline = TRUE

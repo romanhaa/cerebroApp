@@ -314,7 +314,7 @@ output[["overview_projection"]] <- plotly::renderPlotly({
         ),
         hoverlabel = list(font = list(size = 11))
       )
-      if ( options$use_webgl == TRUE ) {
+      if ( preferences[["use_webgl"]] == TRUE ) {
         plot %>% plotly::toWebGL()
       } else {
         plot
@@ -362,7 +362,7 @@ output[["overview_projection"]] <- plotly::renderPlotly({
         ),
         hoverlabel = list(font = list(size = 11))
       )
-      if ( preferences$use_webgl == TRUE ) {
+      if ( preferences[["use_webgl"]] == TRUE ) {
         plot %>% plotly::toWebGL()
       } else {
         plot

@@ -69,7 +69,7 @@ output[["samples_by_cluster_plot"]] <- plotly::renderPlotly({
       showline = TRUE
     ),
     yaxis = list(
-      title = "Percentage (%)",
+      title = "Percentage [%]",
       range = c(0,100),
       hoverformat = ".2f",
       mirror = TRUE,
@@ -141,7 +141,7 @@ output[["samples_nUMI_plot"]] <- plotly::renderPlotly({
       showline = TRUE
     ),
     yaxis = list(
-      title = "Number of UMIs",
+      title = "Number of transcripts",
       hoverformat = ".0f",
       mirror = TRUE,
       showline = TRUE
@@ -281,7 +281,7 @@ output[["samples_percent_mt_plot"]] <- plotly::renderPlotly({
       showline = TRUE
     ),
     yaxis = list(
-      title = "Percentage of mitochondrial gene expression",
+      title = "Percentage of transcripts [%]",
       range = c(0,100),
       hoverformat = ".1f",
       mirror = TRUE,
@@ -350,7 +350,7 @@ output[["samples_percent_ribo_plot"]] <- plotly::renderPlotly({
       showline = TRUE
     ),
     yaxis = list(
-      title = "Percentage of ribosomal gene expression",
+      title = "Percentage of transcripts [%]",
       range = c(0,100),
       hoverformat = ".1f",
       mirror = TRUE,
@@ -422,7 +422,7 @@ output[["samples_by_cell_cycle_seurat_plot"]] <- plotly::renderPlotly({
       showline = TRUE
     ),
     yaxis = list(
-      title = "Percentage (%)",
+      title = "Percentage [%]",
       range = c(0,100),
       hoverformat = ".2f",
       mirror = TRUE,
@@ -495,7 +495,7 @@ output[["samples_by_cell_cycle_cyclone_plot"]] <- plotly::renderPlotly({
       showline = TRUE
     ),
     yaxis = list(
-      title = "Percentage (%)",
+      title = "Percentage [%]",
       range = c(0,100),
       hoverformat = ".2f",
       mirror = TRUE,
