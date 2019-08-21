@@ -39,11 +39,12 @@ launchApp <- function(
   source(system.file("shiny/enriched_pathways/info.R", package = "cerebroApp"), local = TRUE)
   source(system.file("shiny/gene_expression/info.R", package = "cerebroApp"), local = TRUE)
   source(system.file("shiny/gene_set_expression/info.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/trajectory/info.R", package = "cerebroApp"), local = TRUE)
 
   ##--------------------------------------------------------------------------##
   ## Allow upload of files up to 800 MB.
   ##--------------------------------------------------------------------------##
-  options(shiny.maxRequestSize = maxFileSize * 1024^2) 
+  options(shiny.maxRequestSize = maxFileSize * 1024^2)
 
   ##--------------------------------------------------------------------------##
   ## Load server and UI functions.
