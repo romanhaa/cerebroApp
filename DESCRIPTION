@@ -11,15 +11,15 @@ RoxygenNote: 6.1.1
 Depends: R (>= 3.5.1)
 biocViews:
 Imports:
-  dplyr,
-  DT,
-  formattable,
-  ggplot2,
+  dplyr (>= 0.8.3),
+  DT (>= 0.8),
+  formattable (>= 0.2.0.1),
+  ggplot2 (>= 3.2.1),
   ggtree (>= 1.14.6),
   Matrix,
-  msigdbr,
-  plotly,
-  reshape2,
-  shiny,
-  shinydashboard,
-  shinyWidgets
+  msigdbr (>= 6.2.1),
+  plotly (>= 4.9.0),
+  reshape2 (>= 1.4.3),
+  shiny (>= 1.3.2),
+  shinydashboard (>= 0.7.1),
+  shinyWidgets (>= 0.4.8)
