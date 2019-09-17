@@ -22,11 +22,12 @@ output[["clusters_tree_plot"]] <- renderPlot({
   colors_tree <- colors[1:length(tree$tip.label)]
   ggplot(tree, aes(x, y)) +
     scale_y_reverse() +
-    xlim(0, max(tree$edge.length * 1.1)) +
     ggtree::geom_tree() +
     ggtree::theme_tree() +
     ggtree::geom_tiplab(size = 5, hjust = -0.2) +
-    ggtree::geom_tippoint(color = colors_tree, shape = 16, size = 6)
+    ggtree::geom_tippoint(color = colors_tree, shape = 16, size = 6) +
+    coord_cartesian(clip = 'off') +
+    theme(plot.margin = unit(c(0,2.5,0,0), 'cm'))
 })
 
 # alternative text
