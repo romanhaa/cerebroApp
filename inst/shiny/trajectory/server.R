@@ -972,6 +972,9 @@ output[["states_by_cell_cycle_seurat_plot"]] <- plotly::renderPlotly({
   tidyr::spread(cell_cycle_seurat, count, fill = 0) %>%
   dplyr::ungroup() %>%
   reshape2::melt(id.vars = "state") %>%
+  dplyr::mutate(
+    variable = factor(variable, levels = c("G1", "S", "G2M")),
+  ) %>%
   dplyr::left_join(., cell_count_by_state_total, by = "state") %>%
   dplyr::rename(cell_cycle_seurat = variable, cells = value) %>%
   dplyr::mutate(pct = cells / total * 100) %>%
