@@ -160,6 +160,7 @@ output[["enriched_pathways_by_sample_table_present"]] <- DT::renderDataTable(ser
       "Gene set name" = name,
       "Description" = description,
       "Number of genes" = length,
+      "Genes" = genes,
       "Enrichment score" = enrichment_score,
       "p-value" = p_value,
       "adj. p-value" = q_value
@@ -393,6 +394,7 @@ output[["enriched_pathways_by_cluster_table_present"]] <- DT::renderDataTable(se
       "Gene set name" = name,
       "Description" = description,
       "Number of genes" = length,
+      "Genes" = genes,
       "Enrichment score" = enrichment_score,
       "p-value" = p_value,
       "adj. p-value" = q_value
