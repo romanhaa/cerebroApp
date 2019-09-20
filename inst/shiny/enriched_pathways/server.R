@@ -62,10 +62,11 @@ output[["enriched_pathways_by_sample_UI"]] <- renderUI({
 output[["enriched_pathways_by_sample_select_sample_UI"]] <- renderUI({
   req(input[["enriched_pathways_by_sample_select_source"]])
   if ( input[["enriched_pathways_by_sample_select_source"]] == 'enrichr' ) {
-    choices <- names(sample_data()$enriched_pathways$enrichr$by_sample)
+    choices <- levels(sample_data()$enriched_pathways$enrichr$by_sample$sample) %>%
+      intersect(., unique(sample_data()$enriched_pathways$enrichr$by_sample$sample))
   } else if ( input[["enriched_pathways_by_sample_select_source"]] == 'GSVA' ) {
-    choices <- levels(sample_data()$enriched_pathways$GSVA$by_sample$group)
-    choices <- intersect(choices, unique(sample_data()$enriched_pathways$GSVA$by_sample$group))
+    choices <- levels(sample_data()$enriched_pathways$GSVA$by_sample$group) %>%
+      intersect(., unique(sample_data()$enriched_pathways$GSVA$by_sample$group))
   }
   selectInput(
     "enriched_pathways_by_sample_select_sample",
@@ -80,7 +81,10 @@ output[["enriched_pathways_by_sample_select_db_UI"]] <- renderUI({
     input[["enriched_pathways_by_sample_select_source"]],
     input[["enriched_pathways_by_sample_select_sample"]]
   )
-  choices <- names(sample_data()$enriched_pathways$enrichr$by_sample[[ input[["enriched_pathways_by_sample_select_sample"]] ]])
+  choices <- sample_data()$enriched_pathways$enrichr$by_sample %>%
+    dplyr::filter(sample == input[["enriched_pathways_by_sample_select_sample"]]) %>%
+    dplyr::pull(db) %>%
+    intersect(., levels(.))
   selectInput(
     "enriched_pathways_by_sample_select_db",
     label = NULL,
@@ -95,13 +99,17 @@ output[["enriched_pathways_by_sample_table_present"]] <- DT::renderDataTable(ser
     input[["enriched_pathways_by_sample_select_sample"]],
     input[["enriched_pathways_by_sample_select_db"]]
   )
-  if ( input[["enriched_pathways_by_sample_select_source"]] == "enrichr" & is.data.frame(sample_data()$enriched_pathways$enrichr$by_sample[[ input[["enriched_pathways_by_sample_select_sample"]] ]][[ input[["enriched_pathways_by_sample_select_db"]] ]]) ) {
-    sample_data()$enriched_pathways$enrichr$by_sample[[ input[["enriched_pathways_by_sample_select_sample"]] ]][[ input[["enriched_pathways_by_sample_select_db"]] ]] %>%
-    dplyr::select(c(1,2,3,4,8,9)) %>%
+  if ( input[["enriched_pathways_by_sample_select_source"]] == "enrichr" & is.data.frame(sample_data()$enriched_pathways$enrichr$by_sample) ) {
+    sample_data()$enriched_pathways$enrichr$by_sample %>%
+    dplyr::filter(
+      sample == input[["enriched_pathways_by_sample_select_sample"]],
+      db == input[["enriched_pathways_by_sample_select_db"]]
+    ) %>%
+    dplyr::select(3,4,5,6,10,11) %>%
     dplyr::arrange(-Combined.Score) %>%
     dplyr::mutate(
-      P.value = formatC(P.value, format = "e", digits = 3),
-      Adjusted.P.value = formatC(Adjusted.P.value, format = "e", digits = 3),
+      P.value = formatC(P.value, format = "e", digits = 2),
+      Adjusted.P.value = formatC(Adjusted.P.value, format = "e", digits = 2),
       Combined.Score = formatC(Combined.Score, format = "f", digits = 2)
     ) %>%
     dplyr::rename(
@@ -154,8 +162,8 @@ output[["enriched_pathways_by_sample_table_present"]] <- DT::renderDataTable(ser
     dplyr::select(-group) %>%
     dplyr::arrange(q_value) %>%
     dplyr::mutate(
-      p_value = formatC(p_value, format = "e", digits = 3),
-      q_value = formatC(q_value, format = "e", digits = 3)
+      p_value = formatC(p_value, format = "e", digits = 2),
+      q_value = formatC(q_value, format = "e", digits = 2)
     ) %>%
     dplyr::rename(
       "Gene set name" = name,
@@ -297,10 +305,11 @@ output[["enriched_pathways_by_cluster_UI"]] <- renderUI({
 output[["enriched_pathways_by_cluster_select_cluster_UI"]] <- renderUI({
   req(input[["enriched_pathways_by_cluster_select_source"]])
   if ( input[["enriched_pathways_by_cluster_select_source"]] == 'enrichr' ) {
-    choices <- names(sample_data()$enriched_pathways$enrichr$by_cluster)
+    choices <- levels(sample_data()$enriched_pathways$enrichr$by_cluster$cluster) %>%
+      intersect(., unique(sample_data()$enriched_pathways$enrichr$by_cluster$cluster))
   } else if ( input[["enriched_pathways_by_cluster_select_source"]] == 'GSVA' ) {
-    choices <- levels(sample_data()$enriched_pathways$GSVA$by_cluster$group)
-    choices <- intersect(choices, unique(sample_data()$enriched_pathways$GSVA$by_cluster$group))
+    choices <- levels(sample_data()$enriched_pathways$GSVA$by_cluster$group) %>%
+      intersect(., unique(sample_data()$enriched_pathways$GSVA$by_cluster$group))
   }
   selectInput(
     "enriched_pathways_by_cluster_select_cluster",
@@ -315,7 +324,10 @@ output[["enriched_pathways_by_cluster_select_db_UI"]] <- renderUI({
     input[["enriched_pathways_by_cluster_select_source"]],
     input[["enriched_pathways_by_cluster_select_cluster"]]
   )
-  choices <- names(sample_data()$enriched_pathways$enrichr$by_cluster[[ input[["enriched_pathways_by_cluster_select_cluster"]] ]])
+  choices <- sample_data()$enriched_pathways$enrichr$by_cluster %>%
+    dplyr::filter(cluster == input[["enriched_pathways_by_cluster_select_cluster"]]) %>%
+    dplyr::pull(db) %>%
+    intersect(., levels(.))
   selectInput(
     "enriched_pathways_by_cluster_select_db",
     label = NULL,
@@ -330,13 +342,17 @@ output[["enriched_pathways_by_cluster_table_present"]] <- DT::renderDataTable(se
     input[["enriched_pathways_by_cluster_select_cluster"]],
     input[["enriched_pathways_by_cluster_select_db"]]
   )
-  if ( input[["enriched_pathways_by_cluster_select_source"]] == "enrichr" & is.data.frame(sample_data()$enriched_pathways$enrichr$by_cluster[[ input[["enriched_pathways_by_cluster_select_cluster"]] ]][[ input[["enriched_pathways_by_cluster_select_db"]] ]]) ) {
-    sample_data()$enriched_pathways$enrichr$by_cluster[[ input[["enriched_pathways_by_cluster_select_cluster"]] ]][[ input[["enriched_pathways_by_cluster_select_db"]] ]] %>%
-    dplyr::select(c(1,2,3,4,8,9)) %>%
+  if ( input[["enriched_pathways_by_cluster_select_source"]] == "enrichr" & is.data.frame(sample_data()$enriched_pathways$enrichr$by_cluster) ) {
+    sample_data()$enriched_pathways$enrichr$by_cluster %>%
+    dplyr::filter(
+      cluster == input[["enriched_pathways_by_cluster_select_cluster"]],
+      db == input[["enriched_pathways_by_cluster_select_db"]]
+    ) %>%
+    dplyr::select(3,4,5,6,10,11) %>%
     dplyr::arrange(-Combined.Score) %>%
     dplyr::mutate(
-      P.value = formatC(P.value, format = "e", digits = 3),
-      Adjusted.P.value = formatC(Adjusted.P.value, format = "e", digits = 3),
+      P.value = formatC(P.value, format = "e", digits = 2),
+      Adjusted.P.value = formatC(Adjusted.P.value, format = "e", digits = 2),
       Combined.Score = formatC(Combined.Score, format = "f", digits = 2)
     ) %>%
     dplyr::rename(
@@ -389,8 +405,8 @@ output[["enriched_pathways_by_cluster_table_present"]] <- DT::renderDataTable(se
     dplyr::select(-group) %>%
     dplyr::arrange(q_value) %>%
     dplyr::mutate(
-      p_value = formatC(p_value, format = "e", digits = 3),
-      q_value = formatC(q_value, format = "e", digits = 3)
+      p_value = formatC(p_value, format = "e", digits = 2),
+      q_value = formatC(q_value, format = "e", digits = 2)
     ) %>%
     dplyr::rename(
       "Gene set name" = name,
