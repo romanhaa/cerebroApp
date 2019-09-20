@@ -8,11 +8,15 @@
 
 # UI element: choose source for pathway enrichement results (currently Enrichr or GSVA)
 output[["enriched_pathways_by_sample_select_source_UI"]] <- renderUI({
-  selectInput(
-    "enriched_pathways_by_sample_select_source",
-    label = NULL,
-    choices = names(sample_data()$enriched_pathways)
-  )
+  if ( is.null(sample_data()$enriched_pathways) ) {
+    textOutput("enriched_pathways_by_sample_table_missing")
+  } else {
+    selectInput(
+      "enriched_pathways_by_sample_select_source",
+      label = NULL,
+      choices = names(sample_data()$enriched_pathways)
+    )
+  }
 })
 
 # UI element: display results or alternative text
@@ -214,6 +218,11 @@ output[["enriched_pathways_by_sample_table_present"]] <- DT::renderDataTable(ser
 })
 
 # alternative text
+output[["enriched_pathways_by_sample_table_missing"]] <- renderText({
+  "Data not available. Possible reason: Data not generated."
+})
+
+# alternative text
 output[["enriched_pathways_by_sample_table_no_markers_found"]] <- renderText({
   "No marker genes identified to perform pathway enrichment analysis with."
 })
@@ -230,7 +239,7 @@ output[["enriched_pathways_by_sample_table_no_gene_sets_enriched"]] <- renderTex
 
 # alternative text
 output[["enriched_pathways_by_sample_table_missing_gsva"]] <- renderText({
-  "Data not available. Possible reasons: Only 1 sample in this data set or data not generated."
+  "Data not available. Possible reason: Data not generated."
 })
 
 # info box
@@ -251,11 +260,15 @@ observeEvent(input[["enriched_pathways_by_sample_info"]], {
 
 # UI element: choose source for pathway enrichement results (currently Enrichr or GSVA)
 output[["enriched_pathways_by_cluster_select_source_UI"]] <- renderUI({
-  selectInput(
-    "enriched_pathways_by_cluster_select_source",
-    label = NULL,
-    choices = names(sample_data()$enriched_pathways)
-  )
+  if ( is.null(sample_data()$enriched_pathways) ) {
+    textOutput("enriched_pathways_by_cluster_table_missing")
+  } else {
+    selectInput(
+      "enriched_pathways_by_cluster_select_source",
+      label = NULL,
+      choices = names(sample_data()$enriched_pathways)
+    )
+  }
 })
 
 # UI element: display results or alternative text
@@ -457,6 +470,11 @@ output[["enriched_pathways_by_cluster_table_present"]] <- DT::renderDataTable(se
 })
 
 # alternative text
+output[["enriched_pathways_by_cluster_table_missing"]] <- renderText({
+  "Data not available. Possible reason: Data not generated."
+})
+
+# alternative text
 output[["enriched_pathways_by_cluster_table_no_markers_found"]] <- renderText({
   "No marker genes identified to perform pathway enrichment analysis with."
 })
@@ -473,7 +491,7 @@ output[["enriched_pathways_by_cluster_table_no_gene_sets_enriched"]] <- renderTe
 
 # alternative text
 output[["enriched_pathways_by_cluster_table_missing_gsva"]] <- renderText({
-  "Data not available. Possible reasons: Only 1 cluster in this data set or data not generated."
+  "Data not available. Possible reason: Data not generated."
 })
 
 # info box
