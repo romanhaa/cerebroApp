@@ -65,6 +65,7 @@ output[["enriched_pathways_by_sample_select_sample_UI"]] <- renderUI({
     choices <- names(sample_data()$enriched_pathways$enrichr$by_sample)
   } else if ( input[["enriched_pathways_by_sample_select_source"]] == 'GSVA' ) {
     choices <- levels(sample_data()$enriched_pathways$GSVA$by_sample$group)
+    choices <- intersect(choices, unique(sample_data()$enriched_pathways$GSVA$by_sample$group))
   }
   selectInput(
     "enriched_pathways_by_sample_select_sample",
@@ -299,6 +300,7 @@ output[["enriched_pathways_by_cluster_select_cluster_UI"]] <- renderUI({
     choices <- names(sample_data()$enriched_pathways$enrichr$by_cluster)
   } else if ( input[["enriched_pathways_by_cluster_select_source"]] == 'GSVA' ) {
     choices <- levels(sample_data()$enriched_pathways$GSVA$by_cluster$group)
+    choices <- intersect(choices, unique(sample_data()$enriched_pathways$GSVA$by_cluster$group))
   }
   selectInput(
     "enriched_pathways_by_cluster_select_cluster",
