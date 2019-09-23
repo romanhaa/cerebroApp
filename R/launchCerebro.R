@@ -18,7 +18,7 @@
 #' @import shinyWidgets
 #' @examples
 #' launchApp(maxFileSize = 800)
-launchApp <- function(
+launchCerebro <- function(
   maxFileSize = 800
 ) {
 
