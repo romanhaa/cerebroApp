@@ -22,8 +22,7 @@ pseudotime of a cell; defaults to 'Pseudotime'.}
 }
 \value{
 Returns Seurat object with added trajectory. Trajectory info (state,
-pseudotime, projection and tree) will be stored in seurat@misc$trajectory
-under the specified name.
+pseudotime, projection and tree) will be stored in
 }
 \description{
 This function takes a Monocle object, extracts a trajectory that

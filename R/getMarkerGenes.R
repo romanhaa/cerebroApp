@@ -23,7 +23,6 @@
 #' @keywords seurat cerebro
 #' @export
 #' @import dplyr
-#' @import Seurat
 #' @examples
 #' seurat <- getMarkerGenes(
 #'   object = seurat
@@ -50,6 +49,11 @@ getMarkerGenes <- function(
   verbose = TRUE,
   ...
 ) {
+  # check if Seurat is installed
+  if (!requireNamespace("Seurat", quietly = TRUE)) {
+    stop("Package \"Seurat\" needed for this function to work. Please install it.",
+      call. = FALSE)
+  }
   ##--------------------------------------------------------------------------##
   ## Get list of genes in cell surface through gene ontology term GO:0009986.
   ##--------------------------------------------------------------------------##

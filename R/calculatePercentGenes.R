@@ -6,7 +6,6 @@
 #' @param genes List(s) of genes.
 #' @keywords seurat cerebro
 #' @export
-#' @import Seurat
 #' @examples
 #' calculatePercentGenes(
 #'   object = seurat,
@@ -16,6 +15,11 @@ calculatePercentGenes <- function(
   object,
   genes
 ) {
+  # check if Seurat is installed
+  if (!requireNamespace("Seurat", quietly = TRUE)) {
+    stop("Package \"Seurat\" needed for this function to work. Please install it.",
+      call. = FALSE)
+  }
   ##--------------------------------------------------------------------------##
   ## get for every supplied gene list, get the genes that are present in the
   ## data set and calculate the percentage of transcripts that they account for

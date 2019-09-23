@@ -18,6 +18,7 @@ Imports:
   future.apply (>= 1.1.0),
   ggplot2 (>= 3.2.1),
   ggtree (>= 1.14.6),
+  GSVA (>= 1.30.0),
   httr (>= 1.4.0),
   igraph,
   Matrix (>= 1.2),
@@ -33,7 +34,6 @@ Imports:
   tibble (>= 2.1.3),
   tidyr (>= 0.8.2)
 Suggests:
-  GSVA (>= 1.30.0),
   monocle (>= 2.10),
   Seurat (>= 2.3.0)
 

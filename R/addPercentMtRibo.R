@@ -11,7 +11,6 @@
 #' @export
 #' @import dplyr
 #' @import readr
-#' @import Seurat
 #' @examples
 #' seurat <- addPercentMtRibo(
 #'   object = seurat,
@@ -23,6 +22,11 @@ addPercentMtRibo <- function(
   organism,
   gene_nomenclature
 ) {
+  # check if Seurat is installed
+  if (!requireNamespace("Seurat", quietly = TRUE)) {
+    stop("Package \"Seurat\" needed for this function to work. Please install it.",
+      call. = FALSE)
+  }
   ##--------------------------------------------------------------------------##
   ## check if organism is supported
   ##--------------------------------------------------------------------------##

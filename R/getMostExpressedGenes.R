@@ -23,6 +23,11 @@ getMostExpressedGenes <- function(
   column_sample = 'sample',
   column_cluster = 'cluster'
 ) {
+  # check if Seurat is installed
+  if (!requireNamespace("Seurat", quietly = TRUE)) {
+    stop("Package \"Seurat\" needed for this function to work. Please install it.",
+      call. = FALSE)
+  }
   ##--------------------------------------------------------------------------##
   ## create backup of Seurat object (probably not necessary)
   ##--------------------------------------------------------------------------##

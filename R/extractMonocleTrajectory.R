@@ -12,8 +12,8 @@
 #' @param column_pseudotime Name of meta data column that holds info about the
 #' pseudotime of a cell; defaults to 'Pseudotime'.
 #' @return Returns Seurat object with added trajectory. Trajectory info (state,
-#' pseudotime, projection and tree) will be stored in seurat@misc$trajectory
-#' under the specified name.
+#' pseudotime, projection and tree) will be stored in
+# 'seurat@misc$trajectory$monocle2 under the specified name.
 #' @keywords seurat monocle trajectory cerebro
 #' @export
 #' @examples
@@ -32,7 +32,16 @@ extractMonocleTrajectory <- function(
     column_state = 'State',
     column_pseudotime = 'Pseudotime'
   ) {
-
+  # check if Seurat is installed
+  if (!requireNamespace("Seurat", quietly = TRUE)) {
+    stop("Package \"Seurat\" needed for this function to work. Please install it.",
+      call. = FALSE)
+  }
+  # check if monocle is installed
+  if (!requireNamespace("monocle", quietly = TRUE)) {
+    stop("Package \"monocle\" needed for this function to work. Please install it.",
+      call. = FALSE)
+  }
   ##--------------------------------------------------------------------------##
   ## Check if...
   ## - provided Monocle and Seurat objects are of correct type

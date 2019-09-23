@@ -26,7 +26,6 @@
 #' @keywords seurat cerebro
 #' @export
 #' @import dplyr
-#' @import Seurat
 #' @import tidyr
 #' @examples
 #' exportFromSeurat(
@@ -55,6 +54,11 @@ exportFromSeurat <- function(
   column_cell_cycle_cyclone = NULL,
   add_all_meta_data = TRUE
 ) {
+  # check if Seurat is installed
+  if (!requireNamespace("Seurat", quietly = TRUE)) {
+    stop("Package \"Seurat\" needed for this function to work. Please install it.",
+      call. = FALSE)
+  }
   ##--------------------------------------------------------------------------##
   ## check provided parameters
   ##--------------------------------------------------------------------------##

@@ -46,7 +46,11 @@ performGeneSetEnrichmentAnalysis <- function(
   ...
 )
 {
-
+  # check if Seurat is installed
+  if (!requireNamespace("Seurat", quietly = TRUE)) {
+    stop("Package \"Seurat\" needed for this function to work. Please install it.",
+      call. = FALSE)
+  }
   #----------------------------------------------------------------------------#
   # check input parameters
   #----------------------------------------------------------------------------#
