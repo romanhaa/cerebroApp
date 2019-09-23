@@ -58,7 +58,7 @@ addPercentMtRibo <- function(
       system.file(
         'extdata',
         paste0('genes_mt_', organism, '_', gene_nomenclature, '.txt'),
-        package = 'cerebroPrepare'
+        package = 'cerebroApp'
       ),
       col_types = readr::cols(),
       col_names = FALSE
@@ -70,7 +70,7 @@ addPercentMtRibo <- function(
       system.file(
         'extdata',
         paste0('genes_ribo_', organism, '_', gene_nomenclature, '.txt'),
-        package = 'cerebroPrepare'
+        package = 'cerebroApp'
       ),
       col_types = readr::cols(),
       col_names = FALSE
@@ -100,7 +100,7 @@ addPercentMtRibo <- function(
   ## calculate percentage of transcripts for mitochondrial and ribosomal genes
   ##--------------------------------------------------------------------------##
   message(paste0('[', format(Sys.time(), '%H:%M:%S'), '] Calculate percentage of mitochondrial and ribosomal transcripts...'))
-  values <- cerebroPrepare::calculatePercentGenes(
+  values <- cerebroApp::calculatePercentGenes(
     object,
     list(
       'genes_mt' = genes_mt_here,
