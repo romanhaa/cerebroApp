@@ -586,7 +586,7 @@ output[["geneSetExpression_by_gene"]] <- plotly::renderPlotly({
   } else {
     expression_levels <- data.frame(
       "gene" = rownames(sample_data()$expression[ geneSetData()$genes_to_display_present , ]),
-      "expression" = rowMeans(sample_data()$expression[ geneSetData()$genes_to_display_present , ])
+      "expression" = Matrix::rowMeans(sample_data()$expression[ geneSetData()$genes_to_display_present , ])
     ) %>%
     arrange(-expression) %>%
     top_n(50, expression)
