@@ -3,13 +3,15 @@
 #' object.
 #' @description This function calculates the most expressed genes for every
 #' sample and cluster of the Seurat object.
+#' @keywords Cerebro scRNAseq Seurat
 #' @param object Seurat object.
 #' @param column_sample Column in object@meta.data that contains information
 #' about sample; defaults to 'sample'.
 #' @param column_cluster Column in object@meta.data that contains information
 #' about cluster; defaults to 'cluster'.
-#' @keywords seurat cerebro
 #' @export
+#' @return Seurat object with most expressed genes stored for every sample and
+#' cluster stored in object@misc$most_expressed_genes.
 #' @import dplyr
 #' @examples
 #' seurat <- getMostExpressedGenes(

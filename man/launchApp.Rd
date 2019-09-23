@@ -10,8 +10,17 @@ launchApp(maxFileSize = 800)
 \item{maxFileSize}{Maximum size of input file; defaults to 800 MB.}
 }
 \value{
-Cerebro application object
+Cerebro application object.
 }
 \description{
 Launch Cerebro app.
 }
+\details{
+Launch Cerebro app.
+}
+\examples{
+launchApp(maxFileSize = 800)
+}
+\keyword{Cerebro}
+\keyword{Seurat}
+\keyword{scRNAseq}

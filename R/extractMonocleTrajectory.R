@@ -4,6 +4,7 @@
 #' was calculated, and stores it in the specified Seurat object. Trajectory info
 #' (state, pseudotime, projection and tree) will be stored in
 #' seurat@misc$trajectory under the specified name.
+#' @keywords Cerebro scRNAseq Seurat Monocle trajectory
 #' @param monocle Monocle object to extract trajectory from.
 #' @param seurat Seurat object to transfer trajectory to.
 #' @param trajectory_name Name of trajectory.
@@ -11,11 +12,10 @@
 #' of a cell; defaults to 'State'.
 #' @param column_pseudotime Name of meta data column that holds info about the
 #' pseudotime of a cell; defaults to 'Pseudotime'.
+#' @export
 #' @return Returns Seurat object with added trajectory. Trajectory info (state,
 #' pseudotime, projection and tree) will be stored in
-# 'seurat@misc$trajectory$monocle2 under the specified name.
-#' @keywords seurat monocle trajectory cerebro
-#' @export
+#' object@misc$trajectory$monocle2 under the specified name.
 #' @examples
 #' seurat <- extractMonocleTrajectory(
 #'   monocle = monocle,

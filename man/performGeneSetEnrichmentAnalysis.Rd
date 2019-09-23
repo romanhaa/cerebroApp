@@ -29,6 +29,10 @@ about cluster; defaults to 'cluster'.}
 The Broad Institute provides many gene sets which can be downloaded:
 http://software.broadinstitute.org/gsea/msigdb/index.jsp}
 }
+\value{
+Seurat object with GSVA results for samples and clusters stored in
+object@misc$enriched_pathways$GSVA.
+}
 \description{
 This function calculates enrichment scores, p- and q-value
 statistics for provided gene sets for samples and clusters of cells in given
@@ -50,5 +54,7 @@ seurat <- performGeneSetEnrichmentAnalysis(
   thresh_q_val = 0.1
 )
 }
-\keyword{cerebro}
-\keyword{seurat}
+\keyword{Cerebro}
+\keyword{GSVA}
+\keyword{Seurat}
+\keyword{scRNAseq}

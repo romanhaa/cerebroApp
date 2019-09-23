@@ -39,6 +39,10 @@ defaults to 0.25.}
 \item{...}{Further parameters can be passed to control
 Seurat::FindAllMakers().}
 }
+\value{
+Seurat object with marker gene results for samples and clusters
+stored in object@misc$marker_genes.
+}
 \description{
 This function gets marker genes for every sample and cluster of
 the Seurat object.
@@ -60,5 +64,6 @@ seurat <- getMarkerGenes(
   verbose = TRUE
 )
 }
-\keyword{cerebro}
-\keyword{seurat}
+\keyword{Cerebro}
+\keyword{Seurat}
+\keyword{scRNAseq}

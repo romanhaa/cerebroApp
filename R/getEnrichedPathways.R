@@ -2,6 +2,7 @@
 #' @title Get enriched pathways based on marker genes from EnrichR.
 #' @description This function uses the enrichR API to look for enriched pathways
 #' in marker gene sets of samples and clusters.
+#' @keywords Cerebro scRNAseq Seurat Enrichr
 #' @param object Seurat object.
 #' @param column_sample Column in object@meta.data that contains information
 #' about sample; defaults to 'sample'.
@@ -16,8 +17,9 @@
 #' default URL with an alternative taken from the Enrichr website in case the
 #' original is out-of-service; defaults to
 #' 'http://amp.pharm.mssm.edu/Enrichr/enrich'.
-#' @keywords seurat cerebro
 #' @export
+#' @return Seurat object with Enrichr results for samples and clusters stored in
+#' object@misc$enriched_pathways$enrichr
 #' @import dplyr
 #' @examples
 #' seurat <- getEnrichedPathways(

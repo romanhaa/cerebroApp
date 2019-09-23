@@ -2,10 +2,12 @@
 #' @title Calculate percentage of transcripts of gene list.
 #' @description Get percentage of transcripts of gene list compared to all
 #' transcripts per cell.
+#' @keywords Cerebro scRNAseq Seurat
 #' @param object Seurat object.
 #' @param genes List(s) of genes.
-#' @keywords seurat cerebro
 #' @export
+#' @return List of lists containing the percentages of expression for each
+#' provided gene list.
 #' @examples
 #' calculatePercentGenes(
 #'   object = seurat,

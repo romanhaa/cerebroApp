@@ -1,9 +1,12 @@
 #' Launch Cerebro app.
-#' @export
+#' @title Launch Cerebro app.
+#' @description Launch Cerebro app.
+#' @keywords Cerebro scRNAseq Seurat
 #' @param maxFileSize Maximum size of input file; defaults to 800 MB.
-#' @return Cerebro application object
+#' @export
+#' @return Cerebro application object.
 #' @import dplyr
-#' @importFrom DT datatable dataTableOutput formatStyle renderDataTable
+#' @importFrom DT datatable formatStyle
 #' @importFrom formattable proportion
 #' @import ggplot2
 #' @importFrom ggtree geom_tree geom_tiplab geom_tippoint theme_tree
@@ -13,7 +16,8 @@
 #' @import shiny
 #' @import shinydashboard
 #' @import shinyWidgets
-
+#' @examples
+#' launchApp(maxFileSize = 800)
 launchApp <- function(
   maxFileSize = 800
 ) {

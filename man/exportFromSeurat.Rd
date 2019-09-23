@@ -43,7 +43,7 @@ to NULL.}
 be extracted as well.}
 }
 \value{
-Returns object to be saved and loaded in Cerebro.
+Nothing.
 }
 \description{
 This function allows to export a Seurat object to visualize in
@@ -67,5 +67,6 @@ exportFromSeurat(
   add_all_meta_data = TRUE
 )
 }
-\keyword{cerebro}
-\keyword{seurat}
+\keyword{Cerebro}
+\keyword{Seurat}
+\keyword{scRNAseq}

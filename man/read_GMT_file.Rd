@@ -27,5 +27,3 @@ my_gmt <- read_GMT_file(
   file = 'path/to/my/gene_sets.gmt'
 )
 }
-\keyword{cerebro}
-\keyword{seurat}

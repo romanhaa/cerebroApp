@@ -17,6 +17,10 @@ about sample; defaults to 'sample'.}
 \item{column_cluster}{Column in object@meta.data that contains information
 about cluster; defaults to 'cluster'.}
 }
+\value{
+Seurat object with most expressed genes stored for every sample and
+cluster stored in object@misc$most_expressed_genes.
+}
 \description{
 This function calculates the most expressed genes for every
 sample and cluster of the Seurat object.
@@ -31,5 +35,6 @@ seurat <- getMostExpressedGenes(
   column_cluster = 'cluster'
 )
 }
-\keyword{cerebro}
-\keyword{seurat}
+\keyword{Cerebro}
+\keyword{Seurat}
+\keyword{scRNAseq}

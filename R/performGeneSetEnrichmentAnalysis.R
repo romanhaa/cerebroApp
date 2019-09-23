@@ -6,6 +6,7 @@
 #' q-values for gene sets is performed as done in "Evaluation of methods to
 #' assign cell type labels to cell clusters from single-cell RNA-sequencing
 #' data", Diaz-Mejia et al., F1000Research (2019).
+#' @keywords Cerebro scRNAseq Seurat GSVA
 #' @param object Seurat object. log-counts for analysis must be stored in
 #' `object@data` (Seurat object older than v3) or `object@assays$RNA@data`
 #' (Seurat object v3 or newer).
@@ -19,8 +20,9 @@
 #' @param thresh_p_val Threshold for p-value, defaults to 0.05.
 #' @param thresh_q_val Threshold for q-value, defaults to 0.1.
 #' @param ... Further parameters can be passed to control GSVA::gsva().
-#' @keywords seurat cerebro
 #' @export
+#' @return Seurat object with GSVA results for samples and clusters stored in
+#' object@misc$enriched_pathways$GSVA.
 #' @import dplyr
 #' @importFrom GSVA gsva
 #' @importFrom Matrix colSums

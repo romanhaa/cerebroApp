@@ -15,6 +15,10 @@ need to annotated as gene symbol, e.g. MKI67 (human) / Mki67 (mouse).}
 \item{gene_nomenclature}{Define if genes are saved by their name ('name'),
 ENSEMBL ID ('ensembl') or GENCODE ID ('gencode_v27', 'gencode_vM16').}
 }
+\value{
+Seurat object with two new meta data columns containing the
+percentage of mitochondrial and ribosomal gene expression for each cell.
+}
 \description{
 Get percentage of transcripts of gene list compared to all
 transcripts per cell.
@@ -29,5 +33,8 @@ seurat <- addPercentMtRibo(
   gene_nomenclature = 'name'
 )
 }
+\keyword{Cerebro}
+\keyword{Seurat}
 \keyword{cerebro}
+\keyword{scRNAseq}
 \keyword{seurat}

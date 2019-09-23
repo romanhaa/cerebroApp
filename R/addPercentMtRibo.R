@@ -2,6 +2,7 @@
 #' @title Add percentage of mitochondrial and ribosomal transcripts.
 #' @description Get percentage of transcripts of gene list compared to all
 #' transcripts per cell.
+#' @keywords Cerebro scRNAseq Seurat
 #' @param object Seurat object.
 #' @param organism Organism, can be either human ('hg') or mouse ('mm'). Genes
 #' need to annotated as gene symbol, e.g. MKI67 (human) / Mki67 (mouse).
@@ -9,6 +10,8 @@
 #' ENSEMBL ID ('ensembl') or GENCODE ID ('gencode_v27', 'gencode_vM16').
 #' @keywords seurat cerebro
 #' @export
+#' @return Seurat object with two new meta data columns containing the
+#' percentage of mitochondrial and ribosomal gene expression for each cell.
 #' @import dplyr
 #' @examples
 #' seurat <- addPercentMtRibo(

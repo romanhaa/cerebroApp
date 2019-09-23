@@ -34,6 +34,10 @@ default URL with an alternative taken from the Enrichr website in case the
 original is out-of-service; defaults to
 'http://amp.pharm.mssm.edu/Enrichr/enrich'.}
 }
+\value{
+Seurat object with Enrichr results for samples and clusters stored in
+object@misc$enriched_pathways$enrichr
+}
 \description{
 This function uses the enrichR API to look for enriched pathways
 in marker gene sets of samples and clusters.
@@ -52,5 +56,7 @@ seurat <- getEnrichedPathways(
   URL_API = 'http://amp.pharm.mssm.edu/Enrichr/enrich'
 )
 }
-\keyword{cerebro}
-\keyword{seurat}
+\keyword{Cerebro}
+\keyword{Enrichr}
+\keyword{Seurat}
+\keyword{scRNAseq}

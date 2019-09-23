@@ -7,7 +7,6 @@
 #' @return Returns an object in the same format as from the GSA.read.gmt
 #' function (GSA package) with gene sets, gene set names, and gene set
 #' descriptions stored in lists.
-#' @keywords seurat cerebro
 #' @import dplyr
 #' @examples
 #' my_gmt <- read_GMT_file(

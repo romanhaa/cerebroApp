@@ -2,6 +2,7 @@
 #' @title Export Seurat object to Cerebro.
 #' @description This function allows to export a Seurat object to visualize in
 #' Cerebro.
+#' @keywords Cerebro scRNAseq Seurat
 #' @param object Seurat object.
 #' @param file Where to save the output.
 #' @param experiment_name Experiment name.
@@ -22,9 +23,8 @@
 #' to NULL.
 #' @param add_all_meta_data If set to TRUE, all further meta data columns will
 #' be extracted as well.
-#' @return Returns object to be saved and loaded in Cerebro.
-#' @keywords seurat cerebro
 #' @export
+#' @return Nothing.
 #' @import dplyr
 #' @examples
 #' exportFromSeurat(

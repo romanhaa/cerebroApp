@@ -11,6 +11,10 @@ calculatePercentGenes(object, genes)
 
 \item{genes}{List(s) of genes.}
 }
+\value{
+List of lists containing the percentages of expression for each
+provided gene list.
+}
 \description{
 Get percentage of transcripts of gene list compared to all
 transcripts per cell.
@@ -24,5 +28,6 @@ calculatePercentGenes(
   genes = list('example' = c('Fth1','Atf1'))
 )
 }
-\keyword{cerebro}
-\keyword{seurat}
+\keyword{Cerebro}
+\keyword{Seurat}
+\keyword{scRNAseq}

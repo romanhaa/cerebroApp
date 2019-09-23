@@ -2,6 +2,7 @@
 #' @title Get marker genes for every sample and cluster in Seurat object.
 #' @description This function gets marker genes for every sample and cluster of
 #' the Seurat object.
+#' @keywords Cerebro scRNAseq Seurat
 #' @param object Seurat object.
 #' @param organism Organism information for pulling info about presence of
 #' marker genes of cell surface; can be omitted if already saved in Seurat
@@ -20,8 +21,9 @@
 #' @param verbose Print progress bar; defaults to TRUE.
 #' @param ... Further parameters can be passed to control
 #' Seurat::FindAllMakers().
-#' @keywords seurat cerebro
 #' @export
+#' @return Seurat object with marker gene results for samples and clusters
+#' stored in object@misc$marker_genes.
 #' @import dplyr
 #' @examples
 #' seurat <- getMarkerGenes(
