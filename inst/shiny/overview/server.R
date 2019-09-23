@@ -439,9 +439,17 @@ observeEvent(input[["overview_projection_export"]], {
     } else {
       if ( is.factor(to_plot[ , input[["overview_dot_color"]] ]) || is.character(to_plot[ , input[["overview_dot_color"]] ]) ) {
         if ( input[["overview_dot_color"]] == "sample" ) {
-          cols <- sample_data()$samples$colors
+          if ( !is.null(sample_data()$samples$colors) ) {
+            cols <- sample_data()$samples$colors
+          } else {
+            cols <- colors
+          }
         } else if ( input[["overview_dot_color"]] == "cluster" ) {
-          cols <- sample_data()$clusters$colors
+          if ( !is.null(sample_data()$clusters$colors) ) {
+            cols <- sample_data()$clusters$colors
+          } else {
+            cols <- colors
+          }
         } else if ( input[["overview_dot_color"]] %in% c("cell_cycle_seurat","cell_cycle_cyclone") ) {
           cols <- cell_cycle_colorset
         } else if ( is.factor(to_plot[ , input[["overview_dot_color"]] ]) ) {
