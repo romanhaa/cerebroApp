@@ -51,8 +51,7 @@ getMarkerGenes <- function(
 ) {
   # check if Seurat is installed
   if (!requireNamespace("Seurat", quietly = TRUE)) {
-    stop("Package \"Seurat\" needed for this function to work. Please install it.",
-      call. = FALSE)
+    stop("Package 'Seurat' needed for this function to work. Please install it.", call. = FALSE)
   }
   ##--------------------------------------------------------------------------##
   ## Get list of genes in cell surface through gene ontology term GO:0009986.
@@ -114,7 +113,7 @@ getMarkerGenes <- function(
     if ( length(sample_names) > 1 ) {
       message(paste0('[', format(Sys.time(), '%H:%M:%S'), '] Get marker genes for samples...'))
       if ( temp_seurat@version < 3 ) {
-        temp_seurat <- SetAllIdent(temp_seurat, id = column_sample)
+        temp_seurat <- Seurat::SetAllIdent(temp_seurat, id = column_sample)
         temp_seurat@ident <- factor(temp_seurat@ident, levels = sample_names)
         if ( packageVersion('Seurat') < 3 ) {
           markers_by_sample <- Seurat::FindAllMarkers(
@@ -140,7 +139,7 @@ getMarkerGenes <- function(
           )
         }
       } else {
-        Idents(temp_seurat) <- factor(
+        Seurat::Idents(temp_seurat) <- factor(
           temp_seurat@meta.data[[column_sample]],
           levels = sample_names
         )
@@ -179,7 +178,7 @@ getMarkerGenes <- function(
         #
         if ( exists('genes_on_cell_surface') ) {
           markers_by_sample <- markers_by_sample %>%
-            mutate(on_cell_surface = gene %in% genes_on_cell_surface)
+            dplyr::mutate(on_cell_surface = gene %in% genes_on_cell_surface)
         }
       } else {
         message(paste0('[', format(Sys.time(), '%H:%M:%S'), '] No marker genes found for any of the samples.'))
@@ -213,7 +212,7 @@ getMarkerGenes <- function(
     if ( length(cluster_names) > 1 ) {
       message(paste0('[', format(Sys.time(), '%H:%M:%S'), '] Get marker genes by cluster...'))
       if ( temp_seurat@version < 3 ) {
-        temp_seurat <- SetAllIdent(temp_seurat, id = column_cluster)
+        temp_seurat <- Seurat::SetAllIdent(temp_seurat, id = column_cluster)
         temp_seurat@ident <- factor(temp_seurat@ident, levels = cluster_names)
         if ( packageVersion('Seurat') < 3 ) {
           markers_by_cluster <- Seurat::FindAllMarkers(
@@ -239,7 +238,7 @@ getMarkerGenes <- function(
           )
         }
       } else {
-        Idents(temp_seurat) <- factor(
+        Seurat::Idents(temp_seurat) <- factor(
           temp_seurat@meta.data[[column_cluster]],
           levels = cluster_names
         )
@@ -275,7 +274,7 @@ getMarkerGenes <- function(
         #
         if ( exists('genes_on_cell_surface') ) {
           markers_by_cluster <- markers_by_cluster %>%
-            mutate(on_cell_surface = gene %in% genes_on_cell_surface)
+            dplyr::mutate(on_cell_surface = gene %in% genes_on_cell_surface)
         }
       } else {
         message(paste0('[', format(Sys.time(), '%H:%M:%S'), '] No marker genes found for any of the clusters.'))

@@ -25,8 +25,7 @@ getMostExpressedGenes <- function(
 ) {
   # check if Seurat is installed
   if (!requireNamespace("Seurat", quietly = TRUE)) {
-    stop("Package \"Seurat\" needed for this function to work. Please install it.",
-      call. = FALSE)
+    stop("Package 'Seurat' needed for this function to work. Please install it.", call. = FALSE)
   }
   ##--------------------------------------------------------------------------##
   ## create backup of Seurat object (probably not necessary)
@@ -78,14 +77,14 @@ getMostExpressedGenes <- function(
           temp_table <- temp_seurat@raw.data %>%
             as.data.frame(stringsAsFactors = FALSE) %>%
             dplyr::select(which(temp_seurat@meta.data[[column_sample]] == x)) %>%
-            mutate(
+            dplyr::mutate(
               sample = x,
               gene = rownames(.),
               rowSums = rowSums(.),
               pct = rowSums / sum(.[1:(ncol(.))]) * 100
             ) %>%
             dplyr::select(c('sample','gene','pct')) %>%
-            arrange(-pct) %>%
+            dplyr::arrange(-pct) %>%
             head(100)
         })
       } else {
@@ -93,19 +92,19 @@ getMostExpressedGenes <- function(
           temp_table <- temp_seurat@assays$RNA@counts %>%
             as.data.frame(stringsAsFactors = FALSE) %>%
             dplyr::select(which(temp_seurat@meta.data[[column_sample]] == x)) %>%
-            mutate(
+            dplyr::mutate(
               sample = x,
               gene = rownames(.),
               rowSums = rowSums(.),
               pct = rowSums / sum(.[1:(ncol(.))]) * 100
             ) %>%
             dplyr::select(c('sample','gene','pct')) %>%
-            arrange(-pct) %>%
+            dplyr::arrange(-pct) %>%
             head(100)
         })
       }
       most_expressed_genes_by_sample <- do.call(rbind, results) %>%
-        mutate(sample = factor(sample, levels = sample_names))
+        dplyr::mutate(sample = factor(sample, levels = sample_names))
       temp_seurat@misc$most_expressed_genes$by_sample <- most_expressed_genes_by_sample
     }
   }
@@ -149,14 +148,14 @@ getMostExpressedGenes <- function(
           temp_table <- temp_seurat@raw.data %>%
             as.data.frame(stringsAsFactors = FALSE) %>%
             dplyr::select(which(temp_seurat@meta.data[[column_cluster]] == x)) %>%
-            mutate(
+            dplyr::mutate(
               cluster = x,
               gene = rownames(.),
               rowSums = rowSums(.),
               pct = rowSums / sum(.[1:(ncol(.))]) * 100
             ) %>%
             dplyr::select(c('cluster','gene','pct')) %>%
-            arrange(-pct) %>%
+            dplyr::arrange(-pct) %>%
             head(100)
         })
       } else {
@@ -164,19 +163,19 @@ getMostExpressedGenes <- function(
           temp_table <- temp_seurat@assays$RNA@counts %>%
             as.data.frame(stringsAsFactors = FALSE) %>%
             dplyr::select(which(temp_seurat@meta.data[[column_cluster]] == x)) %>%
-            mutate(
+            dplyr::mutate(
               cluster = x,
               gene = rownames(.),
               rowSums = rowSums(.),
               pct = rowSums / sum(.[1:(ncol(.))]) * 100
             ) %>%
             dplyr::select(c('cluster','gene','pct')) %>%
-            arrange(-pct) %>%
+            dplyr::arrange(-pct) %>%
             head(100)
         })
       }
       most_expressed_genes_by_cluster <- do.call(rbind, results) %>%
-        mutate(cluster = factor(cluster, levels = cluster_names))
+        dplyr::mutate(cluster = factor(cluster, levels = cluster_names))
       temp_seurat@misc$most_expressed_genes$by_cluster <- most_expressed_genes_by_cluster
     }
   }

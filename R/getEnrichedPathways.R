@@ -50,8 +50,7 @@ getEnrichedPathways <- function(
 ) {
   # check if Seurat is installed
   if (!requireNamespace("Seurat", quietly = TRUE)) {
-    stop("Package \"Seurat\" needed for this function to work. Please install it.",
-      call. = FALSE)
+    stop("Package 'Seurat' needed for this function to work. Please install it.", call. = FALSE)
   }
   ##--------------------------------------------------------------------------##
   ## create backup of Seurat object (probably not necessary)

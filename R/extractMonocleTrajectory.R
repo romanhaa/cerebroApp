@@ -34,13 +34,11 @@ extractMonocleTrajectory <- function(
   ) {
   # check if Seurat is installed
   if (!requireNamespace("Seurat", quietly = TRUE)) {
-    stop("Package \"Seurat\" needed for this function to work. Please install it.",
-      call. = FALSE)
+    stop("Package 'Seurat' needed for this function to work. Please install it.", call. = FALSE)
   }
   # check if monocle is installed
   if (!requireNamespace("monocle", quietly = TRUE)) {
-    stop("Package \"monocle\" needed for this function to work. Please install it.",
-      call. = FALSE)
+    stop("Package 'monocle' needed for this function to work. Please install it.", call. = FALSE)
   }
   ##--------------------------------------------------------------------------##
   ## Check if...

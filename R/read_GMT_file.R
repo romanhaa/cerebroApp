@@ -9,7 +9,6 @@
 #' descriptions stored in lists.
 #' @keywords seurat cerebro
 #' @import dplyr
-#' @importFrom readr read_delim
 #' @examples
 #' my_gmt <- read_GMT_file(
 #'   file = 'path/to/my/gene_sets.gmt'
@@ -21,7 +20,7 @@ read_GMT_file <- function(file)
     file,
     delim = ';',
     col_names = c('X1'),
-    col_types = cols()
+    col_types = readr::cols()
   )
 
   gene_set_genes <- list()

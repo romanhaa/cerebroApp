@@ -195,7 +195,7 @@ geneSetExpression_plot_data <- reactive({
   } else {
     plot$level <- geneSetData()$genes_to_display_present %>%
       sample_data()$expression[ . , cells_to_display ] %>%
-      colMeans()
+      Matrix::colMeans()
   }
   if ( plot_order == "Random" ) {
     plot <- sample(1:nrow(plot), nrow(plot)) %>%

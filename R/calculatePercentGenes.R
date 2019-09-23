@@ -17,8 +17,7 @@ calculatePercentGenes <- function(
 ) {
   # check if Seurat is installed
   if (!requireNamespace("Seurat", quietly = TRUE)) {
-    stop("Package \"Seurat\" needed for this function to work. Please install it.",
-      call. = FALSE)
+    stop("Package 'Seurat' needed for this function to work. Please install it.", call. = FALSE)
   }
   ##--------------------------------------------------------------------------##
   ## get for every supplied gene list, get the genes that are present in the

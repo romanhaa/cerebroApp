@@ -10,7 +10,6 @@
 #' @keywords seurat cerebro
 #' @export
 #' @import dplyr
-#' @import readr
 #' @examples
 #' seurat <- addPercentMtRibo(
 #'   object = seurat,
@@ -24,8 +23,7 @@ addPercentMtRibo <- function(
 ) {
   # check if Seurat is installed
   if (!requireNamespace("Seurat", quietly = TRUE)) {
-    stop("Package \"Seurat\" needed for this function to work. Please install it.",
-      call. = FALSE)
+    stop("Package 'Seurat' needed for this function to work. Please install it.", call. = FALSE)
   }
   ##--------------------------------------------------------------------------##
   ## check if organism is supported
@@ -59,7 +57,7 @@ addPercentMtRibo <- function(
         paste0('genes_mt_', organism, '_', gene_nomenclature, '.txt'),
         package = 'cerebroPrepare'
       ),
-      col_types = cols(),
+      col_types = readr::cols(),
       col_names = FALSE
     ) %>%
     dplyr::select(1) %>%
@@ -71,7 +69,7 @@ addPercentMtRibo <- function(
         paste0('genes_ribo_', organism, '_', gene_nomenclature, '.txt'),
         package = 'cerebroPrepare'
       ),
-      col_types = cols(),
+      col_types = readr::cols(),
       col_names = FALSE
     ) %>%
     dplyr::select(1) %>%

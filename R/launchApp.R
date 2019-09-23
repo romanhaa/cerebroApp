@@ -1,5 +1,5 @@
 #' Launch Cerebro app.
-#' @export launchApp
+#' @export
 #' @param maxFileSize Maximum size of input file; defaults to 800 MB.
 #' @return Cerebro application object
 #' @import dplyr
@@ -8,7 +8,6 @@
 #' @import ggplot2
 #' @importFrom ggtree geom_tree geom_tiplab geom_tippoint theme_tree
 #' @importFrom msigdbr msigdbr
-#' @import Matrix
 #' @importFrom plotly layout plot_ly plotlyOutput renderPlotly toWebGL
 #' @importFrom reshape2 melt
 #' @import shiny

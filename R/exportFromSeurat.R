@@ -26,7 +26,6 @@
 #' @keywords seurat cerebro
 #' @export
 #' @import dplyr
-#' @import tidyr
 #' @examples
 #' exportFromSeurat(
 #'   object = seurat,
@@ -56,8 +55,7 @@ exportFromSeurat <- function(
 ) {
   # check if Seurat is installed
   if (!requireNamespace("Seurat", quietly = TRUE)) {
-    stop("Package \"Seurat\" needed for this function to work. Please install it.",
-      call. = FALSE)
+    stop("Package 'Seurat' needed for this function to work. Please install it.", call. = FALSE)
   }
   ##--------------------------------------------------------------------------##
   ## check provided parameters
@@ -188,25 +186,25 @@ exportFromSeurat <- function(
   ##--------------------------------------------------------------------------##
   message(paste0('[', format(Sys.time(), '%H:%M:%S'), '] Stratifying samples by clusters...'))
   export$samples$by_cluster <- export$cells %>%
-    group_by(sample, cluster) %>%
-    summarize(count = n()) %>%
-    spread(cluster, count, fill = 0) %>%
-    ungroup() %>%
-    mutate(total_cell_count = rowSums(.[c(2:ncol(.))])) %>%
-    dplyr::select(c('sample', 'total_cell_count', everything())) %>%
-    arrange(factor(sample, levels = sample_names))
+    dplyr::group_by(sample, cluster) %>%
+    dplyr::summarize(count = dplyr::n()) %>%
+    tidyr::spread(cluster, count, fill = 0) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(total_cell_count = rowSums(.[c(2:ncol(.))])) %>%
+    dplyr::select(c('sample', 'total_cell_count', dplyr::everything())) %>%
+    dplyr::arrange(factor(sample, levels = sample_names))
   ##--------------------------------------------------------------------------##
   ## clusters by sample
   ##--------------------------------------------------------------------------##
   message(paste0('[', format(Sys.time(), '%H:%M:%S'), '] Stratifying clusters by samples...'))
   export$clusters$by_samples <- export$cells %>%
-    group_by(cluster, sample) %>%
-    summarize(count = n()) %>%
-    spread(sample, count, fill = 0) %>%
-    ungroup() %>%
-    mutate(total_cell_count = rowSums(.[c(2:ncol(.))])) %>%
-    dplyr::select(c('cluster', 'total_cell_count', everything())) %>%
-    arrange(factor(cluster, levels = cluster_names))
+    dplyr::group_by(cluster, sample) %>%
+    dplyr::summarize(count = dplyr::n()) %>%
+    tidyr::spread(sample, count, fill = 0) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(total_cell_count = rowSums(.[c(2:ncol(.))])) %>%
+    dplyr::select(c('cluster', 'total_cell_count', dplyr::everything())) %>%
+    dplyr::arrange(factor(cluster, levels = cluster_names))
   ##--------------------------------------------------------------------------##
   ## cell cycle Seurat (if present)
   ##--------------------------------------------------------------------------##
@@ -215,22 +213,22 @@ exportFromSeurat <- function(
     export$cells$cell_cycle_seurat <- object@meta.data[[column_cell_cycle_seurat]]
     # by sample
     export$samples$by_cell_cycle_seurat <- export$cells %>%
-      group_by(sample, cell_cycle_seurat) %>%
-      summarize(count = n()) %>%
-      spread(cell_cycle_seurat, count, fill = 0) %>%
-      ungroup() %>%
-      mutate(total_cell_count = rowSums(.[c(2:ncol(.))])) %>%
-      dplyr::select(c('sample', 'total_cell_count', everything())) %>%
-      arrange(factor(sample, levels = sample_names))
+      dplyr::group_by(sample, cell_cycle_seurat) %>%
+      dplyr::summarize(count = dplyr::n()) %>%
+      tidyr::spread(cell_cycle_seurat, count, fill = 0) %>%
+      dplyr::ungroup() %>%
+      dplyr::mutate(total_cell_count = rowSums(.[c(2:ncol(.))])) %>%
+      dplyr::select(c('sample', 'total_cell_count', dplyr::everything())) %>%
+      dplyr::arrange(factor(sample, levels = sample_names))
     # by cluster
     export$clusters$by_cell_cycle_seurat <- export$cells %>%
-      group_by(cluster, cell_cycle_seurat) %>%
-      summarize(count = n()) %>%
-      spread(cell_cycle_seurat, count, fill = 0) %>%
-      ungroup() %>%
-      mutate(total_cell_count = rowSums(.[c(2:ncol(.))])) %>%
-      dplyr::select(c('cluster', 'total_cell_count', everything())) %>%
-      arrange(factor(cluster, levels = cluster_names))
+      dplyr::group_by(cluster, cell_cycle_seurat) %>%
+      dplyr::summarize(count = dplyr::n()) %>%
+      tidyr::spread(cell_cycle_seurat, count, fill = 0) %>%
+      dplyr::ungroup() %>%
+      dplyr::mutate(total_cell_count = rowSums(.[c(2:ncol(.))])) %>%
+      dplyr::select(c('cluster', 'total_cell_count', dplyr::everything())) %>%
+      dplyr::arrange(factor(cluster, levels = cluster_names))
     meta_data_columns <- meta_data_columns[-which(meta_data_columns == column_cell_cycle_seurat)]
   }
   ##--------------------------------------------------------------------------##
@@ -241,22 +239,22 @@ exportFromSeurat <- function(
     export$cells$cell_cycle_cyclone <- object@meta.data[[column_cell_cycle_cyclone]]
     # by sample
     export$samples$by_cell_cycle_cyclone <- export$cells %>%
-      group_by(sample, cell_cycle_cyclone) %>%
-      summarize(count = n()) %>%
-      spread(cell_cycle_cyclone, count, fill = 0) %>%
-      ungroup() %>%
-      mutate(total_cell_count = rowSums(.[c(2:ncol(.))])) %>%
-      dplyr::select(c('sample', 'total_cell_count', everything())) %>%
-      arrange(factor(sample, levels = sample_names))
+      dplyr::group_by(sample, cell_cycle_cyclone) %>%
+      dplyr::summarize(count = dplyr::n()) %>%
+      tidyr::spread(cell_cycle_cyclone, count, fill = 0) %>%
+      dplyr::ungroup() %>%
+      dplyr::mutate(total_cell_count = rowSums(.[c(2:ncol(.))])) %>%
+      dplyr::select(c('sample', 'total_cell_count', dplyr::everything())) %>%
+      dplyr::arrange(factor(sample, levels = sample_names))
     # by cluster
     export$clusters$by_cell_cycle_cyclone <- export$cells %>%
-      group_by(cluster, cell_cycle_cyclone) %>%
-      summarize(count = n()) %>%
-      spread(cell_cycle_cyclone, count, fill = 0) %>%
-      ungroup() %>%
-      mutate(total_cell_count = rowSums(.[c(2:ncol(.))])) %>%
-      dplyr::select(c('cluster', 'total_cell_count', everything())) %>%
-      arrange(factor(cluster, levels = cluster_names))
+      dplyr::group_by(cluster, cell_cycle_cyclone) %>%
+      dplyr::summarize(count = dplyr::n()) %>%
+      tidyr::spread(cell_cycle_cyclone, count, fill = 0) %>%
+      dplyr::ungroup() %>%
+      dplyr::mutate(total_cell_count = rowSums(.[c(2:ncol(.))])) %>%
+      dplyr::select(c('cluster', 'total_cell_count', dplyr::everything())) %>%
+      dplyr::arrange(factor(cluster, levels = cluster_names))
     meta_data_columns <- meta_data_columns[-which(meta_data_columns == column_cell_cycle_cyclone)]
   }
   ##--------------------------------------------------------------------------##
