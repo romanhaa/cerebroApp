@@ -1,4 +1,4 @@
-[![](https://img.shields.io/github/license/romanhaa/cerebroPrepare)](LICENSE.md)
+[![](https://img.shields.io/github/license/romanhaa/cerebroApp)](LICENSE.md)
 [![](https://img.shields.io/twitter/url/https/twitter.com/fakechek1.svg?label=Follow%20%40fakechek1&style=social)](https://twitter.com/fakechek1)
 
 # cerebroApp
