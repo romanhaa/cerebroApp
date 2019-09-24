@@ -20,7 +20,7 @@
 #' launchCerebro(maxFileSize = 800)
 launchCerebro <- function(
   maxFileSize = 800
-) {
+){
 
   ##--------------------------------------------------------------------------##
   ##
