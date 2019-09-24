@@ -39,7 +39,7 @@ exportFromSeurat(seurat, 'my_experiment.crb')
 
 ### Launch Cerebro
 
-Launch Cerebro and load the RDS file you just exported from R.
+Launch Cerebro and load the `.crb` (or `.rds`) file you just exported from R.
 
 ```r
 launchCerebro()
