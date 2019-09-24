@@ -349,7 +349,7 @@ exportFromSeurat <- function(
       paste0(
         '[', format(Sys.time(), '%H:%M:%S'), '] ',
         'Will export the following trajectories: ',
-        paste(names(seurat@misc$trajectory), collapse = ', ')
+        paste(names(seurat@misc$trajectory$monocle2), collapse = ', ')
       )
     )
     export$trajectory <- seurat@misc$trajectory
