@@ -74,14 +74,10 @@ output[["expression_UI"]] <- renderUI({
 output[["expression_scales"]] <- renderUI({
   req(input[["expression_projection_to_display"]])
   projection_to_display <- input[["expression_projection_to_display"]]
-  range_x_min <- round(
-      min(sample_data()$projections[[ projection_to_display ]][,1]) * 1.1)
-  range_x_max <- round(
-      max(sample_data()$projections[[ projection_to_display ]][,1]) * 1.1)
-  range_y_min <- round(
-      min(sample_data()$projections[[ projection_to_display ]][,2]) * 1.1)
-  range_y_max <- round(
-      max(sample_data()$projections[[ projection_to_display ]][,2]) * 1.1)
+  range_x_min <- sample_data()$projections[[ projection_to_display ]][,1] %>% min() %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round()
+  range_x_max <- sample_data()$projections[[ projection_to_display ]][,1] %>% max() %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
+  range_y_min <- sample_data()$projections[[ projection_to_display ]][,2] %>% min() %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round()
+  range_y_max <- sample_data()$projections[[ projection_to_display ]][,2] %>% max() %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
   tagList(
     sliderInput(
       "expression_projection_scale_x_manual_range",
