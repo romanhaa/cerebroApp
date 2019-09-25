@@ -228,7 +228,7 @@ performGeneSetEnrichmentAnalysis <- function(
     # add description, number of genes and list of genes to results
     results_by_sample <- dplyr::left_join(results_by_sample, gene_sets_tibble, by = 'name') %>%
       dplyr::select(group, name, description, length, genes, enrichment_score, p_value, q_value) %>%
-      dplyr::mutate(group = factor(group, levels = sample_names))
+      dplyr::mutate(group = factor(group, levels = intersect(sample_names, group)))
 
     # print number of enriched gene sets
     message(
@@ -332,7 +332,7 @@ performGeneSetEnrichmentAnalysis <- function(
     # add description, number of genes and list of genes to results
     results_by_cluster <- dplyr::left_join(results_by_cluster, gene_sets_tibble, by = 'name') %>%
       dplyr::select(group, name, description, length, genes, enrichment_score, p_value, q_value) %>%
-      dplyr::mutate(group = factor(group, levels = cluster_names))
+      dplyr::mutate(group = factor(group, levels = intersect(cluster_names, group)))
 
     # print number of enriched gene sets
     message(

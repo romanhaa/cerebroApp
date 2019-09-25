@@ -86,7 +86,7 @@ getEnrichedPathways <- function(
         sample_names <- unique(temp_seurat@meta.data[[column_sample]])
       }
       # remove samples for which no marker genes were found
-      sample_names <- sample_names[which(sample_names %in% unique(markers_by_sample$sample))]
+      sample_names <- intersect(sample_names, unique(markers_by_sample$sample))
 
       #
       results_by_sample <- future.apply::future_sapply(
@@ -106,40 +106,41 @@ getEnrichedPathways <- function(
         }
         #
         results_2 <- sapply(names(temp), USE.NAMES = TRUE, simplify = FALSE, function(y) {
-          length <- temp[[y]] %>% dplyr::filter(Adjusted.P.value <= adj_p_cutoff) %>% nrow()
-          # if there are more than max_terms entries with an adjusted p-value of 1 or less...
-          if ( length > max_terms ) {
-            temp[[y]] %>%
-            dplyr::top_n(-max_terms, Adjusted.P.value) %>%
-            dplyr::mutate(db = y)
-          # if there is at least 1 entry with an adjusted p-value of 1 or less...
-          } else if ( length > 0 ) {
-            temp[[y]] %>%
+          # apply cut-off of adj. p-value and add database info as column
+          out <- temp[[y]] %>%
             dplyr::filter(Adjusted.P.value <= adj_p_cutoff) %>%
             dplyr::mutate(db = y)
-          # remove the current database
-          } else {
-            NULL
+          # if there are more than max_terms entries...
+          if ( nrow(out) > max_terms ) {
+            out <- out %>% dplyr::top_n(-max_terms, Adjusted.P.value)
+          # if there are no entries left
+          } else if ( nrow(out) == 0 ) {
+            out <- NULL
           }
+          return(out)
         })
-        # remove samples without any enriched pathways (in any database)
+        # remove dbs without any enriched entries
         for ( i in names(results_2) ) {
-          if ( is.null(results_2[[i]]) ) {
-            results_2[[i]] <- NULL
-          } else {
-            results_2 <- do.call(rbind, results_2)
-          }
+          if ( is.null(results_2[[i]]) ) results_2[[i]] <- NULL
         }
+        # merge databases within each sample
+        results_2 <- do.call(rbind, results_2)
         return(results_2)
       })
+      # remove samples without any enriched entry in any database
+      for ( i in names(results_by_sample) ) {
+        if ( is.null(results_by_sample[[i]]) ) results_by_sample[[i]] <- NULL
+      }
+      # add sample info as column
       for ( i in names(results_by_sample) ) {
         results_by_sample[[i]] <- results_by_sample[[i]] %>%
           dplyr::mutate(sample = i)
       }
+      # merge samples into single table
       results_by_sample <- do.call(rbind, results_by_sample) %>%
         dplyr::select(sample, db, dplyr::everything()) %>%
         dplyr::mutate(
-          sample = factor(sample, levels = sample_names),
+          sample = factor(sample, levels = intersect(sample_names, sample)),
           db = factor(db, databases)
         )
     } else if ( temp_seurat@misc$marker_genes$by_sample == 'no_markers_found' ) {
@@ -173,7 +174,7 @@ getEnrichedPathways <- function(
         cluster_names <- sort(unique(temp_seurat@meta.data[[column_cluster]]))
       }
       # remove clusters for which no marker genes were found
-      cluster_names <- cluster_names[which(cluster_names %in% unique(markers_by_cluster$cluster))]
+      cluster_names <- intersect(cluster_names, unique(markers_by_cluster$cluster))
 
       #
       results_by_cluster <- future.apply::future_sapply(
@@ -193,41 +194,42 @@ getEnrichedPathways <- function(
         }
         #
         results_2 <- sapply(names(temp), USE.NAMES = TRUE, simplify = FALSE, function(y) {
-          length <- temp[[y]] %>% dplyr::filter(Adjusted.P.value <= adj_p_cutoff) %>% nrow()
-          # if there are more than max_terms entries with an adjusted p-value of 1 or less...
-          if ( length > max_terms ) {
-            temp[[y]] %>%
-            dplyr::top_n(-max_terms, Adjusted.P.value) %>%
-            dplyr::mutate(db = y)
-          # if there is at least 1 entry with an adjusted p-value of 1 or less...
-          } else if ( length > 0 ) {
-            temp[[y]] %>%
+          # apply cut-off of adj. p-value and add database info as column
+          out <- temp[[y]] %>%
             dplyr::filter(Adjusted.P.value <= adj_p_cutoff) %>%
             dplyr::mutate(db = y)
-          # remove the curent database
-          } else {
-            NULL
+          # if there are more than max_terms entries...
+          if ( nrow(out) > max_terms ) {
+            out <- out %>% dplyr::top_n(-max_terms, Adjusted.P.value)
+          # if there are no entries left
+          } else if ( nrow(out) == 0 ) {
+            out <- NULL
           }
+          return(out)
         })
-        # remove samples without any enriched pathways (in any database)
+        # remove dbs without any enriched entries
         for ( i in names(results_2) ) {
-          if ( is.null(results_2[[i]]) ) {
-            results_2[[i]] <- NULL
-          } else {
-            results_2 <- do.call(rbind, results_2)
-          }
+          if ( is.null(results_2[[i]]) ) results_2[[i]] <- NULL
         }
+        # merge databases within each cluster
+        results_2 <- do.call(rbind, results_2)
         return(results_2)
       })
+      # remove clusters without any enriched entry in any database
+      for ( i in names(results_by_cluster) ) {
+        if ( is.null(results_by_cluster[[i]]) ) results_by_cluster[[i]] <- NULL
+      }
+      # add cluster info as column
       for ( i in names(results_by_cluster) ) {
         results_by_cluster[[i]] <- results_by_cluster[[i]] %>%
           dplyr::mutate(cluster = i)
       }
+      # merge clusters into single table
       results_by_cluster <- do.call(rbind, results_by_cluster) %>%
         dplyr::select(cluster, db, dplyr::everything()) %>%
         dplyr::mutate(
-          cluster = factor(cluster, levels = cluster_names),
-          db = factor(db, levels = databases)
+          cluster = factor(cluster, levels = intersect(cluster_names, cluster)),
+          db = factor(db, databases)
         )
     } else if ( temp_seurat@misc$marker_genes$by_cluster == 'no_markers_found' ) {
       message(paste0('[', format(Sys.time(), '%H:%M:%S'), '] Skipping pathway enrichment for cluster because no marker genes were identified for any cluster.'))
