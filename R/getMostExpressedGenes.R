@@ -52,7 +52,7 @@ getMostExpressedGenes <- function(
   if ( !is.null(column_sample) && column_sample %in% names(temp_seurat@meta.data) ) {
     #
     if ( is.factor(temp_seurat@meta.data[[column_sample]]) ) {
-      sample_names <- as.character(levels(temp_seurat@meta.data[[column_sample]]))
+      sample_names <- levels(temp_seurat@meta.data[[column_sample]])
     } else {
       sample_names <- unique(temp_seurat@meta.data[[column_sample]])
       if ( any(is.na(sample_names)) ) {
@@ -66,13 +66,7 @@ getMostExpressedGenes <- function(
         )
       }
     }
-    if ( length(sample_names) > 1 ) {
-      most_expressed_genes_by_sample <- data.frame(
-        'sample' = character(),
-        'gene' = character(),
-        'pct' = double(),
-        stringsAsFactors = FALSE
-      )
+    if ( length(sample_names) >= 1 ) {
       message(paste0('[', format(Sys.time(), '%H:%M:%S'), '] Get most expressed genes by sample...'))
       if ( temp_seurat@version < 3 ) {
         results <- pbapply::pblapply(sample_names, function(x) {
@@ -123,7 +117,7 @@ getMostExpressedGenes <- function(
   ##--------------------------------------------------------------------------##
   if ( !is.null(column_cluster) && column_cluster %in% names(temp_seurat@meta.data) ) {
     if ( is.factor(temp_seurat@meta.data[[column_cluster]]) ) {
-      cluster_names <- as.character(levels(temp_seurat@meta.data[[column_cluster]]))
+      cluster_names <- levels(temp_seurat@meta.data[[column_cluster]])
     } else {
       cluster_names <- sort(unique(temp_seurat@meta.data[[column_cluster]]))
       if ( any(is.na(cluster_names)) ) {
@@ -137,13 +131,7 @@ getMostExpressedGenes <- function(
         )
       }
     }
-    if ( length(cluster_names) > 1 ) {
-      most_expressed_genes_by_cluster <- data.frame(
-          'cluster' = character(),
-          'gene' = character(),
-          'expr' = double(),
-          stringsAsFactors = FALSE
-        )
+    if ( length(cluster_names) >= 1 ) {
       message(paste0('[', format(Sys.time(), '%H:%M:%S'), '] Get most expressed genes by cluster...'))
       if ( temp_seurat@version < 3 ) {
         results <- pbapply::pblapply(cluster_names, function(x) {
