@@ -151,7 +151,7 @@ performGeneSetEnrichmentAnalysis <- function(
   #----------------------------------------------------------------------------#
   # workflow for samples
   #----------------------------------------------------------------------------#
-  if ( object@meta.data[[column_sample]] %>% unique() %>% length() > 1 ) {
+  if ( object@meta.data[[column_sample]] %>% unique() %>% length() >= 1 ) {
     message(
       paste0(
         '[', format(Sys.time(), '%H:%M:%S'), '] Performing GSVA for samples...'
@@ -255,7 +255,7 @@ performGeneSetEnrichmentAnalysis <- function(
   #----------------------------------------------------------------------------#
   # workflow for clusters
   #----------------------------------------------------------------------------#
-  if ( object@meta.data[[column_cluster]] %>% unique() %>% length() > 1 ) {
+  if ( object@meta.data[[column_cluster]] %>% unique() %>% length() >= 1 ) {
     message(
       paste0(
         '[', format(Sys.time(), '%H:%M:%S'), '] Performing GSVA for clusters...'
