@@ -80,19 +80,6 @@ getMarkerGenes <- function(
   ##--------------------------------------------------------------------------##
   temp_seurat <- object
   ##--------------------------------------------------------------------------##
-  ## create slot for results in Seurat object
-  ##--------------------------------------------------------------------------##
-  if ( is.null(object@misc$marker_genes) ) {
-    temp_seurat@misc$marker_genes <- list()
-  }
-  temp_seurat@misc$marker_genes$parameters <- list(
-    only_positive = only_pos,
-    minimum_percentage = min_pct,
-    logFC_threshold = thresh_logFC,
-    p_value_threshold = thresh_p_val,
-    test = test
-  )
-  ##--------------------------------------------------------------------------##
   ## samples
   ## - check if column_sample is provided and exists in meta data
   ## - get sample names
@@ -183,9 +170,9 @@ getMarkerGenes <- function(
         message(paste0('[', format(Sys.time(), '%H:%M:%S'), '] No marker genes found for any of the samples.'))
         markers_by_sample <- 'no_markers_found'
       }
-      temp_seurat@misc$marker_genes$by_sample <- markers_by_sample
     } else {
       message('Sample column provided but only 1 sample found.')
+      markers_by_sample <- 'no_markers_found'
     }
   } else {
     warning(paste0('Cannot find specified column (`object@meta.data$', column_sample, '`) that is supposed to contain sample information.'))
@@ -278,13 +265,28 @@ getMarkerGenes <- function(
         message(paste0('[', format(Sys.time(), '%H:%M:%S'), '] No marker genes found for any of the clusters.'))
         markers_by_cluster <- 'no_markers_found'
       }
-      temp_seurat@misc$marker_genes$by_cluster <- markers_by_cluster
     } else {
       message('Cluster column provided but only 1 cluster found.')
+      markers_by_cluster <- 'no_markers_found'
     }
   } else {
     warning(paste0('Cannot find specified column (`object@meta.data$', column_cluster, '`) that is supposed to contain cluster information.'))
   }
+  #----------------------------------------------------------------------------#
+  # merge results, add to Seurat object and return Seurat object
+  #----------------------------------------------------------------------------#
+  results <- list(
+    by_sample = markers_by_sample,
+    by_cluster = markers_by_cluster,
+    parameters = list(
+      only_positive = only_pos,
+      minimum_percentage = min_pct,
+      logFC_threshold = thresh_logFC,
+      p_value_threshold = thresh_p_val,
+      test = test
+    )
+  )
+  temp_seurat@misc$marker_genes <- results
   ##--------------------------------------------------------------------------##
   ## return Seurat object
   ##--------------------------------------------------------------------------##
