@@ -62,7 +62,7 @@ getEnrichedPathways <- function(
   ## check if marker genes are present and stop if they aren't
   ##--------------------------------------------------------------------------##
   if ( is.null(temp_seurat@misc$marker_genes) ) {
-    stop("Please run 'getMarkerGenes()' first.", call. = FALSE)
+    stop("No marker genes found. Please run 'getMarkerGenes()' first.", call. = FALSE)
   }
   ##--------------------------------------------------------------------------##
   ## samples
@@ -143,6 +143,12 @@ getEnrichedPathways <- function(
           sample = factor(sample, levels = intersect(sample_names, sample)),
           db = factor(db, databases)
         )
+      message(
+        paste0(
+          '[', format(Sys.time(), '%H:%M:%S'), '] ', nrow(results_by_sample),
+          ' pathways passed the thresholds across all samples and databases.'
+        )
+      )
     } else if ( temp_seurat@misc$marker_genes$by_sample == 'no_markers_found' ) {
       message(paste0('[', format(Sys.time(), '%H:%M:%S'), '] Skipping pathway enrichment for samples because no marker genes were identified for any sample.'))
       results_by_sample <- 'no_markers_found'
@@ -150,7 +156,7 @@ getEnrichedPathways <- function(
       warning('Unexpected data format of marker genes for samples. Please submit an issue on GitHub: https://github.com/romanhaa/cerebroApp.')
     }
   } else {
-    warning('No marker genes for samples available.')
+    message(paste0('[', format(Sys.time(), '%H:%M:%S'), '] No marker genes for samples available.'))
   }
   ##--------------------------------------------------------------------------##
   ## clusters
@@ -231,6 +237,12 @@ getEnrichedPathways <- function(
           cluster = factor(cluster, levels = intersect(cluster_names, cluster)),
           db = factor(db, databases)
         )
+      message(
+        paste0(
+          '[', format(Sys.time(), '%H:%M:%S'), '] ', nrow(results_by_cluster),
+          ' pathways passed the thresholds across all clusters and databases.'
+        )
+      )
     } else if ( temp_seurat@misc$marker_genes$by_cluster == 'no_markers_found' ) {
       message(paste0('[', format(Sys.time(), '%H:%M:%S'), '] Skipping pathway enrichment for cluster because no marker genes were identified for any cluster.'))
       results_by_cluster <- 'no_markers_found'
@@ -238,9 +250,8 @@ getEnrichedPathways <- function(
       warning('Unexpected data format of marker genes for clusters. Please submit an issue on GitHub: https://github.com/romanhaa/cerebroApp.')
     }
   } else {
-    warning('No marker genes for clusters available.')
+    message(paste0('[', format(Sys.time(), '%H:%M:%S'), '] No marker genes for clusters available.'))
   }
-
   #----------------------------------------------------------------------------#
   # merge results, add to Seurat object and return Seurat object
   #----------------------------------------------------------------------------#
