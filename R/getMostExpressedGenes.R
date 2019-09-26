@@ -71,6 +71,7 @@ getMostExpressedGenes <- function(
       if ( temp_seurat@version < 3 ) {
         results <- pbapply::pblapply(sample_names, function(x) {
           temp_table <- temp_seurat@raw.data %>%
+            as.matrix() %>%
             as.data.frame(stringsAsFactors = FALSE) %>%
             dplyr::select(which(temp_seurat@meta.data[[column_sample]] == x)) %>%
             dplyr::mutate(
@@ -86,6 +87,7 @@ getMostExpressedGenes <- function(
       } else {
         results <- pbapply::pblapply(sample_names, function(x) {
           temp_table <- temp_seurat@assays$RNA@counts %>%
+            as.matrix() %>%
             as.data.frame(stringsAsFactors = FALSE) %>%
             dplyr::select(which(temp_seurat@meta.data[[column_sample]] == x)) %>%
             dplyr::mutate(
@@ -136,6 +138,7 @@ getMostExpressedGenes <- function(
       if ( temp_seurat@version < 3 ) {
         results <- pbapply::pblapply(cluster_names, function(x) {
           temp_table <- temp_seurat@raw.data %>%
+            as.matrix() %>%
             as.data.frame(stringsAsFactors = FALSE) %>%
             dplyr::select(which(temp_seurat@meta.data[[column_cluster]] == x)) %>%
             dplyr::mutate(
@@ -151,6 +154,7 @@ getMostExpressedGenes <- function(
       } else {
         results <- pbapply::pblapply(cluster_names, function(x) {
           temp_table <- temp_seurat@assays$RNA@counts %>%
+            as.matrix() %>%
             as.data.frame(stringsAsFactors = FALSE) %>%
             dplyr::select(which(temp_seurat@meta.data[[column_cluster]] == x)) %>%
             dplyr::mutate(
