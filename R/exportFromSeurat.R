@@ -109,7 +109,7 @@ exportFromSeurat <- function(
   ##--------------------------------------------------------------------------##
   ## initialize export object
   ##--------------------------------------------------------------------------##
-  message(paste0('[', format(Sys.time(), '%H:%M:%S'), '] Initializing Cerebro data slot...'))
+  message(paste0('[', format(Sys.time(), '%H:%M:%S'), '] Initializing Cerebro object...'))
   export <- list(
     experiment = list(
       experiment_name = experiment_name,
