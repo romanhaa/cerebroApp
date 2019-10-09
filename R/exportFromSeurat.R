@@ -151,9 +151,18 @@ exportFromSeurat <- function(
     sample_names <- unique(object@meta.data[[column_sample]])
   }
   export$samples <- list(
-    colors = setNames(colors[ 1:length(sample_names) ], sample_names),
+    colors = NA,
     overview = data.frame('sample' = sample_names)
   )
+  # recycle colors if more samples than colors are in the data set
+  if ( length(sample_names) <= length(colors) ) {
+    export$samples$colors <- setNames(colors[ 1:length(sample_names) ], sample_names)
+  } else {
+    repeat_this_many_times <- ceiling(length(sample_names)/length(colors))
+    colors_to_assign <- rep(colors, repeat_this_many_times)
+    colors_to_assign <- colors_to_assign[1:length(sample_names)]
+    export$samples$colors <- setNames(colors_to_assign, sample_names)
+  }
   ##--------------------------------------------------------------------------##
   ## clusters
   ##--------------------------------------------------------------------------##
@@ -163,9 +172,18 @@ exportFromSeurat <- function(
     cluster_names <- sort(unique(object@meta.data[[column_cluster]]))
   }
   export$clusters <- list(
-    colors = setNames(colors[ 1:length(cluster_names) ], cluster_names),
+    colors = NA,
     overview = data.frame('cluster' = cluster_names)
   )
+  # recycle colors if more clusters than colors are in the data set
+  if ( length(cluster_names) <= length(colors) ) {
+    export$clusters$colors <- setNames(colors[ 1:length(cluster_names) ], cluster_names)
+  } else {
+    repeat_this_many_times <- ceiling(length(cluster_names)/length(colors))
+    colors_to_assign <- rep(colors, repeat_this_many_times)
+    colors_to_assign <- colors_to_assign[1:length(cluster_names)]
+    export$clusters$colors <- setNames(colors_to_assign, cluster_names)
+  }
   ##--------------------------------------------------------------------------##
   ## meta data
   ##--------------------------------------------------------------------------##
