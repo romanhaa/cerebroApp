@@ -360,17 +360,17 @@ exportFromSeurat <- function(
   ##--------------------------------------------------------------------------##
   ## trajectories
   ##--------------------------------------------------------------------------##
-  if ( length(seurat@misc$trajectory) == 0 ) {
+  if ( length(object@misc$trajectory) == 0 ) {
     message(paste0('[', format(Sys.time(), '%H:%M:%S'), '] No trajectories to extracting...'))
   } else {
     message(
       paste0(
         '[', format(Sys.time(), '%H:%M:%S'), '] ',
         'Will export the following trajectories: ',
-        paste(names(seurat@misc$trajectory$monocle2), collapse = ', ')
+        paste(names(object@misc$trajectory$monocle2), collapse = ', ')
       )
     )
-    export$trajectory <- seurat@misc$trajectory
+    export$trajectory <- object@misc$trajectory
   }
   ##--------------------------------------------------------------------------##
   ## cluster tree
