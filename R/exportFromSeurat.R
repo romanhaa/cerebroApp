@@ -361,7 +361,7 @@ exportFromSeurat <- function(
   ## trajectories
   ##--------------------------------------------------------------------------##
   if ( length(object@misc$trajectory) == 0 ) {
-    message(paste0('[', format(Sys.time(), '%H:%M:%S'), '] No trajectories to extracting...'))
+    message(paste0('[', format(Sys.time(), '%H:%M:%S'), '] No trajectories to extract...'))
   } else {
     message(
       paste0(
