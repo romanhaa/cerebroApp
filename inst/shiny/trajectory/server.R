@@ -91,7 +91,14 @@ output[["trajectory_UI"]] <- renderUI({
               style = "margin-right: 5px"
             )
           ),
-          plotly::plotlyOutput("states_by_sample_plot")
+          tagList(
+            shinyWidgets::materialSwitch(
+              inputId = "states_by_sample_select_metric_for_bar_plot",
+              label = "Show composition in percent [%]:",
+              status = "primary"
+            ),
+            plotly::plotlyOutput("states_by_sample_plot")
+          )
         )
       ),
       fluidRow(
@@ -107,7 +114,14 @@ output[["trajectory_UI"]] <- renderUI({
               style = "margin-right: 5px"
             )
           ),
-          plotly::plotlyOutput("states_by_cluster_plot")
+          tagList(
+            shinyWidgets::materialSwitch(
+              inputId = "states_by_cluster_select_metric_for_bar_plot",
+              label = "Show composition in percent [%]:",
+              status = "primary"
+            ),
+            plotly::plotlyOutput("states_by_cluster_plot")
+          )
         )
       ),
       fluidRow(
@@ -764,45 +778,75 @@ output[["states_by_sample_plot"]] <- plotly::renderPlotly({
     dplyr::summarize(total = n()) %>%
     dplyr::ungroup()
   # make plot
-  cbind(
-    sample_data()$trajectory$monocle2[[ input[["trajectory_to_display"]] ]][["meta"]],
-    sample_data()$cells
-  ) %>%
-  dplyr::filter(!is.na(pseudotime)) %>%
-  dplyr::group_by(state, sample) %>%
-  dplyr::summarize(count = n()) %>%
-  tidyr::spread(sample, count, fill = 0) %>%
-  dplyr::ungroup() %>%
-  reshape2::melt(id.vars = "state") %>%
-  dplyr::left_join(., cell_count_by_state_total, by = "state") %>%
-  dplyr::rename(sample = variable, cells = value) %>%
-  dplyr::mutate(pct = cells / total * 100) %>%
-  plotly::plot_ly(
-    x = ~state,
-    y = ~pct,
-    type = "bar",
-    color = ~sample,
-    colors = sample_data()$samples$colors,
-    hoverinfo = "text",
-    text = ~paste0("<b>Sample ", .$sample, ": </b>", format(round(.$pct, 1), nsmall = 1), "%")
-  ) %>%
-  plotly::layout(
-    xaxis = list(
-      title = "",
-      mirror = TRUE,
-      showline = TRUE
-    ),
-    yaxis = list(
-      title = "Percentage (%)",
-      range = c(0,100),
-      hoverformat = ".2f",
-      mirror = TRUE,
-      zeroline = FALSE,
-      showline = TRUE
-    ),
-    barmode = "stack",
-    hovermode = "closest"
-  )
+  temp_data <- cbind(
+      sample_data()$trajectory$monocle2[[ input[["trajectory_to_display"]] ]][["meta"]],
+      sample_data()$cells
+    ) %>%
+    dplyr::filter(!is.na(pseudotime)) %>%
+    dplyr::group_by(state, sample) %>%
+    dplyr::summarize(count = n()) %>%
+    tidyr::spread(sample, count, fill = 0) %>%
+    dplyr::ungroup() %>%
+    reshape2::melt(id.vars = "state") %>%
+    dplyr::left_join(., cell_count_by_state_total, by = "state") %>%
+    dplyr::rename(sample = variable, cells = value)
+  if ( input[["states_by_sample_select_metric_for_bar_plot"]] != TRUE ) {
+    temp_data %>%
+    plotly::plot_ly(
+      x = ~state,
+      y = ~cells,
+      type = "bar",
+      color = ~sample,
+      colors = sample_data()$samples$colors,
+      hoverinfo = "text",
+      text = ~paste0("<b>Sample ", .$sample, ": </b>", formatC(.$cells, big.mark = ','))
+    ) %>%
+    plotly::layout(
+      xaxis = list(
+        title = "",
+        mirror = TRUE,
+        showline = TRUE
+      ),
+      yaxis = list(
+        title = "Number of cells",
+        hoverformat = ".2f",
+        mirror = TRUE,
+        zeroline = FALSE,
+        showline = TRUE
+      ),
+      barmode = "stack",
+      hovermode = "compare"
+    )
+  } else {
+    temp_data %>%
+    dplyr::mutate(pct = cells / total * 100) %>%
+    plotly::plot_ly(
+      x = ~state,
+      y = ~pct,
+      type = "bar",
+      color = ~sample,
+      colors = sample_data()$samples$colors,
+      hoverinfo = "text",
+      text = ~paste0("<b>Sample ", .$sample, ": </b>", format(round(.$pct, 1), nsmall = 1), "%")
+    ) %>%
+    plotly::layout(
+      xaxis = list(
+        title = "",
+        mirror = TRUE,
+        showline = TRUE
+      ),
+      yaxis = list(
+        title = "Percentage (%)",
+        range = c(0,100),
+        hoverformat = ".2f",
+        mirror = TRUE,
+        zeroline = FALSE,
+        showline = TRUE
+      ),
+      barmode = "stack",
+      hovermode = "compare"
+    )
+  }
 })
 
 # info button
@@ -817,9 +861,9 @@ observeEvent(input[["states_by_sample_info"]], {
   )
 })
 
-# ##----------------------------------------------------------------------------##
-# ## States by cluster.
-# ##----------------------------------------------------------------------------##
+##----------------------------------------------------------------------------##
+## States by cluster.
+##----------------------------------------------------------------------------##
 
 # bar plot
 output[["states_by_cluster_plot"]] <- plotly::renderPlotly({
@@ -834,45 +878,75 @@ output[["states_by_cluster_plot"]] <- plotly::renderPlotly({
     dplyr::summarize(total = n()) %>%
     dplyr::ungroup()
   # make plot
-  cbind(
-    sample_data()$trajectory$monocle2[[ input[["trajectory_to_display"]] ]][["meta"]],
-    sample_data()$cells
-  ) %>%
-  dplyr::filter(!is.na(pseudotime)) %>%
-  dplyr::group_by(state, cluster) %>%
-  dplyr::summarize(count = n()) %>%
-  tidyr::spread(cluster, count, fill = 0) %>%
-  dplyr::ungroup() %>%
-  reshape2::melt(id.vars = "state") %>%
-  dplyr::left_join(., cell_count_by_state_total, by = "state") %>%
-  dplyr::rename(cluster = variable, cells = value) %>%
-  dplyr::mutate(pct = cells / total * 100) %>%
-  plotly::plot_ly(
-    x = ~state,
-    y = ~pct,
-    type = "bar",
-    color = ~cluster,
-    colors = sample_data()$clusters$colors,
-    hoverinfo = "text",
-    text = ~paste0("<b>Cluster ", .$cluster, ": </b>", format(round(.$pct, 1), nsmall = 1), "%")
-  ) %>%
-  plotly::layout(
-    xaxis = list(
-      title = "",
-      mirror = TRUE,
-      showline = TRUE
-    ),
-    yaxis = list(
-      title = "Percentage (%)",
-      range = c(0,100),
-      hoverformat = ".2f",
-      mirror = TRUE,
-      zeroline = FALSE,
-      showline = TRUE
-    ),
-    barmode = "stack",
-    hovermode = "closest"
-  )
+  temp_data <- cbind(
+      sample_data()$trajectory$monocle2[[ input[["trajectory_to_display"]] ]][["meta"]],
+      sample_data()$cells
+    ) %>%
+    dplyr::filter(!is.na(pseudotime)) %>%
+    dplyr::group_by(state, cluster) %>%
+    dplyr::summarize(count = n()) %>%
+    tidyr::spread(cluster, count, fill = 0) %>%
+    dplyr::ungroup() %>%
+    reshape2::melt(id.vars = "state") %>%
+    dplyr::left_join(., cell_count_by_state_total, by = "state") %>%
+    dplyr::rename(cluster = variable, cells = value)
+  if ( input[["states_by_cluster_select_metric_for_bar_plot"]] != TRUE ) {
+    temp_data %>%
+    plotly::plot_ly(
+      x = ~state,
+      y = ~cells,
+      type = "bar",
+      color = ~cluster,
+      colors = sample_data()$clusters$colors,
+      hoverinfo = "text",
+      text = ~paste0("<b>Cluster ", .$cluster, ": </b>", formatC(.$cells, big.mark = ','))
+    ) %>%
+    plotly::layout(
+      xaxis = list(
+        title = "",
+        mirror = TRUE,
+        showline = TRUE
+      ),
+      yaxis = list(
+        title = "Number of cells",
+        hoverformat = ".2f",
+        mirror = TRUE,
+        zeroline = FALSE,
+        showline = TRUE
+      ),
+      barmode = "stack",
+      hovermode = "compare"
+    )
+  } else {
+    temp_data %>%
+    dplyr::mutate(pct = cells / total * 100) %>%
+    plotly::plot_ly(
+      x = ~state,
+      y = ~pct,
+      type = "bar",
+      color = ~cluster,
+      colors = sample_data()$clusters$colors,
+      hoverinfo = "text",
+      text = ~paste0("<b>Cluster ", .$cluster, ": </b>", format(round(.$pct, 1), nsmall = 1), "%")
+    ) %>%
+    plotly::layout(
+      xaxis = list(
+        title = "",
+        mirror = TRUE,
+        showline = TRUE
+      ),
+      yaxis = list(
+        title = "Percentage (%)",
+        range = c(0,100),
+        hoverformat = ".2f",
+        mirror = TRUE,
+        zeroline = FALSE,
+        showline = TRUE
+      ),
+      barmode = "stack",
+      hovermode = "compare"
+    )
+  }
 })
 
 # info button
@@ -887,14 +961,21 @@ observeEvent(input[["states_by_cluster_info"]], {
   )
 })
 
-# ##----------------------------------------------------------------------------##
-# ## States by cell cycle status (Seurat).
-# ##----------------------------------------------------------------------------##
+##----------------------------------------------------------------------------##
+## States by cell cycle status (Seurat).
+##----------------------------------------------------------------------------##
 
 # UI element
 output[["states_by_cell_cycle_seurat_UI"]] <- renderUI({
   if ( !is.null(sample_data()$cells$cell_cycle_seurat) ) {
-    plotly::plotlyOutput("states_by_cell_cycle_seurat_plot")
+    tagList(
+      shinyWidgets::materialSwitch(
+        inputId = "states_by_cell_cycle_seurat_select_metric_for_bar_plot",
+        label = "Show composition in percent [%]:",
+        status = "primary"
+      ),
+      plotly::plotlyOutput("states_by_cell_cycle_seurat_plot")
+    )
   } else {
     textOutput("states_by_cell_cycle_seurat_text")
   }
@@ -912,48 +993,78 @@ output[["states_by_cell_cycle_seurat_plot"]] <- plotly::renderPlotly({
     dplyr::summarize(total = n()) %>%
     dplyr::ungroup()
   # make plot
-  cbind(
-    sample_data()$trajectory$monocle2[[ input[["trajectory_to_display"]] ]][["meta"]],
-    sample_data()$cells
-  ) %>%
-  dplyr::filter(!is.na(pseudotime)) %>%
-  dplyr::group_by(state, cell_cycle_seurat) %>%
-  dplyr::summarize(count = n()) %>%
-  tidyr::spread(cell_cycle_seurat, count, fill = 0) %>%
-  dplyr::ungroup() %>%
-  reshape2::melt(id.vars = "state") %>%
-  dplyr::mutate(
-    variable = factor(variable, levels = c("G1", "S", "G2M")),
-  ) %>%
-  dplyr::left_join(., cell_count_by_state_total, by = "state") %>%
-  dplyr::rename(cell_cycle_seurat = variable, cells = value) %>%
-  dplyr::mutate(pct = cells / total * 100) %>%
-  plotly::plot_ly(
-    x = ~state,
-    y = ~pct,
-    type = "bar",
-    color = ~cell_cycle_seurat,
-    colors = cell_cycle_colorset,
-    hoverinfo = "text",
-    text = ~paste0("<b>", .$cell_cycle_seurat, ": </b>", format(round(.$pct, 1), nsmall = 1), "%")
-  ) %>%
-  plotly::layout(
-    xaxis = list(
-      title = "",
-      mirror = TRUE,
-      showline = TRUE
-    ),
-    yaxis = list(
-      title = "Percentage (%)",
-      range = c(0,100),
-      hoverformat = ".2f",
-      mirror = TRUE,
-      zeroline = FALSE,
-      showline = TRUE
-    ),
-    barmode = "stack",
-    hovermode = "closest"
-  )
+  temp_data <- cbind(
+      sample_data()$trajectory$monocle2[[ input[["trajectory_to_display"]] ]][["meta"]],
+      sample_data()$cells
+    ) %>%
+    dplyr::filter(!is.na(pseudotime)) %>%
+    dplyr::group_by(state, cell_cycle_seurat) %>%
+    dplyr::summarize(count = n()) %>%
+    tidyr::spread(cell_cycle_seurat, count, fill = 0) %>%
+    dplyr::ungroup() %>%
+    reshape2::melt(id.vars = "state") %>%
+    dplyr::mutate(
+      variable = factor(variable, levels = c("G1", "S", "G2M")),
+    ) %>%
+    dplyr::left_join(., cell_count_by_state_total, by = "state") %>%
+    dplyr::rename(cell_cycle_seurat = variable, cells = value)
+  if ( input[["states_by_cell_cycle_seurat_select_metric_for_bar_plot"]] != TRUE ) {
+    temp_data %>%
+    plotly::plot_ly(
+      x = ~state,
+      y = ~cells,
+      type = "bar",
+      color = ~cell_cycle_seurat,
+      colors = cell_cycle_colorset,
+      hoverinfo = "text",
+      text = ~paste0("<b>", .$cell_cycle_seurat, ": </b>", formatC(.$cells, big.mark = ','))
+    ) %>%
+    plotly::layout(
+      xaxis = list(
+        title = "",
+        mirror = TRUE,
+        showline = TRUE
+      ),
+      yaxis = list(
+        title = "Number of cells",
+        hoverformat = ".2f",
+        mirror = TRUE,
+        zeroline = FALSE,
+        showline = TRUE
+      ),
+      barmode = "stack",
+      hovermode = "compare"
+    )
+  } else {
+    temp_data %>%
+    dplyr::mutate(pct = cells / total * 100) %>%
+    plotly::plot_ly(
+      x = ~state,
+      y = ~pct,
+      type = "bar",
+      color = ~cell_cycle_seurat,
+      colors = cell_cycle_colorset,
+      hoverinfo = "text",
+      text = ~paste0("<b>", .$cell_cycle_seurat, ": </b>", format(round(.$pct, 1), nsmall = 1), "%")
+    ) %>%
+    plotly::layout(
+      xaxis = list(
+        title = "",
+        mirror = TRUE,
+        showline = TRUE
+      ),
+      yaxis = list(
+        title = "Percentage (%)",
+        range = c(0,100),
+        hoverformat = ".2f",
+        mirror = TRUE,
+        zeroline = FALSE,
+        showline = TRUE
+      ),
+      barmode = "stack",
+      hovermode = "compare"
+    )
+  }
 })
 
 # alternative text

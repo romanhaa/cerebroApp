@@ -10,7 +10,12 @@
 output[["samples_by_cluster_UI"]] <- renderUI({
   if ( !is.null(sample_data()$samples$by_cluster) ) {
     tagList(
-      DT::dataTableOutput("samples_by_cluster_table"),
+      shinyWidgets::materialSwitch(
+        inputId = "samples_by_cluster_select_metric_for_bar_plot",
+        label = "Show composition in percent [%]:",
+        status = "primary"
+      ),
+      # DT::dataTableOutput("samples_by_cluster_table"),
       plotly::plotlyOutput("samples_by_cluster_plot")
     )
   } else {
@@ -20,65 +25,128 @@ output[["samples_by_cluster_UI"]] <- renderUI({
 
 # table
 output[["samples_by_cluster_table"]] <- DT::renderDataTable({
-  sample_data()$samples$by_cluster %>%
-  rename(
-    Sample = sample,
-    "# of cells" = total_cell_count
-  ) %>%
-  DT::datatable(
-    filter = "none",
-    selection = "multiple",
-    escape = FALSE,
-    autoHideNavigation = TRUE,
-    rownames = FALSE,
-    class = "cell-border stripe",
-    options = list(
-      scrollX = TRUE,
-      sDom = '<"top">lrt<"bottom">ip',
-      lengthMenu = c(15, 30, 50, 100),
-      pageLength = 15
+  if ( input[["samples_by_cluster_select_metric_for_bar_plot"]] != TRUE ) {
+    sample_data()$samples$by_cluster %>%
+    rename(
+      Sample = sample,
+      "# of cells" = total_cell_count
+    ) %>%
+    DT::datatable(
+      filter = "none",
+      selection = "none",
+      escape = FALSE,
+      autoHideNavigation = TRUE,
+      rownames = FALSE,
+      class = "cell-border stripe",
+      options = list(
+        scrollX = TRUE,
+        sDom = '<"top">lrt<"bottom">ip',
+        lengthMenu = c(15, 30, 50, 100),
+        pageLength = 15
+      )
     )
-  )
+  } else {
+    temp_table <- sample_data()$samples$by_cluster
+    for ( i in 3:ncol(temp_table) ) {
+      temp_table[,i] <- round(temp_table[,i] / temp_table$total_cell_count * 100, digits = 1)
+    }
+    temp_table %>%
+    rename(
+      Sample = sample,
+      "# of cells" = total_cell_count
+    ) %>%
+    DT::datatable(
+      filter = "none",
+      selection = "none",
+      escape = FALSE,
+      autoHideNavigation = TRUE,
+      rownames = FALSE,
+      class = "cell-border stripe",
+      options = list(
+        scrollX = TRUE,
+        sDom = '<"top">lrt<"bottom">ip',
+        lengthMenu = c(15, 30, 50, 100),
+        pageLength = 15
+      )
+    )
+  }
 })
 
 # bar plot
 output[["samples_by_cluster_plot"]] <- plotly::renderPlotly({
-  sample_data()$samples$by_cluster %>%
-  select(-total_cell_count) %>%
-  reshape2::melt(id.vars = "sample") %>%
-  rename(cluster = variable, cells = value) %>%
-  left_join(
-    .,
-    sample_data()$samples$by_cluster[ , c("sample", "total_cell_count") ],
-    by = "sample"
-  ) %>%
-  mutate(pct = cells / total_cell_count * 100) %>%
-  plotly::plot_ly(
-    x = ~sample,
-    y = ~pct,
-    type = "bar",
-    color = ~cluster,
-    colors = sample_data()$clusters$colors,
-    hoverinfo = "text",
-    text = ~paste0("<b>Cluster ", .$cluster, ": </b>", format(round(.$pct, 1), nsmall = 1), "%")
-  ) %>%
-  plotly::layout(
-    xaxis = list(
-      title = "",
-      mirror = TRUE,
-      showline = TRUE
-    ),
-    yaxis = list(
-      title = "Percentage [%]",
-      range = c(0,100),
-      hoverformat = ".2f",
-      mirror = TRUE,
-      zeroline = FALSE,
-      showline = TRUE
-    ),
-    barmode = "stack",
-    hovermode = "closest"
-  )
+  if ( input[["samples_by_cluster_select_metric_for_bar_plot"]] != TRUE ) {
+    sample_data()$samples$by_cluster %>%
+    select(-total_cell_count) %>%
+    reshape2::melt(id.vars = "sample") %>%
+    rename(cluster = variable, cells = value) %>%
+    left_join(
+      .,
+      sample_data()$samples$by_cluster[ , c("sample", "total_cell_count") ],
+      by = "sample"
+    ) %>%
+    plotly::plot_ly(
+      x = ~sample,
+      y = ~cells,
+      type = "bar",
+      color = ~cluster,
+      colors = sample_data()$clusters$colors,
+      hoverinfo = "text",
+      text = ~paste0("<b>Cluster ", .$cluster, ": </b>", formatC(.$cells, big.mark = ','))
+    ) %>%
+    plotly::layout(
+      xaxis = list(
+        title = "",
+        mirror = TRUE,
+        showline = TRUE
+      ),
+      yaxis = list(
+        title = "Number of cells",
+        hoverformat = ".2f",
+        mirror = TRUE,
+        zeroline = FALSE,
+        showline = TRUE
+      ),
+      barmode = "stack",
+      hovermode = "compare"
+    )
+  } else {
+    sample_data()$samples$by_cluster %>%
+    select(-total_cell_count) %>%
+    reshape2::melt(id.vars = "sample") %>%
+    rename(cluster = variable, cells = value) %>%
+    left_join(
+      .,
+      sample_data()$samples$by_cluster[ , c("sample", "total_cell_count") ],
+      by = "sample"
+    ) %>%
+    mutate(pct = cells / total_cell_count * 100) %>%
+    plotly::plot_ly(
+      x = ~sample,
+      y = ~pct,
+      type = "bar",
+      color = ~cluster,
+      colors = sample_data()$clusters$colors,
+      hoverinfo = "text",
+      text = ~paste0("<b>Cluster ", .$cluster, ": </b>", format(round(.$pct, 1), nsmall = 1), "%")
+    ) %>%
+    plotly::layout(
+      xaxis = list(
+        title = "",
+        mirror = TRUE,
+        showline = TRUE
+      ),
+      yaxis = list(
+        title = "Percent of cells [%]",
+        range = c(0,100),
+        hoverformat = ".2f",
+        mirror = TRUE,
+        zeroline = FALSE,
+        showline = TRUE
+      ),
+      barmode = "stack",
+      hovermode = "compare"
+    )
+  }
 })
 
 # alternative text
@@ -385,7 +453,14 @@ observeEvent(input[["samples_percent_ribo_info"]], {
 # UI element
 output[["samples_by_cell_cycle_seurat_UI"]] <- renderUI({
   if ( !is.null(sample_data()$samples$by_cell_cycle_seurat) ) {
-    plotly::plotlyOutput("samples_by_cell_cycle_seurat_plot")
+    tagList(
+      shinyWidgets::materialSwitch(
+        inputId = "samples_by_cell_cycle_seurat_select_metric_for_bar_plot",
+        label = "Show composition in percent [%]:",
+        status = "primary"
+      ),
+      plotly::plotlyOutput("samples_by_cell_cycle_seurat_plot")
+    )
   } else {
     textOutput("samples_by_cell_cycle_seurat_text")
   }
@@ -393,45 +468,85 @@ output[["samples_by_cell_cycle_seurat_UI"]] <- renderUI({
 
 # bar plot
 output[["samples_by_cell_cycle_seurat_plot"]] <- plotly::renderPlotly({
-  sample_data()$samples$by_cell_cycle_seurat %>%
-  select(-total_cell_count) %>%
-  reshape2::melt(id.vars = "sample") %>%
-  rename(phase = variable, cells = value) %>%
-  mutate(
-    phase = factor(phase, levels = c("G1", "S", "G2M")),
-  ) %>%
-  left_join(
-    .,
-    sample_data()$samples$by_cell_cycle_seurat[ , c("sample", "total_cell_count") ],
-    by = "sample"
-  ) %>%
-  mutate(pct = cells / total_cell_count * 100) %>%
-  plotly::plot_ly(
-    x = ~sample,
-    y = ~pct,
-    type = "bar",
-    color = ~phase,
-    colors = cell_cycle_colorset,
-    hoverinfo = "text",
-    text = ~paste0("<b>", .$phase, ": </b>", format(round(.$pct, 1), nsmall = 1), "%")
-  ) %>%
-  plotly::layout(
-    xaxis = list(
-      title ="",
-      mirror = TRUE,
-      showline = TRUE
-    ),
-    yaxis = list(
-      title = "Percentage [%]",
-      range = c(0,100),
-      hoverformat = ".2f",
-      mirror = TRUE,
-      zeroline = FALSE,
-      showline = TRUE
-    ),
-    barmode = "stack",
-    hovermode = "compare"
-  )
+  if ( input[["samples_by_cell_cycle_seurat_select_metric_for_bar_plot"]] != TRUE ) {
+    sample_data()$samples$by_cell_cycle_seurat %>%
+    select(-total_cell_count) %>%
+    reshape2::melt(id.vars = "sample") %>%
+    rename(phase = variable, cells = value) %>%
+    mutate(
+      phase = factor(phase, levels = c("G1", "S", "G2M")),
+    ) %>%
+    left_join(
+      .,
+      sample_data()$samples$by_cell_cycle_seurat[ , c("sample", "total_cell_count") ],
+      by = "sample"
+    ) %>%
+    plotly::plot_ly(
+      x = ~sample,
+      y = ~cells,
+      type = "bar",
+      color = ~phase,
+      colors = cell_cycle_colorset,
+      hoverinfo = "text",
+      text = ~paste0("<b>", .$phase, ": </b>", formatC(.$cells, big.mark = ','))
+    ) %>%
+    plotly::layout(
+      xaxis = list(
+        title ="",
+        mirror = TRUE,
+        showline = TRUE
+      ),
+      yaxis = list(
+        title = "Number of cells",
+        hoverformat = ".2f",
+        mirror = TRUE,
+        zeroline = FALSE,
+        showline = TRUE
+      ),
+      barmode = "stack",
+      hovermode = "compare"
+    )
+  } else {
+    sample_data()$samples$by_cell_cycle_seurat %>%
+    select(-total_cell_count) %>%
+    reshape2::melt(id.vars = "sample") %>%
+    rename(phase = variable, cells = value) %>%
+    mutate(
+      phase = factor(phase, levels = c("G1", "S", "G2M")),
+    ) %>%
+    left_join(
+      .,
+      sample_data()$samples$by_cell_cycle_seurat[ , c("sample", "total_cell_count") ],
+      by = "sample"
+    ) %>%
+    mutate(pct = cells / total_cell_count * 100) %>%
+    plotly::plot_ly(
+      x = ~sample,
+      y = ~pct,
+      type = "bar",
+      color = ~phase,
+      colors = cell_cycle_colorset,
+      hoverinfo = "text",
+      text = ~paste0("<b>", .$phase, ": </b>", format(round(.$pct, 1), nsmall = 1), "%")
+    ) %>%
+    plotly::layout(
+      xaxis = list(
+        title ="",
+        mirror = TRUE,
+        showline = TRUE
+      ),
+      yaxis = list(
+        title = "Percent of cells [%]",
+        range = c(0,100),
+        hoverformat = ".2f",
+        mirror = TRUE,
+        zeroline = FALSE,
+        showline = TRUE
+      ),
+      barmode = "stack",
+      hovermode = "compare"
+    )
+  }
 })
 
 # alternative text
@@ -458,7 +573,14 @@ observeEvent(input[["samples_by_cell_cycle_seurat_info"]], {
 # UI element
 output[["samples_by_cell_cycle_cyclone_UI"]] <- renderUI({
   if ( !is.null(sample_data()$samples$by_cell_cycle_cyclone) ) {
-    plotly::plotlyOutput("samples_by_cell_cycle_cyclone_plot")
+    tagList(
+      shinyWidgets::materialSwitch(
+        inputId = "samples_by_cell_cycle_cyclone_select_metric_for_bar_plot",
+        label = "Show composition in percent [%]:",
+        status = "primary"
+      ),
+      plotly::plotlyOutput("samples_by_cell_cycle_cyclone_plot")
+    )
   } else {
     textOutput("samples_by_cell_cycle_cyclone_text")
   }
@@ -466,45 +588,85 @@ output[["samples_by_cell_cycle_cyclone_UI"]] <- renderUI({
 
 # bar plot
 output[["samples_by_cell_cycle_cyclone_plot"]] <- plotly::renderPlotly({
-  sample_data()$samples$by_cell_cycle_cyclone %>%
-  select(-total_cell_count) %>%
-  reshape2::melt(id.vars = "sample") %>%
-  rename(phase = variable, cells = value) %>%
-  mutate(
-    phase = factor(phase, levels = c("G1", "S", "G2M", "-")),
-  ) %>%
-  left_join(
-    .,
-    sample_data()$samples$by_cell_cycle_cyclone[ , c("sample", "total_cell_count") ],
-    by = "sample"
-  ) %>%
-  mutate(pct = cells / total_cell_count * 100) %>%
-  plotly::plot_ly(
-    x = ~sample,
-    y = ~pct,
-    type = "bar",
-    color = ~phase,
-    colors = cell_cycle_colorset,
-    hoverinfo = "text",
-    text = ~paste0("<b>", .$phase, ": </b>", format(round(.$pct, 1), nsmall = 1), "%")
-  ) %>%
-  plotly::layout(
-    xaxis = list(
-      title = "",
-      mirror = TRUE,
-      showline = TRUE
-    ),
-    yaxis = list(
-      title = "Percentage [%]",
-      range = c(0,100),
-      hoverformat = ".2f",
-      mirror = TRUE,
-      zeroline = FALSE,
-      showline = TRUE
-    ),
-    barmode = "stack",
-    hovermode = "compare"
-  )
+  if ( input[["samples_by_cell_cycle_cyclone_select_metric_for_bar_plot"]] != TRUE ) {
+    sample_data()$samples$by_cell_cycle_cyclone %>%
+    select(-total_cell_count) %>%
+    reshape2::melt(id.vars = "sample") %>%
+    rename(phase = variable, cells = value) %>%
+    mutate(
+      phase = factor(phase, levels = c("G1", "S", "G2M", "-")),
+    ) %>%
+    left_join(
+      .,
+      sample_data()$samples$by_cell_cycle_cyclone[ , c("sample", "total_cell_count") ],
+      by = "sample"
+    ) %>%
+    plotly::plot_ly(
+      x = ~sample,
+      y = ~cells,
+      type = "bar",
+      color = ~phase,
+      colors = cell_cycle_colorset,
+      hoverinfo = "text",
+      text = ~paste0("<b>", .$phase, ": </b>", formatC(.$cells, big.mark = ','))
+    ) %>%
+    plotly::layout(
+      xaxis = list(
+        title = "",
+        mirror = TRUE,
+        showline = TRUE
+      ),
+      yaxis = list(
+        title = "Number of cells",
+        hoverformat = ".2f",
+        mirror = TRUE,
+        zeroline = FALSE,
+        showline = TRUE
+      ),
+      barmode = "stack",
+      hovermode = "compare"
+    )
+  } else {
+    sample_data()$samples$by_cell_cycle_cyclone %>%
+    select(-total_cell_count) %>%
+    reshape2::melt(id.vars = "sample") %>%
+    rename(phase = variable, cells = value) %>%
+    mutate(
+      phase = factor(phase, levels = c("G1", "S", "G2M", "-")),
+    ) %>%
+    left_join(
+      .,
+      sample_data()$samples$by_cell_cycle_cyclone[ , c("sample", "total_cell_count") ],
+      by = "sample"
+    ) %>%
+    mutate(pct = cells / total_cell_count * 100) %>%
+    plotly::plot_ly(
+      x = ~sample,
+      y = ~pct,
+      type = "bar",
+      color = ~phase,
+      colors = cell_cycle_colorset,
+      hoverinfo = "text",
+      text = ~paste0("<b>", .$phase, ": </b>", format(round(.$pct, 1), nsmall = 1), "%")
+    ) %>%
+    plotly::layout(
+      xaxis = list(
+        title = "",
+        mirror = TRUE,
+        showline = TRUE
+      ),
+      yaxis = list(
+        title = "Percent of cells [%]",
+        range = c(0,100),
+        hoverformat = ".2f",
+        mirror = TRUE,
+        zeroline = FALSE,
+        showline = TRUE
+      ),
+      barmode = "stack",
+      hovermode = "compare"
+    )
+  }
 })
 
 # alternative text
