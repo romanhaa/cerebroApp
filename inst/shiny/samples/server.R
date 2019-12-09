@@ -53,7 +53,7 @@ output[["samples_by_cluster_plot"]] <- plotly::renderPlotly({
       y = ~cells,
       type = "bar",
       color = ~cluster,
-      colors = sample_data()$clusters$colors,
+      colors = reactive_colors()$clusters,
       hoverinfo = "text",
       text = ~paste0("<b>Cluster ", .$cluster, ": </b>", formatC(.$cells, big.mark = ','))
     ) %>%
@@ -87,7 +87,7 @@ output[["samples_by_cluster_plot"]] <- plotly::renderPlotly({
       y = ~pct,
       type = "bar",
       color = ~cluster,
-      colors = sample_data()$clusters$colors,
+      colors = reactive_colors()$clusters,
       hoverinfo = "text",
       text = ~paste0("<b>Cluster ", .$cluster, ": </b>", format(round(.$pct, 1), nsmall = 1), "%")
     ) %>%
@@ -182,7 +182,7 @@ output[["samples_nUMI_plot"]] <- plotly::renderPlotly({
       visible = TRUE
     ),
     color = ~sample,
-    colors = sample_data()$samples$colors,
+    colors = reactive_colors()$samples,
     source = "subset",
     showlegend = FALSE,
     hoverinfo = "y",
@@ -252,7 +252,7 @@ output[["samples_nGene_plot"]] <- plotly::renderPlotly({
       visible = TRUE
     ),
     color = ~sample,
-    colors = sample_data()$samples$colors,
+    colors = reactive_colors()$samples,
     source = "subset",
     showlegend = FALSE,
     hoverinfo = "y",
@@ -322,7 +322,7 @@ output[["samples_percent_mt_plot"]] <- plotly::renderPlotly({
       visible = TRUE
     ),
     color = ~sample,
-    colors = sample_data()$samples$colors,
+    colors = reactive_colors()$samples,
     source = "subset",
     showlegend = FALSE,
     hoverinfo = "y",
@@ -393,7 +393,7 @@ output[["samples_percent_ribo_plot"]] <- plotly::renderPlotly({
       visible = TRUE
     ),
     color = ~sample,
-    colors = sample_data()$samples$colors,
+    colors = reactive_colors()$samples,
     source = "subset",
     showlegend = FALSE,
     hoverinfo = "y",

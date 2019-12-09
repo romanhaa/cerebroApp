@@ -464,7 +464,7 @@ output[["expression_by_sample"]] <- plotly::renderPlotly({
       visible = TRUE
     ),
     color = ~sample,
-    colors = sample_data()$samples$colors,
+    colors = reactive_colors()$samples,
     source = "subset",
     showlegend = FALSE,
     hoverinfo = "y",
@@ -520,7 +520,7 @@ output[["expression_by_cluster"]] <- plotly::renderPlotly({
       visible = TRUE
     ),
     color = ~cluster,
-    colors = sample_data()$clusters$colors,
+    colors = reactive_colors()$clusters,
     source = "subset",
     showlegend = FALSE,
     hoverinfo = "y",

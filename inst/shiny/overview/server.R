@@ -133,16 +133,19 @@ output[["overview_projection"]] <- plotly::renderPlotly({
   to_plot <- to_plot[ sample(1:nrow(to_plot)) , ]
 
   # define colors
-  colors <- if ( input[["overview_dot_color"]] == "sample" ) {
-    sample_data()$samples$colors
+  if ( input[["overview_dot_color"]] == "sample" ) {
+    colors_this_plot <- reactive_colors()$samples
   } else if ( input[["overview_dot_color"]] == "cluster" ) {
-    sample_data()$clusters$colors
+    colors_this_plot <- reactive_colors()$clusters
   } else if ( input[["overview_dot_color"]] %in% c("cell_cycle_seurat","cell_cycle_cyclone") ) {
-    cell_cycle_colorset
+    colors_this_plot <- cell_cycle_colorset
   } else if ( is.factor(to_plot[[ input[["overview_dot_color"]] ]]) ) {
-    setNames(colors[1:length(levels(to_plot[ , input[["overview_dot_color"]] ]))], levels(to_plot[ , input[["overview_dot_color"]] ]))
+    colors_this_plot <- setNames(
+      default_colorset[1:length(levels(to_plot[ , input[["overview_dot_color"]] ]))],
+      levels(to_plot[ , input[["overview_dot_color"]] ])
+    )
   } else if ( is.character(to_plot[[ input[["overview_dot_color"]] ]]) ) {
-    colors
+    default_colorset
   } else {
     NULL
   }
@@ -216,7 +219,7 @@ output[["overview_projection"]] <- plotly::renderPlotly({
         y = ~to_plot[,2],
         z = ~to_plot[,3],
         color = ~to_plot[ , input[["overview_dot_color"]] ],
-        colors = colors,
+        colors = colors_this_plot,
         type = "scatter3d",
         mode = "markers",
         marker = list(
@@ -319,7 +322,7 @@ output[["overview_projection"]] <- plotly::renderPlotly({
         x = ~to_plot[,1],
         y = ~to_plot[,2],
         color = ~to_plot[[ input[["overview_dot_color"]] ]],
-        colors = colors,
+        colors = colors_this_plot,
         type = "scatter",
         mode = "markers",
         marker = list(
@@ -427,23 +430,18 @@ observeEvent(input[["overview_projection_export"]], {
     } else {
       if ( is.factor(to_plot[ , input[["overview_dot_color"]] ]) || is.character(to_plot[ , input[["overview_dot_color"]] ]) ) {
         if ( input[["overview_dot_color"]] == "sample" ) {
-          if ( !is.null(sample_data()$samples$colors) ) {
-            cols <- sample_data()$samples$colors
-          } else {
-            cols <- colors
-          }
+          colors_this_plot <- reactive_colors()$samples
         } else if ( input[["overview_dot_color"]] == "cluster" ) {
-          if ( !is.null(sample_data()$clusters$colors) ) {
-            cols <- sample_data()$clusters$colors
-          } else {
-            cols <- colors
-          }
+          colors_this_plot <- reactive_colors()$clusters
         } else if ( input[["overview_dot_color"]] %in% c("cell_cycle_seurat","cell_cycle_cyclone") ) {
-          cols <- cell_cycle_colorset
+          colors_this_plot <- cell_cycle_colorset
         } else if ( is.factor(to_plot[ , input[["overview_dot_color"]] ]) ) {
-          cols <- setNames(colors[1:length(levels(to_plot[ , input[["overview_dot_color"]] ]))], levels(to_plot[ , input[["overview_dot_color"]] ]))
+          colors_this_plot <- setNames(
+            default_colorset[1:length(levels(to_plot[ , input[["overview_dot_color"]] ]))],
+            levels(to_plot[ , input[["overview_dot_color"]] ])
+          )
         } else {
-          cols <- colors
+          colors_this_plot <- default_colorset
         }
         p <- ggplot(
             to_plot,
@@ -460,7 +458,7 @@ observeEvent(input[["overview_projection_export"]], {
             color = "#c4c4c4",
             alpha = input[["overview_dot_opacity"]]
           ) +
-          scale_fill_manual(values = cols) +
+          scale_fill_manual(values = colors_this_plot) +
           lims(x = xlim, y = ylim) +
           theme_bw()
       } else {

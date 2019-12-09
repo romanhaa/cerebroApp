@@ -41,6 +41,7 @@ source(system.file("shiny/gene_set_expression/UI.R", package = "cerebroApp"), lo
 source(system.file("shiny/trajectory/UI.R", package = "cerebroApp"), local = TRUE)
 source(system.file("shiny/gene_id_conversion/UI.R", package = "cerebroApp"), local = TRUE)
 source(system.file("shiny/analysis_info/UI.R", package = "cerebroApp"), local = TRUE)
+source(system.file("shiny/color_management/UI.R", package = "cerebroApp"), local = TRUE)
 source(system.file("shiny/about/UI.R", package = "cerebroApp"), local = TRUE)
 
 ##----------------------------------------------------------------------------##
@@ -71,6 +72,7 @@ ui <- dashboardPage(
       tab_trajectory,
       tab_gene_id_conversion,
       tab_analysis_info,
+      tab_color_management,
       tab_about
     )
   )

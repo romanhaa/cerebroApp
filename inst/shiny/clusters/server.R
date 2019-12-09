@@ -19,7 +19,7 @@ output[["clusters_tree_UI"]] <- renderUI({
 output[["clusters_tree_plot"]] <- renderPlot({
   tree <- sample_data()$clusters$tree
   tree$tip.label <- paste0("Cluster ", tree$tip.label)
-  colors_tree <- colors[1:length(tree$tip.label)]
+  colors_tree <- reactive_colors()$clusters
   ggplot(tree, aes(x, y)) +
     scale_y_reverse() +
     ggtree::geom_tree() +
@@ -96,7 +96,7 @@ output[["clusters_by_sample_plot"]] <- plotly::renderPlotly({
       y = ~cells,
       type = "bar",
       color = ~sample,
-      colors = sample_data()$samples$colors,
+      colors = reactive_colors()$samples,
       hoverinfo = "text",
       text = ~paste0("<b>", .$sample, ": </b>", formatC(.$cells, big.mark = ','))
     ) %>%
@@ -130,7 +130,7 @@ output[["clusters_by_sample_plot"]] <- plotly::renderPlotly({
       y = ~pct,
       type = "bar",
       color = ~sample,
-      colors = sample_data()$samples$colors,
+      colors = reactive_colors()$samples,
       hoverinfo = "text",
       text = ~paste0("<b>", .$sample, ": </b>", format(round(.$pct, 1), nsmall = 1), "%")
     ) %>%
@@ -225,7 +225,7 @@ output[["clusters_nUMI_plot"]] <- plotly::renderPlotly({
       visible = TRUE
     ),
     color = ~cluster,
-    colors = sample_data()$clusters$colors,
+    colors = reactive_colors()$clusters,
     source = "subset",
     showlegend = FALSE,
     hoverinfo = "y",
@@ -295,7 +295,7 @@ output[["clusters_nGene_plot"]] <- plotly::renderPlotly({
       visible = TRUE
     ),
     color = ~cluster,
-    colors = sample_data()$clusters$colors,
+    colors = reactive_colors()$clusters,
     source = "subset",
     showlegend = FALSE,
     hoverinfo = "y",
@@ -365,7 +365,7 @@ output[["clusters_percent_mt_plot"]] <- plotly::renderPlotly({
       visible = TRUE
     ),
     color = ~cluster,
-    colors = sample_data()$clusters$colors,
+    colors = reactive_colors()$clusters,
     source = "subset",
     showlegend = FALSE,
     hoverinfo = "y",
@@ -441,7 +441,7 @@ output[["clusters_percent_ribo_plot"]] <- plotly::renderPlotly({
       visible = TRUE
     ),
     color = ~cluster,
-    colors = sample_data()$clusters$colors,
+    colors = reactive_colors()$clusters,
     source = "subset",
     showlegend = FALSE,
     hoverinfo = "y",

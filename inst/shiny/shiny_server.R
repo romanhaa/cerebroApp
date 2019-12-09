@@ -7,7 +7,7 @@ server <- function(input, output, session) {
   ## Color management.
   ##--------------------------------------------------------------------------##
   # Dutch palette from flatuicolors.com
-  colors_dutch <- c(
+  colorset_dutch <- c(
     "#FFC312","#C4E538","#12CBC4","#FDA7DF","#ED4C67",
     "#F79F1F","#A3CB38","#1289A7","#D980FA","#B53471",
     "#EE5A24","#009432","#0652DD","#9980FA","#833471",
@@ -15,14 +15,14 @@ server <- function(input, output, session) {
   )
 
   # Spanish palette from flatuicolors.com
-  colors_spanish <- c(
+  colorset_spanish <- c(
     "#40407a","#706fd3","#f7f1e3","#34ace0","#33d9b2",
     "#2c2c54","#474787","#aaa69d","#227093","#218c74",
     "#ff5252","#ff793f","#d1ccc0","#ffb142","#ffda79",
     "#b33939","#cd6133","#84817a","#cc8e35","#ccae62"
   )
 
-  colors <- c(colors_dutch, colors_spanish)
+  default_colorset <- c(colorset_dutch, colorset_spanish)
 
   cell_cycle_colorset <- setNames(
     c("#45aaf2", "#f1c40f", "#e74c3c", "#7f8c8d"),
@@ -109,6 +109,10 @@ server <- function(input, output, session) {
         icon = icon("info")
       ),
       menuItem(
+        "Color management", tabName = "color_management",
+        icon = icon("palette")
+      ),
+      menuItem(
         "About", tabName = "about",
         icon = icon("at")
       )
@@ -125,8 +129,18 @@ server <- function(input, output, session) {
       req(input[["input_file"]])
       sample_data <- readRDS(input[["input_file"]]$datapath)
     }
-    sample_data$sample_names <- levels(sample_data$cells$sample)
-    sample_data$cluster_names <- levels(sample_data$cells$cluster)
+    # get list of sample names
+    if ( is.factor(sample_data$cells$sample) ) {
+      sample_data$sample_names <- levels(sample_data$cells$sample)
+    } else {
+      sample_data$sample_names <- sample_data$cells$sample %>% unique()
+    }
+    # get list of cluster names
+    if ( is.factor(sample_data$cells$cluster) ) {
+      sample_data$cluster_names <- levels(sample_data$cells$cluster)
+    } else {
+      sample_data$cluster_names <- sample_data$cells$cluster %>% unique() %>% sort()
+    }
     sample_data
   })
 
@@ -173,6 +187,46 @@ server <- function(input, output, session) {
   }
 
   ##--------------------------------------------------------------------------##
+  ## Colors for samples and clusters.
+  ##--------------------------------------------------------------------------##
+  reactive_colors <- reactive({
+    colors <- list()
+
+    # grab sample-specific colors from input file if it exists, otherwise take
+    # default colorset
+    if ( !is.null(sample_data()$samples$colors) ) {
+      colors$samples <- sample_data()$samples$colors
+    } else {
+      colors$samples <- default_colorset[1:length(sample_data()$sample_names)]
+      names(colors$samples) <- sample_data()$sample_names
+    }
+    # assign respective color picker in "Color management" tab to each sample
+    if ( !is.null(input[[paste0('color_sample_', levels(sample_data()$cells$sample)[1])]]) ) {
+      for ( i in 1:length(colors$samples) ) {
+        colors$samples[i] <- input[[paste0('color_sample_', levels(sample_data()$cells$sample)[i])]]
+      }
+    }
+
+    # grab cluster-specific colors from input file if it exists, otherwise take
+    # default colorset
+    if ( !is.null(sample_data()$clusters$colors) ) {
+      colors$clusters <- sample_data()$clusters$colors
+    } else {
+      colors$clusters <- default_colorset[1:length(sample_data()$cluster_names)]
+      names(colors$clusters) <- sample_data()$cluster_names
+    }
+    # assign respective color picker in "Color management" tab to each cluster
+    colors$clusters <- sample_data()$clusters$colors
+    if ( !is.null(input[[paste0('color_cluster_', levels(sample_data()$cells$cluster)[1])]]) ) {
+      for ( i in 1:length(colors$clusters) ) {
+        colors$clusters[i] <- input[[paste0('color_cluster_', levels(sample_data()$cells$cluster)[i])]]
+      }
+    }
+
+    return(colors)
+  })
+
+  ##--------------------------------------------------------------------------##
   ## Tabs.
   ##--------------------------------------------------------------------------##
   source(system.file("shiny/load_data/server.R", package = "cerebroApp"), local = TRUE)
@@ -187,6 +241,7 @@ server <- function(input, output, session) {
   source(system.file("shiny/gene_id_conversion/server.R", package = "cerebroApp"), local = TRUE)
   source(system.file("shiny/trajectory/server.R", package = "cerebroApp"), local = TRUE)
   source(system.file("shiny/analysis_info/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/color_management/server.R", package = "cerebroApp"), local = TRUE)
   source(system.file("shiny/about/server.R", package = "cerebroApp"), local = TRUE)
 
 }

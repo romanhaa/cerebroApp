@@ -203,9 +203,9 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
   samples_to_display <- input[["trajectory_samples_to_display"]]
   clusters_to_display <- input[["trajectory_clusters_to_display"]]
   cells_to_display <- which(
-      (sample_data()$cells$sample %in% samples_to_display) &
-      (sample_data()$cells$cluster %in% clusters_to_display)
-    )
+    (sample_data()$cells$sample %in% samples_to_display) &
+    (sample_data()$cells$cluster %in% clusters_to_display)
+  )
 
   # randomly remove cells
   if ( input[["trajectory_percentage_cells_to_show"]] < 100 ) {
@@ -243,31 +243,26 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
   }
 
   if ( is.factor(to_plot[[ color_variable ]]) || is.character(to_plot[[ color_variable ]]) ) {
-    cols <- if ( color_variable == "sample" ) {
-        if ( !is.null(sample_data()$samples$colors) ) {
-          sample_data()$samples$colors
-        } else {
-          colors
-        }
-      } else if ( color_variable == "cluster" ) {
-        if ( !is.null(sample_data()$clusters$colors) ) {
-          sample_data()$clusters$colors
-        } else {
-          colors
-        }
-      } else if ( color_variable %in% c("cell_cycle_seurat","cell_cycle_cyclone") ) {
-        cell_cycle_colorset
-      } else if ( is.factor(to_plot[[ color_variable ]]) ) {
-        setNames(colors[1:length(levels(to_plot[[ color_variable ]]))], levels(to_plot[[ color_variable ]]))
-      } else {
-        colors
-      }
+    if ( color_variable == "sample" ) {
+      colors_this_plot <- reactive_colors()$sampless
+    } else if ( color_variable == "cluster" ) {
+      colors_this_plot <- reactive_colors()$clusters
+    } else if ( color_variable %in% c("cell_cycle_seurat","cell_cycle_cyclone") ) {
+      colors_this_plot <- cell_cycle_colorset
+    } else if ( is.factor(to_plot[[ color_variable ]]) ) {
+      colors_this_plot <- setNames(
+        default_colorset[1:length(levels(to_plot[[ color_variable ]]))],
+        levels(to_plot[[ color_variable ]])
+      )
+    } else {
+      colors_this_plot <- default_colorset
+    }
     plot <- plotly::plot_ly(
       to_plot,
       x = ~DR_1,
       y = ~DR_2,
       color = ~to_plot[[ color_variable ]],
-      colors = cols,
+      colors = colors_this_plot,
       type = "scatter",
       mode = "markers",
       marker = list(
@@ -415,15 +410,18 @@ observeEvent(input[["trajectory_projection_export"]], {
 
     if ( is.factor(to_plot[[ color_variable ]]) || is.character(to_plot[[ color_variable ]]) ) {
       if ( color_variable == "sample" ) {
-        cols <- sample_data()$samples$colors
+        colors_this_plot <- reactive_colors()$samples
       } else if ( color_variable == "cluster" ) {
-        cols <- sample_data()$clusters$colors
+        colors_this_plot <- reactive_colors()$clusters
       } else if ( color_variable %in% c("cell_cycle_seurat","cell_cycle_cyclone") ) {
-        cols <- cell_cycle_colorset
+        colors_this_plot <- cell_cycle_colorset
       } else if ( is.factor(to_plot[ , color_variable ]) ) {
-        cols <- setNames(colors[1:length(levels(to_plot[ , color_variable ]))], levels(to_plot[ , color_variable ]))
+        colors_this_plot <- setNames(
+          default_colorset[1:length(levels(to_plot[ , color_variable ]))],
+          levels(to_plot[ , color_variable ])
+        )
       } else {
-        cols <- colors
+        colors_this_plot <- default_colorset
       }
       p <- ggplot() +
         geom_point(
@@ -440,7 +438,7 @@ observeEvent(input[["trajectory_projection_export"]], {
           aes(source_dim_1, source_dim_2, xend = target_dim_1, yend = target_dim_2),
           size = 0.75, linetype = "solid", na.rm = TRUE
         ) +
-        scale_fill_manual(values = cols) +
+        scale_fill_manual(values = colors_this_plot) +
         theme_bw()
     } else {
       p <- ggplot() +
@@ -540,30 +538,33 @@ output[["trajectory_density_plot"]] <- plotly::renderPlotly({
   color_variable <- input[["trajectory_dot_color"]]
 
   if ( is.factor(to_plot[[ color_variable ]]) || is.character(to_plot[[ color_variable ]]) ) {
-    cols <- if ( color_variable == "sample" ) {
-      sample_data()$samples$colors
+    if ( color_variable == "sample" ) {
+      colors_this_plot <- reactive_colors()$samples
     } else if ( color_variable == "cluster" ) {
-      sample_data()$clusters$colors
+      colors_this_plot <- reactive_colors()$clusters
     } else if ( color_variable %in% c("cell_cycle_seurat","cell_cycle_cyclone") ) {
-      cell_cycle_colorset
+      colors_this_plot <- cell_cycle_colorset
     } else if ( is.factor(to_plot[[ color_variable ]]) ) {
-      setNames(colors[1:length(levels(to_plot[[ color_variable ]]))], levels(to_plot[[ color_variable ]]))
+      colors_this_plot <- setNames(
+        default_colorset[1:length(levels(to_plot[[ color_variable ]]))],
+        levels(to_plot[[ color_variable ]])
+      )
     } else {
-      colors
+      colors_this_plot <- default_colorset
     }
     p <- ggplot(to_plot, aes_string(x = "pseudotime", fill = color_variable)) +
       geom_density(alpha = 0.4, color = "black") +
       theme_bw() +
       labs(x = "Pseudotime", y = "Density") +
-      scale_fill_manual(values = cols) +
+      scale_fill_manual(values = colors_this_plot) +
       guides(fill = guide_legend(override.aes = list(alpha = 1)))
     plotly::ggplotly(p, tooltip = "text") %>%
     plotly::style(
       hoveron = "fill"
     )
   } else {
-    colorset <- setNames(
-      colors[1:length(levels(sample_data()$trajectory$monocle2[[ input[["trajectory_to_display"]] ]][["meta"]]$state))],
+    colors_this_plot <- setNames(
+      default_colorset[1:length(levels(sample_data()$trajectory$monocle2[[ input[["trajectory_to_display"]] ]][["meta"]]$state))],
       levels(sample_data()$trajectory$monocle2[[ input[["trajectory_to_display"]] ]][["meta"]]$state)
     )
     plot <- plotly::plot_ly(
@@ -573,7 +574,7 @@ output[["trajectory_density_plot"]] <- plotly::renderPlotly({
       type = "scatter",
       mode = "markers",
       color = ~state,
-      colors = colorset,
+      colors = colors_this_plot,
       marker = list(
         opacity = input[["trajectory_dot_opacity"]],
         line = list(
@@ -770,7 +771,7 @@ output[["states_by_sample_plot"]] <- plotly::renderPlotly({
       y = ~cells,
       type = "bar",
       color = ~sample,
-      colors = sample_data()$samples$colors,
+      colors = reactive_colors()$samples,
       hoverinfo = "text",
       text = ~paste0("<b>Sample ", .$sample, ": </b>", formatC(.$cells, big.mark = ','))
     ) %>%
@@ -798,7 +799,7 @@ output[["states_by_sample_plot"]] <- plotly::renderPlotly({
       y = ~pct,
       type = "bar",
       color = ~sample,
-      colors = sample_data()$samples$colors,
+      colors = reactive_colors()$samples,
       hoverinfo = "text",
       text = ~paste0("<b>Sample ", .$sample, ": </b>", format(round(.$pct, 1), nsmall = 1), "%")
     ) %>%
@@ -943,7 +944,7 @@ output[["states_by_cluster_plot"]] <- plotly::renderPlotly({
       y = ~cells,
       type = "bar",
       color = ~cluster,
-      colors = sample_data()$clusters$colors,
+      colors = reactive_colors()$clusters,
       hoverinfo = "text",
       text = ~paste0("<b>Cluster ", .$cluster, ": </b>", formatC(.$cells, big.mark = ','))
     ) %>%
@@ -971,7 +972,7 @@ output[["states_by_cluster_plot"]] <- plotly::renderPlotly({
       y = ~pct,
       type = "bar",
       color = ~cluster,
-      colors = sample_data()$clusters$colors,
+      colors = reactive_colors()$clusters,
       hoverinfo = "text",
       text = ~paste0("<b>Cluster ", .$cluster, ": </b>", format(round(.$pct, 1), nsmall = 1), "%")
     ) %>%
@@ -1249,8 +1250,8 @@ observeEvent(input[["states_by_cell_cycle_seurat_info"]], {
 # violin plot
 output[["states_nUMI_plot"]] <- plotly::renderPlotly({
   req(input[["trajectory_to_display"]])
-  colorset <- setNames(
-    colors[1:length(levels(sample_data()$trajectory$monocle2[[ input[["trajectory_to_display"]] ]][["meta"]]$state))],
+  colors_this_plot <- setNames(
+    default_colorset[1:length(levels(sample_data()$trajectory$monocle2[[ input[["trajectory_to_display"]] ]][["meta"]]$state))],
     levels(sample_data()$trajectory$monocle2[[ input[["trajectory_to_display"]] ]][["meta"]]$state)
   )
   cbind(
@@ -1269,7 +1270,7 @@ output[["states_nUMI_plot"]] <- plotly::renderPlotly({
       visible = TRUE
     ),
     color = ~state,
-    colors = colorset,
+    colors = colors_this_plot,
     source = "subset",
     showlegend = FALSE,
     hoverinfo = "y",
@@ -1314,8 +1315,8 @@ observeEvent(input[["states_nUMI_info"]], {
 # violin plot
 output[["states_nGene_plot"]] <- plotly::renderPlotly({
   req(input[["trajectory_to_display"]])
-  colorset <- setNames(
-    colors[1:length(levels(sample_data()$trajectory$monocle2[[ input[["trajectory_to_display"]] ]][["meta"]]$state))],
+  colors_this_plot <- setNames(
+    default_colorset[1:length(levels(sample_data()$trajectory$monocle2[[ input[["trajectory_to_display"]] ]][["meta"]]$state))],
     levels(sample_data()$trajectory$monocle2[[ input[["trajectory_to_display"]] ]][["meta"]]$state)
   )
   cbind(
@@ -1334,7 +1335,7 @@ output[["states_nGene_plot"]] <- plotly::renderPlotly({
       visible = TRUE
     ),
     color = ~state,
-    colors = colorset,
+    colors = colors_this_plot,
     source = "subset",
     showlegend = FALSE,
     hoverinfo = "y",

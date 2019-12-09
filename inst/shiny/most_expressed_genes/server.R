@@ -38,9 +38,9 @@ output[["most_expressed_genes_by_sample_table_present"]] <- DT::renderDataTable(
   formattable::formattable(
     list(
       "Sample" = formattable::color_tile(
-          colors[ which(sample_data()$samples$overview$sample == input[["most_expressed_genes_by_sample_input"]]) ],
-          colors[ which(sample_data()$samples$overview$sample == input[["most_expressed_genes_by_sample_input"]]) ]
-        ),
+        reactive_colors()$samples[[ input[["most_expressed_genes_by_sample_input"]] ]],
+        reactive_colors()$samples[[ input[["most_expressed_genes_by_sample_input"]] ]]
+      ),
       "% of total expression" = formattable::color_bar("pink")
     )
   ) %>%
@@ -133,9 +133,9 @@ output[["most_expressed_genes_by_cluster_table_present"]] <- DT::renderDataTable
   formattable::formattable(
     list(
       "Cluster" = formattable::color_tile(
-          colors[ which(sample_data()$clusters$overview$cluster == input[["most_expressed_genes_by_cluster_input"]]) ],
-          colors[ which(sample_data()$clusters$overview$cluster == input[["most_expressed_genes_by_cluster_input"]]) ]
-        ),
+        reactive_colors()$clusters[[ input[["most_expressed_genes_by_cluster_input"]] ]],
+        reactive_colors()$clusters[[ input[["most_expressed_genes_by_cluster_input"]] ]]
+      ),
       "% of total expression" = formattable::color_bar("pink")
     )
   ) %>%
