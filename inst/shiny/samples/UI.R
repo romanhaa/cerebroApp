@@ -9,7 +9,10 @@ tab_samples <- tabItem(
       boxTitle("Samples by cluster"),
       cerebroInfoButton("samples_by_cluster_info")
     ),
-    uiOutput("samples_by_cluster_UI")
+    tagList(
+      uiOutput("samples_by_cluster_UI_buttons"),
+      uiOutput("samples_by_cluster_UI_rest")
+    )
   ),
   cerebroBox(
     title = tagList(

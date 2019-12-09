@@ -6,17 +6,38 @@
 ## Samples by clusters: table + bar plot.
 ##----------------------------------------------------------------------------##
 
-# UI element
-output[["samples_by_cluster_UI"]] <- renderUI({
+# UI element: buttons
+output[["samples_by_cluster_UI_buttons"]] <- renderUI({
   if ( !is.null(sample_data()$samples$by_cluster) ) {
     tagList(
       shinyWidgets::materialSwitch(
         inputId = "samples_by_cluster_select_metric_for_bar_plot",
         label = "Show composition in percent [%]:",
-        status = "primary"
+        status = "primary",
+        inline = TRUE
       ),
-      # DT::dataTableOutput("samples_by_cluster_table"),
-      plotly::plotlyOutput("samples_by_cluster_plot")
+      shinyWidgets::materialSwitch(
+        inputId = "samples_by_cluster_show_table",
+        label = "Show table:",
+        status = "primary",
+        inline = TRUE
+      ),
+    )
+  } else {
+    textOutput("samples_by_cluster_text")
+  }
+})
+
+# UI element: rest
+output[["samples_by_cluster_UI_rest"]] <- renderUI({
+  if ( !is.null(sample_data()$samples$by_cluster) ) {
+    tagList(
+      plotly::plotlyOutput("samples_by_cluster_plot"),
+      {
+        if ( !is.null(input[["samples_by_cluster_show_table"]]) && input[["samples_by_cluster_show_table"]] == TRUE ) {
+          DT::dataTableOutput("samples_by_cluster_table")
+        }
+      }
     )
   } else {
     textOutput("samples_by_cluster_text")
