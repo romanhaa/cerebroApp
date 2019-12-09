@@ -131,6 +131,48 @@ server <- function(input, output, session) {
   })
 
   ##--------------------------------------------------------------------------##
+  ## Function to calculate A-by-B tables (e.g. samples by clusters).
+  ##--------------------------------------------------------------------------##
+  calculateTableAB <- function(groupA, groupB) {
+    # check if specified group columns exist in meta data
+    if ( groupA %in% colnames(sample_data()$cells) == FALSE ) {
+      stop(paste0("Column specified as groupA (`", groupA, "`) could not be found in meta data."), call. = FALSE)
+    }
+    if ( groupB %in% colnames(sample_data()$cells) == FALSE ) {
+      stop(paste0("Column specified as groupB (`", groupB, "`) could not be found in meta data."), call. = FALSE)
+    }
+    table <- sample_data()$cells[,c(groupA,groupB)]
+    # factorize group columns A and B if not already a factor
+    if ( is.character(table[,groupA]) ) {
+      table[[,groupA]] <- factor(
+        table[[,groupA]],
+        levels = table[[,groupA]] %>% unique() %>% sort()
+      )
+    }
+    if ( is.character(table[,groupB]) ) {
+      table[[,groupB]] <- factor(
+        table[[,groupB]],
+        levels = table[[,groupB]] %>% unique() %>% sort()
+      )
+    }
+    # generate table
+    table <- table %>%
+      dplyr::group_by_at(c(groupA,groupB)) %>%
+      dplyr::summarize(count = dplyr::n()) %>%
+      tidyr::spread(`groupB`, count, fill = 0) %>%
+      dplyr::ungroup() %>%
+      dplyr::mutate(total_cell_count = rowSums(.[c(2:ncol(.))])) %>%
+      dplyr::select(c(`groupA`, 'total_cell_count', dplyr::everything()))
+    # fix order of columns if cell cycle info was chosen as second group
+    if ( 'G1' %in% colnames(table) && 'G2M' %in% colnames(table) && 'S' %in% colnames(table) ) {
+      table <- table %>%
+        dplyr::select(c(`groupA`, 'total_cell_count', 'G1', 'S', 'G2M', dplyr::everything()))
+    }
+    # return
+    return(table)
+  }
+
+  ##--------------------------------------------------------------------------##
   ## Tabs.
   ##--------------------------------------------------------------------------##
   source(system.file("shiny/load_data/server.R", package = "cerebroApp"), local = TRUE)
