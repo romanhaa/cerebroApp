@@ -216,7 +216,6 @@ server <- function(input, output, session) {
       names(colors$clusters) <- sample_data()$cluster_names
     }
     # assign respective color picker in "Color management" tab to each cluster
-    colors$clusters <- sample_data()$clusters$colors
     if ( !is.null(input[[paste0('color_cluster_', levels(sample_data()$cells$cluster)[1])]]) ) {
       for ( i in 1:length(colors$clusters) ) {
         colors$clusters[i] <- input[[paste0('color_cluster_', levels(sample_data()$cells$cluster)[i])]]

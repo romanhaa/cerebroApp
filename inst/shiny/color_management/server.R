@@ -7,12 +7,12 @@ output[["colors_for_samples_UI"]] <- renderUI({
   tagList(
     {
       color_list <- list()
-      for ( i in 1:length(levels(sample_data()$cells$sample)) ) {
-        sample_name <- names(sample_data()$samples$colors)[i]
+      for ( i in 1:length(sample_data()$sample_names) ) {
+        sample_name <- sample_data()$sample_names[i]
         color_list[[i]] <- colourpicker::colourInput(
           paste0('color_sample_', sample_name),
           sample_name,
-          sample_data()$samples$colors[i]
+          reactive_colors()$samples[i]
         )
       }
       color_list
@@ -25,12 +25,12 @@ output[["colors_for_clusters_UI"]] <- renderUI({
   tagList(
     {
       color_list <- list()
-      for ( i in 1:length(levels(sample_data()$cells$cluster)) ) {
-        cluster_name <- names(sample_data()$clusters$colors)[i]
+      for ( i in 1:length(sample_data()$cluster_names) ) {
+        cluster_name <- sample_data()$cluster_names[i]
         color_list[[i]] <- colourpicker::colourInput(
           paste0('color_cluster_', cluster_name),
           paste0('Cluster: ', cluster_name),
-          sample_data()$clusters$colors[i]
+          reactive_colors()$clusters[i]
         )
       }
       color_list
