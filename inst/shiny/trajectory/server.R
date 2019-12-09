@@ -50,14 +50,7 @@ output[["trajectory_UI"]] <- renderUI({
         cerebroBox(
           title = tagList(
             boxTitle("Distribution along pseudotime"),
-            actionButton(
-              inputId = "trajectory_density_info",
-              label = "info",
-              icon = NULL,
-              class = "btn-xs",
-              title = "Show additional information for this panel.",
-              style = "margin-right: 5px"
-            )
+            cerebroInfoButton("trajectory_density_info")
           ),
           plotly::plotlyOutput("trajectory_density_plot")
         )
@@ -66,14 +59,7 @@ output[["trajectory_UI"]] <- renderUI({
         cerebroBox(
           title = tagList(
             boxTitle("Number of cells by state"),
-            actionButton(
-              inputId = "trajectory_cells_by_state_info",
-              label = "info",
-              icon = NULL,
-              class = "btn-xs",
-              title = "Show additional information for this panel.",
-              style = "margin-right: 5px"
-            )
+            cerebroInfoButton("trajectory_cells_by_state_info")
           ),
           DT::dataTableOutput("trajectory_number_of_cells_by_state_table")
         )
@@ -82,22 +68,11 @@ output[["trajectory_UI"]] <- renderUI({
         cerebroBox(
           title = tagList(
             boxTitle("States by sample"),
-            actionButton(
-              inputId = "states_by_sample_info",
-              label = "info",
-              icon = NULL,
-              class = "btn-xs",
-              title = "Show additional information for this panel.",
-              style = "margin-right: 5px"
-            )
+            cerebroInfoButton("states_by_sample_info")
           ),
           tagList(
-            shinyWidgets::materialSwitch(
-              inputId = "states_by_sample_select_metric_for_bar_plot",
-              label = "Show composition in percent [%]:",
-              status = "primary"
-            ),
-            plotly::plotlyOutput("states_by_sample_plot")
+            uiOutput("states_by_sample_UI_buttons"),
+            uiOutput("states_by_sample_UI_rest")
           )
         )
       ),
@@ -105,22 +80,11 @@ output[["trajectory_UI"]] <- renderUI({
         cerebroBox(
           title = tagList(
             boxTitle("States by cluster"),
-            actionButton(
-              inputId = "states_by_cluster_info",
-              label = "info",
-              icon = NULL,
-              class = "btn-xs",
-              title = "Show additional information for this panel.",
-              style = "margin-right: 5px"
-            )
+            cerebroInfoButton("states_by_cluster_info")
           ),
           tagList(
-            shinyWidgets::materialSwitch(
-              inputId = "states_by_cluster_select_metric_for_bar_plot",
-              label = "Show composition in percent [%]:",
-              status = "primary"
-            ),
-            plotly::plotlyOutput("states_by_cluster_plot")
+            uiOutput("states_by_cluster_UI_buttons"),
+            uiOutput("states_by_cluster_UI_rest")
           )
         )
       ),
@@ -128,14 +92,7 @@ output[["trajectory_UI"]] <- renderUI({
         cerebroBox(
           title = tagList(
             boxTitle("States by cell cycle (Seurat)"),
-            actionButton(
-              inputId = "states_by_cell_cycle_seurat_info",
-              label = "info",
-              icon = NULL,
-              class = "btn-xs",
-              title = "Show additional information for this panel.",
-              style = "margin-right: 5px"
-            )
+            cerebroInfoButton("states_by_cell_cycle_seurat_info")
           ),
           shiny::uiOutput("states_by_cell_cycle_seurat_UI")
         )
@@ -144,14 +101,7 @@ output[["trajectory_UI"]] <- renderUI({
         cerebroBox(
           title = tagList(
             boxTitle("Number of transcripts by state"),
-            actionButton(
-              inputId = "states_nUMI_info",
-              label = "info",
-              icon = NULL,
-              class = "btn-xs",
-              title = "Show additional information for this panel.",
-              style = "margin-right: 5px"
-            )
+            cerebroInfoButton("states_nUMI_info")
           ),
           plotly::plotlyOutput("states_nUMI_plot")
         )
@@ -160,14 +110,7 @@ output[["trajectory_UI"]] <- renderUI({
         cerebroBox(
           title = tagList(
             boxTitle("Number of expressed genes by state"),
-            actionButton(
-              inputId = "states_nGene_info",
-              label = "info",
-              icon = NULL,
-              class = "btn-xs",
-              title = "Show additional information for this panel.",
-              style = "margin-right: 5px"
-            )
+            cerebroInfoButton("states_nGene_info")
           ),
           plotly::plotlyOutput("states_nGene_plot")
         )
@@ -765,6 +708,36 @@ observeEvent(input[["trajectory_number_of_cells_by_state_info"]], {
 ## States by sample.
 ##----------------------------------------------------------------------------##
 
+# UI element: buttons
+output[["states_by_sample_UI_buttons"]] <- renderUI({
+  tagList(
+    shinyWidgets::materialSwitch(
+      inputId = "states_by_sample_select_metric_for_bar_plot",
+      label = "Show composition in percent [%]:",
+      status = "primary",
+      inline = TRUE
+    ),
+    shinyWidgets::materialSwitch(
+      inputId = "states_by_sample_show_table",
+      label = "Show table:",
+      status = "primary",
+      inline = TRUE
+    )
+  )
+})
+
+# UI element: rest
+output[["states_by_sample_UI_rest"]] <- renderUI({
+  tagList(
+    plotly::plotlyOutput("states_by_sample_plot"),
+    {
+      if ( !is.null(input[["states_by_sample_show_table"]]) && input[["states_by_sample_show_table"]] == TRUE ) {
+        DT::dataTableOutput("states_by_sample_table")
+      }
+    }
+  )
+})
+
 # bar plot
 output[["states_by_sample_plot"]] <- plotly::renderPlotly({
   req(input[["trajectory_to_display"]])
@@ -849,6 +822,49 @@ output[["states_by_sample_plot"]] <- plotly::renderPlotly({
   }
 })
 
+# table
+output[["states_by_sample_table"]] <- DT::renderDataTable({
+  req(input[["trajectory_to_display"]])
+  # generate table
+  temp_table <- cbind(
+      sample_data()$trajectory$monocle2[[ input[["trajectory_to_display"]] ]][["meta"]],
+      sample_data()$cells
+    ) %>%
+    dplyr::filter(!is.na(pseudotime)) %>%
+    dplyr::group_by(state,sample) %>%
+    dplyr::summarize(count = n()) %>%
+    tidyr::spread(sample, count, fill = 0) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(total_cell_count = rowSums(.[c(2:ncol(.))])) %>%
+    dplyr::select(c(state, 'total_cell_count', dplyr::everything()))
+  if ( input[["states_by_sample_select_metric_for_bar_plot"]] == TRUE ) {
+    # normalize counts to 100% percent
+    for ( i in 3:ncol(temp_table) ) {
+      temp_table[,i] <- round(temp_table[,i] / temp_table$total_cell_count * 100, digits = 1)
+    }
+  }
+  # process table and convert to DT
+  temp_table %>%
+  rename(
+    State = state,
+    "# of cells" = total_cell_count
+  ) %>%
+  DT::datatable(
+    filter = "none",
+    selection = "none",
+    escape = FALSE,
+    autoHideNavigation = TRUE,
+    rownames = FALSE,
+    class = "cell-border stripe",
+    options = list(
+      scrollX = TRUE,
+      sDom = '<"top">lrt<"bottom">ip',
+      lengthMenu = c(15, 30, 50, 100),
+      pageLength = 15
+    )
+  )
+})
+
 # info button
 observeEvent(input[["states_by_sample_info"]], {
   showModal(
@@ -864,6 +880,36 @@ observeEvent(input[["states_by_sample_info"]], {
 ##----------------------------------------------------------------------------##
 ## States by cluster.
 ##----------------------------------------------------------------------------##
+
+# UI element: buttons
+output[["states_by_cluster_UI_buttons"]] <- renderUI({
+  tagList(
+    shinyWidgets::materialSwitch(
+      inputId = "states_by_cluster_select_metric_for_bar_plot",
+      label = "Show composition in percent [%]:",
+      status = "primary",
+      inline = TRUE
+    ),
+    shinyWidgets::materialSwitch(
+      inputId = "states_by_cluster_show_table",
+      label = "Show table:",
+      status = "primary",
+      inline = TRUE
+    )
+  )
+})
+
+# UI element: rest
+output[["states_by_cluster_UI_rest"]] <- renderUI({
+  tagList(
+    plotly::plotlyOutput("states_by_cluster_plot"),
+    {
+      if ( !is.null(input[["states_by_cluster_show_table"]]) && input[["states_by_cluster_show_table"]] == TRUE ) {
+        DT::dataTableOutput("states_by_cluster_table")
+      }
+    }
+  )
+})
 
 # bar plot
 output[["states_by_cluster_plot"]] <- plotly::renderPlotly({
@@ -949,6 +995,49 @@ output[["states_by_cluster_plot"]] <- plotly::renderPlotly({
   }
 })
 
+# table
+output[["states_by_cluster_table"]] <- DT::renderDataTable({
+  req(input[["trajectory_to_display"]])
+  # generate table
+  temp_table <- cbind(
+      sample_data()$trajectory$monocle2[[ input[["trajectory_to_display"]] ]][["meta"]],
+      sample_data()$cells
+    ) %>%
+    dplyr::filter(!is.na(pseudotime)) %>%
+    dplyr::group_by(state,cluster) %>%
+    dplyr::summarize(count = n()) %>%
+    tidyr::spread(cluster, count, fill = 0) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(total_cell_count = rowSums(.[c(2:ncol(.))])) %>%
+    dplyr::select(c(state, 'total_cell_count', dplyr::everything()))
+  if ( input[["states_by_cluster_select_metric_for_bar_plot"]] == TRUE ) {
+    # normalize counts to 100% percent
+    for ( i in 3:ncol(temp_table) ) {
+      temp_table[,i] <- round(temp_table[,i] / temp_table$total_cell_count * 100, digits = 1)
+    }
+  }
+  # process table and convert to DT
+  temp_table %>%
+  rename(
+    State = state,
+    "# of cells" = total_cell_count
+  ) %>%
+  DT::datatable(
+    filter = "none",
+    selection = "none",
+    escape = FALSE,
+    autoHideNavigation = TRUE,
+    rownames = FALSE,
+    class = "cell-border stripe",
+    options = list(
+      scrollX = TRUE,
+      sDom = '<"top">lrt<"bottom">ip',
+      lengthMenu = c(15, 30, 50, 100),
+      pageLength = 15
+    )
+  )
+})
+
 # info button
 observeEvent(input[["states_by_cluster_info"]], {
   showModal(
@@ -967,18 +1056,44 @@ observeEvent(input[["states_by_cluster_info"]], {
 
 # UI element
 output[["states_by_cell_cycle_seurat_UI"]] <- renderUI({
-  if ( !is.null(sample_data()$cells$cell_cycle_seurat) ) {
+  if ( "cell_cycle_seurat" %in% colnames(sample_data()$cells) ) {
     tagList(
-      shinyWidgets::materialSwitch(
-        inputId = "states_by_cell_cycle_seurat_select_metric_for_bar_plot",
-        label = "Show composition in percent [%]:",
-        status = "primary"
-      ),
-      plotly::plotlyOutput("states_by_cell_cycle_seurat_plot")
+      uiOutput("states_by_cell_cycle_seurat_UI_buttons"),
+      uiOutput("states_by_cell_cycle_seurat_UI_rest")
     )
   } else {
     textOutput("states_by_cell_cycle_seurat_text")
   }
+})
+
+# UI element: buttons
+output[["states_by_cell_cycle_seurat_UI_buttons"]] <- renderUI({
+  tagList(
+    shinyWidgets::materialSwitch(
+      inputId = "states_by_cell_cycle_seurat_select_metric_for_bar_plot",
+      label = "Show composition in percent [%]:",
+      status = "primary",
+      inline = TRUE
+    ),
+    shinyWidgets::materialSwitch(
+      inputId = "states_by_cell_cycle_seurat_show_table",
+      label = "Show table:",
+      status = "primary",
+      inline = TRUE
+    )
+  )
+})
+
+# UI element: rest
+output[["states_by_cell_cycle_seurat_UI_rest"]] <- renderUI({
+  tagList(
+    plotly::plotlyOutput("states_by_cell_cycle_seurat_plot"),
+    {
+      if ( !is.null(input[["states_by_cell_cycle_seurat_show_table"]]) && input[["states_by_cell_cycle_seurat_show_table"]] == TRUE ) {
+        DT::dataTableOutput("states_by_cell_cycle_seurat_table")
+      }
+    }
+  )
 })
 
 output[["states_by_cell_cycle_seurat_plot"]] <- plotly::renderPlotly({
@@ -1065,6 +1180,49 @@ output[["states_by_cell_cycle_seurat_plot"]] <- plotly::renderPlotly({
       hovermode = "compare"
     )
   }
+})
+
+# table
+output[["states_by_cell_cycle_seurat_table"]] <- DT::renderDataTable({
+  req(input[["trajectory_to_display"]])
+  # generate table
+  temp_table <- cbind(
+      sample_data()$trajectory$monocle2[[ input[["trajectory_to_display"]] ]][["meta"]],
+      sample_data()$cells
+    ) %>%
+    dplyr::filter(!is.na(pseudotime)) %>%
+    dplyr::group_by(state,cell_cycle_seurat) %>%
+    dplyr::summarize(count = n()) %>%
+    tidyr::spread(cell_cycle_seurat, count, fill = 0) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(total_cell_count = rowSums(.[c(2:ncol(.))])) %>%
+    dplyr::select(c(state, 'total_cell_count', 'G1', 'S', 'G2M', dplyr::everything()))
+  if ( input[["states_by_cell_cycle_seurat_select_metric_for_bar_plot"]] == TRUE ) {
+    # normalize counts to 100% percent
+    for ( i in 3:ncol(temp_table) ) {
+      temp_table[,i] <- round(temp_table[,i] / temp_table$total_cell_count * 100, digits = 1)
+    }
+  }
+  # process table and convert to DT
+  temp_table %>%
+  rename(
+    State = state,
+    "# of cells" = total_cell_count
+  ) %>%
+  DT::datatable(
+    filter = "none",
+    selection = "none",
+    escape = FALSE,
+    autoHideNavigation = TRUE,
+    rownames = FALSE,
+    class = "cell-border stripe",
+    options = list(
+      scrollX = TRUE,
+      sDom = '<"top">lrt<"bottom">ip',
+      lengthMenu = c(15, 30, 50, 100),
+      pageLength = 15
+    )
+  )
 })
 
 # alternative text
