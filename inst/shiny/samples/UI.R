@@ -60,5 +60,6 @@ tab_samples <- tabItem(
     tagList(
       uiOutput("samples_by_cell_cycle_cyclone_UI_buttons"),
       uiOutput("samples_by_cell_cycle_cyclone_UI_rest")
-    )  )
+    )
+  )
 )

@@ -6,7 +6,7 @@ tab_color_management <- tabItem(
   tabName = "color_management",
   box(
     title = tagList(
-      boxTitle("Colors for samples"),
+      boxTitle("Samples"),
       cerebroInfoButton("colors_for_samples_info")
     ),
     status = "primary",
@@ -17,7 +17,7 @@ tab_color_management <- tabItem(
   ),
   box(
     title = tagList(
-      boxTitle("Colors for clusters"),
+      boxTitle("Clusters"),
       cerebroInfoButton("colors_for_clusters_info")
     ),
     status = "primary",
@@ -25,5 +25,5 @@ tab_color_management <- tabItem(
     width = 6,
     collapsible = TRUE,
     uiOutput("colors_for_clusters_UI")
-  ),
+  )
 )
