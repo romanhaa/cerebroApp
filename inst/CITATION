@@ -12,7 +12,7 @@ citEntry(
   issue        = '1367-4803',
   doi          = '10.1093/bioinformatics/btz877',
   url          = 'https://doi.org/10.1093/bioinformatics/btz877',
-  eprint       = 'http://oup.prod.sis.lan/bioinformatics/advance-article-pdf/doi/10.1093/bioinformatics/btz877/31451703/btz877.pdf'
+  eprint       = 'http://oup.prod.sis.lan/bioinformatics/advance-article-pdf/doi/10.1093/bioinformatics/btz877/31451703/btz877.pdf',
 
   textVersion  =
   paste('Hillje, R., Pelicci, P.G. & Luzi, L.',
