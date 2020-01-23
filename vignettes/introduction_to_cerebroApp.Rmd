@@ -23,6 +23,7 @@ library(dplyr)
 library(Seurat)
 library(monocle)
 library(cerebroApp)
+library(devtools)
 
 set.seed(1234567)
 ```
@@ -236,7 +237,7 @@ seurat <- extractMonocleTrajectory(monocle, seurat, 'highly_variable_genes')
 Finally, we use the `exportFromSeurat()` function of cerebroApp to export our Seurat object to a `.crb` file which can be loaded into Cerebro.
 
 ```{r export_data}
-cerebroApp::exportFromSeurat(
+exportFromSeurat(
   seurat,
   experiment_name = 'pbmc',
   file = paste0('cerebro_pbmc_', Sys.Date(), '.crb'),
