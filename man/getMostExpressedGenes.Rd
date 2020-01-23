@@ -29,10 +29,12 @@ sample and cluster of the Seurat object.
 Get most expressed genes for every sample and cluster in Seurat object.
 }
 \examples{
-seurat <- getMostExpressedGenes(
-  object = seurat,
+pbmc <- readRDS(system.file("extdata", "seurat_pbmc.rds",
+  package = "cerebroApp"))
+pbmc <- getMostExpressedGenes(
+  object = pbmc,
   column_sample = 'sample',
-  column_cluster = 'cluster'
+  column_cluster = 'seurat_clusters'
 )
 }
 \keyword{Cerebro}

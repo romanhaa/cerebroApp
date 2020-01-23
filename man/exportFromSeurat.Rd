@@ -53,18 +53,17 @@ Cerebro.
 Export Seurat object to Cerebro.
 }
 \examples{
+pbmc <- readRDS(system.file("extdata", "seurat_pbmc.rds",
+  package = "cerebroApp"))
 exportFromSeurat(
-  object = seurat,
-  file = 'PDX_patient_A.crb',
-  experiment_name = 'PDX_patient_A',
+  object = pbmc,
+  file = 'pbmc.crb',
+  experiment_name = 'PBMC',
   organism = 'hg',
   column_sample = 'sample',
-  column_cluster = 'cluster',
-  column_nUMI = 'nUMI',
-  column_nGene = 'nGene',
-  column_cell_cycle_seurat = 'cell_cycle_seurat',
-  column_cell_cycle_cyclone = 'cell_cycle_cyclone',
-  add_all_meta_data = TRUE
+  column_cluster = 'seurat_clusters',
+  column_nUMI = 'nCount_RNA',
+  column_nGene = 'nFeature_RNA'
 )
 }
 \keyword{Cerebro}

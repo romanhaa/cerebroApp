@@ -13,6 +13,10 @@ performGeneSetEnrichmentAnalysis(object, GMT_file,
 `object@data` (Seurat object older than v3) or `object@assays$RNA@data`
 (Seurat object v3 or newer).}
 
+\item{GMT_file}{Path to GMT file containing the gene sets to be tested.
+The Broad Institute provides many gene sets which can be downloaded:
+http://software.broadinstitute.org/gsea/msigdb/index.jsp}
+
 \item{column_sample}{Column in object@meta.data that contains information
 about sample; defaults to 'sample'.}
 
@@ -24,10 +28,6 @@ about cluster; defaults to 'cluster'.}
 \item{thresh_q_val}{Threshold for q-value, defaults to 0.1.}
 
 \item{...}{Further parameters can be passed to control GSVA::gsva().}
-
-\item{gene_sets}{Path to GMT file containing the gene sets to be tested.
-The Broad Institute provides many gene sets which can be downloaded:
-http://software.broadinstitute.org/gsea/msigdb/index.jsp}
 }
 \value{
 Seurat object with GSVA results for samples and clusters stored in
@@ -45,13 +45,18 @@ data", Diaz-Mejia et al., F1000Research (2019).
 Perform gene set enrichment analysis with GSVA.
 }
 \examples{
-seurat <- performGeneSetEnrichmentAnalysis(
-  object = seurat,
-  gene_sets = 'path/to/gene_sets.gmt',
+pbmc <- readRDS(system.file("extdata", "seurat_pbmc.rds",
+  package = "cerebroApp"))
+example_gene_set <- system.file("extdata", "example_gene_set.gmt",
+  package = "cerebroApp")
+pbmc <- performGeneSetEnrichmentAnalysis(
+  object = pbmc,
+  GMT_file = example_gene_set,
   column_sample = 'sample',
-  column_cluster = 'cluster',
+  column_cluster = 'seurat_clusters',
   thresh_p_val = 0.05,
-  thresh_q_val = 0.1
+  thresh_q_val = 0.1,
+  parallel.sz = 1
 )
 }
 \keyword{Cerebro}

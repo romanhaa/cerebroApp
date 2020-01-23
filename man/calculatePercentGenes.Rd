@@ -23,9 +23,11 @@ transcripts per cell.
 Calculate percentage of transcripts of gene list.
 }
 \examples{
+pbmc <- readRDS(system.file("extdata", "seurat_pbmc.rds",
+  package = "cerebroApp"))
 calculatePercentGenes(
-  object = seurat,
-  genes = list('example' = c('Fth1','Atf1'))
+  object = pbmc,
+  genes = list('example' = c('FCN1','CD3D'))
 )
 }
 \keyword{Cerebro}

@@ -12,7 +12,7 @@ score between 0 and 1 in the other.}
 
 \item{databases}{Databases to search.}
 
-\item{API_url}{URL to send requests to (Enrichr API).
+\item{URL_API}{URL to send requests to (Enrichr API).
 See http://amp.pharm.mssm.edu/Enrichr/ for available databases.}
 }
 \value{

@@ -22,8 +22,3 @@ second column, and the gene names in the following columns.
 \details{
 Read GMT file.
 }
-\examples{
-my_gmt <- read_GMT_file(
-  file = 'path/to/my/gene_sets.gmt'
-)
-}

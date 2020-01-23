@@ -19,7 +19,9 @@ Launch Cerebro app.
 Launch Cerebro app.
 }
 \examples{
-launchCerebro(maxFileSize = 800)
+if ( interactive() ) {
+  launchCerebro(maxFileSize = 800)
+}
 }
 \keyword{Cerebro}
 \keyword{Seurat}

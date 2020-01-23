@@ -35,13 +35,15 @@ seurat@misc$trajectory under the specified name.
 Extract trajectory from Monocle and add to Seurat object.
 }
 \examples{
+\dontrun{
 seurat <- extractMonocleTrajectory(
   monocle = monocle,
   seurat = seurat,
-  name = 'trajectory_1'
+  name = 'trajectory_1',
   column_state = 'State',
   column_pseudotime = 'Pseudotime'
 )
+}
 }
 \keyword{Cerebro}
 \keyword{Monocle}

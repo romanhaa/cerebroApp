@@ -51,11 +51,13 @@ the Seurat object.
 Get marker genes for every sample and cluster in Seurat object.
 }
 \examples{
-seurat <- getMarkerGenes(
-  object = seurat
+pbmc <- readRDS(system.file("extdata", "seurat_pbmc.rds",
+  package = "cerebroApp"))
+pbmc <- getMarkerGenes(
+  object = pbmc,
   organism = 'hg',
   column_sample = 'sample',
-  column_cluster = 'cluster',
+  column_cluster = 'seurat_clusters',
   only_pos = TRUE,
   min_pct = 0.7,
   thresh_logFC = 0.25,

@@ -46,10 +46,12 @@ in marker gene sets of samples and clusters.
 Get enriched pathways based on marker genes from EnrichR.
 }
 \examples{
-seurat <- getEnrichedPathways(
-  object = seurat,
+pbmc <- readRDS(system.file("extdata", "seurat_pbmc.rds",
+  package = "cerebroApp"))
+pbmc <- getEnrichedPathways(
+  object = pbmc,
   column_sample = 'sample',
-  column_cluster = 'cluster',
+  column_cluster = 'seurat_clusters',
   databases = c('GO_Biological_Process_2018','GO_Cellular_Component_2018'),
   adj_p_cutoff = 0.01,
   max_terms = 100,
