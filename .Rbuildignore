@@ -1,2 +1,7 @@
+.DS_Store
+.Rhistory
 ^LICENSE\.md$
 .git
+.gitignore
+prepare_example_data_set.R
+TODO.md
