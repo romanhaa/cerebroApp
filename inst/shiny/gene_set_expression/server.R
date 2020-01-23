@@ -48,18 +48,18 @@ output[["geneSetExpression_UI"]] <- renderUI({
   tagList(
     selectInput(
       "geneSetExpression_select_geneSet",
-      label = "Gene set:",
+      label = "Gene set",
       choices = c("-", unique(geneSets()$gs_name)),
       selected = "-"
     ),
     selectInput(
       "geneSetExpression_projection_to_display",
-      label = "Projection:",
+      label = "Projection",
       choices = names(sample_data()$projections)
     ),
     shinyWidgets::pickerInput(
       "geneSetExpression_samples_to_display",
-      label = "Samples to display:",
+      label = "Samples to display",
       choices = sample_data()$sample_names,
       selected = sample_data()$sample_names,
       options = list("actions-box" = TRUE),
@@ -67,7 +67,7 @@ output[["geneSetExpression_UI"]] <- renderUI({
     ),
     shinyWidgets::pickerInput(
       "geneSetExpression_clusters_to_display",
-      label = "Clusters to display:",
+      label = "Clusters to display",
       choices = sample_data()$cluster_names,
       selected = sample_data()$cluster_names,
       options = list("actions-box" = TRUE),
@@ -83,12 +83,12 @@ output[["geneSetExpression_UI"]] <- renderUI({
     ),
     selectInput(
       "geneSetExpression_projection_plotting_order",
-      label = "Plotting order:",
+      label = "Plotting order",
       choices = c("Random", "Highest expression on top")
     ),
     sliderInput(
       "geneSetExpression_projection_dot_size",
-      label = "Dot size:",
+      label = "Dot size",
       min = scatter_plot_dot_size[["min"]],
       max = scatter_plot_dot_size[["max"]],
       step = scatter_plot_dot_size[["step"]],
@@ -96,11 +96,39 @@ output[["geneSetExpression_UI"]] <- renderUI({
     ),
     sliderInput(
       "geneSetExpression_projection_dot_opacity",
-      label = "Dot opacity:",
+      label = "Dot opacity",
       min = scatter_plot_dot_opacity[["min"]],
       max = scatter_plot_dot_opacity[["max"]],
       step = scatter_plot_dot_opacity[["step"]],
       value = scatter_plot_dot_opacity[["default"]]
+    ),
+    selectInput(
+      "geneSetExpression_projection_color_scale",
+      label = "Color scale",
+      choices = c("YlGnBu", "YlOrRd","Blues","Greens","Reds","RdBu","viridis"),
+      selected = "YlGnBu"
+    )
+  )
+})
+
+##----------------------------------------------------------------------------##
+## UI element for color scale range in projection.
+##----------------------------------------------------------------------------##
+output[["geneSetExpression_color_scale_range"]] <- renderUI({
+  range <- range(geneSetExpression_plot_data()$level)
+  if ( range[1] == 0 & range[2] == 0 ) {
+    range[2] = 1
+  } else {
+    range[1] <- range[1] %>% round(digits = 2)
+    range[2] <- range[2] %>% round(digits = 2)
+  }
+  tagList(
+    sliderInput(
+      "geneSetExpression_projection_color_scale_range",
+      label = "Range of color scale",
+      min = range[1],
+      max = range[2],
+      value = c(range[1], range[2])
     )
   )
 })
@@ -118,14 +146,14 @@ output[["geneSetExpression_scales"]] <- renderUI({
   tagList(
     sliderInput(
       "geneSetExpression_projection_scale_x_manual_range",
-      label = "X axis",
+      label = "Range of X axis",
       min = range_x_min,
       max = range_x_max,
       value = c(range_x_min, range_x_max)
     ),
     sliderInput(
       "geneSetExpression_projection_scale_y_manual_range",
-      label = "Y axis",
+      label = "Range of Y axis",
       min = range_y_min,
       max = range_y_max,
       value = c(range_y_min, range_y_max)
@@ -207,11 +235,19 @@ geneSetExpression_plot_data <- reactive({
 ##----------------------------------------------------------------------------##
 output[["geneSetExpression_projection"]] <- plotly::renderPlotly({
   req(
-    input[["geneSetExpression_projection_dot_opacity"]],
+    input[["geneSetExpression_projection_to_display"]],
     input[["geneSetExpression_projection_dot_size"]],
+    input[["geneSetExpression_projection_dot_opacity"]],
+    input[["geneSetExpression_projection_color_scale"]],
+    input[["geneSetExpression_projection_color_scale_range"]],
     input[["geneSetExpression_projection_scale_x_manual_range"]],
     input[["geneSetExpression_projection_scale_y_manual_range"]]
   )
+  if ( input[["geneSetExpression_projection_color_scale"]] == 'viridis' ) {
+    color_scale <- 'Viridis'
+  } else {
+    color_scale <- input[["geneSetExpression_projection_color_scale"]]
+  }
   if ( ncol(sample_data()$projections[[ input[["geneSetExpression_projection_to_display"]] ]]) == 3 ) {
     plotly::plot_ly(
       geneSetExpression_plot_data(),
@@ -226,7 +262,10 @@ output[["geneSetExpression_projection"]] <- plotly::renderPlotly({
         ),
         color = ~level,
         opacity = input[["geneSetExpression_projection_dot_opacity"]],
-        colorscale = "YlGnBu",
+        colorscale = color_scale,
+        cauto = FALSE,
+        cmin = input[["geneSetExpression_projection_color_scale_range"]][1],
+        cmax = input[["geneSetExpression_projection_color_scale_range"]][2],
         reversescale = TRUE,
         line = list(
           color = "rgb(196,196,196)",
@@ -286,7 +325,10 @@ output[["geneSetExpression_projection"]] <- plotly::renderPlotly({
         ),
         color = ~level,
         opacity = input[["geneSetExpression_projection_dot_opacity"]],
-        colorscale = "YlGnBu",
+        colorscale = color_scale,
+        cauto = FALSE,
+        cmin = input[["geneSetExpression_projection_color_scale_range"]][1],
+        cmax = input[["geneSetExpression_projection_color_scale_range"]][2],
         reversescale = TRUE,
         line = list(
           color = "rgb(196,196,196)",
@@ -362,9 +404,11 @@ observeEvent(input[["geneSetExpression_projection_info"]], {
 observeEvent(input[["geneSetExpression_projection_export"]], {
   req(
     input[["geneSetExpression_projection_to_display"]],
-    input[["geneSetExpression_projection_dot_opacity"]],
-    input[["geneSetExpression_projection_dot_size"]],
     input[["geneSetExpression_projection_plotting_order"]],
+    input[["geneSetExpression_projection_dot_size"]],
+    input[["geneSetExpression_projection_dot_opacity"]],
+    input[["geneSetExpression_projection_color_scale"]],
+    input[["geneSetExpression_projection_color_scale_range"]],
     input[["geneSetExpression_projection_scale_x_manual_range"]],
     input[["geneSetExpression_projection_scale_y_manual_range"]]
   )
@@ -414,14 +458,28 @@ observeEvent(input[["geneSetExpression_projection_export"]], {
           color = "#c4c4c4",
           alpha = input[["geneSetExpression_projection_dot_opacity"]]
         ) +
-        scale_fill_distiller(
-          palette = "YlGnBu",
-          direction = 1,
-          name = "Log-normalised\nexpression",
-          guide = guide_colorbar(frame.colour = "black", ticks.colour = "black")
-        ) +
         lims(x = xlim, y = ylim) +
         theme_bw()
+
+        if ( input[["geneSetExpression_projection_color_scale"]] == 'viridis' ) {
+          p <- p + viridis::scale_fill_viridis(
+            option = "viridis",
+            limits = input[["geneSetExpression_projection_color_scale_range"]],
+            oob = scales::squish,
+            direction = -1,
+            name = "Log-normalised\nexpression",
+            guide = guide_colorbar(frame.colour = "black", ticks.colour = "black")
+          )
+        } else {
+          p <- p + scale_fill_distiller(
+            palette = input[["geneSetExpression_projection_color_scale"]],
+            limits = input[["geneSetExpression_projection_color_scale_range"]],
+            oob = scales::squish,
+            direction = 1,
+            name = "Log-normalised\nexpression",
+            guide = guide_colorbar(frame.colour = "black", ticks.colour = "black")
+          )
+        }
 
       pdf(NULL)
       ggsave(out_filename, p, height = 8, width = 11)
@@ -569,6 +627,9 @@ observeEvent(input[["geneSetExpression_by_cluster_info"]], {
 
 # bar plot
 output[["geneSetExpression_by_gene"]] <- plotly::renderPlotly({
+  req(
+    input[["geneSetExpression_projection_color_scale"]]
+  )
   if ( length(geneSetData()$genes_to_display_present) == 0 ) {
     expression_levels <- data.frame(
       "gene" = character(),
@@ -587,6 +648,12 @@ output[["geneSetExpression_by_gene"]] <- plotly::renderPlotly({
     arrange(-expression) %>%
     top_n(50, expression)
   }
+  # color scale
+  if ( input[["geneSetExpression_projection_color_scale"]] == 'viridis' ) {
+    color_scale <- 'Viridis'
+  } else {
+    color_scale <- input[["geneSetExpression_projection_color_scale"]]
+  }
   plotly::plot_ly(
     expression_levels,
     x = ~gene,
@@ -595,7 +662,7 @@ output[["geneSetExpression_by_gene"]] <- plotly::renderPlotly({
     type = "bar",
     marker = list(
       color = ~expression,
-      colorscale = "YlGnBu",
+      colorscale = color_scale,
       reversescale = TRUE,
       line = list(
         color = "rgb(196,196,196)",

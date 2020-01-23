@@ -11,6 +11,7 @@ tab_gene_set_expression <- tabItem(
           title = "Input parameters",
           tagList(
             uiOutput("geneSetExpression_UI"),
+            uiOutput("geneSetExpression_color_scale_range"),
             uiOutput("geneSetExpression_scales")
           )
         )
