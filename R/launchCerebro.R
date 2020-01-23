@@ -1,10 +1,10 @@
-#' Launch Cerebro app.
-#' @title Launch Cerebro app.
-#' @description Launch Cerebro app.
+#' Launch Cerebro interface.
+#' @title Launch Cerebro interface.
+#' @description Launch Cerebro interface.
 #' @keywords Cerebro scRNAseq Seurat
 #' @param maxFileSize Maximum size of input file; defaults to 800 MB.
 #' @export
-#' @return Cerebro application object.
+#' @return Shiny application.
 #' @import dplyr
 #' @importFrom DT datatable formatStyle
 #' @importFrom formattable proportion
@@ -13,9 +13,11 @@
 #' @importFrom msigdbr msigdbr
 #' @importFrom plotly layout plot_ly plotlyOutput renderPlotly toWebGL
 #' @importFrom reshape2 melt
+#' @import scales
 #' @import shiny
 #' @import shinydashboard
 #' @import shinyWidgets
+#' @import viridis
 #' @examples
 #' if ( interactive() ) {
 #'   launchCerebro(maxFileSize = 800)
