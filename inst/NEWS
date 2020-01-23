@@ -1,0 +1,42 @@
+\name{NEWS}
+\title{News for Package \pkg{cerebroApp}}
+
+\section{Changes in version 1.2.0}{
+\itemize{
+    \item Package submitted to Bioconductor.
+    \item New features:
+    \itemize{
+      \item New button for composition plots (e.g. samples by clusters or cell cycle) that allows to choose whether to scale by actual cell count (default) or percentage.
+      \item New button for composition plots that allows to show/hide the respective table of numbers behind them.
+      \item New tab "Color Management": Users can now change the color assigned to each sample/cluster.
+      \item "Gene expression" and "Gene set expression" panels: Users can now pick from a set of color scales and adjust the color range.
+    }
+    \item Other changes:
+    \itemize{
+      \item Add citation info.
+      \item Composition tables (e.g. samples by clusters or cell cycle) are now calculated in the Shiny app rather than being expected to be present in the \texttt{.crb} file.
+      \item Fix log message in \texttt{exportFromSeurat()} when extracting trajectories.
+      \item Remove dependency on pre-assigned colors in the \texttt{.crb} file. If no colors have been assigned to samples and clusters when loading a data set, they will be assigned then.
+      \item Update examples of functions and include mini-Seurat object and example gene set (GMT file) to run the examples.
+      \item Modify pre-loaded data set in Cerebro interface to contain more data.
+      \item When attempting to download genes in GO term "cell surface" in the \texttt{getMarkerGenes()} function, it tries at max. 3 times to contact the biomaRt server and continues without if all attempts failed. Sometimes the server does not respond which gave an error in previous versions of the function.
+      \item Plenty of changes to meet Bioconductor guidelines (character count per line, replace \texttt{.} in dplyr pipes with \texttt{rlang::.data}, etc.).
+    }
+}}
+
+\section{Changes in version 1.1.0}{
+  \itemize{
+    \item Release along with manuscript revision.
+    \item New features:
+    \itemize{
+      \item New function \texttt{extractMonocleTrajectory()}: Users can extract data from trajectories calculated with Monocle v2.
+      \item New tab "Trajectories": Allows visualization of trajectories calculated with Monocle v2.
+    }
+  }
+}
+
+\section{Changes in version 1.0.0}{
+  \itemize{
+    \item Public release along with manuscript submission to bioRxiv.
+  }
+}
