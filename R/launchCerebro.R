@@ -17,7 +17,9 @@
 #' @import shinydashboard
 #' @import shinyWidgets
 #' @examples
-#' launchCerebro(maxFileSize = 800)
+#' if ( interactive() ) {
+#'   launchCerebro(maxFileSize = 800)
+#' }
 launchCerebro <- function(
   maxFileSize = 800
 ){
@@ -62,6 +64,6 @@ launchCerebro <- function(
   ##--------------------------------------------------------------------------##
   ## Launch app.
   ##--------------------------------------------------------------------------##
-  shinyApp(ui = ui, server = server)
+  shiny::shinyApp(ui = ui, server = server)
 
 }

@@ -9,9 +9,11 @@
 #' @return List of lists containing the percentages of expression for each
 #' provided gene list.
 #' @examples
+#' pbmc <- readRDS(system.file("extdata", "seurat_pbmc.rds",
+#'   package = "cerebroApp"))
 #' calculatePercentGenes(
-#'   object = seurat,
-#'   genes = list('example' = c('Fth1','Atf1'))
+#'   object = pbmc,
+#'   genes = list('example' = c('FCN1','CD3D'))
 #' )
 calculatePercentGenes <- function(
   object,
@@ -19,7 +21,10 @@ calculatePercentGenes <- function(
 ) {
   # check if Seurat is installed
   if (!requireNamespace("Seurat", quietly = TRUE)) {
-    stop("Package 'Seurat' needed for this function to work. Please install it.", call. = FALSE)
+    stop(
+      "Package 'Seurat' needed for this function to work. Please install it.",
+      call. = FALSE
+    )
   }
   ##--------------------------------------------------------------------------##
   ## get for every supplied gene list, get the genes that are present in the
@@ -30,7 +35,12 @@ calculatePercentGenes <- function(
       genes,
       function(x) {
         genes_here <- intersect(x, rownames(object@raw.data))
-        Matrix::colSums(object@raw.data[genes_here,]) / Matrix::colSums(object@raw.data)
+        if ( length(genes_here) == 1 ) {
+          object@raw.data[genes_here,] / Matrix::colSums(object@raw.data)
+        } else {
+          Matrix::colSums(object@raw.data[genes_here,]) /
+          Matrix::colSums(object@raw.data)
+        }
       }
     )
   } else {
@@ -38,7 +48,13 @@ calculatePercentGenes <- function(
       genes,
       function(x) {
         genes_here <- intersect(x, rownames(object@assays$RNA@counts))
-        Matrix::colSums(object@assays$RNA@counts[genes_here,]) / Matrix::colSums(object@assays$RNA@counts)
+        if ( length(genes_here) == 1 ) {
+          object@assays$RNA@counts[genes_here,] /
+          Matrix::colSums(object@assays$RNA@counts)
+        } else {
+          Matrix::colSums(object@assays$RNA@counts[genes_here,]) /
+          Matrix::colSums(object@assays$RNA@counts)
+        }
       }
     )
   }

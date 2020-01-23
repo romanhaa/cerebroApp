@@ -10,7 +10,7 @@
 #' @param object Seurat object. log-counts for analysis must be stored in
 #' `object@data` (Seurat object older than v3) or `object@assays$RNA@data`
 #' (Seurat object v3 or newer).
-#' @param gene_sets Path to GMT file containing the gene sets to be tested.
+#' @param GMT_file Path to GMT file containing the gene sets to be tested.
 #' The Broad Institute provides many gene sets which can be downloaded:
 #' http://software.broadinstitute.org/gsea/msigdb/index.jsp
 #' @param column_sample Column in object@meta.data that contains information
@@ -27,17 +27,22 @@
 #' @importFrom GSVA gsva
 #' @importFrom Matrix colSums
 #' @importFrom qvalue qvalue
+#' @importFrom rlang .data
 #' @importFrom tibble tibble
 #' @examples
-#' seurat <- performGeneSetEnrichmentAnalysis(
-#'   object = seurat,
-#'   gene_sets = 'path/to/gene_sets.gmt',
+#' pbmc <- readRDS(system.file("extdata", "seurat_pbmc.rds",
+#'   package = "cerebroApp"))
+#' example_gene_set <- system.file("extdata", "example_gene_set.gmt",
+#'   package = "cerebroApp")
+#' pbmc <- performGeneSetEnrichmentAnalysis(
+#'   object = pbmc,
+#'   GMT_file = example_gene_set,
 #'   column_sample = 'sample',
-#'   column_cluster = 'cluster',
+#'   column_cluster = 'seurat_clusters',
 #'   thresh_p_val = 0.05,
-#'   thresh_q_val = 0.1
+#'   thresh_q_val = 0.1,
+#'   parallel.sz = 1
 #' )
-
 performGeneSetEnrichmentAnalysis <- function(
   object,
   GMT_file,
@@ -50,7 +55,10 @@ performGeneSetEnrichmentAnalysis <- function(
 {
   # check if Seurat is installed
   if (!requireNamespace("Seurat", quietly = TRUE)) {
-    stop("Package 'Seurat' needed for this function to work. Please install it.", call. = FALSE)
+    stop(
+      "Package 'Seurat' needed for this function to work. Please install it.",
+      call. = FALSE
+    )
   }
   #----------------------------------------------------------------------------#
   # check input parameters
@@ -69,11 +77,17 @@ performGeneSetEnrichmentAnalysis <- function(
   }
   if ( thresh_p_val < 0 | thresh_p_val > 1 )
   {
-    stop("Specified threshold for p-value must be between 0 and 1.", call. = FALSE)
+    stop(
+      "Specified threshold for p-value must be between 0 and 1.",
+      call. = FALSE
+    )
   }
   if ( thresh_q_val < 0 | thresh_q_val > 1 )
   {
-    stop("Specified threshold for q-value must be between 0 and 1.", call. = FALSE)
+    stop(
+      "Specified threshold for q-value must be between 0 and 1.",
+      call. = FALSE
+    )
   }
 
   #----------------------------------------------------------------------------#
@@ -97,11 +111,11 @@ performGeneSetEnrichmentAnalysis <- function(
       genes = NA
     )
 
-  for ( i in 1:length(gene_sets$genesets) ) {
+  for ( i in seq_len(length(gene_sets$genesets)) ) {
     gene_sets_tibble$length[i] <- gene_sets$genesets[[i]] %>% length()
     gene_sets_tibble$genes[i] <- gene_sets$genesets[[i]] %>%
       unlist() %>%
-      paste(., collapse = ',')
+      paste(.data, collapse = ',')
   }
 
   message(
@@ -120,16 +134,22 @@ performGeneSetEnrichmentAnalysis <- function(
   if ( object@version < 3 ) {
     if ( is.null(object@data) )
     {
-      stop("`@data` slot doesn't exist in provided Seurat object.", call. = FALSE)
+      stop(
+        "`@data` slot doesn't exist in provided Seurat object.",
+        call. = FALSE
+      )
     }
-    matrix_full <- seurat@data %>%
+    matrix_full <- object@data %>%
       as.matrix() %>%
       t() %>%
       as.data.frame()
   } else {
     if ( is.null(object@assays$RNA@data) )
     {
-      stop("`@assays$RNA@data` slot doesn't exist in provided Seurat object.", call. = FALSE)
+      stop(
+        "`@assays$RNA@data` slot doesn't exist in provided Seurat object.",
+        call. = FALSE
+      )
     }
     matrix_full <- object@assays$RNA@data %>%
       as.matrix() %>%
@@ -171,7 +191,7 @@ performGeneSetEnrichmentAnalysis <- function(
 
     # calculate mean log counts per group of cells
     matrix_merged <- temp_matrix_full %>%
-      dplyr::group_by(group) %>%
+      dplyr::group_by(.data$group) %>%
       dplyr::summarise_all(mean)
 
     # keep order of groups for later
@@ -179,7 +199,7 @@ performGeneSetEnrichmentAnalysis <- function(
 
     # remove group information from count matrix and transpose for GSVA
     matrix_merged <- matrix_merged %>%
-      dplyr::select(-group) %>%
+      dplyr::select(-'group') %>%
       as.matrix() %>%
       t()
 
@@ -193,11 +213,12 @@ performGeneSetEnrichmentAnalysis <- function(
         ...
       )
 
-    # calculate statistics for enrichment scores and filter those which don't pass
-    # the specified tresholds
+    # calculate statistics for enrichment scores and filter those which don't
+    # pass the specified tresholds
     message(
       paste0(
-        '[', format(Sys.time(), '%H:%M:%S'), '] Filtering results based on specified thresholds...'
+        '[', format(Sys.time(), '%H:%M:%S'), '] Filtering results based on ',
+        'specified thresholds...'
       )
     )
     results_by_sample <- tibble::tibble(
@@ -207,28 +228,53 @@ performGeneSetEnrichmentAnalysis <- function(
         p_value = numeric(),
         q_value = numeric()
       )
-    for ( i in 1:ncol(enrichment_scores) ) {
+    for ( i in seq_len(ncol(enrichment_scores)) ) {
       temp_results <- tibble::tibble(
           group = colnames(matrix_merged)[i],
           name = rownames(enrichment_scores),
           enrichment_score = enrichment_scores[,i]
-        ) %>%
-        dplyr::mutate(
-          p_value = pnorm(-abs(scale(enrichment_score)[,1])),
-          q_value = qvalue::qvalue(p_value, pi0 = 1)$lfdr
-        ) %>%
-        dplyr::filter(
-          p_value <= thresh_p_val,
-          q_value <= thresh_q_val
         )
+      if ( nrow(temp_results) < 2 ) {
+        message(
+          paste0(
+            '[', format(Sys.time(), '%H:%M:%S'), '] Only 1 gene set ',
+            'available, therefore no p- and q-values can be calculated and no ',
+            'filtering of the results will be performed.'
+          )
+        )
+        temp_results <- temp_results %>%
+          dplyr::mutate(p_value = NA, q_value = NA)
+      } else {
+        message(
+          paste0(
+            '[', format(Sys.time(), '%H:%M:%S'), '] Filtering results based on ',
+            'specified thresholds...'
+          )
+        )
+        temp_results <- temp_results %>%
+          dplyr::mutate(
+            p_value = stats::pnorm(-abs(scale(.data$enrichment_score)[,1])),
+            q_value = qvalue::qvalue(.data$p_value, pi0 = 1)$lfdr
+          ) %>%
+          dplyr::filter(
+            .data$p_value <= thresh_p_val,
+            .data$q_value <= thresh_q_val
+          )
+      }
       results_by_sample <- dplyr::bind_rows(results_by_sample, temp_results) %>%
-        dplyr::arrange(q_value)
+        dplyr::arrange(.data$q_value)
     }
 
     # add description, number of genes and list of genes to results
-    results_by_sample <- dplyr::left_join(results_by_sample, gene_sets_tibble, by = 'name') %>%
-      dplyr::select(group, name, description, length, genes, enrichment_score, p_value, q_value) %>%
-      dplyr::mutate(group = factor(group, levels = intersect(sample_names, group)))
+    results_by_sample <- dplyr::left_join(
+        results_by_sample,
+        gene_sets_tibble,
+        by = 'name'
+      ) %>%
+      dplyr::select(c('group','name','description','length','genes',
+        'enrichment_score','p_value','q_value')) %>%
+      dplyr::mutate(group = factor(.data$group, levels = intersect(sample_names,
+        .data$group)))
 
     # print number of enriched gene sets
     message(
@@ -246,7 +292,8 @@ performGeneSetEnrichmentAnalysis <- function(
   } else {
     message(
       paste0(
-        '[', format(Sys.time(), '%H:%M:%S'), '] Only 1 sample in the data set, will skip analysis by sample...'
+        '[', format(Sys.time(), '%H:%M:%S'), '] Only 1 sample in the data ',
+        'set, will skip analysis by sample...'
       )
     )
     results_by_sample <- 'only_one_sample_in_data_set'
@@ -275,7 +322,7 @@ performGeneSetEnrichmentAnalysis <- function(
 
     # calculate mean log counts per group of cells
     matrix_merged <- temp_matrix_full %>%
-      dplyr::group_by(group) %>%
+      dplyr::group_by(.data$group) %>%
       dplyr::summarise_all(mean)
 
     # keep order of groups for later
@@ -283,7 +330,7 @@ performGeneSetEnrichmentAnalysis <- function(
 
     # remove group information from count matrix and transpose for GSVA
     matrix_merged <- matrix_merged %>%
-      dplyr::select(-group) %>%
+      dplyr::select(-'group') %>%
       as.matrix() %>%
       t()
 
@@ -297,13 +344,8 @@ performGeneSetEnrichmentAnalysis <- function(
         ...
       )
 
-    # calculate statistics for enrichment scores and filter those which don't pass
-    # the specified tresholds
-    message(
-      paste0(
-        '[', format(Sys.time(), '%H:%M:%S'), '] Filtering results based on specified thresholds...'
-      )
-    )
+    # calculate statistics for enrichment scores and filter those which don't
+    # pass the specified tresholds
     results_by_cluster <- tibble::tibble(
         group = character(),
         name = character(),
@@ -311,28 +353,56 @@ performGeneSetEnrichmentAnalysis <- function(
         p_value = numeric(),
         q_value = numeric()
       )
-    for ( i in 1:ncol(enrichment_scores) ) {
+    for ( i in seq_len(ncol(enrichment_scores)) ) {
       temp_results <- tibble::tibble(
           group = colnames(matrix_merged)[i],
           name = rownames(enrichment_scores),
           enrichment_score = enrichment_scores[,i]
-        ) %>%
-        dplyr::mutate(
-          p_value = pnorm(-abs(scale(enrichment_score)[,1])),
-          q_value = qvalue::qvalue(p_value, pi0 = 1)$lfdr
-        ) %>%
-        dplyr::filter(
-          p_value <= thresh_p_val,
-          q_value <= thresh_q_val
         )
-      results_by_cluster <- dplyr::bind_rows(results_by_cluster, temp_results) %>%
-        dplyr::arrange(q_value)
+      if ( nrow(temp_results) < 2 ) {
+        message(
+          paste0(
+            '[', format(Sys.time(), '%H:%M:%S'), '] Only 1 gene set ',
+            'available, therefore no p- and q-values can be calculated and no ',
+            'filtering of the results will be performed.'
+          )
+        )
+        temp_results <- temp_results %>%
+          dplyr::mutate(p_value = NA, q_value = NA)
+      } else {
+        message(
+          paste0(
+            '[', format(Sys.time(), '%H:%M:%S'), '] Filtering results based on ',
+            'specified thresholds...'
+          )
+        )
+        temp_results <- temp_results %>%
+          dplyr::mutate(
+            p_value = stats::pnorm(-abs(scale(.data$enrichment_score)[,1])),
+            q_value = qvalue::qvalue(.data$p_value, pi0 = 1)$lfdr
+          ) %>%
+          dplyr::filter(
+            .data$p_value <= thresh_p_val,
+            .data$q_value <= thresh_q_val
+          )
+      }
+      results_by_cluster <- dplyr::bind_rows(
+          results_by_cluster,
+          temp_results
+        ) %>%
+        dplyr::arrange(.data$q_value)
     }
 
     # add description, number of genes and list of genes to results
-    results_by_cluster <- dplyr::left_join(results_by_cluster, gene_sets_tibble, by = 'name') %>%
-      dplyr::select(group, name, description, length, genes, enrichment_score, p_value, q_value) %>%
-      dplyr::mutate(group = factor(group, levels = intersect(cluster_names, group)))
+    results_by_cluster <- dplyr::left_join(
+        results_by_cluster,
+        gene_sets_tibble,
+        by = 'name'
+      ) %>%
+      dplyr::select(c('group','name','description','length','genes',
+        'enrichment_score','p_value','q_value')) %>%
+      dplyr::mutate(group = factor(.data$group, levels = intersect(
+        cluster_names, .data$group)))
 
     # print number of enriched gene sets
     message(
@@ -350,7 +420,8 @@ performGeneSetEnrichmentAnalysis <- function(
   } else {
     message(
       paste0(
-        '[', format(Sys.time(), '%H:%M:%S'), '] Only 1 cluster in the data set, will skip analysis by cluster...'
+        '[', format(Sys.time(), '%H:%M:%S'), '] Only 1 cluster in the data ',
+        'set, will skip analysis by cluster...'
       )
     )
     results_by_cluster <- 'only_one_cluster_in_data_set'

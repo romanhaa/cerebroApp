@@ -8,11 +8,6 @@
 #' function (GSA package) with gene sets, gene set names, and gene set
 #' descriptions stored in lists.
 #' @import dplyr
-#' @examples
-#' my_gmt <- read_GMT_file(
-#'   file = 'path/to/my/gene_sets.gmt'
-#' )
-
 read_GMT_file <- function(file)
 {
   gmt <- readr::read_delim(
@@ -23,7 +18,7 @@ read_GMT_file <- function(file)
   )
 
   gene_set_genes <- list()
-  for ( i in 1:nrow(gmt) )
+  for ( i in seq_len(nrow(gmt)) )
   {
     temp_genes <- strsplit(gmt$X1[i], split = '\t')[[1]] %>% unlist()
     temp_genes <- temp_genes[3:length(temp_genes)]
@@ -32,7 +27,9 @@ read_GMT_file <- function(file)
   gene_set_loaded <- list(
     genesets = gene_set_genes,
     geneset.names = lapply(strsplit(gmt$X1, split = '\t'), '[', 1) %>% unlist(),
-    geneset.description = lapply(strsplit(gmt$X1, split = '\t'), '[', 2) %>% unlist()
+    geneset.description = lapply(
+        strsplit(gmt$X1, split = '\t'), '[', 2
+      ) %>% unlist()
   )
 
   return(gene_set_loaded)

@@ -14,8 +14,10 @@
 #' percentage of mitochondrial and ribosomal gene expression for each cell.
 #' @import dplyr
 #' @examples
-#' seurat <- addPercentMtRibo(
-#'   object = seurat,
+#' pbmc <- readRDS(system.file("extdata", "seurat_pbmc.rds",
+#'   package = "cerebroApp"))
+#' pbmc <- addPercentMtRibo(
+#'   object = pbmc,
 #'   organism = 'hg',
 #'   gene_nomenclature = 'name'
 #' )
@@ -26,7 +28,10 @@ addPercentMtRibo <- function(
 ) {
   # check if Seurat is installed
   if (!requireNamespace("Seurat", quietly = TRUE)) {
-    stop("Package 'Seurat' needed for this function to work. Please install it.", call. = FALSE)
+    stop(
+      "Package 'Seurat' needed for this function to work. Please install it.",
+      call. = FALSE
+    )
   }
   ##--------------------------------------------------------------------------##
   ## check if organism is supported
@@ -89,24 +94,64 @@ addPercentMtRibo <- function(
     genes_ribo_here <- intersect(genes_ribo, rownames(object@assays$RNA@counts))
   }
   ##--------------------------------------------------------------------------##
-  ## save gene lists in Seurat object and create place if not existing yet
+  ## prepare slot in Seurat object to store gene lists (if it doesn't already
+  ## exist)
   ##--------------------------------------------------------------------------##
   if ( is.null(object@misc$gene_lists) ) {
     object@misc$gene_lists <- list()
   }
-  object@misc$gene_lists$mitochondrial_genes <- genes_mt_here
-  object@misc$gene_lists$ribosomal_genes <- genes_ribo_here
   ##--------------------------------------------------------------------------##
-  ## calculate percentage of transcripts for mitochondrial and ribosomal genes
+  ## calculate mitochondrial gene expression
   ##--------------------------------------------------------------------------##
-  message(paste0('[', format(Sys.time(), '%H:%M:%S'), '] Calculate percentage of mitochondrial and ribosomal transcripts...'))
-  values <- cerebroApp::calculatePercentGenes(
-    object,
-    list(
-      'genes_mt' = genes_mt_here,
-      'genes_ribo' = genes_ribo_here
+  if ( length(genes_mt_here) > 0 ) {
+    object@misc$gene_lists$mitochondrial_genes <- genes_mt_here
+    message(
+      paste0(
+        '[', format(Sys.time(), '%H:%M:%S'), '] Calculate percentage of ',
+        length(genes_mt_here),
+        ' mitochondrial transcript(s) present in the data set...'
+      )
     )
-  )
+    values_mt <- cerebroApp::calculatePercentGenes(
+      object,
+      list('genes_mt' = genes_mt_here)
+    )
+  } else {
+    object@misc$gene_lists$mitochondrial_genes <- 'no_mitochondrial_genes_found'
+    message(
+      paste0(
+        '[', format(Sys.time(), '%H:%M:%S'),
+        '] No mitochondrial genes found in data set.'
+      )
+    )
+    values_mt <- 0
+  }
+  ##--------------------------------------------------------------------------##
+  ## calculate ribosomal gene expression
+  ##--------------------------------------------------------------------------##
+  if ( length(genes_ribo_here) > 0 ) {
+    object@misc$gene_lists$ribosomal_genes <- genes_ribo_here
+    message(
+      paste0(
+        '[', format(Sys.time(), '%H:%M:%S'), '] Calculate percentage of ',
+        length(genes_ribo_here),
+        ' ribosomal transcript(s) present in the data set...'
+      )
+    )
+    values_ribo <- cerebroApp::calculatePercentGenes(
+      object,
+      list('genes_ribo' = genes_ribo_here)
+    )
+  } else {
+    object@misc$gene_lists$ribosomal_genes <- 'no_ribosomal_genes_found'
+    message(
+      paste0(
+        '[', format(Sys.time(), '%H:%M:%S'),
+        '] No ribosomal genes found in data set.'
+      )
+    )
+    values_ribo <- 0
+  }
   ##--------------------------------------------------------------------------##
   ## add results to Seurat object
   ##--------------------------------------------------------------------------##
@@ -115,25 +160,16 @@ addPercentMtRibo <- function(
       object,
       data.frame(
         row.names = colnames(object@raw.data),
-        'percent_mt' = values[['genes_mt']],
-        'percent_ribo' = values[['genes_ribo']]
+        'percent_mt' = values_mt,
+        'percent_ribo' = values_ribo
       )
     )
   } else {
-    object$percent_mt <- values[['genes_mt']]
-    object$percent_ribo <- values[['genes_ribo']]
+    object$percent_mt <- values_mt
+    object$percent_ribo <- values_ribo
   }
   ##--------------------------------------------------------------------------##
   ##
   ##--------------------------------------------------------------------------##
   return(object)
 }
-
-
-
-
-
-
-
-
-
