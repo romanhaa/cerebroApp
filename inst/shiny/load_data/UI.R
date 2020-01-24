@@ -9,7 +9,7 @@ tab_load_data <- tabItem(
       titlePanel("Load data"),
       fileInput(
         inputId = "input_file",
-        label = "Select input data (.crb or .rds file)...",
+        label = "Select input data (.crb or .rds file)",
         multiple = FALSE,
         accept = c(".rds",".crb",".cerebro"),
         width = '350px',

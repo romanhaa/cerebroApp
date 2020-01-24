@@ -4,4 +4,5 @@
 .git
 .gitignore
 prepare_example_data_set.R
+prepare_Seurat_pbmc_object_for_examples.R
 TODO.md
