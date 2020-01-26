@@ -534,7 +534,7 @@ exportFromSeurat <- function(
     export$expression <- object@data
   } else {
     # check if provided assay exists
-    if ( (assay %in% names(object@assay) == FALSE ) ) {
+    if ( (assay %in% names(object@assays) == FALSE ) ) {
       stop(
         paste0(
           'Assay slot `', assay, '` could not be found in provided Seurat ',
@@ -544,7 +544,7 @@ exportFromSeurat <- function(
       )
     }
     # check if `data` matrix exist in provided assay
-    if ( ('data' %in% names(object@assay[[assay]]) == FALSE ) ) {
+    if ( is.null(object@assays[[assay]]@data) ) {
       stop(
         paste0(
           '`data` matrix could not be found in `', assay, '` assay slot.'

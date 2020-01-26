@@ -179,7 +179,7 @@ getMarkerGenes <- function(
         )
       } else {
         # check if provided assay exists
-        if ( (assay %in% names(object@assay) == FALSE ) ) {
+        if ( (assay %in% names(object@assays) == FALSE ) ) {
           stop(
             paste0(
               'Assay slot `', assay, '` could not be found in provided Seurat ',
@@ -297,7 +297,7 @@ getMarkerGenes <- function(
         )
       } else {
         # check if provided assay exists
-        if ( (assay %in% names(object@assay) == FALSE ) ) {
+        if ( (assay %in% names(object@assays) == FALSE ) ) {
           stop(
             paste0(
               'Assay slot `', assay, '` could not be found in provided Seurat ',

@@ -117,7 +117,7 @@ getMostExpressedGenes <- function(
         })
       } else {
         # check if provided assay exists
-        if ( (assay %in% names(object@assay) == FALSE ) ) {
+        if ( (assay %in% names(object@assays) == FALSE ) ) {
           stop(
             paste0(
               'Assay slot `', assay, '` could not be found in provided Seurat ',
@@ -127,7 +127,7 @@ getMostExpressedGenes <- function(
           )
         }
         # check if `counts` matrix exist in provided assay
-        if ( ('counts' %in% names(object@assay[[assay]]) == FALSE ) ) {
+        if ( is.null(object@assays[[assay]]@counts) ) {
           stop(
             paste0(
               '`counts` matrix could not be found in `', assay, '` assay slot.'
@@ -219,7 +219,7 @@ getMostExpressedGenes <- function(
         })
       } else {
         # check if provided assay exists
-        if ( (assay %in% names(object@assay) == FALSE ) ) {
+        if ( (assay %in% names(object@assays) == FALSE ) ) {
           stop(
             paste0(
               'Assay slot `', assay, '` could not be found in provided Seurat ',
@@ -229,7 +229,7 @@ getMostExpressedGenes <- function(
           )
         }
         # check if `counts` matrix exist in provided assay
-        if ( ('counts' %in% names(object@assay[[assay]]) == FALSE ) ) {
+        if ( is.null(object@assays[[assay]]@counts) ) {
           stop(
             paste0(
               '`counts` matrix could not be found in `', assay, '` assay slot.'
