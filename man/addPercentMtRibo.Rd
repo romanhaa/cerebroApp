@@ -4,10 +4,13 @@
 \alias{addPercentMtRibo}
 \title{Add percentage of mitochondrial and ribosomal transcripts.}
 \usage{
-addPercentMtRibo(object, organism, gene_nomenclature)
+addPercentMtRibo(object, assay = "RNA", organism, gene_nomenclature)
 }
 \arguments{
 \item{object}{Seurat object.}
+
+\item{assay}{Assay to pull counts from; defaults to 'RNA'. Only relevant in
+Seurat v3.0 or higher since the concept of assays wasn't implemented before.}
 
 \item{organism}{Organism, can be either human ('hg') or mouse ('mm'). Genes
 need to annotated as gene symbol, e.g. MKI67 (human) / Mki67 (mouse).}

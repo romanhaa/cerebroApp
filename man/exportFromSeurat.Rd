@@ -6,6 +6,7 @@
 \usage{
 exportFromSeurat(
   object,
+  assay = "RNA",
   file,
   experiment_name,
   organism,
@@ -20,6 +21,9 @@ exportFromSeurat(
 }
 \arguments{
 \item{object}{Seurat object.}
+
+\item{assay}{Assay to pull counts from; defaults to 'RNA'. Only relevant in
+Seurat v3.0 or higher since the concept of assays wasn't implemented before.}
 
 \item{file}{Where to save the output.}
 

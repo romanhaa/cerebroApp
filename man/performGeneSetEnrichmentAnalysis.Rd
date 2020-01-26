@@ -6,6 +6,7 @@
 \usage{
 performGeneSetEnrichmentAnalysis(
   object,
+  assay = "RNA",
   GMT_file,
   column_sample = "sample",
   column_cluster = "cluster",
@@ -15,9 +16,10 @@ performGeneSetEnrichmentAnalysis(
 )
 }
 \arguments{
-\item{object}{Seurat object. log-counts for analysis must be stored in
-`object@data` (Seurat object older than v3) or `object@assays$RNA@data`
-(Seurat object v3 or newer).}
+\item{object}{Seurat object.}
+
+\item{assay}{Assay to pull counts from; defaults to 'RNA'. Only relevant in
+Seurat v3.0 or higher since the concept of assays wasn't implemented before.}
 
 \item{GMT_file}{Path to GMT file containing the gene sets to be tested.
 The Broad Institute provides many gene sets which can be downloaded:

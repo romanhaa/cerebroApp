@@ -4,6 +4,8 @@
 #' Cerebro.
 #' @keywords Cerebro scRNAseq Seurat
 #' @param object Seurat object.
+#' @param assay Assay to pull counts from; defaults to 'RNA'. Only relevant in
+#' Seurat v3.0 or higher since the concept of assays wasn't implemented before.
 #' @param file Where to save the output.
 #' @param experiment_name Experiment name.
 #' @param organism Organism, e.g. hg (human), mm (mouse), etc.
@@ -42,6 +44,7 @@
 #' )
 exportFromSeurat <- function(
   object,
+  assay = 'RNA',
   file,
   experiment_name,
   organism,
@@ -518,9 +521,38 @@ exportFromSeurat <- function(
     )
   )
   if ( object@version < 3 ) {
+    # check if `data` matrix exist in provided Seurat object
+    if ( ('data' %in% names(object) == FALSE ) ) {
+      stop(
+        paste0(
+          '`data` matrix could not be found in provided Seurat ',
+          'object.'
+        ),
+        call. = FALSE
+      )
+    }
     export$expression <- object@data
   } else {
-    export$expression <- object@assays$RNA@data
+    # check if provided assay exists
+    if ( (assay %in% names(object@assay) == FALSE ) ) {
+      stop(
+        paste0(
+          'Assay slot `', assay, '` could not be found in provided Seurat ',
+          'object.'
+        ),
+        call. = FALSE
+      )
+    }
+    # check if `data` matrix exist in provided assay
+    if ( ('data' %in% names(object@assay[[assay]]) == FALSE ) ) {
+      stop(
+        paste0(
+          '`data` matrix could not be found in `', assay, '` assay slot.'
+        ),
+        call. = FALSE
+      )
+    }
+    export$expression <- object@assays[[assay]]@data
   }
   ##--------------------------------------------------------------------------##
   ## save export object to disk

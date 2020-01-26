@@ -86,7 +86,7 @@ The code below should work with a real data set.
 
 ```{r cell_cycle_analysis, eval=FALSE}
 seurat <- CellCycleScoring(
-seurat,
+  seurat,
   g2m.features = cc.genes$g2m.genes,
   s.features = cc.genes$s.genes
 )

@@ -4,6 +4,8 @@
 #' the Seurat object.
 #' @keywords Cerebro scRNAseq Seurat
 #' @param object Seurat object.
+#' @param assay Assay to pull counts from; defaults to 'RNA'. Only relevant in
+#' Seurat v3.0 or higher since the concept of assays wasn't implemented before.
 #' @param organism Organism information for pulling info about presence of
 #' marker genes of cell surface; can be omitted if already saved in Seurat
 #' object; defaults to NULL.
@@ -43,6 +45,7 @@
 #' )
 getMarkerGenes <- function(
   object,
+  assay = 'RNA',
   organism = NULL,
   column_sample = 'sample',
   column_cluster = 'cluster',
@@ -175,8 +178,19 @@ getMarkerGenes <- function(
           ...
         )
       } else {
+        # check if provided assay exists
+        if ( (assay %in% names(object@assay) == FALSE ) ) {
+          stop(
+            paste0(
+              'Assay slot `', assay, '` could not be found in provided Seurat ',
+              'object.'
+            ),
+            call. = FALSE
+          )
+        }
         markers_by_sample <- Seurat::FindAllMarkers(
           temp_seurat,
+          assay = assay,
           only.pos = only_pos,
           min.pct = min_pct,
           logfc.threshold = thresh_logFC,
@@ -205,6 +219,7 @@ getMarkerGenes <- function(
       } else {
         markers_by_sample <- Seurat::FindAllMarkers(
           temp_seurat,
+          assay = assay,
           only.pos = only_pos,
           min.pct = min_pct,
           logfc.threshold = thresh_logFC,
@@ -281,8 +296,19 @@ getMarkerGenes <- function(
           ...
         )
       } else {
+        # check if provided assay exists
+        if ( (assay %in% names(object@assay) == FALSE ) ) {
+          stop(
+            paste0(
+              'Assay slot `', assay, '` could not be found in provided Seurat ',
+              'object.'
+            ),
+            call. = FALSE
+          )
+        }
         markers_by_cluster <- Seurat::FindAllMarkers(
           temp_seurat,
+          assay = assay,
           only.pos = only_pos,
           min.pct = min_pct,
           logfc.threshold = thresh_logFC,
@@ -311,6 +337,7 @@ getMarkerGenes <- function(
       } else {
         markers_by_cluster <- Seurat::FindAllMarkers(
           temp_seurat,
+          assay = assay,
           only.pos = only_pos,
           min.pct = min_pct,
           logfc.threshold = thresh_logFC,

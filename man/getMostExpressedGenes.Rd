@@ -7,12 +7,16 @@ object.}
 \usage{
 getMostExpressedGenes(
   object,
+  assay = "RNA",
   column_sample = "sample",
   column_cluster = "cluster"
 )
 }
 \arguments{
 \item{object}{Seurat object.}
+
+\item{assay}{Assay to pull counts from; defaults to 'RNA'. Only relevant in
+Seurat v3.0 or higher since the concept of assays wasn't implemented before.}
 
 \item{column_sample}{Column in object@meta.data that contains information
 about sample; defaults to 'sample'.}

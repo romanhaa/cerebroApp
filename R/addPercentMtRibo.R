@@ -4,6 +4,8 @@
 #' transcripts per cell.
 #' @keywords Cerebro scRNAseq Seurat
 #' @param object Seurat object.
+#' @param assay Assay to pull counts from; defaults to 'RNA'. Only relevant in
+#' Seurat v3.0 or higher since the concept of assays wasn't implemented before.
 #' @param organism Organism, can be either human ('hg') or mouse ('mm'). Genes
 #' need to annotated as gene symbol, e.g. MKI67 (human) / Mki67 (mouse).
 #' @param gene_nomenclature Define if genes are saved by their name ('name'),
@@ -23,6 +25,7 @@
 #' )
 addPercentMtRibo <- function(
   object,
+  assay = 'RNA',
   organism,
   gene_nomenclature
 ) {
@@ -89,11 +92,44 @@ addPercentMtRibo <- function(
   ## keep only genes that are present in data set
   ##--------------------------------------------------------------------------##
   if ( object@version < 3 ) {
+    # check if `raw.data` matrix exist in provided Seurat object
+    if ( ('raw.data' %in% names(object) == FALSE ) ) {
+      stop(
+        paste0(
+          '`raw.data` matrix could not be found in provided Seurat ',
+          'object.'
+        ),
+        call. = FALSE
+      )
+    }
     genes_mt_here <- intersect(genes_mt, rownames(object@raw.data))
     genes_ribo_here <- intersect(genes_ribo, rownames(object@raw.data))
   } else {
-    genes_mt_here <- intersect(genes_mt, rownames(object@assays$RNA@counts))
-    genes_ribo_here <- intersect(genes_ribo, rownames(object@assays$RNA@counts))
+    # check if provided assay exists
+    if ( (assay %in% names(object@assay) == FALSE ) ) {
+      stop(
+        paste0(
+          'Assay slot `', assay, '` could not be found in provided Seurat ',
+          'object.'
+        ),
+        call. = FALSE
+      )
+    }
+    # check if `counts` matrix exist in provided assay
+    if ( ('counts' %in% names(object@assay[[assay]]) == FALSE ) ) {
+      stop(
+        paste0(
+          '`counts` matrix could not be found in `', assay, '` assay slot.'
+        ),
+        call. = FALSE
+      )
+    }
+    genes_mt_here <- intersect(
+      genes_mt, rownames(object@assays[[assay]]@counts)
+    )
+    genes_ribo_here <- intersect(
+      genes_ribo, rownames(object@assays[[assay]]@counts)
+    )
   }
   ##--------------------------------------------------------------------------##
   ## prepare slot in Seurat object to store gene lists (if it doesn't already
@@ -116,6 +152,7 @@ addPercentMtRibo <- function(
     )
     values_mt <- cerebroApp::calculatePercentGenes(
       object,
+      assay = assay,
       list('genes_mt' = genes_mt_here)
     )
   } else {
@@ -142,6 +179,7 @@ addPercentMtRibo <- function(
     )
     values_ribo <- cerebroApp::calculatePercentGenes(
       object,
+      assay = assay,
       list('genes_ribo' = genes_ribo_here)
     )
   } else {

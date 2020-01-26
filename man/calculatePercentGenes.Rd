@@ -4,10 +4,13 @@
 \alias{calculatePercentGenes}
 \title{Calculate percentage of transcripts of gene list.}
 \usage{
-calculatePercentGenes(object, genes)
+calculatePercentGenes(object, assay = "RNA", genes)
 }
 \arguments{
 \item{object}{Seurat object.}
+
+\item{assay}{Assay to pull counts from; defaults to 'RNA'. Only relevant in
+Seurat v3.0 or higher since the concept of assays wasn't implemented before.}
 
 \item{genes}{List(s) of genes.}
 }

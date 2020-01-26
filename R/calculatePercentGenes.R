@@ -4,6 +4,8 @@
 #' transcripts per cell.
 #' @keywords Cerebro scRNAseq Seurat
 #' @param object Seurat object.
+#' @param assay Assay to pull counts from; defaults to 'RNA'. Only relevant in
+#' Seurat v3.0 or higher since the concept of assays wasn't implemented before.
 #' @param genes List(s) of genes.
 #' @export
 #' @return List of lists containing the percentages of expression for each
@@ -17,6 +19,7 @@
 #' )
 calculatePercentGenes <- function(
   object,
+  assay = 'RNA',
   genes
 ) {
   # check if Seurat is installed
@@ -31,6 +34,16 @@ calculatePercentGenes <- function(
   ## data set and calculate the percentage of transcripts that they account for
   ##--------------------------------------------------------------------------##
   if ( object@version < 3 ) {
+    # check if `raw.data` matrix exist in provided Seurat object
+    if ( ('raw.data' %in% names(object) == FALSE ) ) {
+      stop(
+        paste0(
+          '`raw.data` matrix could not be found in provided Seurat ',
+          'object.'
+        ),
+        call. = FALSE
+      )
+    }
     result <- pbapply::pblapply(
       genes,
       function(x) {
@@ -44,16 +57,35 @@ calculatePercentGenes <- function(
       }
     )
   } else {
+    # check if provided assay exists
+    if ( (assay %in% names(object@assay) == FALSE ) ) {
+      stop(
+        paste0(
+          'Assay slot `', assay, '` could not be found in provided Seurat ',
+          'object.'
+        ),
+        call. = FALSE
+      )
+    }
+    # check if `counts` matrix exist in provided assay
+    if ( ('counts' %in% names(object@assay[[assay]]) == FALSE ) ) {
+      stop(
+        paste0(
+          '`counts` matrix could not be found in `', assay, '` assay slot.'
+        ),
+        call. = FALSE
+      )
+    }
     result <- pbapply::pblapply(
       genes,
       function(x) {
-        genes_here <- intersect(x, rownames(object@assays$RNA@counts))
+        genes_here <- intersect(x, rownames(object@assays[[assay]]@counts))
         if ( length(genes_here) == 1 ) {
-          object@assays$RNA@counts[genes_here,] /
-          Matrix::colSums(object@assays$RNA@counts)
+          object@assays[[assay]]@counts[genes_here,] /
+          Matrix::colSums(object@assays[[assay]]@counts)
         } else {
-          Matrix::colSums(object@assays$RNA@counts[genes_here,]) /
-          Matrix::colSums(object@assays$RNA@counts)
+          Matrix::colSums(object@assays[[assay]]@counts[genes_here,]) /
+          Matrix::colSums(object@assays[[assay]]@counts)
         }
       }
     )

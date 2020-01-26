@@ -6,6 +6,7 @@
 \usage{
 getMarkerGenes(
   object,
+  assay = "RNA",
   organism = NULL,
   column_sample = "sample",
   column_cluster = "cluster",
@@ -20,6 +21,9 @@ getMarkerGenes(
 }
 \arguments{
 \item{object}{Seurat object.}
+
+\item{assay}{Assay to pull counts from; defaults to 'RNA'. Only relevant in
+Seurat v3.0 or higher since the concept of assays wasn't implemented before.}
 
 \item{organism}{Organism information for pulling info about presence of
 marker genes of cell surface; can be omitted if already saved in Seurat

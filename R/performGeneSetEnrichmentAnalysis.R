@@ -7,9 +7,9 @@
 #' assign cell type labels to cell clusters from single-cell RNA-sequencing
 #' data", Diaz-Mejia et al., F1000Research (2019).
 #' @keywords Cerebro scRNAseq Seurat GSVA
-#' @param object Seurat object. log-counts for analysis must be stored in
-#' `object@data` (Seurat object older than v3) or `object@assays$RNA@data`
-#' (Seurat object v3 or newer).
+#' @param object Seurat object.
+#' @param assay Assay to pull counts from; defaults to 'RNA'. Only relevant in
+#' Seurat v3.0 or higher since the concept of assays wasn't implemented before.
 #' @param GMT_file Path to GMT file containing the gene sets to be tested.
 #' The Broad Institute provides many gene sets which can be downloaded:
 #' http://software.broadinstitute.org/gsea/msigdb/index.jsp
@@ -45,6 +45,7 @@
 #' )
 performGeneSetEnrichmentAnalysis <- function(
   object,
+  assay = 'RNA',
   GMT_file,
   column_sample = 'sample',
   column_cluster = 'cluster',
@@ -132,10 +133,14 @@ performGeneSetEnrichmentAnalysis <- function(
     )
   )
   if ( object@version < 3 ) {
+    # check if `data` matrix exist in provided Seurat object
     if ( is.null(object@data) )
     {
       stop(
-        "`@data` slot doesn't exist in provided Seurat object.",
+        paste0(
+          '`data` matrix could not be found in provided Seurat ',
+          'object.'
+        ),
         call. = FALSE
       )
     }
@@ -144,14 +149,26 @@ performGeneSetEnrichmentAnalysis <- function(
       t() %>%
       as.data.frame()
   } else {
-    if ( is.null(object@assays$RNA@data) )
-    {
+    # check if provided assay exists
+    if ( (assay %in% names(object@assay) == FALSE ) ) {
       stop(
-        "`@assays$RNA@data` slot doesn't exist in provided Seurat object.",
+        paste0(
+          'Assay slot `', assay, '` could not be found in provided Seurat ',
+          'object.'
+        ),
         call. = FALSE
       )
     }
-    matrix_full <- object@assays$RNA@data %>%
+    # check if `data` matrix exist in provided assay
+    if ( ('data' %in% names(object@assay[[assay]]) == FALSE ) ) {
+      stop(
+        paste0(
+          '`data` matrix could not be found in `', assay, '` assay slot.'
+        ),
+        call. = FALSE
+      )
+    }
+    matrix_full <- object@assays[[assay]]@data %>%
       as.matrix() %>%
       t() %>%
       as.data.frame()
