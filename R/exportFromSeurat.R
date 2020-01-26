@@ -28,7 +28,7 @@
 #' @import dplyr
 #' @importFrom rlang .data
 #' @examples
-#' pbmc <- readRDS(system.file("extdata", "seurat_pbmc.rds",
+#' pbmc <- readRDS(system.file("extdata/v1.2/seurat_pbmc.rds",
 #'   package = "cerebroApp"))
 #' exportFromSeurat(
 #'   object = pbmc,

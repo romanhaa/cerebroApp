@@ -27,7 +27,7 @@ transcripts per cell.
 Add percentage of mitochondrial and ribosomal transcripts.
 }
 \examples{
-pbmc <- readRDS(system.file("extdata", "seurat_pbmc.rds",
+pbmc <- readRDS(system.file("extdata/v1.2/seurat_pbmc.rds",
   package = "cerebroApp"))
 pbmc <- addPercentMtRibo(
   object = pbmc,

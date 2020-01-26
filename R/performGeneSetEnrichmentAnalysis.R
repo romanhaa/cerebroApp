@@ -30,9 +30,9 @@
 #' @importFrom rlang .data
 #' @importFrom tibble tibble
 #' @examples
-#' pbmc <- readRDS(system.file("extdata", "seurat_pbmc.rds",
+#' pbmc <- readRDS(system.file("extdata/v1.2/seurat_pbmc.rds",
 #'   package = "cerebroApp"))
-#' example_gene_set <- system.file("extdata", "example_gene_set.gmt",
+#' example_gene_set <- system.file("extdata/example_gene_set.gmt",
 #'   package = "cerebroApp")
 #' pbmc <- performGeneSetEnrichmentAnalysis(
 #'   object = pbmc,

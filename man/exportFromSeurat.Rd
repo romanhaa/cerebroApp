@@ -4,11 +4,19 @@
 \alias{exportFromSeurat}
 \title{Export Seurat object to Cerebro.}
 \usage{
-exportFromSeurat(object, file, experiment_name, organism,
-  column_sample = "sample", column_cluster = "cluster",
-  column_nUMI = "nUMI", column_nGene = "nGene",
-  column_cell_cycle_seurat = NULL, column_cell_cycle_cyclone = NULL,
-  add_all_meta_data = TRUE)
+exportFromSeurat(
+  object,
+  file,
+  experiment_name,
+  organism,
+  column_sample = "sample",
+  column_cluster = "cluster",
+  column_nUMI = "nUMI",
+  column_nGene = "nGene",
+  column_cell_cycle_seurat = NULL,
+  column_cell_cycle_cyclone = NULL,
+  add_all_meta_data = TRUE
+)
 }
 \arguments{
 \item{object}{Seurat object.}
@@ -53,7 +61,7 @@ Cerebro.
 Export Seurat object to Cerebro.
 }
 \examples{
-pbmc <- readRDS(system.file("extdata", "seurat_pbmc.rds",
+pbmc <- readRDS(system.file("extdata/v1.2/seurat_pbmc.rds",
   package = "cerebroApp"))
 exportFromSeurat(
   object = pbmc,

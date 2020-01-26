@@ -5,7 +5,7 @@
 output[["about"]] <- renderText({
   paste0(
     '<b>Version of cerebroApp:</b><br>',
-    packageVersion("cerebroApp"), '<br>
+    'v1.0<br>
     <br>
     <b>Author:</b><br>
     Roman Hillje<br>
@@ -29,23 +29,6 @@ output[["about"]] <- renderText({
     <ul>
       <li>App icon made by <a href="https://www.flaticon.com/authors/kiranshastry" title="Kiranshastry" target="_blank">Kiranshastry</a> from <a href="https://www.flaticon.com/" title="Flaticon" target="_blank">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></li>
       <li>Sample and cluster color palettes taken from <a href="https://flatuicolors.com/" title="Flat UI Colors 2" target="_blank">https://flatuicolors.com/</a></li>
-    </ul>
-    <br>
-    <b>Preferences:</b>'
+    </ul>'
   )
-})
-
-output[["preferences"]] <- renderUI({
-  tagList(
-    checkboxInput("webgl_checkbox", label = "Use WebGL", value = TRUE)
-  )
-})
-
-observeEvent(input[["webgl_checkbox"]], {
-  preferences$use_webgl <- input[["webgl_checkbox"]]
-  print(paste0("WebGL status is now: ", preferences$use_webgl))
-})
-
-observeEvent(input[["browser"]], {
-  browser()
 })

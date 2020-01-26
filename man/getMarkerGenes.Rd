@@ -4,10 +4,19 @@
 \alias{getMarkerGenes}
 \title{Get marker genes for every sample and cluster in Seurat object.}
 \usage{
-getMarkerGenes(object, organism = NULL, column_sample = "sample",
-  column_cluster = "cluster", only_pos = TRUE, min_pct = 0.7,
-  thresh_logFC = 0.25, thresh_p_val = 0.01, test = "wilcox",
-  verbose = TRUE, ...)
+getMarkerGenes(
+  object,
+  organism = NULL,
+  column_sample = "sample",
+  column_cluster = "cluster",
+  only_pos = TRUE,
+  min_pct = 0.7,
+  thresh_logFC = 0.25,
+  thresh_p_val = 0.01,
+  test = "wilcox",
+  verbose = TRUE,
+  ...
+)
 }
 \arguments{
 \item{object}{Seurat object.}
@@ -51,7 +60,7 @@ the Seurat object.
 Get marker genes for every sample and cluster in Seurat object.
 }
 \examples{
-pbmc <- readRDS(system.file("extdata", "seurat_pbmc.rds",
+pbmc <- readRDS(system.file("extdata/v1.2/seurat_pbmc.rds",
   package = "cerebroApp"))
 pbmc <- getMarkerGenes(
   object = pbmc,

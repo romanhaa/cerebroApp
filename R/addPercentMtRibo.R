@@ -14,7 +14,7 @@
 #' percentage of mitochondrial and ribosomal gene expression for each cell.
 #' @import dplyr
 #' @examples
-#' pbmc <- readRDS(system.file("extdata", "seurat_pbmc.rds",
+#' pbmc <- readRDS(system.file("extdata/v1.2/seurat_pbmc.rds",
 #'   package = "cerebroApp"))
 #' pbmc <- addPercentMtRibo(
 #'   object = pbmc,
@@ -40,7 +40,7 @@ addPercentMtRibo <- function(
   if ( !(organism %in% supported_organisms) ) {
     stop(
       paste0(
-        "User-specified organism ('", organism ,
+        "User-specified organism ('", organism,
         "') not in list of supported organisms: ",
         paste(supported_organisms, collapse = ', ')
       )
@@ -61,8 +61,9 @@ addPercentMtRibo <- function(
   ##--------------------------------------------------------------------------##
   genes_mt <- readr::read_tsv(
       system.file(
-        'extdata',
-        paste0('genes_mt_', organism, '_', gene_nomenclature, '.txt'),
+        paste0(
+          'extdata/genes_mt_', organism, '_', gene_nomenclature, '.txt'
+        ),
         package = 'cerebroApp'
       ),
       col_types = readr::cols(),
@@ -73,8 +74,9 @@ addPercentMtRibo <- function(
     as.vector()
   genes_ribo <- readr::read_tsv(
       system.file(
-        'extdata',
-        paste0('genes_ribo_', organism, '_', gene_nomenclature, '.txt'),
+        paste0(
+          'extdata/genes_ribo_', organism, '_', gene_nomenclature, '.txt'
+        ),
         package = 'cerebroApp'
       ),
       col_types = readr::cols(),

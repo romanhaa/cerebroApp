@@ -4,8 +4,13 @@
 \alias{extractMonocleTrajectory}
 \title{Extract trajectory from Monocle and add to Seurat object.}
 \usage{
-extractMonocleTrajectory(monocle, seurat, trajectory_name,
-  column_state = "State", column_pseudotime = "Pseudotime")
+extractMonocleTrajectory(
+  monocle,
+  seurat,
+  trajectory_name,
+  column_state = "State",
+  column_pseudotime = "Pseudotime"
+)
 }
 \arguments{
 \item{monocle}{Monocle object to extract trajectory from.}

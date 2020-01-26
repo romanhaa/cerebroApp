@@ -29,20 +29,18 @@ boxTitle <- function(title) {
 ##----------------------------------------------------------------------------##
 ##
 ##----------------------------------------------------------------------------##
-source(system.file("shiny/load_data/UI.R", package = "cerebroApp"), local = TRUE)
-source(system.file("shiny/overview/UI.R", package = "cerebroApp"), local = TRUE)
-source(system.file("shiny/samples/UI.R", package = "cerebroApp"), local = TRUE)
-source(system.file("shiny/clusters/UI.R", package = "cerebroApp"), local = TRUE)
-source(system.file("shiny/most_expressed_genes/UI.R", package = "cerebroApp"), local = TRUE)
-source(system.file("shiny/marker_genes/UI.R", package = "cerebroApp"), local = TRUE)
-source(system.file("shiny/enriched_pathways/UI.R", package = "cerebroApp"), local = TRUE)
-source(system.file("shiny/gene_expression/UI.R", package = "cerebroApp"), local = TRUE)
-source(system.file("shiny/gene_set_expression/UI.R", package = "cerebroApp"), local = TRUE)
-source(system.file("shiny/trajectory/UI.R", package = "cerebroApp"), local = TRUE)
-source(system.file("shiny/gene_id_conversion/UI.R", package = "cerebroApp"), local = TRUE)
-source(system.file("shiny/analysis_info/UI.R", package = "cerebroApp"), local = TRUE)
-source(system.file("shiny/color_management/UI.R", package = "cerebroApp"), local = TRUE)
-source(system.file("shiny/about/UI.R", package = "cerebroApp"), local = TRUE)
+source(system.file("shiny/v1.0/load_data/UI.R", package = "cerebroApp"), local = TRUE)
+source(system.file("shiny/v1.0/overview/UI.R", package = "cerebroApp"), local = TRUE)
+source(system.file("shiny/v1.0/samples/UI.R", package = "cerebroApp"), local = TRUE)
+source(system.file("shiny/v1.0/clusters/UI.R", package = "cerebroApp"), local = TRUE)
+source(system.file("shiny/v1.0/most_expressed_genes/UI.R", package = "cerebroApp"), local = TRUE)
+source(system.file("shiny/v1.0/marker_genes/UI.R", package = "cerebroApp"), local = TRUE)
+source(system.file("shiny/v1.0/enriched_pathways/UI.R", package = "cerebroApp"), local = TRUE)
+source(system.file("shiny/v1.0/gene_expression/UI.R", package = "cerebroApp"), local = TRUE)
+source(system.file("shiny/v1.0/gene_set_expression/UI.R", package = "cerebroApp"), local = TRUE)
+source(system.file("shiny/v1.0/gene_id_conversion/UI.R", package = "cerebroApp"), local = TRUE)
+source(system.file("shiny/v1.0/analysis_info/UI.R", package = "cerebroApp"), local = TRUE)
+source(system.file("shiny/v1.0/about/UI.R", package = "cerebroApp"), local = TRUE)
 
 ##----------------------------------------------------------------------------##
 ##
@@ -69,10 +67,8 @@ ui <- dashboardPage(
       tab_enriched_pathways,
       tab_gene_expression,
       tab_gene_set_expression,
-      tab_trajectory,
       tab_gene_id_conversion,
       tab_analysis_info,
-      tab_color_management,
       tab_about
     )
   )

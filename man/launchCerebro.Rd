@@ -2,21 +2,24 @@
 % Please edit documentation in R/launchCerebro.R
 \name{launchCerebro}
 \alias{launchCerebro}
-\title{Launch Cerebro app.}
+\title{Launch Cerebro interface.}
 \usage{
-launchCerebro(maxFileSize = 800)
+launchCerebro(version = "v1.2", maxFileSize = 800)
 }
 \arguments{
+\item{version}{Which version of Cerebro to launch: "v1.0", "v1.1", "v1.2".
+Defaults to "v1.2".}
+
 \item{maxFileSize}{Maximum size of input file; defaults to 800 MB.}
 }
 \value{
-Cerebro application object.
+Shiny application.
 }
 \description{
-Launch Cerebro app.
+Launch Cerebro interface.
 }
 \details{
-Launch Cerebro app.
+Launch Cerebro interface.
 }
 \examples{
 if ( interactive() ) {

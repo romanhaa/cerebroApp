@@ -124,7 +124,9 @@ server <- function(input, output, session) {
   ##--------------------------------------------------------------------------##
   sample_data <- reactive({
     if ( is.null(input[["input_file"]]) || is.na(input[["input_file"]]) ) {
-      sample_data <- readRDS(system.file("resources/example.rds", package = "cerebroApp"))
+      sample_data <- readRDS(
+        system.file("extdata/v1.2/example.rds", package = "cerebroApp")
+      )
     } else {
       req(input[["input_file"]])
       sample_data <- readRDS(input[["input_file"]]$datapath)
@@ -228,19 +230,19 @@ server <- function(input, output, session) {
   ##--------------------------------------------------------------------------##
   ## Tabs.
   ##--------------------------------------------------------------------------##
-  source(system.file("shiny/load_data/server.R", package = "cerebroApp"), local = TRUE)
-  source(system.file("shiny/overview/server.R", package = "cerebroApp"), local = TRUE)
-  source(system.file("shiny/samples/server.R", package = "cerebroApp"), local = TRUE)
-  source(system.file("shiny/clusters/server.R", package = "cerebroApp"), local = TRUE)
-  source(system.file("shiny/most_expressed_genes/server.R", package = "cerebroApp"), local = TRUE)
-  source(system.file("shiny/marker_genes/server.R", package = "cerebroApp"), local = TRUE)
-  source(system.file("shiny/enriched_pathways/server.R", package = "cerebroApp"), local = TRUE)
-  source(system.file("shiny/gene_expression/server.R", package = "cerebroApp"), local = TRUE)
-  source(system.file("shiny/gene_set_expression/server.R", package = "cerebroApp"), local = TRUE)
-  source(system.file("shiny/gene_id_conversion/server.R", package = "cerebroApp"), local = TRUE)
-  source(system.file("shiny/trajectory/server.R", package = "cerebroApp"), local = TRUE)
-  source(system.file("shiny/analysis_info/server.R", package = "cerebroApp"), local = TRUE)
-  source(system.file("shiny/color_management/server.R", package = "cerebroApp"), local = TRUE)
-  source(system.file("shiny/about/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/v1.2/load_data/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/v1.2/overview/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/v1.2/samples/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/v1.2/clusters/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/v1.2/most_expressed_genes/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/v1.2/marker_genes/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/v1.2/enriched_pathways/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/v1.2/gene_expression/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/v1.2/gene_set_expression/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/v1.2/gene_id_conversion/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/v1.2/trajectory/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/v1.2/analysis_info/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/v1.2/color_management/server.R", package = "cerebroApp"), local = TRUE)
+  source(system.file("shiny/v1.2/about/server.R", package = "cerebroApp"), local = TRUE)
 
 }

@@ -194,7 +194,7 @@ seurat <- getEnrichedPathways(
   max_terms = 100
 )
 
-example_gene_set <- system.file("extdata", "example_gene_set.gmt", package = "cerebroApp")
+example_gene_set <- system.file("extdata/example_gene_set.gmt", package = "cerebroApp")
 
 seurat <- performGeneSetEnrichmentAnalysis(
   seurat,

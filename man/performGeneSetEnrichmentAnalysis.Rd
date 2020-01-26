@@ -4,9 +4,15 @@
 \alias{performGeneSetEnrichmentAnalysis}
 \title{Perform gene set enrichment analysis with GSVA.}
 \usage{
-performGeneSetEnrichmentAnalysis(object, GMT_file,
-  column_sample = "sample", column_cluster = "cluster",
-  thresh_p_val = 0.05, thresh_q_val = 0.1, ...)
+performGeneSetEnrichmentAnalysis(
+  object,
+  GMT_file,
+  column_sample = "sample",
+  column_cluster = "cluster",
+  thresh_p_val = 0.05,
+  thresh_q_val = 0.1,
+  ...
+)
 }
 \arguments{
 \item{object}{Seurat object. log-counts for analysis must be stored in
@@ -45,9 +51,9 @@ data", Diaz-Mejia et al., F1000Research (2019).
 Perform gene set enrichment analysis with GSVA.
 }
 \examples{
-pbmc <- readRDS(system.file("extdata", "seurat_pbmc.rds",
+pbmc <- readRDS(system.file("extdata/v1.2/seurat_pbmc.rds",
   package = "cerebroApp"))
-example_gene_set <- system.file("extdata", "example_gene_set.gmt",
+example_gene_set <- system.file("extdata/example_gene_set.gmt",
   package = "cerebroApp")
 pbmc <- performGeneSetEnrichmentAnalysis(
   object = pbmc,

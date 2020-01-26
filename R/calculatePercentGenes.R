@@ -9,7 +9,7 @@
 #' @return List of lists containing the percentages of expression for each
 #' provided gene list.
 #' @examples
-#' pbmc <- readRDS(system.file("extdata", "seurat_pbmc.rds",
+#' pbmc <- readRDS(system.file("extdata/v1.2/seurat_pbmc.rds",
 #'   package = "cerebroApp"))
 #' calculatePercentGenes(
 #'   object = pbmc,
