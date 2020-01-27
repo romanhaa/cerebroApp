@@ -54,16 +54,17 @@ performGeneSetEnrichmentAnalysis <- function(
   ...
 )
 {
-  # check if Seurat is installed
-  if (!requireNamespace("Seurat", quietly = TRUE)) {
+  ## check if Seurat is installed
+  if (!requireNamespace("Seurat", quietly = TRUE))
+  {
     stop(
       "Package 'Seurat' needed for this function to work. Please install it.",
       call. = FALSE
     )
   }
-  #----------------------------------------------------------------------------#
-  # check input parameters
-  #----------------------------------------------------------------------------#
+  ##---------------------------------------------------------------------------#
+  ## check input parameters
+  ##---------------------------------------------------------------------------#
   if ( !file.exists(GMT_file) )
   {
     stop("Specified GMT file with gene sets cannot be found.", call. = FALSE)
@@ -91,20 +92,20 @@ performGeneSetEnrichmentAnalysis <- function(
     )
   }
 
-  #----------------------------------------------------------------------------#
-  # preparation
-  #----------------------------------------------------------------------------#
-  # load gene sets from GMT file
+  ##---------------------------------------------------------------------------#
+  ## preparation
+  ##---------------------------------------------------------------------------#
+  ## load gene sets from GMT file
   message(
     paste0(
       '[', format(Sys.time(), '%H:%M:%S'), '] Loading gene sets...'
     )
   )
-  gene_sets <- read_GMT_file(GMT_file)
+  gene_sets <- .read_GMT_file(GMT_file)
 
   names(gene_sets$genesets) <- gene_sets$geneset.names
 
-  # make tibble that contains name, description and list of genes for each set
+  ## make tibble that contains name, description and list of genes for each set
   gene_sets_tibble <- tibble::tibble(
       name = gene_sets$geneset.names,
       description = gene_sets$geneset.description,
@@ -112,7 +113,8 @@ performGeneSetEnrichmentAnalysis <- function(
       genes = NA
     )
 
-  for ( i in seq_len(length(gene_sets$genesets)) ) {
+  for ( i in seq_len(length(gene_sets$genesets)) )
+  {
     gene_sets_tibble$length[i] <- gene_sets$genesets[[i]] %>% length()
     gene_sets_tibble$genes[i] <- gene_sets$genesets[[i]] %>%
       unlist() %>%
@@ -126,14 +128,15 @@ performGeneSetEnrichmentAnalysis <- function(
     )
   )
 
-  # extract transcript count matrix (log-scale) from Seurat object
+  ## extract transcript count matrix (log-scale) from Seurat object
   message(
     paste0(
       '[', format(Sys.time(), '%H:%M:%S'), '] Extracting transcript counts...'
     )
   )
-  if ( object@version < 3 ) {
-    # check if `data` matrix exist in provided Seurat object
+  if ( object@version < 3 )
+  {
+    ## check if `data` matrix exist in provided Seurat object
     if ( is.null(object@data) )
     {
       stop(
@@ -148,9 +151,11 @@ performGeneSetEnrichmentAnalysis <- function(
       as.matrix() %>%
       t() %>%
       as.data.frame()
-  } else {
-    # check if provided assay exists
-    if ( (assay %in% names(object@assays) == FALSE ) ) {
+  } else
+  {
+    ## check if provided assay exists
+    if ( (assay %in% names(object@assays) == FALSE ) )
+    {
       stop(
         paste0(
           'Assay slot `', assay, '` could not be found in provided Seurat ',
@@ -159,8 +164,9 @@ performGeneSetEnrichmentAnalysis <- function(
         call. = FALSE
       )
     }
-    # check if `data` matrix exist in provided assay
-    if ( is.null(object@assays[[assay]]@data) ) {
+    ## check if `data` matrix exist in provided assay
+    if ( is.null(object@assays[[assay]]@data) )
+    {
       stop(
         paste0(
           '`data` matrix could not be found in `', assay, '` assay slot.'
@@ -174,7 +180,7 @@ performGeneSetEnrichmentAnalysis <- function(
       as.data.frame()
   }
 
-  # remove genes with zero counts across all cells
+  ## remove genes with zero counts across all cells
   message(
     paste0(
       '[', format(Sys.time(), '%H:%M:%S'), '] Removing non-expressed genes...'
@@ -185,9 +191,9 @@ performGeneSetEnrichmentAnalysis <- function(
   expressed_genes <- which(expressed_genes != 0)
   matrix_full <- matrix_full[,expressed_genes]
 
-  #----------------------------------------------------------------------------#
-  # workflow for samples
-  #----------------------------------------------------------------------------#
+  ##---------------------------------------------------------------------------#
+  ## workflow for samples
+  ##---------------------------------------------------------------------------#
   if ( object@meta.data[[column_sample]] %>% unique() %>% length() > 1 ) {
     message(
       paste0(
@@ -195,43 +201,45 @@ performGeneSetEnrichmentAnalysis <- function(
       )
     )
 
-    # get sample names
-    if ( is.factor(object@meta.data[[column_sample]]) ) {
+    ## get sample names
+    if ( is.factor(object@meta.data[[column_sample]]) )
+    {
       sample_names <- levels(object@meta.data[[column_sample]])
-    } else {
+    } else
+    {
       sample_names <- unique(object@meta.data[[column_sample]])
     }
 
-    # add group information as column to expression matrix
+    ## add group information as column to expression matrix
     temp_matrix_full <- matrix_full %>%
       dplyr::mutate(group = object@meta.data[[column_sample]])
 
-    # calculate mean log counts per group of cells
+    ## calculate mean log counts per group of cells
     matrix_merged <- temp_matrix_full %>%
       dplyr::group_by(.data$group) %>%
       dplyr::summarise_all(mean)
 
-    # keep order of groups for later
+    ## keep order of groups for later
     groups <- matrix_merged$group
 
-    # remove group information from count matrix and transpose for GSVA
+    ## remove group information from count matrix and transpose for GSVA
     matrix_merged <- matrix_merged %>%
       dplyr::select(-'group') %>%
       as.matrix() %>%
       t()
 
-    # add group info back to count matrix as column names
+    ## add group info back to count matrix as column names
     colnames(matrix_merged) <- groups
 
-    # get enrichment score for each gene set in every cell group
+    ## get enrichment score for each gene set in every cell group
     enrichment_scores <- GSVA::gsva(
         expr = matrix_merged,
         gset.idx.list = gene_sets$genesets,
         ...
       )
 
-    # calculate statistics for enrichment scores and filter those which don't
-    # pass the specified tresholds
+    ## calculate statistics for enrichment scores and filter those which don't
+    ## pass the specified tresholds
     message(
       paste0(
         '[', format(Sys.time(), '%H:%M:%S'), '] Filtering results based on ',
@@ -245,13 +253,15 @@ performGeneSetEnrichmentAnalysis <- function(
         p_value = numeric(),
         q_value = numeric()
       )
-    for ( i in seq_len(ncol(enrichment_scores)) ) {
+    for ( i in seq_len(ncol(enrichment_scores)) )
+    {
       temp_results <- tibble::tibble(
           group = colnames(matrix_merged)[i],
           name = rownames(enrichment_scores),
           enrichment_score = enrichment_scores[,i]
         )
-      if ( nrow(temp_results) < 2 ) {
+      if ( nrow(temp_results) < 2 )
+      {
         message(
           paste0(
             '[', format(Sys.time(), '%H:%M:%S'), '] Only 1 gene set ',
@@ -261,7 +271,8 @@ performGeneSetEnrichmentAnalysis <- function(
         )
         temp_results <- temp_results %>%
           dplyr::mutate(p_value = NA, q_value = NA)
-      } else {
+      } else
+      {
         message(
           paste0(
             '[', format(Sys.time(), '%H:%M:%S'), '] Filtering results based on ',
@@ -282,7 +293,7 @@ performGeneSetEnrichmentAnalysis <- function(
         dplyr::arrange(.data$q_value)
     }
 
-    # add description, number of genes and list of genes to results
+    ## add description, number of genes and list of genes to results
     results_by_sample <- dplyr::left_join(
         results_by_sample,
         gene_sets_tibble,
@@ -293,7 +304,7 @@ performGeneSetEnrichmentAnalysis <- function(
       dplyr::mutate(group = factor(.data$group, levels = intersect(sample_names,
         .data$group)))
 
-    # print number of enriched gene sets
+    ## print number of enriched gene sets
     message(
       paste0(
         '[', format(Sys.time(), '%H:%M:%S'), '] ', nrow(results_by_sample),
@@ -301,12 +312,13 @@ performGeneSetEnrichmentAnalysis <- function(
       )
     )
 
-    # test if any gene sets passed the filtering
+    ## test if any gene sets passed the filtering
     if ( nrow(results_by_sample) == 0 )
     {
       results_by_sample <- 'no_gene_sets_enriched'
     }
-  } else {
+  } else
+  {
     message(
       paste0(
         '[', format(Sys.time(), '%H:%M:%S'), '] Only 1 sample in the data ',
@@ -316,53 +328,56 @@ performGeneSetEnrichmentAnalysis <- function(
     results_by_sample <- 'only_one_sample_in_data_set'
   }
 
-  #----------------------------------------------------------------------------#
-  # workflow for clusters
-  #----------------------------------------------------------------------------#
-  if ( object@meta.data[[column_cluster]] %>% unique() %>% length() > 1 ) {
+  ##---------------------------------------------------------------------------#
+  ## workflow for clusters
+  ##---------------------------------------------------------------------------#
+  if ( object@meta.data[[column_cluster]] %>% unique() %>% length() > 1 )
+  {
     message(
       paste0(
         '[', format(Sys.time(), '%H:%M:%S'), '] Performing GSVA for clusters...'
       )
     )
 
-    # get cluster names
-    if ( is.factor(object@meta.data[[column_cluster]]) ) {
+    ## get cluster names
+    if ( is.factor(object@meta.data[[column_cluster]]) )
+    {
       cluster_names <- levels(object@meta.data[[column_cluster]])
-    } else {
+    } else
+    {
       cluster_names <- unique(object@meta.data[[column_cluster]])
     }
 
-    # add group information as column to expression matrix
+    ## add group information as column to expression matrix
     temp_matrix_full <- matrix_full %>%
       dplyr::mutate(group = object@meta.data[[column_cluster]])
 
-    # calculate mean log counts per group of cells
+    ## calculate mean log counts per group of cells
     matrix_merged <- temp_matrix_full %>%
       dplyr::group_by(.data$group) %>%
       dplyr::summarise_all(mean)
 
-    # keep order of groups for later
+    ## keep order of groups for later
     groups <- matrix_merged$group
 
-    # remove group information from count matrix and transpose for GSVA
+    ## remove group information from count matrix and transpose for GSVA
     matrix_merged <- matrix_merged %>%
       dplyr::select(-'group') %>%
       as.matrix() %>%
       t()
 
-    # add group info back to count matrix as column names
+    ## add group info back to count matrix as column names
     colnames(matrix_merged) <- groups
 
-    # get enrichment score for each gene set in every cell group
+    ## get enrichment score for each gene set in every cell group
     enrichment_scores <- GSVA::gsva(
         expr = matrix_merged,
         gset.idx.list = gene_sets$genesets,
         ...
       )
 
-    # calculate statistics for enrichment scores and filter those which don't
-    # pass the specified tresholds
+    ## calculate statistics for enrichment scores and filter those which don't
+    ## pass the specified tresholds
     results_by_cluster <- tibble::tibble(
         group = character(),
         name = character(),
@@ -370,13 +385,15 @@ performGeneSetEnrichmentAnalysis <- function(
         p_value = numeric(),
         q_value = numeric()
       )
-    for ( i in seq_len(ncol(enrichment_scores)) ) {
+    for ( i in seq_len(ncol(enrichment_scores)) )
+    {
       temp_results <- tibble::tibble(
           group = colnames(matrix_merged)[i],
           name = rownames(enrichment_scores),
           enrichment_score = enrichment_scores[,i]
         )
-      if ( nrow(temp_results) < 2 ) {
+      if ( nrow(temp_results) < 2 )
+      {
         message(
           paste0(
             '[', format(Sys.time(), '%H:%M:%S'), '] Only 1 gene set ',
@@ -386,7 +403,8 @@ performGeneSetEnrichmentAnalysis <- function(
         )
         temp_results <- temp_results %>%
           dplyr::mutate(p_value = NA, q_value = NA)
-      } else {
+      } else
+      {
         message(
           paste0(
             '[', format(Sys.time(), '%H:%M:%S'), '] Filtering results based on ',
@@ -410,7 +428,7 @@ performGeneSetEnrichmentAnalysis <- function(
         dplyr::arrange(.data$q_value)
     }
 
-    # add description, number of genes and list of genes to results
+    ## add description, number of genes and list of genes to results
     results_by_cluster <- dplyr::left_join(
         results_by_cluster,
         gene_sets_tibble,
@@ -421,7 +439,7 @@ performGeneSetEnrichmentAnalysis <- function(
       dplyr::mutate(group = factor(.data$group, levels = intersect(
         cluster_names, .data$group)))
 
-    # print number of enriched gene sets
+    ## print number of enriched gene sets
     message(
       paste0(
         '[', format(Sys.time(), '%H:%M:%S'), '] ', nrow(results_by_cluster),
@@ -429,12 +447,13 @@ performGeneSetEnrichmentAnalysis <- function(
       )
     )
 
-    # test if any gene sets passed the filtering
+    ## test if any gene sets passed the filtering
     if ( nrow(results_by_cluster) == 0 )
     {
       results_by_cluster <- 'no_gene_sets_enriched'
     }
-  } else {
+  } else
+  {
     message(
       paste0(
         '[', format(Sys.time(), '%H:%M:%S'), '] Only 1 cluster in the data ',
@@ -444,9 +463,9 @@ performGeneSetEnrichmentAnalysis <- function(
     results_by_cluster <- 'only_one_cluster_in_data_set'
   }
 
-  #----------------------------------------------------------------------------#
-  # merge results, add to Seurat object and return Seurat object
-  #----------------------------------------------------------------------------#
+  ##---------------------------------------------------------------------------#
+  ## merge results, add to Seurat object and return Seurat object
+  ##---------------------------------------------------------------------------#
   results <- list(
     by_sample = results_by_sample,
     by_cluster = results_by_cluster,

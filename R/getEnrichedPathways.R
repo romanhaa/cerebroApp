@@ -53,8 +53,9 @@ getEnrichedPathways <- function(
   max_terms = 100,
   URL_API = 'http://amp.pharm.mssm.edu/Enrichr/enrich'
 ) {
-  # check if Seurat is installed
-  if (!requireNamespace("Seurat", quietly = TRUE)) {
+  ## check if Seurat is installed
+  if (!requireNamespace("Seurat", quietly = TRUE))
+  {
     stop(
       "Package 'Seurat' needed for this function to work. Please install it.",
       call. = FALSE
@@ -67,7 +68,8 @@ getEnrichedPathways <- function(
   ##--------------------------------------------------------------------------##
   ## check if marker genes are present and stop if they aren't
   ##--------------------------------------------------------------------------##
-  if ( is.null(temp_seurat@misc$marker_genes) ) {
+  if ( is.null(temp_seurat@misc$marker_genes) )
+  {
     stop(
       "No marker genes found. Please run 'getMarkerGenes()' first.",
       call. = FALSE
@@ -83,8 +85,10 @@ getEnrichedPathways <- function(
   ## - try up to three times to run enrichR annotation (fails sometimes)
   ## - filter results
   ##--------------------------------------------------------------------------##
-  if ( !is.null(temp_seurat@misc$marker_genes$by_sample) ) {
-    if ( is.data.frame(temp_seurat@misc$marker_genes$by_sample) ) {
+  if ( !is.null(temp_seurat@misc$marker_genes$by_sample) )
+  {
+    if ( is.data.frame(temp_seurat@misc$marker_genes$by_sample) )
+    {
       message(
         paste0(
           '[', format(Sys.time(), '%H:%M:%S'),
@@ -94,18 +98,21 @@ getEnrichedPathways <- function(
       #
       markers_by_sample <- temp_seurat@misc$marker_genes$by_sample
       #
-      if ( is.factor(temp_seurat@meta.data[[column_sample]]) ) {
+      if ( is.factor(temp_seurat@meta.data[[column_sample]]) )
+      {
         sample_names <- levels(temp_seurat@meta.data[[column_sample]])
-      } else {
+      } else
+      {
         sample_names <- unique(temp_seurat@meta.data[[column_sample]])
       }
-      # remove samples for which no marker genes were found
+      ## remove samples for which no marker genes were found
       sample_names <- intersect(sample_names, unique(markers_by_sample$sample))
 
       #
       results_by_sample <- future.apply::future_sapply(
         sample_names, USE.NAMES = TRUE, simplify = FALSE,
-        future.globals = FALSE, function(x) {
+        future.globals = FALSE, function(x)
+      {
         temp <- list()
         attempt <- 1
         while(
@@ -120,43 +127,49 @@ getEnrichedPathways <- function(
               dplyr::select('gene') %>%
               t() %>%
               as.vector() %>%
-              send_enrichr_query(databases = databases, URL_API = URL_API)
+              .send_enrichr_query(databases = databases, URL_API = URL_API)
           )
         }
         #
         results_2 <- sapply(names(temp), USE.NAMES = TRUE,
-          simplify = FALSE, function(y) {
-          # apply cut-off of adj. p-value and add database info as column
+          simplify = FALSE, function(y)
+        {
+          ## apply cut-off of adj. p-value and add database info as column
           out <- temp[[y]] %>%
             dplyr::filter(.data$Adjusted.P.value <= adj_p_cutoff) %>%
             dplyr::mutate(db = y)
-          # if there are more than max_terms entries...
-          if ( nrow(out) > max_terms ) {
+          ## if there are more than max_terms entries...
+          if ( nrow(out) > max_terms )
+          {
             out <- out %>% dplyr::top_n(-max_terms, .data$Adjusted.P.value)
-          # if there are no entries left
-          } else if ( nrow(out) == 0 ) {
+          ## if there are no entries left
+          } else if ( nrow(out) == 0 )
+          {
             out <- NULL
           }
           return(out)
         })
-        # remove dbs without any enriched entries
-        for ( i in names(results_2) ) {
+        ## remove dbs without any enriched entries
+        for ( i in names(results_2) )
+        {
           if ( is.null(results_2[[i]]) ) results_2[[i]] <- NULL
         }
-        # merge databases within each sample
+        ## merge databases within each sample
         results_2 <- do.call(rbind, results_2)
         return(results_2)
       })
-      # remove samples without any enriched entry in any database
-      for ( i in names(results_by_sample) ) {
+      ## remove samples without any enriched entry in any database
+      for ( i in names(results_by_sample) )
+      {
         if ( is.null(results_by_sample[[i]]) ) results_by_sample[[i]] <- NULL
       }
-      # add sample info as column
-      for ( i in names(results_by_sample) ) {
+      ## add sample info as column
+      for ( i in names(results_by_sample) )
+      {
         results_by_sample[[i]] <- results_by_sample[[i]] %>%
           dplyr::mutate(sample = i)
       }
-      # merge samples into single table
+      ## merge samples into single table
       results_by_sample <- do.call(rbind, results_by_sample) %>%
         dplyr::select('sample', 'db', dplyr::everything()) %>%
         dplyr::mutate(
@@ -180,7 +193,8 @@ getEnrichedPathways <- function(
         )
       )
       results_by_sample <- 'no_markers_found'
-    } else {
+    } else
+    {
       warning(
         paste0(
           'Unexpected data format of marker genes for samples. Please submit ',
@@ -188,7 +202,8 @@ getEnrichedPathways <- function(
         )
       )
     }
-  } else {
+  } else
+  {
     message(
       paste0(
         '[', format(Sys.time(), '%H:%M:%S'),
@@ -206,8 +221,10 @@ getEnrichedPathways <- function(
   ## - try up to three times to run enrichR annotation (fails sometimes)
   ## - filter results
   ##--------------------------------------------------------------------------##
-  if ( !is.null(temp_seurat@misc$marker_genes$by_cluster) ) {
-    if ( is.data.frame(temp_seurat@misc$marker_genes$by_cluster) ) {
+  if ( !is.null(temp_seurat@misc$marker_genes$by_cluster) )
+  {
+    if ( is.data.frame(temp_seurat@misc$marker_genes$by_cluster) )
+    {
       message(
         paste0(
           '[', format(Sys.time(), '%H:%M:%S'),
@@ -217,18 +234,21 @@ getEnrichedPathways <- function(
       #
       markers_by_cluster <- temp_seurat@misc$marker_genes$by_cluster
       #
-      if ( is.factor(temp_seurat@meta.data[[column_cluster]]) ) {
+      if ( is.factor(temp_seurat@meta.data[[column_cluster]]) )
+      {
         cluster_names <- as.character(levels(temp_seurat@meta.data[[column_cluster]]))
-      } else {
+      } else
+      {
         cluster_names <- sort(unique(temp_seurat@meta.data[[column_cluster]]))
       }
-      # remove clusters for which no marker genes were found
+      ## remove clusters for which no marker genes were found
       cluster_names <- intersect(cluster_names, unique(markers_by_cluster$cluster))
 
       #
       results_by_cluster <- future.apply::future_sapply(
         cluster_names, USE.NAMES = TRUE, simplify = FALSE,
-        future.globals = FALSE, function(x) {
+        future.globals = FALSE, function(x)
+      {
         temp <- list()
         attempt <- 1
         while(
@@ -243,43 +263,49 @@ getEnrichedPathways <- function(
               dplyr::select('gene') %>%
               t() %>%
               as.vector() %>%
-              send_enrichr_query(databases = databases, URL_API = URL_API)
+              .send_enrichr_query(databases = databases, URL_API = URL_API)
           )
         }
         #
         results_2 <- sapply(names(temp), USE.NAMES = TRUE,
-          simplify = FALSE, function(y) {
-          # apply cut-off of adj. p-value and add database info as column
+          simplify = FALSE, function(y)
+        {
+          ## apply cut-off of adj. p-value and add database info as column
           out <- temp[[y]] %>%
             dplyr::filter(.data$Adjusted.P.value <= adj_p_cutoff) %>%
             dplyr::mutate(db = y)
-          # if there are more than max_terms entries...
-          if ( nrow(out) > max_terms ) {
+          ## if there are more than max_terms entries...
+          if ( nrow(out) > max_terms )
+          {
             out <- out %>% dplyr::top_n(-max_terms, .data$Adjusted.P.value)
-          # if there are no entries left
-          } else if ( nrow(out) == 0 ) {
+          ## if there are no entries left
+          } else if ( nrow(out) == 0 )
+          {
             out <- NULL
           }
           return(out)
         })
-        # remove dbs without any enriched entries
-        for ( i in names(results_2) ) {
+        ## remove dbs without any enriched entries
+        for ( i in names(results_2) )
+        {
           if ( is.null(results_2[[i]]) ) results_2[[i]] <- NULL
         }
-        # merge databases within each cluster
+        ## merge databases within each cluster
         results_2 <- do.call(rbind, results_2)
         return(results_2)
       })
-      # remove clusters without any enriched entry in any database
-      for ( i in names(results_by_cluster) ) {
+      ## remove clusters without any enriched entry in any database
+      for ( i in names(results_by_cluster) )
+      {
         if ( is.null(results_by_cluster[[i]]) ) results_by_cluster[[i]] <- NULL
       }
-      # add cluster info as column
-      for ( i in names(results_by_cluster) ) {
+      ## add cluster info as column
+      for ( i in names(results_by_cluster) )
+      {
         results_by_cluster[[i]] <- results_by_cluster[[i]] %>%
           dplyr::mutate(cluster = i)
       }
-      # merge clusters into single table
+      ## merge clusters into single table
       results_by_cluster <- do.call(rbind, results_by_cluster) %>%
         dplyr::select(.data$cluster, .data$db, dplyr::everything()) %>%
         dplyr::mutate(
@@ -303,7 +329,8 @@ getEnrichedPathways <- function(
         )
       )
       results_by_cluster <- 'no_markers_found'
-    } else {
+    } else
+    {
       warning(
         paste0(
           'Unexpected data format of marker genes for clusters. Please submit ',
@@ -311,7 +338,8 @@ getEnrichedPathways <- function(
         )
       )
     }
-  } else {
+  } else
+  {
     message(
       paste0(
         '[', format(Sys.time(), '%H:%M:%S'),
@@ -319,9 +347,9 @@ getEnrichedPathways <- function(
       )
     )
   }
-  #----------------------------------------------------------------------------#
-  # merge results, add to Seurat object and return Seurat object
-  #----------------------------------------------------------------------------#
+  ##---------------------------------------------------------------------------#
+  ## merge results, add to Seurat object and return Seurat object
+  ##---------------------------------------------------------------------------#
   results <- list(
     by_sample = results_by_sample,
     by_cluster = results_by_cluster,

@@ -34,15 +34,17 @@ extractMonocleTrajectory <- function(
     column_state = 'State',
     column_pseudotime = 'Pseudotime'
   ) {
-  # check if Seurat is installed
-  if (!requireNamespace("Seurat", quietly = TRUE)) {
+  ## check if Seurat is installed
+  if (!requireNamespace("Seurat", quietly = TRUE))
+  {
     stop(
       "Package 'Seurat' needed for this function to work. Please install it.",
       call. = FALSE
     )
   }
-  # check if monocle is installed
-  if (!requireNamespace("monocle", quietly = TRUE)) {
+  ## check if monocle is installed
+  if (!requireNamespace("monocle", quietly = TRUE))
+  {
     stop(
       "Package 'monocle' needed for this function to work. Please install it.",
       call. = FALSE
@@ -54,19 +56,22 @@ extractMonocleTrajectory <- function(
   ## - required data is present in Monocle object
   ## - number of cells is equal on Monocle and Seurat objects
   ##--------------------------------------------------------------------------##
-  if ( !methods::is(monocle, 'CellDataSet') ) {
+  if ( !methods::is(monocle, 'CellDataSet') )
+  {
     stop(
       "The provided object for 'monocle' is not of type 'CellDataSet'.",
       call. = FALSE
     )
   }
-  if ( !(class(seurat) %in% c('seurat','Seurat')) ) {
+  if ( !(class(seurat) %in% c('seurat','Seurat')) )
+  {
     stop(
       "The provided object for 'seurat' doesn't seem to be a Seurat object.",
       call. = FALSE
     )
   }
-  if ( (column_state %in% colnames(monocle@phenoData@data)) == FALSE ) {
+  if ( (column_state %in% colnames(monocle@phenoData@data)) == FALSE )
+  {
     stop(
       paste0(
         "Specified column for state info ('", column_state,
@@ -75,7 +80,8 @@ extractMonocleTrajectory <- function(
       call. = FALSE
     )
   }
-  if ( (column_pseudotime %in% colnames(monocle@phenoData@data)) == FALSE ) {
+  if ( (column_pseudotime %in% colnames(monocle@phenoData@data)) == FALSE )
+  {
     stop(
       paste0(
         "Specified column for pseudotime info ('", column_pseudotime,
@@ -84,25 +90,29 @@ extractMonocleTrajectory <- function(
       call. = FALSE
     )
   }
-  if ( length(monocle@minSpanningTree) == 0 ) {
+  if ( length(monocle@minSpanningTree) == 0 )
+  {
     stop(
       'monocle@minSpanningTree appears to be empty but is required.',
       call. = FALSE
     )
   }
-  if ( length(monocle@reducedDimK) == 0 ) {
+  if ( length(monocle@reducedDimK) == 0 )
+  {
     stop(
       'monocle@reducedDimK appears to be empty but is required.',
       call. = FALSE
     )
   }
-  if ( length(monocle@reducedDimS) == 0 ) {
+  if ( length(monocle@reducedDimS) == 0 )
+  {
     stop(
       'monocle@reducedDimS appears to be empty but is required.',
       call. = FALSE
     )
   }
-  if ( !is.null(seurat@misc$trajectory[[trajectory_name]]) ) {
+  if ( !is.null(seurat@misc$trajectory[[trajectory_name]]) )
+  {
     stop(
       paste0(
         "Trajectory with specified name ('", trajectory_name,
@@ -112,7 +122,8 @@ extractMonocleTrajectory <- function(
       call. = FALSE
     )
   }
-  if ( nrow(monocle@phenoData@data) > nrow(seurat@meta.data) ) {
+  if ( nrow(monocle@phenoData@data) > nrow(seurat@meta.data) )
+  {
     stop(
       paste0(
         'Number of cells in monocle object (', nrow(monocle@phenoData@data),
@@ -122,7 +133,8 @@ extractMonocleTrajectory <- function(
       call. = FALSE
     )
   }
-  if ( length(which(rownames(monocle@phenoData@data) %in%
+  if (
+    length(which(rownames(monocle@phenoData@data) %in%
     rownames(seurat@meta.data))) != nrow(monocle@phenoData@data) )
   {
     stop(
@@ -135,13 +147,15 @@ extractMonocleTrajectory <- function(
       call. = FALSE
     )
   }
-  if ( nrow(monocle@reducedDimK) > 2 ) {
+  if ( nrow(monocle@reducedDimK) > 2 )
+  {
     stop(
       'Currently only two-dimensional reductions are supported.',
       call. = FALSE
     )
   }
-  if ( nrow(monocle@phenoData@data) < nrow(seurat@meta.data) ) {
+  if ( nrow(monocle@phenoData@data) < nrow(seurat@meta.data) )
+  {
     warning(
       paste0(
         'There are ', nrow(seurat@meta.data) - nrow(monocle@phenoData@data),

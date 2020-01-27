@@ -30,8 +30,9 @@ getMostExpressedGenes <- function(
   column_sample = 'sample',
   column_cluster = 'cluster'
 ) {
-  # check if Seurat is installed
-  if (!requireNamespace("Seurat", quietly = TRUE)) {
+  ## check if Seurat is installed
+  if (!requireNamespace("Seurat", quietly = TRUE))
+  {
     stop(
       "Package 'Seurat' needed for this function to work. Please install it.",
       call. = FALSE
@@ -44,7 +45,8 @@ getMostExpressedGenes <- function(
   ##--------------------------------------------------------------------------##
   ## create slot for results in Seurat object if not already existing
   ##--------------------------------------------------------------------------##
-  if ( is.null(temp_seurat@misc$most_expressed_genes) ) {
+  if ( is.null(temp_seurat@misc$most_expressed_genes) )
+  {
     temp_seurat@misc$most_expressed_genes <- list()
   }
   ##--------------------------------------------------------------------------##
@@ -60,13 +62,17 @@ getMostExpressedGenes <- function(
   if (
     !is.null(column_sample) &&
     column_sample %in% names(temp_seurat@meta.data)
-  ) {
+  )
+  {
     #
-    if ( is.factor(temp_seurat@meta.data[[column_sample]]) ) {
+    if ( is.factor(temp_seurat@meta.data[[column_sample]]) )
+    {
       sample_names <- levels(temp_seurat@meta.data[[column_sample]])
-    } else {
+    } else
+    {
       sample_names <- unique(temp_seurat@meta.data[[column_sample]])
-      if ( any(is.na(sample_names)) ) {
+      if ( any(is.na(sample_names)) )
+      {
         number_of_NA_in_sample_column <- which(is.na(sample_names)) %>% length()
         sample_names <- stats::na.omit(sample_names)
         message(
@@ -79,16 +85,19 @@ getMostExpressedGenes <- function(
         )
       }
     }
-    if ( length(sample_names) >= 1 ) {
+    if ( length(sample_names) >= 1 )
+    {
       message(
         paste0(
           '[', format(Sys.time(), '%H:%M:%S'),
           '] Get most expressed genes by sample...'
         )
       )
-      if ( temp_seurat@version < 3 ) {
-        # check if `data` matrix exist in provided Seurat object
-        if ( ('raw.data' %in% names(object) == FALSE ) ) {
+      if ( temp_seurat@version < 3 )
+      {
+        ## check if `data` matrix exist in provided Seurat object
+        if ( ('raw.data' %in% names(object) == FALSE ) )
+        {
           stop(
             paste0(
               '`raw.data` matrix could not be found in provided Seurat ',
@@ -97,7 +106,8 @@ getMostExpressedGenes <- function(
             call. = FALSE
           )
         }
-        results <- pbapply::pblapply(sample_names, function(x) {
+        results <- pbapply::pblapply(sample_names, function(x)
+        {
           temp_table <- temp_seurat@raw.data %>%
             as.matrix() %>%
             as.data.frame(stringsAsFactors = FALSE) %>%
@@ -115,9 +125,11 @@ getMostExpressedGenes <- function(
             dplyr::arrange(-.data$pct) %>%
             utils::head(100)
         })
-      } else {
-        # check if provided assay exists
-        if ( (assay %in% names(object@assays) == FALSE ) ) {
+      } else
+      {
+        ## check if provided assay exists
+        if ( (assay %in% names(object@assays) == FALSE ) )
+        {
           stop(
             paste0(
               'Assay slot `', assay, '` could not be found in provided Seurat ',
@@ -126,8 +138,9 @@ getMostExpressedGenes <- function(
             call. = FALSE
           )
         }
-        # check if `counts` matrix exist in provided assay
-        if ( is.null(object@assays[[assay]]@counts) ) {
+        ## check if `counts` matrix exist in provided assay
+        if ( is.null(object@assays[[assay]]@counts) )
+        {
           stop(
             paste0(
               '`counts` matrix could not be found in `', assay, '` assay slot.'
@@ -135,7 +148,8 @@ getMostExpressedGenes <- function(
             call. = FALSE
           )
         }
-        results <- pbapply::pblapply(sample_names, function(x) {
+        results <- pbapply::pblapply(sample_names, function(x)
+        {
           temp_table <- temp_seurat@assays[[assay]]@counts %>%
             as.matrix() %>%
             as.data.frame(stringsAsFactors = FALSE) %>%
@@ -172,12 +186,16 @@ getMostExpressedGenes <- function(
   if (
     !is.null(column_cluster) &&
     column_cluster %in% names(temp_seurat@meta.data)
-  ) {
-    if ( is.factor(temp_seurat@meta.data[[column_cluster]]) ) {
+  )
+  {
+    if ( is.factor(temp_seurat@meta.data[[column_cluster]]) )
+    {
       cluster_names <- levels(temp_seurat@meta.data[[column_cluster]])
-    } else {
+    } else
+    {
       cluster_names <- sort(unique(temp_seurat@meta.data[[column_cluster]]))
-      if ( any(is.na(cluster_names)) ) {
+      if ( any(is.na(cluster_names)) )
+      {
         number_of_NA_in_cluster_column <- which(is.na(cluster_names)) %>%
           length()
         cluster_names <- stats::na.omit(cluster_names)
@@ -191,15 +209,18 @@ getMostExpressedGenes <- function(
         )
       }
     }
-    if ( length(cluster_names) >= 1 ) {
+    if ( length(cluster_names) >= 1 )
+    {
       message(
         paste0(
           '[', format(Sys.time(), '%H:%M:%S'),
           '] Get most expressed genes by cluster...'
         )
       )
-      if ( temp_seurat@version < 3 ) {
-        results <- pbapply::pblapply(cluster_names, function(x) {
+      if ( temp_seurat@version < 3 )
+      {
+        results <- pbapply::pblapply(cluster_names, function(x)
+        {
           temp_table <- temp_seurat@raw.data %>%
             as.matrix() %>%
             as.data.frame(stringsAsFactors = FALSE) %>%
@@ -217,9 +238,11 @@ getMostExpressedGenes <- function(
             dplyr::arrange(-.data$pct) %>%
             utils::head(100)
         })
-      } else {
-        # check if provided assay exists
-        if ( (assay %in% names(object@assays) == FALSE ) ) {
+      } else
+      {
+        ## check if provided assay exists
+        if ( (assay %in% names(object@assays) == FALSE ) )
+        {
           stop(
             paste0(
               'Assay slot `', assay, '` could not be found in provided Seurat ',
@@ -228,8 +251,9 @@ getMostExpressedGenes <- function(
             call. = FALSE
           )
         }
-        # check if `counts` matrix exist in provided assay
-        if ( is.null(object@assays[[assay]]@counts) ) {
+        ## check if `counts` matrix exist in provided assay
+        if ( is.null(object@assays[[assay]]@counts) )
+        {
           stop(
             paste0(
               '`counts` matrix could not be found in `', assay, '` assay slot.'
@@ -237,7 +261,8 @@ getMostExpressedGenes <- function(
             call. = FALSE
           )
         }
-        results <- pbapply::pblapply(cluster_names, function(x) {
+        results <- pbapply::pblapply(cluster_names, function(x)
+        {
           temp_table <- temp_seurat@assays[[assay]]@counts %>%
             as.matrix() %>%
             as.data.frame(stringsAsFactors = FALSE) %>%

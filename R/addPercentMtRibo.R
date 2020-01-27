@@ -29,8 +29,9 @@ addPercentMtRibo <- function(
   organism,
   gene_nomenclature
 ) {
-  # check if Seurat is installed
-  if (!requireNamespace("Seurat", quietly = TRUE)) {
+  ## check if Seurat is installed
+  if (!requireNamespace("Seurat", quietly = TRUE))
+  {
     stop(
       "Package 'Seurat' needed for this function to work. Please install it.",
       call. = FALSE
@@ -40,7 +41,8 @@ addPercentMtRibo <- function(
   ## check if organism is supported
   ##--------------------------------------------------------------------------##
   supported_organisms <- c('hg','mm')
-  if ( !(organism %in% supported_organisms) ) {
+  if ( !(organism %in% supported_organisms) )
+  {
     stop(
       paste0(
         "User-specified organism ('", organism,
@@ -50,7 +52,8 @@ addPercentMtRibo <- function(
     )
   }
   supported_nomenclatures <- c('name','ensembl','gencode_v27','gencode_vM16')
-  if ( !(gene_nomenclature %in% supported_nomenclatures) ) {
+  if ( !(gene_nomenclature %in% supported_nomenclatures) )
+  {
     stop(
       paste0(
         "User-specified gene nomenclature ('", gene_nomenclature,
@@ -91,9 +94,11 @@ addPercentMtRibo <- function(
   ##--------------------------------------------------------------------------##
   ## keep only genes that are present in data set
   ##--------------------------------------------------------------------------##
-  if ( object@version < 3 ) {
-    # check if `raw.data` matrix exist in provided Seurat object
-    if ( ('raw.data' %in% names(object) == FALSE ) ) {
+  if ( object@version < 3 )
+  {
+    ## check if `raw.data` matrix exist in provided Seurat object
+    if ( ('raw.data' %in% names(object) == FALSE ) )
+    {
       stop(
         paste0(
           '`raw.data` matrix could not be found in provided Seurat ',
@@ -104,9 +109,11 @@ addPercentMtRibo <- function(
     }
     genes_mt_here <- intersect(genes_mt, rownames(object@raw.data))
     genes_ribo_here <- intersect(genes_ribo, rownames(object@raw.data))
-  } else {
-    # check if provided assay exists
-    if ( (assay %in% names(object@assays) == FALSE ) ) {
+  } else
+  {
+    ## check if provided assay exists
+    if ( (assay %in% names(object@assays) == FALSE ) )
+    {
       stop(
         paste0(
           'Assay slot `', assay, '` could not be found in provided Seurat ',
@@ -115,8 +122,9 @@ addPercentMtRibo <- function(
         call. = FALSE
       )
     }
-    # check if `counts` matrix exist in provided assay
-    if ( is.null(object@assays[[assay]]@counts) ) {
+    ## check if `counts` matrix exist in provided assay
+    if ( is.null(object@assays[[assay]]@counts) )
+    {
       stop(
         paste0(
           '`counts` matrix could not be found in `', assay, '` assay slot.'
@@ -135,13 +143,15 @@ addPercentMtRibo <- function(
   ## prepare slot in Seurat object to store gene lists (if it doesn't already
   ## exist)
   ##--------------------------------------------------------------------------##
-  if ( is.null(object@misc$gene_lists) ) {
+  if ( is.null(object@misc$gene_lists) )
+  {
     object@misc$gene_lists <- list()
   }
   ##--------------------------------------------------------------------------##
   ## calculate mitochondrial gene expression
   ##--------------------------------------------------------------------------##
-  if ( length(genes_mt_here) > 0 ) {
+  if ( length(genes_mt_here) > 0 )
+  {
     object@misc$gene_lists$mitochondrial_genes <- genes_mt_here
     message(
       paste0(
@@ -155,7 +165,8 @@ addPercentMtRibo <- function(
       assay = assay,
       list('genes_mt' = genes_mt_here)
     )
-  } else {
+  } else
+  {
     object@misc$gene_lists$mitochondrial_genes <- 'no_mitochondrial_genes_found'
     message(
       paste0(
@@ -168,7 +179,8 @@ addPercentMtRibo <- function(
   ##--------------------------------------------------------------------------##
   ## calculate ribosomal gene expression
   ##--------------------------------------------------------------------------##
-  if ( length(genes_ribo_here) > 0 ) {
+  if ( length(genes_ribo_here) > 0 )
+  {
     object@misc$gene_lists$ribosomal_genes <- genes_ribo_here
     message(
       paste0(
@@ -182,7 +194,8 @@ addPercentMtRibo <- function(
       assay = assay,
       list('genes_ribo' = genes_ribo_here)
     )
-  } else {
+  } else
+  {
     object@misc$gene_lists$ribosomal_genes <- 'no_ribosomal_genes_found'
     message(
       paste0(
@@ -195,7 +208,8 @@ addPercentMtRibo <- function(
   ##--------------------------------------------------------------------------##
   ## add results to Seurat object
   ##--------------------------------------------------------------------------##
-  if ( object@version < 3 ) {
+  if ( object@version < 3 )
+  {
     object <- Seurat::AddMetaData(
       object,
       data.frame(
@@ -204,7 +218,8 @@ addPercentMtRibo <- function(
         'percent_ribo' = values_ribo
       )
     )
-  } else {
+  } else
+  {
     object$percent_mt <- values_mt
     object$percent_ribo <- values_ribo
   }

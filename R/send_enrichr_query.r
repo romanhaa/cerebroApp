@@ -8,23 +8,30 @@
 #' See http://amp.pharm.mssm.edu/Enrichr/ for available databases.
 #' @return Returns a data frame of enrichment terms, p-values, ...
 #' @author Wajid Jawaid, modified by Roman Hillje
-send_enrichr_query <- function(
+.send_enrichr_query <- function(
   genes,
   databases = NULL,
   URL_API = NULL
 )
 {
-  if (is.vector(genes) & ! all(genes == '') & length(genes) != 0) {
+  if (
+    is.vector(genes) &
+    !all(genes == '') &
+    length(genes) != 0
+  )
+  {
     temp <- httr::POST(
       url = URL_API,
       body = list(list = paste(genes, collapse = '\n'))
     )
-  } else if (is.data.frame(genes)) {
+  } else if ( is.data.frame(genes) )
+  {
     temp <- httr::POST(
       url = URL_API,
       body = list(list = paste(paste(genes[,1], genes[,2], sep = ','), collapse = '\n'))
     )
-  } else {
+  } else
+  {
     warning(
       paste0('genes must be a non-empty vector of gene names or a dataframe ',
       'with genes and score.'
@@ -35,7 +42,8 @@ send_enrichr_query <- function(
   dfSAF <- options()$stringsAsFactors
   options(stringsAsFactors = FALSE)
   result <- future.apply::future_sapply(databases, USE.NAMES = TRUE,
-    simplify = FALSE, function(x) {
+    simplify = FALSE, function(x)
+  {
     r <- httr::GET(
       url = 'http://amp.pharm.mssm.edu/Enrichr/export',
       query = list(file = 'API', backgroundType = x)
@@ -47,6 +55,5 @@ send_enrichr_query <- function(
     close(tc)
     return(r)
   })
-  options(stringsAsFactors = dfSAF)
   return(result)
 }

@@ -32,7 +32,8 @@ launchCerebro <- function(
   ##
   ##--------------------------------------------------------------------------##
   available_versions = c("v1.0","v1.1","v1.2")
-  if ( (version %in% c('v1.0','v1.1','v1.2') == FALSE ) ) {
+  if ( (version %in% available_versions == FALSE ) )
+  {
     stop(
       'Version must be one of: ', paste0(available_versions, collapse = ', '),
       call. = FALSE
@@ -41,12 +42,15 @@ launchCerebro <- function(
   ##--------------------------------------------------------------------------##
   ##
   ##--------------------------------------------------------------------------##
-  if ( grepl(tolower(Sys.info()["sysname"]), pattern = "^win") ) {
+  if ( grepl(tolower(Sys.info()["sysname"]), pattern = "^win") )
+  {
     .libPaths(paste0(getwd(), "/R-Portable-Win/library"))
     plot_export_path <- paste0(Sys.getenv("USERPROFILE"), "\\Desktop\\")
-  } else if ( "DOCKER" %in% names(Sys.getenv()) ) {
+  } else if ( "DOCKER" %in% names(Sys.getenv()) )
+  {
     plot_export_path <- "/plots"
-  } else if ( grepl(tolower(Sys.info()["sysname"]), pattern = "darwin") ) {
+  } else if ( grepl(tolower(Sys.info()["sysname"]), pattern = "darwin") )
+  {
     .libPaths(paste0(getwd(), "/R-Portable-Mac/library"))
     plot_export_path <- "~/Desktop/"
   }

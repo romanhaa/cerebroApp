@@ -56,8 +56,9 @@ exportFromSeurat <- function(
   column_cell_cycle_cyclone = NULL,
   add_all_meta_data = TRUE
 ) {
-  # check if Seurat is installed
-  if (!requireNamespace("Seurat", quietly = TRUE)) {
+  ## check if Seurat is installed
+  if (!requireNamespace("Seurat", quietly = TRUE))
+  {
     stop(
       "Package 'Seurat' needed for this function to work. Please install it.",
       call. = FALSE
@@ -66,19 +67,25 @@ exportFromSeurat <- function(
   ##--------------------------------------------------------------------------##
   ## check provided parameters
   ##--------------------------------------------------------------------------##
-  if ( (column_sample %in% names(object@meta.data) == FALSE ) ) {
+  ## `column_sample`
+  if ( (column_sample %in% names(object@meta.data) == FALSE ) )
+  {
     stop(
       'Column specified in `column_sample` not found in meta data.',
       call. = FALSE
     )
   }
-  if ( (column_cluster %in% names(object@meta.data) == FALSE ) ) {
+  ## `column_cluster`
+  if ( (column_cluster %in% names(object@meta.data) == FALSE ) )
+  {
     stop(
       'Column specified in `column_cluster` not found in meta data.',
       call. = FALSE
     )
   }
-  if ( (column_nUMI %in% names(object@meta.data) == FALSE ) ) {
+  ## `column_nUMI`
+  if ( (column_nUMI %in% names(object@meta.data) == FALSE ) )
+  {
     stop(
       paste0(
         'Column with number of transcripts per cell (`nUMI`) not found in ',
@@ -87,7 +94,9 @@ exportFromSeurat <- function(
       call. = FALSE
     )
   }
-  if ( (column_nGene %in% names(object@meta.data) == FALSE ) ) {
+  ## `column_nGene`
+  if ( (column_nGene %in% names(object@meta.data) == FALSE ) )
+  {
     stop(
       paste0(
         'Column with number of expressed genes per cell (`nGene`) not found ',
@@ -96,28 +105,6 @@ exportFromSeurat <- function(
       call. = FALSE
     )
   }
-  ##--------------------------------------------------------------------------##
-  ## colors
-  ##--------------------------------------------------------------------------##
-  # Dutch palette from flatuicolors.com
-  colors_dutch <- c(
-    '#FFC312','#C4E538','#12CBC4','#FDA7DF','#ED4C67',
-    '#F79F1F','#A3CB38','#1289A7','#D980FA','#B53471',
-    '#EE5A24','#009432','#0652DD','#9980FA','#833471',
-    '#EA2027','#006266','#1B1464','#5758BB','#6F1E51'
-  )
-  # Spanish palette from flatuicolors.com
-  colors_spanish <- c(
-    '#40407a','#706fd3','#f7f1e3','#34ace0','#33d9b2',
-    '#2c2c54','#474787','#aaa69d','#227093','#218c74',
-    '#ff5252','#ff793f','#d1ccc0','#ffb142','#ffda79',
-    '#b33939','#cd6133','#84817a','#cc8e35','#ccae62'
-  )
-  colors <- c(colors_dutch, colors_spanish)
-  cell_cycle_colorset <- stats::setNames(
-    c('#45aaf2', '#f1c40f', '#e74c3c', '#7f8c8d'),
-    c('G1',      'S',       'G2M',     '-')
-  )
   ##--------------------------------------------------------------------------##
   ## initialize export object
   ##--------------------------------------------------------------------------##
@@ -135,74 +122,56 @@ exportFromSeurat <- function(
   ##--------------------------------------------------------------------------##
   ## collect some more data if present
   ##--------------------------------------------------------------------------##
-  #
+  ## data of analysis
   export$experiment$date_of_analysis <- object@misc$experiment$date_of_analysis
-  #
-  if ( is.null(object@misc$parameters) ) {
+  ## `parameters`
+  if ( is.null(object@misc$parameters) )
+  {
     export$parameters <- list()
-  } else {
+  } else
+  {
     export$parameters <- object@misc$parameters
   }
-  #
-  if ( is.null(object@misc$gene_lists) ) {
+  ## `gene_lists`
+  if ( is.null(object@misc$gene_lists) )
+  {
     export$gene_lists <- list()
-  } else {
+  } else
+  {
     export$gene_lists <- object@misc$gene_lists
   }
-  #
-  if ( is.null(object@misc$technical_info) ) {
+  ## technical_info`
+  if ( is.null(object@misc$technical_info) )
+  {
     export$technical_info <- list()
-  } else {
+  } else
+  {
     export$technical_info <- object@misc$technical_info
   }
-  if ( is.null(object@misc$technical_info$seurat_version) ) {
+  ## Seurat version
+  if ( is.null(object@misc$technical_info$seurat_version) )
+  {
     export$technical_info$seurat_version <- object@version
   }
   ##--------------------------------------------------------------------------##
-  ## samples
+  ## get sample names
   ##--------------------------------------------------------------------------##
-  if ( is.factor(object@meta.data[[column_sample]]) ) {
+  if ( is.factor(object@meta.data[[column_sample]]) )
+  {
     sample_names <- levels(object@meta.data[[column_sample]])
-  } else {
+  } else
+  {
     sample_names <- unique(object@meta.data[[column_sample]])
   }
-  export$samples <- list(
-    colors = NA,
-    overview = data.frame('sample' = sample_names)
-  )
-  # recycle colors if more samples than colors are in the data set
-  if ( length(sample_names) <= length(colors) ) {
-    export$samples$colors <- stats::setNames(
-      colors[ seq_len(length(sample_names)) ], sample_names
-    )
-  } else {
-    repeat_this_many_times <- ceiling(length(sample_names)/length(colors))
-    colors_to_assign <- rep(colors, repeat_this_many_times)
-    colors_to_assign <- colors_to_assign[ seq_len(length(sample_names)) ]
-    export$samples$colors <- stats::setNames(colors_to_assign, sample_names)
-  }
   ##--------------------------------------------------------------------------##
-  ## clusters
+  ## get cluster names
   ##--------------------------------------------------------------------------##
-  if ( is.factor(object@meta.data[[column_cluster]]) ) {
+  if ( is.factor(object@meta.data[[column_cluster]]) )
+  {
     cluster_names <- levels(object@meta.data[[column_cluster]])
-  } else {
+  } else
+  {
     cluster_names <- unique(object@meta.data[[column_cluster]]) %>% sort()
-  }
-  export$clusters <- list(
-    colors = NA,
-    overview = data.frame('cluster' = cluster_names)
-  )
-  # recycle colors if more clusters than colors are in the data set
-  if ( length(cluster_names) <= length(colors) ) {
-    export$clusters$colors <- stats::setNames(
-      colors[ seq_len(length(cluster_names)) ], cluster_names
-    )
-  } else {
-    repeat_this_many_times <- ceiling(length(cluster_names)/length(colors))
-    colors_to_assign <- rep(colors, repeat_this_many_times)
-    colors_to_assign <- colors_to_assign[ seq_len(length(cluster_names)) ]
-    export$clusters$colors <- stats::setNames(colors_to_assign, cluster_names)
   }
   ##--------------------------------------------------------------------------##
   ## meta data
@@ -228,121 +197,17 @@ exportFromSeurat <- function(
   meta_data_columns <- meta_data_columns[-which(meta_data_columns == column_nUMI)]
   meta_data_columns <- meta_data_columns[-which(meta_data_columns == column_nGene)]
   ##--------------------------------------------------------------------------##
-  ## samples by cluster
-  ##--------------------------------------------------------------------------##
-  message(
-    paste0(
-      '[', format(Sys.time(), '%H:%M:%S'),
-      '] Stratifying samples by clusters...'
-    )
-  )
-  temp_data <- export$cells %>%
-    dplyr::group_by(sample, .data$cluster) %>%
-    dplyr::summarize(count = dplyr::n()) %>%
-    tidyr::spread(.data$cluster, count, fill = 0) %>%
-    dplyr::ungroup()
-  export$samples$by_cluster <- temp_data %>%
-    dplyr::mutate(total_cell_count = rowSums(temp_data[c(2:ncol(temp_data))])) %>%
-    dplyr::select(c('sample', 'total_cell_count', dplyr::everything())) %>%
-    dplyr::arrange(factor(sample, levels = sample_names))
-  ##--------------------------------------------------------------------------##
-  ## clusters by sample
-  ##--------------------------------------------------------------------------##
-  message(
-    paste0(
-      '[', format(Sys.time(), '%H:%M:%S'),
-      '] Stratifying clusters by samples...'
-    )
-  )
-  temp_data <- export$cells %>%
-    dplyr::group_by(.data$cluster, sample) %>%
-    dplyr::summarize(count = dplyr::n()) %>%
-    tidyr::spread(sample, count, fill = 0) %>%
-    dplyr::ungroup()
-  export$clusters$by_samples <- temp_data %>%
-    dplyr::mutate(total_cell_count = rowSums(temp_data[c(2:ncol(temp_data))])) %>%
-    dplyr::select(c('cluster', 'total_cell_count', dplyr::everything())) %>%
-    dplyr::arrange(factor(.data$cluster, levels = cluster_names))
-  ##--------------------------------------------------------------------------##
-  ## cell cycle Seurat (if present)
-  ##--------------------------------------------------------------------------##
-  if ( !is.null(column_cell_cycle_seurat) &&
-    column_cell_cycle_seurat %in% names(object@meta.data) )
-  {
-    message(
-      paste0(
-        '[', format(Sys.time(), '%H:%M:%S'),
-        '] Processing cell cycle data generated by Seurat...'
-      )
-    )
-    export$cells$cell_cycle_seurat <- object@meta.data[[column_cell_cycle_seurat]]
-    # by sample
-    temp_data <- export$cells %>%
-      dplyr::group_by(sample, .data$cell_cycle_seurat) %>%
-      dplyr::summarize(count = dplyr::n()) %>%
-      tidyr::spread(.data$cell_cycle_seurat, count, fill = 0) %>%
-      dplyr::ungroup()
-    export$samples$by_cell_cycle_seurat <- temp_data %>%
-      dplyr::mutate(total_cell_count = rowSums(temp_data[c(2:ncol(temp_data))])) %>%
-      dplyr::select(c('sample', 'total_cell_count', dplyr::everything())) %>%
-      dplyr::arrange(factor(sample, levels = sample_names))
-    # by cluster
-    temp_data <- export$cells %>%
-      dplyr::group_by(.data$cluster, .data$cell_cycle_seurat) %>%
-      dplyr::summarize(count = dplyr::n()) %>%
-      tidyr::spread(.data$cell_cycle_seurat, count, fill = 0) %>%
-      dplyr::ungroup()
-    export$clusters$by_cell_cycle_seurat <- temp_data %>%
-      dplyr::mutate(total_cell_count = rowSums(temp_data[c(2:ncol(temp_data))])) %>%
-      dplyr::select(c('cluster', 'total_cell_count', dplyr::everything())) %>%
-      dplyr::arrange(factor(.data$cluster, levels = cluster_names))
-    meta_data_columns <- meta_data_columns[-which(meta_data_columns == column_cell_cycle_seurat)]
-  }
-  ##--------------------------------------------------------------------------##
-  ## cell cycle Cyclone (if present)
-  ##--------------------------------------------------------------------------##
-  if ( !is.null(column_cell_cycle_cyclone) &&
-    column_cell_cycle_cyclone %in% names(object@meta.data) )
-  {
-    message(
-      paste0(
-        '[', format(Sys.time(), '%H:%M:%S'),
-        '] Processing cell cycle data generated by Cyclone...'
-      )
-    )
-    export$cells$cell_cycle_cyclone <- object@meta.data[[column_cell_cycle_cyclone]]
-    # by sample
-    temp_data <- export$cells %>%
-      dplyr::group_by(sample, .data$cell_cycle_cyclone) %>%
-      dplyr::summarize(count = dplyr::n()) %>%
-      tidyr::spread(.data$cell_cycle_cyclone, count, fill = 0) %>%
-      dplyr::ungroup()
-    export$samples$by_cell_cycle_cyclone <- temp_data %>%
-      dplyr::mutate(total_cell_count = rowSums(temp_data[c(2:ncol(temp_data))])) %>%
-      dplyr::select(c('sample', 'total_cell_count', dplyr::everything())) %>%
-      dplyr::arrange(factor(sample, levels = sample_names))
-    # by cluster
-    temp_data <- export$cells %>%
-      dplyr::group_by(.data$cluster, .data$cell_cycle_cyclone) %>%
-      dplyr::summarize(count = dplyr::n()) %>%
-      tidyr::spread(.data$cell_cycle_cyclone, count, fill = 0) %>%
-      dplyr::ungroup()
-    export$clusters$by_cell_cycle_cyclone <- temp_data %>%
-      dplyr::mutate(total_cell_count = rowSums(temp_data[c(2:ncol(temp_data))])) %>%
-      dplyr::select(c('cluster', 'total_cell_count', dplyr::everything())) %>%
-      dplyr::arrange(factor(.data$cluster, levels = cluster_names))
-    meta_data_columns <- meta_data_columns[-which(meta_data_columns == column_cell_cycle_cyclone)]
-  }
-  ##--------------------------------------------------------------------------##
   ## cell barcode
   ##--------------------------------------------------------------------------##
-  if ( !is.null(rownames(as.data.frame(object@meta.data))) ) {
+  if ( !is.null(rownames(as.data.frame(object@meta.data))) )
+  {
     export$cells$cell_barcode <- rownames(as.data.frame(object@meta.data))
   }
   ##--------------------------------------------------------------------------##
   ## add all other meta data if specified
   ##--------------------------------------------------------------------------##
-  if ( add_all_meta_data ) {
+  if ( add_all_meta_data )
+  {
     message(
       paste0(
         '[', format(Sys.time(), '%H:%M:%S'),
@@ -354,7 +219,8 @@ exportFromSeurat <- function(
   ##--------------------------------------------------------------------------##
   ## most expressed genes
   ##--------------------------------------------------------------------------##
-  if ( !is.null(object@misc$most_expressed_genes) ) {
+  if ( !is.null(object@misc$most_expressed_genes) )
+  {
     message(
       paste0(
         '[', format(Sys.time(), '%H:%M:%S'),
@@ -366,7 +232,8 @@ exportFromSeurat <- function(
   ##--------------------------------------------------------------------------##
   ## marker genes
   ##--------------------------------------------------------------------------##
-  if ( !is.null(object@misc$marker_genes) ) {
+  if ( !is.null(object@misc$marker_genes) )
+  {
     message(
       paste0(
         '[', format(Sys.time(), '%H:%M:%S'),
@@ -378,7 +245,8 @@ exportFromSeurat <- function(
   ##--------------------------------------------------------------------------##
   ## enriched pathways
   ##--------------------------------------------------------------------------##
-  if ( !is.null(object@misc$enriched_pathways) ) {
+  if ( !is.null(object@misc$enriched_pathways) )
+  {
     message(
       paste0(
         '[', format(Sys.time(), '%H:%M:%S'),
@@ -397,7 +265,8 @@ exportFromSeurat <- function(
     )
   )
   export$projections <- list()
-  if ( object@version < 3 ) {
+  if ( object@version < 3 )
+  {
     projections_available <- names(object@dr)
     projections_available_pca <- projections_available[grep(
       projections_available, pattern = 'pca', ignore.case = TRUE, invert = FALSE
@@ -405,9 +274,11 @@ exportFromSeurat <- function(
     projections_available_non_pca <- projections_available[grep(
       projections_available, pattern = 'pca', ignore.case = TRUE, invert = TRUE
     )]
-    if ( length(projections_available) == 0 ) {
+    if ( length(projections_available) == 0 )
+    {
       stop('Warning: No dimensional reductions available.', call. = FALSE)
-    } else if ( length(projections_available) == 1 &&
+    } else if (
+      length(projections_available) == 1 &&
       length(projections_available_pca) == 1 )
     {
       warning(
@@ -420,7 +291,8 @@ exportFromSeurat <- function(
       export$projections[[projections_available]] <- as.data.frame(
         object@dr[[projections_available]]@cell.embeddings
       )
-    } else if ( length(projections_available_non_pca) > 0 ) {
+    } else if ( length(projections_available_non_pca) > 0 )
+    {
       message(
         paste0(
           '[', format(Sys.time(), '%H:%M:%S'), '] ',
@@ -428,11 +300,13 @@ exportFromSeurat <- function(
           paste(projections_available_non_pca, collapse = ', ')
         )
       )
-      for ( i in projections_available_non_pca ) {
+      for ( i in projections_available_non_pca )
+      {
         export$projections[[i]] <- as.data.frame(object@dr[[i]]@cell.embeddings)
       }
     }
-  } else {
+  } else
+  {
     projections_available <- names(object@reductions)
     projections_available_pca <- projections_available[grep(
       projections_available, pattern = 'pca', ignore.case = TRUE, invert = FALSE
@@ -440,9 +314,11 @@ exportFromSeurat <- function(
     projections_available_non_pca <- projections_available[grep(
       projections_available, pattern = 'pca', ignore.case = TRUE, invert = TRUE
     )]
-    if ( length(projections_available) == 0 ) {
+    if ( length(projections_available) == 0 )
+    {
       stop('Warning: No dimensional reductions available.', call. = FALSE)
-    } else if ( length(projections_available) == 1 &&
+    } else if (
+      length(projections_available) == 1 &&
       length(projections_available_pca) == 1 )
     {
       export$projections[[projections_available]] <- as.data.frame(
@@ -455,7 +331,8 @@ exportFromSeurat <- function(
           'UMAP instead.'
         )
       )
-    } else if ( length(projections_available_non_pca) >= 1 ) {
+    } else if ( length(projections_available_non_pca) >= 1 )
+    {
       message(
         paste0(
           '[', format(Sys.time(), '%H:%M:%S'), '] ',
@@ -463,7 +340,8 @@ exportFromSeurat <- function(
           paste(projections_available_non_pca, collapse = ', ')
         )
       )
-      for ( i in projections_available_non_pca ) {
+      for ( i in projections_available_non_pca )
+      {
         export$projections[[i]] <- as.data.frame(
           object@reductions[[i]]@cell.embeddings
         )
@@ -473,13 +351,15 @@ exportFromSeurat <- function(
   ##--------------------------------------------------------------------------##
   ## trajectories
   ##--------------------------------------------------------------------------##
-  if ( length(object@misc$trajectory) == 0 ) {
+  if ( length(object@misc$trajectory) == 0 )
+  {
     message(
       paste0(
         '[', format(Sys.time(), '%H:%M:%S'), '] No trajectories to extract...'
       )
     )
-  } else {
+  } else
+  {
     message(
       paste0(
         '[', format(Sys.time(), '%H:%M:%S'), '] ',
@@ -492,8 +372,10 @@ exportFromSeurat <- function(
   ##--------------------------------------------------------------------------##
   ## cluster tree
   ##--------------------------------------------------------------------------##
-  if ( object@version < 3 ) {
-    if ( !is.null(object@cluster.tree) ) {
+  if ( object@version < 3 )
+  {
+    if ( !is.null(object@cluster.tree) )
+    {
       message(
         paste0(
           '[', format(Sys.time(), '%H:%M:%S'), '] Extracting cluster tree...'
@@ -501,8 +383,10 @@ exportFromSeurat <- function(
       )
       export$clusters$tree <- object@cluster.tree[[1]]
     }
-  } else {
-    if ( !is.null(object@tools$BuildClusterTree) ) {
+  } else
+  {
+    if ( !is.null(object@tools$BuildClusterTree) )
+    {
       message(
         paste0(
           '[', format(Sys.time(), '%H:%M:%S'), '] Extracting cluster tree...'
@@ -520,9 +404,11 @@ exportFromSeurat <- function(
       '] Extracting log-normalized expression data...'
     )
   )
-  if ( object@version < 3 ) {
-    # check if `data` matrix exist in provided Seurat object
-    if ( ('data' %in% names(object) == FALSE ) ) {
+  if ( object@version < 3 )
+  {
+    ## check if `data` matrix exist in provided Seurat object
+    if ( ('data' %in% names(object) == FALSE ) )
+    {
       stop(
         paste0(
           '`data` matrix could not be found in provided Seurat ',
@@ -532,9 +418,11 @@ exportFromSeurat <- function(
       )
     }
     export$expression <- object@data
-  } else {
-    # check if provided assay exists
-    if ( (assay %in% names(object@assays) == FALSE ) ) {
+  } else
+  {
+    ## check if provided assay exists
+    if ( (assay %in% names(object@assays) == FALSE ) )
+    {
       stop(
         paste0(
           'Assay slot `', assay, '` could not be found in provided Seurat ',
@@ -543,8 +431,9 @@ exportFromSeurat <- function(
         call. = FALSE
       )
     }
-    # check if `data` matrix exist in provided assay
-    if ( is.null(object@assays[[assay]]@data) ) {
+    ## check if `data` matrix exist in provided assay
+    if ( is.null(object@assays[[assay]]@data) )
+    {
       stop(
         paste0(
           '`data` matrix could not be found in `', assay, '` assay slot.'
@@ -557,7 +446,8 @@ exportFromSeurat <- function(
   ##--------------------------------------------------------------------------##
   ## save export object to disk
   ##--------------------------------------------------------------------------##
-  if ( !file.exists(dirname(file)) ) {
+  if ( !file.exists(dirname(file)) )
+  {
     message(
       paste0(
         '[', format(Sys.time(), '%H:%M:%S'),
