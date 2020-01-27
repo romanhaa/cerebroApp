@@ -4,20 +4,10 @@
 \alias{getMarkerGenes}
 \title{Get marker genes for every sample and cluster in Seurat object.}
 \usage{
-getMarkerGenes(
-  object,
-  assay = "RNA",
-  organism = NULL,
-  column_sample = "sample",
-  column_cluster = "cluster",
-  only_pos = TRUE,
-  min_pct = 0.7,
-  thresh_logFC = 0.25,
-  thresh_p_val = 0.01,
-  test = "wilcox",
-  verbose = TRUE,
-  ...
-)
+getMarkerGenes(object, assay = "RNA", organism = NULL,
+  column_sample = "sample", column_cluster = "cluster",
+  only_pos = TRUE, min_pct = 0.7, thresh_logFC = 0.25,
+  thresh_p_val = 0.01, test = "wilcox", verbose = TRUE, ...)
 }
 \arguments{
 \item{object}{Seurat object.}

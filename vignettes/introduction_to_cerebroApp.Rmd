@@ -1,6 +1,10 @@
 ---
-title: "Introduction to cerebroApp"
-output: rmarkdown::html_vignette
+title: Introduction to cerebroApp
+author: Roman Hillje
+date: 27.01.2020
+output:
+  rmarkdown::html_vignette:
+    toc: true
 vignette: >
   %\VignetteIndexEntry{Introduction to cerebroApp}
   %\VignetteEngine{knitr::rmarkdown}
@@ -14,9 +18,36 @@ knitr::opts_chunk$set(
 )
 ```
 
-## Load packages
+# Introduction
 
-To do the analysis, we load the following libraries.
+The `cerebroApp` package has two main purposes: (1) Give access to the Cerebro user interface, and (2) provide a set of functions to pre-process and export scRNA-seq data for visualization in Cerebro.
+The Cerebro user interface was built using the Shiny framework and designed to provide numerous perspectives on a given data set that should facilitate data interpretation.
+This vignette will give you an example of how scRNA-seq data can be processed using the [`Seurat toolkit`](https://satijalab.org/seurat/) and then exported for visualization in Cerebro.
+
+Ket features that can be accessed through Cerebro:
+
+* Interactive 2D and 3D dimensional reductions.
+* Sample and cluster overview panels.
+* Tables of most expressed genes and marker genes for samples and clusters.
+* Tables of enriched pathways for samples and clusters.
+* Query gene(s) and gene sets from MSigDB and show their expression in dimensional reductions.
+* Visualize trajectories calculated with Monocle v2.
+* All plots can be exported to PNG. In addition, 2D dimensional reductions can be exported to PDF.
+* Tables can be downloaded in CSV or Excel format.
+
+# Installation
+
+Before starting the workflow, we need to install `cerebroApp`, as well as the [`Seurat`](https://satijalab.org/seurat/) and [`monocle`](http://cole-trapnell-lab.github.io/monocle-release/) packages, which are not installed as dependencies of `cerebroApp` because they are only necessary if you want/need to pre-process your scRNA-seq data but not if you just want to launch the Cerebro user interface, e.g. because you already have the pre-processed data.
+
+```{r installation}
+if ( 'cerebroApp' %in% installed.packages() == FALSE ) BiocManager::install('cerebroApp')
+if ( 'Seurat' %in% installed.packages() == FALSE ) BiocManager::install('Seurat')
+if ( 'monocle' %in% installed.packages() == FALSE ) BiocManager::install('monocle')
+```
+
+# Load packages
+
+Apart from the packages we just installed, we will also load the `dplyr` and `devtools` packages and set a seed to make our analysis reproducible.
 
 ```{r setup, message=FALSE, warning=FALSE}
 library(dplyr)
@@ -28,9 +59,9 @@ library(devtools)
 set.seed(1234567)
 ```
 
-## Load count data
+# Load count data
 
-First, we load a small example transcript count table from the Seurat package.
+In this example workflow, we will load a small transcript count table from the [`Seurat`](https://satijalab.org/seurat/) package containing 80 cells and 230 genes.
 
 ```{r load_data}
 pbmc <- read.table(
@@ -39,10 +70,11 @@ pbmc <- read.table(
 )
 ```
 
-## Pre-processing with Seurat
+# Pre-processing with Seurat
 
-Now, we create a Seurat object and remove cells with less than `50` transcripts or fewer than `10` expressed genes (these cut-offs are only reasonable for this example data set and would probably need to be adjusted in a real data set).
-Then, we follow the standard Seurat workflow, including...
+Now, we create a Seurat object and filter out cells with less than `50` transcripts or fewer than `10` expressed genes.
+Those cut-offs are only reasonable for this example data set and will likely need to be adjusted in a real data set.
+Then, we follow the [standard Seurat workflow](https://satijalab.org/seurat/essential_commands.html), including...
 
 * log-normalization of transcript counts,
 * identification of highly variably genes,
@@ -62,9 +94,9 @@ seurat <- ScaleData(seurat, vars.to.regress = 'nCount_RNA', verbose = FALSE)
 seurat <- RunPCA(seurat, features = seurat@assays$RNA@var.features, verbose = FALSE)
 ```
 
-## Clustering
+# Clustering
 
-Then, we identify neighbors and clusters and build a cluster tree that represents the similarity between clusters.
+Then, we identify clusters and build a cluster tree that represents the similarity between clusters.
 
 ```{r clustering}
 seurat <- FindNeighbors(seurat, verbose = FALSE)
@@ -78,10 +110,10 @@ seurat <- BuildClusterTree(
 )
 ```
 
-## Cell cycle analysis
+# Cell cycle analysis
 
 We could also perform cell cycle analysis using the `CellCycleScoring()` built into Seurat.
-However, too few of the cell cycle genes are present in this example data set so we will skip it.
+However, too few of the cell cycle genes are present in this example data set so we will skip it here.
 The code below should work with a real data set.
 
 ```{r cell_cycle_analysis, eval=FALSE}
@@ -95,7 +127,7 @@ seurat@misc$gene_lists$G2M_phase_genes <- cc.genes$g2m.genes
 seurat@misc$gene_lists$S_phase_genes <- cc.genes$s.genes
 ```
 
-## Dimensional reduction
+# Dimensional reduction
 
 Next, we use the UMAP technique to generate two- and three-dimensional projections.
 
@@ -121,10 +153,10 @@ seurat <- RunUMAP(
 )
 ```
 
-## Curate meta data
+# Curate meta data
 
 This example data set consists of a single sample so we just add that name to the meta data.
-Moreover, in order to be able to understand how we did the analysis later , we add some meta data to the `misc` slot of the Seurat object.
+Moreover, in order to be able to understand how we did the analysis later, we add some meta data to the `misc` slot of our Seurat object.
 
 ```{r prepare_meta_data}
 seurat@meta.data$sample <- factor('pbmc', levels = 'pbmc')
@@ -157,9 +189,9 @@ seurat@misc$technical_info <- list(
 )
 ```
 
-## cerebroApp functions (optional but recommended)
+# cerebroApp functions (optional but recommended)
 
-Using the functions provided by cerebroApp, we check the percentage of mitochondrial and ribosomal genes and, for every sample and cluster, we...
+Using the functions provided by `cerebroApp`, we check the percentage of mitochondrial and ribosomal genes and, for every sample (even though we have only one) and cluster, we...
 
 * get the 100 most expressed genes,
 * identify marker genes (with the `FindAllMarkers` of Seurat),
@@ -208,10 +240,10 @@ seurat <- performGeneSetEnrichmentAnalysis(
 )
 ```
 
-## Trajectory analysis with Monocle (optional)
+# Trajectory analysis with Monocle (optional)
 
-Then, we perform trajectory analysis with Monocle using the previously identified highly variable genes.
-We extract the trajectory from the generated Monocle object with the `extractMonocleTrajectory()` function of cerebroApp and attach it to our Seurat object.
+Then, we perform trajectory analysis with [`monocle v2`](http://cole-trapnell-lab.github.io/monocle-release/) using the previously identified highly variable genes.
+We extract the trajectory from the generated Monocle object with the `extractMonocleTrajectory()` function of `cerebroApp` and attach it to our Seurat object.
 
 ```{r analysis_with_monocle}
 monocle <- newCellDataSet(
@@ -232,9 +264,9 @@ monocle <- orderCells(monocle)
 seurat <- extractMonocleTrajectory(monocle, seurat, 'highly_variable_genes')
 ```
 
-## Export to Cerebro format
+# Export to Cerebro format
 
-Finally, we use the `exportFromSeurat()` function of cerebroApp to export our Seurat object to a `.crb` file which can be loaded into Cerebro.
+Finally, we use the `exportFromSeurat()` function of `cerebroApp` to export our Seurat object to a `.crb` file which can be loaded into Cerebro.
 
 ```{r export_data}
 exportFromSeurat(
@@ -248,4 +280,10 @@ exportFromSeurat(
 )
 ```
 
-The exported `.crb` file can be loaded from the Cerebro interface (`launchCerebro()`).
+The Cerebro use interface can be launched using the `launchCerebro()` function.
+
+# Session info
+
+```{r session_info}
+sessionInfo()
+```
