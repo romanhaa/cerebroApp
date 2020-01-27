@@ -15,6 +15,7 @@
 #' @importFrom msigdbr msigdbr
 #' @importFrom plotly layout plot_ly plotlyOutput renderPlotly toWebGL
 #' @importFrom reshape2 melt
+#' @importFrom tidyr spread
 #' @import scales
 #' @import shiny
 #' @import shinydashboard

@@ -4,9 +4,16 @@
 \alias{performGeneSetEnrichmentAnalysis}
 \title{Perform gene set enrichment analysis with GSVA.}
 \usage{
-performGeneSetEnrichmentAnalysis(object, assay = "RNA", GMT_file,
-  column_sample = "sample", column_cluster = "cluster",
-  thresh_p_val = 0.05, thresh_q_val = 0.1, ...)
+performGeneSetEnrichmentAnalysis(
+  object,
+  assay = "RNA",
+  GMT_file,
+  column_sample = "sample",
+  column_cluster = "cluster",
+  thresh_p_val = 0.05,
+  thresh_q_val = 0.1,
+  ...
+)
 }
 \arguments{
 \item{object}{Seurat object.}

@@ -40,9 +40,13 @@ Ket features that can be accessed through Cerebro:
 Before starting the workflow, we need to install `cerebroApp`, as well as the [`Seurat`](https://satijalab.org/seurat/) and [`monocle`](http://cole-trapnell-lab.github.io/monocle-release/) packages, which are not installed as dependencies of `cerebroApp` because they are only necessary if you want/need to pre-process your scRNA-seq data but not if you just want to launch the Cerebro user interface, e.g. because you already have the pre-processed data.
 
 ```{r installation}
-if ( 'cerebroApp' %in% installed.packages() == FALSE ) BiocManager::install('cerebroApp')
-if ( 'Seurat' %in% installed.packages() == FALSE ) BiocManager::install('Seurat')
-if ( 'monocle' %in% installed.packages() == FALSE ) BiocManager::install('monocle')
+if ( 'BiocManager' %in% installed.packages() == FALSE ) install.packages('BiocManager')
+
+library(BiocManager)
+
+if ( 'cerebroApp' %in% installed.packages() == FALSE ) install('cerebroApp')
+if ( 'Seurat' %in% installed.packages() == FALSE ) install('Seurat')
+if ( 'monocle' %in% installed.packages() == FALSE ) install('monocle')
 ```
 
 # Load packages
@@ -185,7 +189,7 @@ seurat@misc$parameters$filtering <- list(
 )
 
 seurat@misc$technical_info <- list(
-  'R' = capture.output(devtools::session_info())
+  'R' = capture.output(session_info())
 )
 ```
 

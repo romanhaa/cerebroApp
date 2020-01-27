@@ -5,8 +5,12 @@
 \title{Get most expressed genes for every sample and cluster in Seurat
 object.}
 \usage{
-getMostExpressedGenes(object, assay = "RNA", column_sample = "sample",
-  column_cluster = "cluster")
+getMostExpressedGenes(
+  object,
+  assay = "RNA",
+  column_sample = "sample",
+  column_cluster = "cluster"
+)
 }
 \arguments{
 \item{object}{Seurat object.}
