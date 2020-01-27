@@ -48,5 +48,3 @@ output$load_data_organism <- renderValueBox({
     sample_data()$experiment$organism
   )
 })
-
-

@@ -28,4 +28,3 @@ geneSetExpression_by_cluster_info <- list(
   title = "Expression levels by cluster",
   text = p("Average log-normalised expression of genes in selected gene set by cluster.")
 )
-

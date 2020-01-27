@@ -41,7 +41,3 @@ clusters_by_cell_cycle_cyclone_info <- list(
   title = "Cell cycle analysis (Cyclone)",
   text = p("Cell cycle distribution by cluster using the machine learning-based Cyclone method published by Scialdone et al (2015). It assigns the cell cycle phase based on scores calculated using relative expression of lists of gene pairs. In contrast to the Seurat method, scores are calculated for G1 and G2M phase. Cells with a low score for both are assigned S phase.")
 )
-
-
-
-

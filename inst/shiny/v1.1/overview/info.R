@@ -17,7 +17,3 @@ overview_projection_info <- list(
     "The plot is interactive (drag and zoom) but depending on the computer of the user and the number of cells displayed it can become very slow."
   )
 )
-
-
-
-

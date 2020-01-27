@@ -152,7 +152,7 @@ gene_expression_plot_data <- reactive({
   plot_order <- input[["expression_projection_plotting_order"]]
   # check which cells to display
   cells_to_display <- which(
-      grepl(sample_data()$cells$sample, pattern = paste0("^", samples_to_display, "$", collapse = "|")) == TRUE & 
+      grepl(sample_data()$cells$sample, pattern = paste0("^", samples_to_display, "$", collapse = "|")) == TRUE &
       grepl(sample_data()$cells$cluster, pattern = paste0("^", clusters_to_display, "$", collapse = "|")) == TRUE
     )
   # randomly remove cells
@@ -630,5 +630,3 @@ observeEvent(input[["expression_by_gene_info"]], {
     )
   )
 })
-
-

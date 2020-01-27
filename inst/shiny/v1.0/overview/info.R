@@ -5,7 +5,7 @@
 overview_projection_info <- list(
   title = "Dimensional reduction",
   text = p(
-    "Interactive projection of cells into 2-dimensional space based on their expression profile.", 
+    "Interactive projection of cells into 2-dimensional space based on their expression profile.",
     tags$ul(
       tags$li("Both tSNE and UMAP are frequently used algorithms for dimensional reduction in single cell transcriptomics. While they generally allow to make similar conclusions, some differences exist between the two (please refer to Google)."),
       tags$li("Cells can be colored by the sample they came from, the cluster they were assigned, the number of transcripts or expressed genes, percentage of mitochondrial and ribosomal gene expression, an apoptotic score (calculated based on the expression of few marker genes; more info in the 'Sample info' tab on the left), or cell cycle status (determined using the Seurat and Cyclone method)."),
@@ -17,7 +17,3 @@ overview_projection_info <- list(
     "The plot is interactive (drag and zoom) but depending on the computer of the user and the number of cells displayed it can become very slow."
   )
 )
-
-
-
-

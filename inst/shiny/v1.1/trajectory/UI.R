@@ -6,4 +6,3 @@ tab_trajectory <- tabItem(
   tabName = "trajectory",
   uiOutput("trajectory_UI")
 )
-

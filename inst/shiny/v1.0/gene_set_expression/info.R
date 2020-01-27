@@ -5,7 +5,7 @@
 geneSetExpression_projection_info <- list(
   title = "Dimensional reduction",
   text = p(
-    "Interactive projection of cells into 2-dimensional space based on their expression profile.", 
+    "Interactive projection of cells into 2-dimensional space based on their expression profile.",
     tags$ul(
       tags$li("Both tSNE and UMAP are frequently used algorithms for dimensional reduction in single cell transcriptomics. While they generally allow to make similar conclusions, some differences exist between the two (please refer to Google)."),
       tags$li("For human and murine data sets, all organism-specific gene sets from the MSigDB can be selected. If the experiment was performed in another organism, the murine gene sets will be available."),
@@ -28,4 +28,3 @@ geneSetExpression_by_cluster_info <- list(
   title = "Expression levels by cluster",
   text = p("Average log-normalised expression of genes in selected gene set by cluster.")
 )
-

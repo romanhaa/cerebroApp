@@ -631,5 +631,3 @@ observeEvent(input[["expression_by_gene_info"]], {
     )
   )
 })
-
-

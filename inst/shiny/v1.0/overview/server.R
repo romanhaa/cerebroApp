@@ -65,7 +65,7 @@ output[["overview_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 output[["overview_scales"]] <- renderUI({
   projection_to_display <- if ( is.null(input[["overview_projection_to_display"]]) || is.na(input[["overview_projection_to_display"]]) ) {
-    names(sample_data()$projections)[1] 
+    names(sample_data()$projections)[1]
   } else {
     input[["overview_projection_to_display"]]
   }
@@ -116,7 +116,7 @@ output[["overview_projection"]] <- plotly::renderPlotly({
       grepl(
         sample_data()$cells$sample,
         pattern = paste0("^", samples_to_display, "$", collapse="|")
-      ) & 
+      ) &
       grepl(
         sample_data()$cells$cluster,
         pattern = paste0("^", clusters_to_display, "$", collapse="|")
