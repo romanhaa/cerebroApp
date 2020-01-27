@@ -10,6 +10,8 @@
       \item New button for composition plots that allows to show/hide the respective table of numbers behind them.
       \item New tab "Color Management": Users can now change the color assigned to each sample/cluster.
       \item "Gene expression" and "Gene set expression" panels: Users can now pick from a set of color scales and adjust the color range.
+      \item It is now possible to export assays other than \texttt{RNA} through the \texttt{assay} parameter in relevant functions.
+      \item Launch old Cerebro interfaces through \texttt{version} parameter in \texttt{launchCerebro()}.
     }
     \item Other changes:
     \itemize{
