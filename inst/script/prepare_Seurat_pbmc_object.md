@@ -1,3 +1,6 @@
+# How to generate the Seurat PBMC example data set used in the examples parts of cerebroApp function
+
+```r
 library(Seurat)
 library(cerebroApp)
 
@@ -35,3 +38,4 @@ pbmc <- getMarkerGenes(
 )
 
 saveRDS(pbmc, 'inst/extdata/v1.2/seurat_pbmc.rds')
+```

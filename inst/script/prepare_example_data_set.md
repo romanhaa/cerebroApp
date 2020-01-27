@@ -1,4 +1,9 @@
+# How to generate the pre-loaded example data set for the Cerebro user interface
 
+```r
+## download the .crb file of the 10k PBMC example from the Cerebro GitHub
+## repository
+## https://github.com/romanhaa/Cerebro/tree/master/examples
 data <- readRDS('cerebro_pbmc_10k_v3_2019-10-10.crb')
 
 data$cells$cell_cycle_cyclone <- data$cells$cell_cycle_seurat
@@ -76,3 +81,4 @@ data$trajectory$monocle2$all_cells$meta <- data$trajectory$monocle2$all_cells$me
 data$trajectory$monocle2$subset_of_cells$meta <- data$trajectory$monocle2$subset_of_cells$meta[cells,]
 
 saveRDS(data, 'example.rds')
+```

@@ -68,7 +68,7 @@ addPercentMtRibo <- function(
   genes_mt <- readr::read_tsv(
       system.file(
         paste0(
-          'extdata/genes_mt_', organism, '_', gene_nomenclature, '.txt'
+          'extdata/genes_mt_', organism, '_', gene_nomenclature, '.tsv.gz'
         ),
         package = 'cerebroApp'
       ),
@@ -81,7 +81,7 @@ addPercentMtRibo <- function(
   genes_ribo <- readr::read_tsv(
       system.file(
         paste0(
-          'extdata/genes_ribo_', organism, '_', gene_nomenclature, '.txt'
+          'extdata/genes_ribo_', organism, '_', gene_nomenclature, '.tsv.gz'
         ),
         package = 'cerebroApp'
       ),

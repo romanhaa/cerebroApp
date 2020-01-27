@@ -5,12 +5,12 @@
 output[["gene_info"]] <- DT::renderDataTable({
   if ( input[["geneIdConversion_organism"]] == "mouse" ) {
     conversion_table <- read.table(
-      system.file("extdata/mm10_gene_ID_name.txt.gz", package = "cerebroApp"),
+      system.file("extdata/mm10_gene_ID_name.tsv.gz", package = "cerebroApp"),
       sep = "\t", header = TRUE, stringsAsFactors = FALSE
     )
   } else if ( input[["geneIdConversion_organism"]] == "human" ) {
     conversion_table <- read.table(
-      system.file("extdata/hg38_gene_ID_name.txt.gz", package = "cerebroApp"),
+      system.file("extdata/hg38_gene_ID_name.tsv.gz", package = "cerebroApp"),
       sep = "\t", header = TRUE, stringsAsFactors = FALSE
     )
   }
