@@ -39,15 +39,11 @@ getMostExpressedGenes <- function(
     )
   }
   ##--------------------------------------------------------------------------##
-  ## create backup of Seurat object (probably not necessary)
-  ##--------------------------------------------------------------------------##
-  temp_seurat <- object
-  ##--------------------------------------------------------------------------##
   ## create slot for results in Seurat object if not already existing
   ##--------------------------------------------------------------------------##
-  if ( is.null(temp_seurat@misc$most_expressed_genes) )
+  if ( is.null(object@misc$most_expressed_genes) )
   {
-    temp_seurat@misc$most_expressed_genes <- list()
+    object@misc$most_expressed_genes <- list()
   }
   ##--------------------------------------------------------------------------##
   ## samples
@@ -59,29 +55,44 @@ getMostExpressedGenes <- function(
   ## - sort by sample (probably not necessary)
   ## - store results in Seurat object
   ##--------------------------------------------------------------------------##
-  if (
-    !is.null(column_sample) &&
-    column_sample %in% names(temp_seurat@meta.data)
-  )
+  if ( is.null(column_sample) )
+  {
+    warning(
+      paste0(
+        'Parameter `column_sample` not provided. Will skip calculation of ',
+        'expressed genes for samples.'
+      )
+    )
+  } else if ( column_sample %in% names(object@meta.data) == FALSE )
+  {
+    stop(
+      paste0(
+        'Sample column (`column_sample`) could not be found in data. Please ',
+        'provide an existing column name or NULL if you want to skip ',
+        'calculation of most expressed genes for samples.'
+      ),
+      call. = FALSE
+    )
+  } else
   {
     #
-    if ( is.factor(temp_seurat@meta.data[[column_sample]]) )
+    if ( is.factor(object@meta.data[[column_sample]]) )
     {
-      sample_names <- levels(temp_seurat@meta.data[[column_sample]])
+      sample_names <- levels(object@meta.data[[column_sample]])
     } else
     {
-      sample_names <- unique(temp_seurat@meta.data[[column_sample]])
+      sample_names <- unique(object@meta.data[[column_sample]])
       if ( any(is.na(sample_names)) )
       {
         number_of_NA_in_sample_column <- which(is.na(sample_names)) %>% length()
         sample_names <- stats::na.omit(sample_names)
-        message(
+        warning(
           paste0(
-            '[', format(Sys.time(), '%H:%M:%S'), '] Found ',
-            number_of_NA_in_sample_column, ' cell(s) without cluster ',
+            'Found ', number_of_NA_in_sample_column, ' cell(s) without sample ',
             'information (NA). These cells will be ignored during this ',
             'analysis.'
-          )
+          ),
+          call. = FALSE
         )
       }
     }
@@ -93,7 +104,7 @@ getMostExpressedGenes <- function(
           '] Get most expressed genes by sample...'
         )
       )
-      if ( temp_seurat@version < 3 )
+      if ( object@version < 3 )
       {
         ## check if `data` matrix exist in provided Seurat object
         if ( ('raw.data' %in% names(object) == FALSE ) )
@@ -108,10 +119,10 @@ getMostExpressedGenes <- function(
         }
         results <- pbapply::pblapply(sample_names, function(x)
         {
-          temp_table <- temp_seurat@raw.data %>%
+          temp_table <- object@raw.data %>%
             as.matrix() %>%
             as.data.frame(stringsAsFactors = FALSE) %>%
-            dplyr::select(which(temp_seurat@meta.data[[column_sample]] == x))
+            dplyr::select(which(object@meta.data[[column_sample]] == x))
           temp_genes <- rownames(temp_table)
           temp_table <- temp_table %>%
             dplyr::mutate(
@@ -150,10 +161,10 @@ getMostExpressedGenes <- function(
         }
         results <- pbapply::pblapply(sample_names, function(x)
         {
-          temp_table <- temp_seurat@assays[[assay]]@counts %>%
+          temp_table <- object@assays[[assay]]@counts %>%
             as.matrix() %>%
             as.data.frame(stringsAsFactors = FALSE) %>%
-            dplyr::select(which(temp_seurat@meta.data[[column_sample]] == x))
+            dplyr::select(which(object@meta.data[[column_sample]] == x))
           temp_genes <- rownames(temp_table)
           temp_table <- temp_table %>%
             dplyr::mutate(
@@ -170,7 +181,7 @@ getMostExpressedGenes <- function(
       }
       most_expressed_genes_by_sample <- do.call(rbind, results) %>%
         dplyr::mutate(sample = factor(.data$sample, levels = sample_names))
-      temp_seurat@misc$most_expressed_genes$by_sample <- most_expressed_genes_by_sample
+      object@misc$most_expressed_genes$by_sample <- most_expressed_genes_by_sample
     }
   }
   ##--------------------------------------------------------------------------##
@@ -183,29 +194,44 @@ getMostExpressedGenes <- function(
   ## - sort by cluster (probably not necessary)
   ## - store results in Seurat object
   ##--------------------------------------------------------------------------##
-  if (
-    !is.null(column_cluster) &&
-    column_cluster %in% names(temp_seurat@meta.data)
-  )
+  if ( is.null(column_cluster) )
   {
-    if ( is.factor(temp_seurat@meta.data[[column_cluster]]) )
+    warning(
+      paste0(
+        'Parameter `column_cluster` not provided. Will skip calculation of ',
+        'expressed genes for clusters.'
+      )
+    )
+  } else if ( column_cluster %in% names(object@meta.data) == FALSE )
+  {
+    stop(
+      paste0(
+        'Cluster column (`column_cluster`) could not be found in data. Please ',
+        'provide an existing column name or NULL if you want to skip ',
+        'calculation of most expressed genes for clusters.'
+      ),
+      call. = FALSE
+    )
+  } else
+  {
+    if ( is.factor(object@meta.data[[column_cluster]]) )
     {
-      cluster_names <- levels(temp_seurat@meta.data[[column_cluster]])
+      cluster_names <- levels(object@meta.data[[column_cluster]])
     } else
     {
-      cluster_names <- sort(unique(temp_seurat@meta.data[[column_cluster]]))
+      cluster_names <- sort(unique(object@meta.data[[column_cluster]]))
       if ( any(is.na(cluster_names)) )
       {
         number_of_NA_in_cluster_column <- which(is.na(cluster_names)) %>%
           length()
         cluster_names <- stats::na.omit(cluster_names)
-        message(
+        warning(
           paste0(
-            '[', format(Sys.time(), '%H:%M:%S'), '] Found ',
-            number_of_NA_in_cluster_column, ' cell(s) without cluster ',
-            'information (NA). These cells will be ignored during this ',
-            'analysis.'
-          )
+            'Found ', number_of_NA_in_cluster_column, ' cell(s) without ',
+            'cluster information (NA). These cells will be ignored during ',
+            'this analysis.'
+          ),
+          call. = FALSE
         )
       }
     }
@@ -217,14 +243,14 @@ getMostExpressedGenes <- function(
           '] Get most expressed genes by cluster...'
         )
       )
-      if ( temp_seurat@version < 3 )
+      if ( object@version < 3 )
       {
         results <- pbapply::pblapply(cluster_names, function(x)
         {
-          temp_table <- temp_seurat@raw.data %>%
+          temp_table <- object@raw.data %>%
             as.matrix() %>%
             as.data.frame(stringsAsFactors = FALSE) %>%
-            dplyr::select(which(temp_seurat@meta.data[[column_cluster]] == x))
+            dplyr::select(which(object@meta.data[[column_cluster]] == x))
           temp_genes <- rownames(temp_table)
           temp_table <- temp_table %>%
             dplyr::mutate(
@@ -263,10 +289,10 @@ getMostExpressedGenes <- function(
         }
         results <- pbapply::pblapply(cluster_names, function(x)
         {
-          temp_table <- temp_seurat@assays[[assay]]@counts %>%
+          temp_table <- object@assays[[assay]]@counts %>%
             as.matrix() %>%
             as.data.frame(stringsAsFactors = FALSE) %>%
-            dplyr::select(which(temp_seurat@meta.data[[column_cluster]] == x))
+            dplyr::select(which(object@meta.data[[column_cluster]] == x))
           temp_genes <- rownames(temp_table)
           temp_table <- temp_table %>%
             dplyr::mutate(
@@ -283,12 +309,12 @@ getMostExpressedGenes <- function(
       }
       most_expressed_genes_by_cluster <- do.call(rbind, results) %>%
         dplyr::mutate(cluster = factor(.data$cluster, levels = cluster_names))
-      temp_seurat@misc$most_expressed_genes$by_cluster <- most_expressed_genes_by_cluster
+      object@misc$most_expressed_genes$by_cluster <- most_expressed_genes_by_cluster
     }
   }
   ##--------------------------------------------------------------------------##
   ## return Seurat object
   ##--------------------------------------------------------------------------##
-  return(temp_seurat)
+  return(object)
 }
 

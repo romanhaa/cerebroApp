@@ -146,10 +146,6 @@ getMarkerGenes <- function(
     }
   }
   ##--------------------------------------------------------------------------##
-  ## make copy of Seurat object
-  ##--------------------------------------------------------------------------##
-  temp_seurat <- object
-  ##--------------------------------------------------------------------------##
   ## samples
   ## - get sample names
   ## - check if more than 1 sample exists
@@ -160,11 +156,11 @@ getMarkerGenes <- function(
   ## - store results in Seurat object
   ##--------------------------------------------------------------------------##
   #
-  if ( is.factor(temp_seurat@meta.data[[column_sample]]) )
+  if ( is.factor(object@meta.data[[column_sample]]) )
   {
-    sample_names <- levels(temp_seurat@meta.data[[column_sample]])
+    sample_names <- levels(object@meta.data[[column_sample]])
   } else {
-    sample_names <- unique(temp_seurat@meta.data[[column_sample]])
+    sample_names <- unique(object@meta.data[[column_sample]])
   }
   #
   if ( length(sample_names) > 1 )
@@ -174,14 +170,14 @@ getMarkerGenes <- function(
         '[', format(Sys.time(), '%H:%M:%S'), '] Get marker genes for samples...'
       )
     )
-    if ( temp_seurat@version < 3 )
+    if ( object@version < 3 )
     {
-      temp_seurat <- Seurat::SetAllIdent(temp_seurat, id = column_sample)
-      temp_seurat@ident <- factor(temp_seurat@ident, levels = sample_names)
+      object <- Seurat::SetAllIdent(object, id = column_sample)
+      object@ident <- factor(object@ident, levels = sample_names)
       if ( utils::packageVersion('Seurat') < 3 )
       {
         markers_by_sample <- Seurat::FindAllMarkers(
-          temp_seurat,
+          object,
           only.pos = only_pos,
           min.pct = min_pct,
           thresh.use = thresh_logFC,
@@ -204,7 +200,7 @@ getMarkerGenes <- function(
           )
         }
         markers_by_sample <- Seurat::FindAllMarkers(
-          temp_seurat,
+          object,
           assay = assay,
           only.pos = only_pos,
           min.pct = min_pct,
@@ -217,14 +213,14 @@ getMarkerGenes <- function(
       }
     } else
     {
-      Seurat::Idents(temp_seurat) <- factor(
-        temp_seurat@meta.data[[column_sample]],
+      Seurat::Idents(object) <- factor(
+        object@meta.data[[column_sample]],
         levels = sample_names
       )
       if ( utils::packageVersion('Seurat') < 3 )
       {
         markers_by_sample <- Seurat::FindAllMarkers(
-          temp_seurat,
+          object,
           only.pos = only_pos,
           min.pct = min_pct,
           thresh.use = thresh_logFC,
@@ -236,7 +232,7 @@ getMarkerGenes <- function(
       } else
       {
         markers_by_sample <- Seurat::FindAllMarkers(
-          temp_seurat,
+          object,
           assay = assay,
           only.pos = only_pos,
           min.pct = min_pct,
@@ -291,12 +287,12 @@ getMarkerGenes <- function(
   ## - add column with cell surface genes if present
   ##--------------------------------------------------------------------------##
   #
-  if ( is.factor(temp_seurat@meta.data[[column_cluster]]) )
+  if ( is.factor(object@meta.data[[column_cluster]]) )
   {
-    cluster_names <- levels(temp_seurat@meta.data[[column_cluster]])
+    cluster_names <- levels(object@meta.data[[column_cluster]])
   } else
   {
-    cluster_names <- unique(temp_seurat@meta.data[[column_cluster]]) %>% sort()
+    cluster_names <- unique(object@meta.data[[column_cluster]]) %>% sort()
   }
   #
   if ( length(cluster_names) > 1 )
@@ -306,14 +302,14 @@ getMarkerGenes <- function(
         '[', format(Sys.time(), '%H:%M:%S'), '] Get marker genes by cluster...'
       )
     )
-    if ( temp_seurat@version < 3 )
+    if ( object@version < 3 )
     {
-      temp_seurat <- Seurat::SetAllIdent(temp_seurat, id = column_cluster)
-      temp_seurat@ident <- factor(temp_seurat@ident, levels = cluster_names)
+      object <- Seurat::SetAllIdent(object, id = column_cluster)
+      object@ident <- factor(object@ident, levels = cluster_names)
       if ( utils::packageVersion('Seurat') < 3 )
       {
         markers_by_cluster <- Seurat::FindAllMarkers(
-          temp_seurat,
+          object,
           only.pos = only_pos,
           min.pct = min_pct,
           thresh.use = thresh_logFC,
@@ -336,7 +332,7 @@ getMarkerGenes <- function(
           )
         }
         markers_by_cluster <- Seurat::FindAllMarkers(
-          temp_seurat,
+          object,
           assay = assay,
           only.pos = only_pos,
           min.pct = min_pct,
@@ -349,14 +345,14 @@ getMarkerGenes <- function(
       }
     } else
     {
-      Seurat::Idents(temp_seurat) <- factor(
-        temp_seurat@meta.data[[column_cluster]],
+      Seurat::Idents(object) <- factor(
+        object@meta.data[[column_cluster]],
         levels = cluster_names
       )
       if ( utils::packageVersion('Seurat') < 3 )
       {
         markers_by_cluster <- Seurat::FindAllMarkers(
-          temp_seurat,
+          object,
           only.pos = only_pos,
           min.pct = min_pct,
           thresh.use = thresh_logFC,
@@ -368,7 +364,7 @@ getMarkerGenes <- function(
       } else
       {
         markers_by_cluster <- Seurat::FindAllMarkers(
-          temp_seurat,
+          object,
           assay = assay,
           only.pos = only_pos,
           min.pct = min_pct,
@@ -426,11 +422,11 @@ getMarkerGenes <- function(
       test = test
     )
   )
-  temp_seurat@misc$marker_genes <- results
+  object@misc$marker_genes <- results
   ##--------------------------------------------------------------------------##
   ## return Seurat object
   ##--------------------------------------------------------------------------##
-  return(temp_seurat)
+  return(object)
 }
 
 

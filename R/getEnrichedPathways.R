@@ -62,13 +62,9 @@ getEnrichedPathways <- function(
     )
   }
   ##--------------------------------------------------------------------------##
-  ## create backup of Seurat object (probably not necessary)
-  ##--------------------------------------------------------------------------##
-  temp_seurat <- object
-  ##--------------------------------------------------------------------------##
   ## check if marker genes are present and stop if they aren't
   ##--------------------------------------------------------------------------##
-  if ( is.null(temp_seurat@misc$marker_genes) )
+  if ( is.null(object@misc$marker_genes) )
   {
     stop(
       "No marker genes found. Please run 'getMarkerGenes()' first.",
@@ -85,9 +81,9 @@ getEnrichedPathways <- function(
   ## - try up to three times to run enrichR annotation (fails sometimes)
   ## - filter results
   ##--------------------------------------------------------------------------##
-  if ( !is.null(temp_seurat@misc$marker_genes$by_sample) )
+  if ( !is.null(object@misc$marker_genes$by_sample) )
   {
-    if ( is.data.frame(temp_seurat@misc$marker_genes$by_sample) )
+    if ( is.data.frame(object@misc$marker_genes$by_sample) )
     {
       message(
         paste0(
@@ -96,14 +92,14 @@ getEnrichedPathways <- function(
         )
       )
       #
-      markers_by_sample <- temp_seurat@misc$marker_genes$by_sample
+      markers_by_sample <- object@misc$marker_genes$by_sample
       #
-      if ( is.factor(temp_seurat@meta.data[[column_sample]]) )
+      if ( is.factor(object@meta.data[[column_sample]]) )
       {
-        sample_names <- levels(temp_seurat@meta.data[[column_sample]])
+        sample_names <- levels(object@meta.data[[column_sample]])
       } else
       {
-        sample_names <- unique(temp_seurat@meta.data[[column_sample]])
+        sample_names <- unique(object@meta.data[[column_sample]])
       }
       ## remove samples for which no marker genes were found
       sample_names <- intersect(sample_names, unique(markers_by_sample$sample))
@@ -183,7 +179,7 @@ getEnrichedPathways <- function(
           ' pathways passed the thresholds across all samples and databases.'
         )
       )
-    } else if ( temp_seurat@misc$marker_genes$by_sample == 'no_markers_found' )
+    } else if ( object@misc$marker_genes$by_sample == 'no_markers_found' )
     {
       message(
         paste0(
@@ -221,9 +217,9 @@ getEnrichedPathways <- function(
   ## - try up to three times to run enrichR annotation (fails sometimes)
   ## - filter results
   ##--------------------------------------------------------------------------##
-  if ( !is.null(temp_seurat@misc$marker_genes$by_cluster) )
+  if ( !is.null(object@misc$marker_genes$by_cluster) )
   {
-    if ( is.data.frame(temp_seurat@misc$marker_genes$by_cluster) )
+    if ( is.data.frame(object@misc$marker_genes$by_cluster) )
     {
       message(
         paste0(
@@ -232,14 +228,14 @@ getEnrichedPathways <- function(
         )
       )
       #
-      markers_by_cluster <- temp_seurat@misc$marker_genes$by_cluster
+      markers_by_cluster <- object@misc$marker_genes$by_cluster
       #
-      if ( is.factor(temp_seurat@meta.data[[column_cluster]]) )
+      if ( is.factor(object@meta.data[[column_cluster]]) )
       {
-        cluster_names <- as.character(levels(temp_seurat@meta.data[[column_cluster]]))
+        cluster_names <- as.character(levels(object@meta.data[[column_cluster]]))
       } else
       {
-        cluster_names <- sort(unique(temp_seurat@meta.data[[column_cluster]]))
+        cluster_names <- sort(unique(object@meta.data[[column_cluster]]))
       }
       ## remove clusters for which no marker genes were found
       cluster_names <- intersect(cluster_names, unique(markers_by_cluster$cluster))
@@ -319,7 +315,7 @@ getEnrichedPathways <- function(
           ' pathways passed the thresholds across all clusters and databases.'
         )
       )
-    } else if ( temp_seurat@misc$marker_genes$by_cluster == 'no_markers_found' )
+    } else if ( object@misc$marker_genes$by_cluster == 'no_markers_found' )
     {
       message(
         paste0(
@@ -359,10 +355,10 @@ getEnrichedPathways <- function(
       max_terms = max_terms
     )
   )
-  temp_seurat@misc$enriched_pathways$enrichr <- results
+  object@misc$enriched_pathways$enrichr <- results
 
   ##--------------------------------------------------------------------------##
   ## return Seurat object
   ##--------------------------------------------------------------------------##
-  return(temp_seurat)
+  return(object)
 }
