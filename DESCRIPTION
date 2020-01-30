@@ -21,6 +21,7 @@ biocViews:
   Visualization
 Imports:
   biomaRt (>= 2.38.0),
+  colourpicker (>= 1.0),
   dplyr (>= 0.8.3),
   DT (>= 0.8),
   formattable (>= 0.2.0.1),
