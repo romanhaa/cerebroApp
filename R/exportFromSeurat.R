@@ -124,6 +124,8 @@ exportFromSeurat <- function(
   ##--------------------------------------------------------------------------##
   ## data of analysis
   export$experiment$date_of_analysis <- object@misc$experiment$date_of_analysis
+  ## data of export
+  export$experiment$date_of_export <- Sys.Date()
   ## `parameters`
   if ( is.null(object@misc$parameters) )
   {
@@ -149,10 +151,12 @@ exportFromSeurat <- function(
     export$technical_info <- object@misc$technical_info
   }
   ## Seurat version
-  if ( is.null(object@misc$technical_info$seurat_version) )
+  if ( !is.null(object@version) )
   {
     export$technical_info$seurat_version <- object@version
   }
+  ## cerebroApp version
+  export$technical_info$cerebroApp_version <- utils::packageVersion('cerebroApp')
   ##--------------------------------------------------------------------------##
   ## get sample names
   ##--------------------------------------------------------------------------##
