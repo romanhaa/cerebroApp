@@ -73,8 +73,7 @@ getMarkerGenes <- function(
   {
     stop(
       paste0(
-        '[', format(Sys.time(), '%H:%M:%S'),
-        '] Cannot find specified column (`object@meta.data$', column_sample,
+        'Cannot find specified column (`object@meta.data$', column_sample,
         '`) that is supposed to contain sample information.'
       ),
       call. = FALSE
@@ -88,8 +87,7 @@ getMarkerGenes <- function(
   {
     stop(
       paste0(
-        '[', format(Sys.time(), '%H:%M:%S'),
-        '] Cannot find specified column (`object@meta.data$', column_cluster,
+        'Cannot find specified column (`object@meta.data$', column_cluster,
         '`) that is supposed to contain cluster information.'
       ),
       call. = FALSE
@@ -167,7 +165,8 @@ getMarkerGenes <- function(
   {
     message(
       paste0(
-        '[', format(Sys.time(), '%H:%M:%S'), '] Get marker genes for samples...'
+        '[', format(Sys.time(), '%H:%M:%S'), '] Get marker genes for ',
+        length(sample_names), ' samples...'
       )
     )
     if ( object@version < 3 )
@@ -299,7 +298,8 @@ getMarkerGenes <- function(
   {
     message(
       paste0(
-        '[', format(Sys.time(), '%H:%M:%S'), '] Get marker genes by cluster...'
+        '[', format(Sys.time(), '%H:%M:%S'), '] Get marker genes for ',
+        length(cluster_names), ' clusters...'
       )
     )
     if ( object@version < 3 )
@@ -411,7 +411,7 @@ getMarkerGenes <- function(
   ##---------------------------------------------------------------------------#
   ## merge results, add to Seurat object and return Seurat object
   ##---------------------------------------------------------------------------#
-  results <- list(
+  object@misc$marker_genes <- list(
     by_sample = markers_by_sample,
     by_cluster = markers_by_cluster,
     parameters = list(
@@ -422,7 +422,6 @@ getMarkerGenes <- function(
       test = test
     )
   )
-  object@misc$marker_genes <- results
   ##--------------------------------------------------------------------------##
   ## return Seurat object
   ##--------------------------------------------------------------------------##
