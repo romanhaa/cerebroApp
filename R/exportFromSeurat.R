@@ -280,7 +280,7 @@ exportFromSeurat <- function(
     )]
     if ( length(projections_available) == 0 )
     {
-      stop('Warning: No dimensional reductions available.', call. = FALSE)
+      stop('No dimensional reductions available.', call. = FALSE)
     } else if (
       length(projections_available) == 1 &&
       length(projections_available_pca) == 1 )
@@ -320,7 +320,7 @@ exportFromSeurat <- function(
     )]
     if ( length(projections_available) == 0 )
     {
-      stop('Warning: No dimensional reductions available.', call. = FALSE)
+      stop('No dimensional reductions available.', call. = FALSE)
     } else if (
       length(projections_available) == 1 &&
       length(projections_available_pca) == 1 )
