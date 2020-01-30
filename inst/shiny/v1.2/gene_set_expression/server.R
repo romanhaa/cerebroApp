@@ -46,11 +46,11 @@ output[["geneSetExpression_genes_displayed"]] <- renderText({
 ##----------------------------------------------------------------------------##
 output[["geneSetExpression_UI"]] <- renderUI({
   tagList(
-    selectInput(
-      "geneSetExpression_select_geneSet",
-      label = "Gene set",
+    selectizeInput(
+      'geneSetExpression_select_geneSet',
+      label = 'Gene set',
       choices = c("-", unique(geneSets()$gs_name)),
-      selected = "-"
+      options = list(create = TRUE), multiple = FALSE, selected = "-"
     ),
     selectInput(
       "geneSetExpression_projection_to_display",
