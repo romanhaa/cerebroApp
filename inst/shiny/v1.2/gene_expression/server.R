@@ -7,12 +7,11 @@
 ##----------------------------------------------------------------------------##
 output[["expression_UI"]] <- renderUI({
   tagList(
-    textAreaInput(
-      "expression_genes_input",
-      label = "Gene(s)",
-      value = "",
-      placeholder = "Insert genes here.",
-      resize = "vertical"
+    selectizeInput(
+      'expression_genes_input',
+      label = 'Gene(s)',
+      choices = rownames(sample_data()$expression),
+      options = list(create = TRUE), multiple = TRUE
     ),
     selectInput(
       "expression_projection_to_display",
@@ -129,7 +128,7 @@ output[["expression_scales"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 
 # cannot use req() because it delays initialization and plot is updated only with button press so plot doesn't initialize at all
-genesToPlot <- eventReactive(input[["keyPressed"]], ignoreNULL = FALSE, {
+genesToPlot <- reactive({
   genesToPlot <- list()
   if ( is.null(input[["expression_genes_input"]]) ) {
     genesToPlot[["genes_to_display"]] <- character()

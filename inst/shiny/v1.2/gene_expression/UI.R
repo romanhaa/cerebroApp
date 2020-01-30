@@ -4,17 +4,6 @@
 
 tab_gene_expression <- tabItem(
   tabName = "geneExpression",
-  tags$script('
-    $(document).on("keyup", function(event) {
-      if ( event.keyCode == 13 ) {
-        event.preventDefault();
-        Shiny.onInputChange("keyPressed", Math.random());
-      }
-      if ( event.keyCode == 32 ) {
-        Shiny.onInputChange("keyPressed", Math.random());
-      }
-    });
-  '),
   tagList(
     fluidRow(
       column(width = 3, offset = 0, style = "padding: 0px;",
