@@ -112,10 +112,10 @@ getEnrichedPathways <- function(
         temp <- list()
         attempt <- 1
         while(
-          length(temp) == 0 &&
-          !('Adjusted.P.value' %in% names(temp)) &&
+          'Adjusted.P.value' %in% names(temp) == FALSE &&
           attempt <= 3
-        ) {
+        )
+        {
           attempt <- attempt + 1
           try(
             temp <- markers_by_sample %>%
@@ -248,10 +248,10 @@ getEnrichedPathways <- function(
         temp <- list()
         attempt <- 1
         while(
-          length(temp) == 0 &&
-          !('Adjusted.P.value' %in% names(temp)) &&
+          'Adjusted.P.value' %in% names(temp) == FALSE &&
           attempt <= 3
-        ) {
+        )
+        {
           attempt <- attempt + 1
           try(
             temp <- markers_by_cluster %>%
