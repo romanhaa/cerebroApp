@@ -49,4 +49,17 @@ output$load_data_organism <- renderValueBox({
   )
 })
 
-
+# date of export
+output$load_data_date_of_export <- renderValueBox({
+  box(
+    title = "Date when data was exported",
+    width = 5,
+    background = "light-blue",
+    if ( !is.null(sample_data()$experiment$date_of_export) )
+    {
+      sample_data()$experiment$date_of_export
+    } else {
+      'not available'
+    }
+  )
+})

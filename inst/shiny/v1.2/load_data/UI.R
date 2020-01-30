@@ -25,6 +25,7 @@ tab_load_data <- tabItem(
   ),
   fluidRow(
     valueBoxOutput("load_data_experiment_name"),
-    valueBoxOutput("load_data_organism")
+    valueBoxOutput("load_data_organism"),
+    valueBoxOutput("load_data_date_of_export")
   )
 )
