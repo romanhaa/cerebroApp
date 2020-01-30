@@ -100,8 +100,8 @@ getMostExpressedGenes <- function(
     {
       message(
         paste0(
-          '[', format(Sys.time(), '%H:%M:%S'),
-          '] Get most expressed genes by sample...'
+          '[', format(Sys.time(), '%H:%M:%S'), '] Get most expressed genes ',
+          'for ', length(sample_names), ' sample(s)...'
         )
       )
       if ( object@version < 3 )
@@ -239,8 +239,8 @@ getMostExpressedGenes <- function(
     {
       message(
         paste0(
-          '[', format(Sys.time(), '%H:%M:%S'),
-          '] Get most expressed genes by cluster...'
+          '[', format(Sys.time(), '%H:%M:%S'), '] Get most expressed genes ',
+          'for ', length(cluster_names), ' clusters...'
         )
       )
       if ( object@version < 3 )
