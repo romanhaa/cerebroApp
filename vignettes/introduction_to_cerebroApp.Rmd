@@ -291,3 +291,7 @@ The Cerebro use interface can be launched using the `launchCerebro()` function.
 ```{r session_info}
 sessionInfo()
 ```
+
+# Example data sets
+
+We provide ready-to-load `.crb` files for a set of real data sets processed using either [scanpy](https://icb-scanpy.readthedocs-hosted.com/en/stable/) and [Seurat (v2.x and v3.x)](https://satijalab.org/seurat/) on our GitHub repository: <https://github.com/romanhaa/Cerebro/tree/master/examples>
