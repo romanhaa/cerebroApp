@@ -54,8 +54,8 @@ output[["logo_Cerebro"]] <- renderImage({
   list(
     src = system.file('extdata/logo_Cerebro.png', package = 'cerebroApp'),
     contentType = 'image/png',
-    width = 400,
-    height = 463,
+    width = 350,
+    height = 405,
     alt = "Cerebro logo",
     align = "right"
   )},
