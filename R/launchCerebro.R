@@ -41,18 +41,16 @@ launchCerebro <- function(
     )
   }
   ##--------------------------------------------------------------------------##
-  ##
+  ## define path to export plots to
   ##--------------------------------------------------------------------------##
   if ( grepl(tolower(Sys.info()["sysname"]), pattern = "^win") )
   {
-    # .libPaths(paste0(getwd(), "/R-Portable-Win/library"))
     plot_export_path <- paste0(Sys.getenv("USERPROFILE"), "\\Desktop\\")
   } else if ( "DOCKER" %in% names(Sys.getenv()) )
   {
     plot_export_path <- "/plots"
   } else if ( grepl(tolower(Sys.info()["sysname"]), pattern = "darwin") )
   {
-    # .libPaths(paste0(getwd(), "/R-Portable-Mac/library"))
     plot_export_path <- "~/Desktop/"
   }
 
@@ -119,6 +117,13 @@ launchCerebro <- function(
     source(
       system.file(
         paste0("shiny/", version, "/trajectory/info.R"),
+        package = "cerebroApp"
+      ),
+      local = TRUE
+    )
+    source(
+      system.file(
+        paste0("shiny/", version, "/color_management/info.R"),
         package = "cerebroApp"
       ),
       local = TRUE
