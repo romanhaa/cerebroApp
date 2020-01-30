@@ -2,3 +2,4 @@
 cerebroApp.Rcheck
 cerebroApp_*.tar.gz
 .Rhistory
+vignettes/*.crb
