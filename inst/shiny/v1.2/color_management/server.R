@@ -20,6 +20,18 @@ output[["colors_for_samples_UI"]] <- renderUI({
   )
 })
 
+# info box
+observeEvent(input[["colors_for_samples_info"]], {
+  showModal(
+    modalDialog(
+      colors_for_samples_info[["text"]],
+      title = colors_for_samples_info[["title"]],
+      easyClose = TRUE,
+      footer = NULL
+    )
+  )
+})
+
 # UI element
 output[["colors_for_clusters_UI"]] <- renderUI({
   tagList(
@@ -35,5 +47,17 @@ output[["colors_for_clusters_UI"]] <- renderUI({
       }
       color_list
     }
+  )
+})
+
+# info box
+observeEvent(input[["colors_for_clusters_info"]], {
+  showModal(
+    modalDialog(
+      colors_for_clusters_info[["text"]],
+      title = colors_for_clusters_info[["title"]],
+      easyClose = TRUE,
+      footer = NULL
+    )
   )
 })
