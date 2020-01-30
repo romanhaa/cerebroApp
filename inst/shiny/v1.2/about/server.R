@@ -49,3 +49,15 @@ observeEvent(input[["webgl_checkbox"]], {
 observeEvent(input[["browser"]], {
   browser()
 })
+
+output[["logo_Cerebro"]] <- renderImage({
+  list(
+    src = system.file('extdata/logo_Cerebro.png', package = 'cerebroApp'),
+    contentType = 'image/png',
+    width = 400,
+    height = 463,
+    alt = "Cerebro logo",
+    align = "right"
+  )},
+  deleteFile = TRUE
+)
