@@ -7,6 +7,7 @@
 #' @param maxFileSize Maximum size of input file; defaults to 800 MB.
 #' @export
 #' @return Shiny application.
+#' @importFrom colourpicker colourInput
 #' @import dplyr
 #' @importFrom DT datatable formatStyle
 #' @importFrom formattable proportion
