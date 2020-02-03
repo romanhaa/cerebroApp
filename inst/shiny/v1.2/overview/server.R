@@ -137,7 +137,7 @@ output[["overview_projection"]] <- plotly::renderPlotly({
     colors_this_plot <- reactive_colors()$samples
   } else if ( input[["overview_dot_color"]] == "cluster" ) {
     colors_this_plot <- reactive_colors()$clusters
-  } else if ( input[["overview_dot_color"]] %in% c("cell_cycle_seurat","cell_cycle_cyclone") ) {
+  } else if ( input[["overview_dot_color"]] %in% c("cell_cycle_seurat","cell_cycle_cyclone","Phase") ) {
     colors_this_plot <- cell_cycle_colorset
   } else if ( is.factor(to_plot[[ input[["overview_dot_color"]] ]]) ) {
     colors_this_plot <- setNames(
@@ -145,7 +145,10 @@ output[["overview_projection"]] <- plotly::renderPlotly({
       levels(to_plot[ , input[["overview_dot_color"]] ])
     )
   } else if ( is.character(to_plot[[ input[["overview_dot_color"]] ]]) ) {
-    default_colorset
+    colors_this_plot <- setNames(
+      default_colorset[1:length(unique(to_plot[ , input[["overview_dot_color"]] ]))],
+      unique(to_plot[ , input[["overview_dot_color"]] ])
+    )
   } else {
     NULL
   }
