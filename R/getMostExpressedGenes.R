@@ -107,7 +107,7 @@ getMostExpressedGenes <- function(
       if ( object@version < 3 )
       {
         ## check if `data` matrix exist in provided Seurat object
-        if ( ('raw.data' %in% names(object) == FALSE ) )
+        if ( ( is.null(object@raw.data) ) )
         {
           stop(
             paste0(
