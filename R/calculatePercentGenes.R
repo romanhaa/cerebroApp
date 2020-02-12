@@ -37,7 +37,7 @@ calculatePercentGenes <- function(
   if ( object@version < 3 )
   {
     ## check if `raw.data` matrix exist in provided Seurat object
-    if ( ( is.null(object@raw.data) )
+    if ( is.null(object@raw.data) )
     {
       stop(
         paste0(

@@ -411,7 +411,7 @@ exportFromSeurat <- function(
   if ( object@version < 3 )
   {
     ## check if `data` matrix exist in provided Seurat object
-    if ( ( is.null(object@data) ) )
+    if ( is.null(object@data) )
     {
       stop(
         paste0(
