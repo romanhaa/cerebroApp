@@ -538,6 +538,7 @@ output[["expression_by_sample"]] <- plotly::renderPlotly({
     ),
     yaxis = list(
       title = "Expression level",
+      range = c(0, max(gene_expression_plot_data()$level) * 1.2),
       hoverformat = ".2f",
       mirror = TRUE,
       showline = TRUE
@@ -594,6 +595,7 @@ output[["expression_by_cluster"]] <- plotly::renderPlotly({
     ),
     yaxis = list(
       title = "Expression level",
+      range = c(0, max(gene_expression_plot_data()$level) * 1.2),
       hoverformat = ".2f",
       mirror = TRUE,
       showline = TRUE
@@ -652,7 +654,10 @@ output[["expression_by_gene"]] <- plotly::renderPlotly({
     expression_levels,
     x = ~gene,
     y = ~expression,
-    text = ~gene,
+    text = ~paste0(
+      expression_levels$gene, ': ',
+      format(expression_levels$expression, digits = 3)
+    ),
     type = "bar",
     marker = list(
       color = ~expression,
