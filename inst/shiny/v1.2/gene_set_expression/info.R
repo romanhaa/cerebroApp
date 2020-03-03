@@ -19,6 +19,16 @@ geneSetExpression_projection_info <- list(
   )
 )
 
+geneSetExpression_details_selected_cells_info <- list(
+  title = "Details of selected cells",
+  text = p("Table containing average expression values of genes in the selected gene set as well as selected meta data (sample, cluster, number of transcripts, number of expressed genes) for cells selected in the plot using the box or lasso selection tool. If you want the table to contain all cells in the data set, you must select all cells in the plot. The table can be saved to disk in CSV or Excel format for further analysis.")
+)
+
+geneSetExpression_in_selected_cells_info <- list(
+  title = "Expression levels in selected cells",
+  text = p("This plot shows the average log-normalised expression of genes in the selected gene set for cells grouped by whether they were selected using the box or lasso selection tool.")
+)
+
 geneSetExpression_by_sample_info <- list(
   title = "Expression levels by sample",
   text = p("Average log-normalised expression of genes in selected gene set by sample.")
@@ -29,3 +39,7 @@ geneSetExpression_by_cluster_info <- list(
   text = p("Average log-normalised expression of genes in selected gene set by cluster.")
 )
 
+geneSetExpression_by_gene_info <- list(
+  title = "Expression levels by gene",
+  text = p("Log-normalised expression of 50 highest expressed genes inserted above. Shows mean across all cells.")
+)

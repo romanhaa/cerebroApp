@@ -38,7 +38,7 @@ tab_gene_expression <- tabItem(
           ),
           tagList(
             plotly::plotlyOutput(
-              "expression_projection_plotly",
+              "expression_projection",
               width = "auto",
               height = "85vh"
             ),
@@ -46,6 +46,24 @@ tab_gene_expression <- tabItem(
             htmlOutput("expression_genes_displayed")
           )
         )
+      )
+    ),
+    fluidRow(
+      cerebroBox(
+        title = tagList(
+          boxTitle("Details of selected cells"),
+          cerebroInfoButton("expression_details_selected_cells_info")
+        ),
+        DT::dataTableOutput("expression_details_selected_cells")
+      )
+    ),
+    fluidRow(
+      cerebroBox(
+        title = tagList(
+          boxTitle("Expression levels in selected cells"),
+          cerebroInfoButton("expression_in_selected_cells_info")
+        ),
+        plotly::plotlyOutput("expression_in_selected_cells")
       )
     ),
     fluidRow(
