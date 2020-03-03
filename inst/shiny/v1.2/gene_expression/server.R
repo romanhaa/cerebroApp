@@ -260,7 +260,8 @@ output[["expression_projection_plotly"]] <- plotly::renderPlotly({
         "<b>Transcripts</b>: ", formatC(gene_expression_plot_data()$nUMI, format = "f", big.mark = ",", digits = 0), "<br>",
         "<b>Expressed genes</b>: ", formatC(gene_expression_plot_data()$nGene, format = "f", big.mark = ",", digits = 0), "<br>",
         "<b>Expression level</b>: ", formatC(gene_expression_plot_data()$level, format = "f", big.mark = ",", digits = 3)
-      )
+      ),
+      source = "expression_projection_plotly"
     ) %>%
     plotly::layout(
       scene = list(
@@ -323,7 +324,8 @@ output[["expression_projection_plotly"]] <- plotly::renderPlotly({
         "<b>Transcripts</b>: ", formatC(gene_expression_plot_data()$nUMI, format = "f", big.mark = ",", digits = 0), "<br>",
         "<b>Expressed genes</b>: ", formatC(gene_expression_plot_data()$nGene, format = "f", big.mark = ",", digits = 0), "<br>",
         "<b>Expression level</b>: ", formatC(gene_expression_plot_data()$level, format = "f", big.mark = ",", digits = 3)
-      )
+      ),
+      source = "expression_projection_plotly"
     ) %>%
     plotly::layout(
       xaxis = list(
@@ -502,6 +504,194 @@ observeEvent(input[["expression_projection_export"]], {
     )
   }
 })
+
+##----------------------------------------------------------------------------##
+## Table for details of selected cells.
+##----------------------------------------------------------------------------##
+output[["expression_details_selected_cells"]] <- DT::renderDataTable(server = FALSE, {
+  # if no selection has been made, return table of all cells
+  if ( is.null(plotly::event_data("plotly_selected", source = "expression_projection_plotly")) ) {
+    table <- gene_expression_plot_data()
+  # if no cells are selected, return table of all cells
+  } else if ( nrow(plotly::event_data("plotly_selected", source = "expression_projection_plotly")) == 0 ) {
+    table <- gene_expression_plot_data()
+  # if at least 1 cell has been selected
+  } else {
+    # get info of selected cells and create identifier from X-Y coordinates
+    selected_cells <- plotly::event_data("plotly_selected", source = "expression_projection_plotly") %>%
+      dplyr::mutate(identifier = paste0(x, '-', y))
+    # filter out non-selected cells with X-Y identifier
+    table <- gene_expression_plot_data() %>%
+      dplyr::rename(X1 = 1, X2 = 2) %>%
+      dplyr::mutate(identifier = paste0(X1, '-', X2)) %>%
+      dplyr::filter(identifier %in% selected_cells$identifier)
+    # if no cells match the selection (e.g. when changing dimensional
+    # reduction), go back to table of all cells
+    if ( nrow(table) == 0 ) {
+      table <- gene_expression_plot_data()
+    }
+  }
+  table %>%
+  dplyr::mutate(
+    level = round(level, digits = 3),
+    nUMI = formattable::comma(nUMI, big.mark = ',', digits = 0),
+    nGene = formattable::comma(nGene, big.mark = ',', digits = 0)
+  ) %>%
+  dplyr::select(cell_barcode, level, sample, cluster, nUMI, nGene) %>%
+  dplyr::rename(
+    'Cell' = cell_barcode,
+    'Expression of selected genes' = level,
+    'Sample' = sample,
+    'Cluster' = cluster
+  ) %>%
+  formattable::formattable(list(
+    'Expression of selected genes' = formattable::color_tile("white", "orange"),
+    'nUMI' = formattable::color_tile("white", "orange"),
+    'nGene' = formattable::color_tile("white", "orange")
+  )) %>%
+  formattable::as.datatable(
+    filter = "top",
+    selection = "none",
+    escape = FALSE,
+    autoHideNavigation = TRUE,
+    rownames = FALSE,
+    extensions = c("Buttons"),
+    class = "cell-border stripe",
+    options = list(
+      dom = "Bfrtip",
+      lengthMenu = c(15, 30, 50, 100),
+      pageLength = 15,
+      buttons = list(
+        "colvis",
+        list(
+          extend = "collection",
+          text = "Download",
+          buttons = list(
+            list(
+              extend = "csv",
+              filename = "gene_expression_details_of_selected_cells",
+              title = "Gene expression details of selected cells"
+            ),
+            list(
+              extend = "excel",
+              filename = "gene_expression_details_of_selected_cells",
+              title = "Gene expression details of selected cells"
+            )
+          )
+        )
+      )
+    )
+  ) %>%
+  DT::formatStyle(
+    columns = c('Expression of selected genes', 'nUMI', 'nGene'),
+    textAlign = 'right'
+  ) %>%
+  DT::formatStyle(
+    columns = 'Sample',
+    textAlign = 'center',
+    backgroundColor = DT::styleEqual(
+      names(reactive_colors()$samples),
+      reactive_colors()$samples
+    )
+  ) %>%
+    DT::formatStyle(
+    columns = 'Cluster',
+    textAlign = 'center',
+    backgroundColor = DT::styleEqual(
+      names(reactive_colors()$clusters),
+      reactive_colors()$clusters
+    )
+  )
+})
+
+# info box
+# observeEvent(input[["expression_by_sample_info"]], {
+#   showModal(
+#     modalDialog(
+#       expression_by_sample_info$text,
+#       title = expression_by_sample_info$title,
+#       easyClose = TRUE,
+#       footer = NULL
+#     )
+#   )
+# })
+
+##----------------------------------------------------------------------------##
+## Expression of selected cells.
+##----------------------------------------------------------------------------##
+
+# box plot
+output[["expression_of_selected_cells"]] <- plotly::renderPlotly({
+  if (
+    is.null(plotly::event_data("plotly_selected", source = "expression_projection_plotly")) |
+    which(grepl(colnames(gene_expression_plot_data()), pattern = 'sample'))[1] != 3
+  ) {
+    table <- gene_expression_plot_data() %>%
+      dplyr::mutate(
+        group = 'not selected',
+        group = factor(group, levels = c('selected', 'not selected'))
+      )
+  } else {
+    selected_cells <- plotly::event_data("plotly_selected", source = "expression_projection_plotly") %>%
+      dplyr::mutate(identifier = paste0(x, '-', y))
+    table <- gene_expression_plot_data() %>%
+      dplyr::rename(X1 = 1, X2 = 2) %>%
+      dplyr::mutate(
+        identifier = paste0(X1, '-', X2),
+        group = ifelse(identifier %in% selected_cells$identifier, 'selected', 'not selected'),
+        group = factor(group, levels = c('selected', 'not selected'))
+      )
+  }
+  plotly::plot_ly(
+    table,
+    x = ~group,
+    y = ~level,
+    type = "violin",
+    box = list(
+      visible = TRUE
+    ),
+    meanline = list(
+      visible = TRUE
+    ),
+    color = ~group,
+    colors = setNames(c('#e74c3c','#7f8c8d'),c('selected', 'not selected')),
+    source = "subset",
+    showlegend = FALSE,
+    hoverinfo = "y",
+    marker = list(
+      size = 5
+    )
+  ) %>%
+  plotly::layout(
+    title = "",
+    xaxis = list(
+      title = "",
+      mirror = TRUE,
+      showline = TRUE
+    ),
+    yaxis = list(
+      title = "Expression level",
+      range = c(0, max(table$level) * 1.2),
+      hoverformat = ".2f",
+      mirror = TRUE,
+      showline = TRUE
+    ),
+    dragmode = "select",
+    hovermode = "compare"
+  )
+})
+
+# info box
+# observeEvent(input[["expression_by_sample_info"]], {
+#   showModal(
+#     modalDialog(
+#       expression_by_sample_info$text,
+#       title = expression_by_sample_info$title,
+#       easyClose = TRUE,
+#       footer = NULL
+#     )
+#   )
+# })
 
 ##----------------------------------------------------------------------------##
 ## Expression by sample.
