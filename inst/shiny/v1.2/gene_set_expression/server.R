@@ -613,11 +613,7 @@ output[["geneSetExpression_details_selected_cells"]] <- DT::renderDataTable(serv
     textAlign = 'right'
   ) %>%
   DT::formatStyle(
-    columns = 'Sample',
-    textAlign = 'center'
-  ) %>%
-    DT::formatStyle(
-    columns = 'Cluster',
+    columns = c('Sample','Cluster'),
     textAlign = 'center'
   )
 })

@@ -42,6 +42,24 @@ tab_overview <- tabItem(
           )
         )
       )
+    ),
+    fluidRow(
+      cerebroBox(
+        title = tagList(
+          boxTitle("Table of selected cells"),
+          cerebroInfoButton("overview_details_selected_cells_table_info")
+        ),
+        DT::dataTableOutput("overview_details_selected_cells_table")
+      )
+    ),
+    fluidRow(
+      cerebroBox(
+        title = tagList(
+          boxTitle("Plot of selected cells"),
+          cerebroInfoButton("overview_details_selected_cells_plot_info")
+        ),
+        plotly::plotlyOutput("overview_details_selected_cells_plot")
+      )
     )
   )
 )

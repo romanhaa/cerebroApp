@@ -186,7 +186,8 @@ output[["overview_projection"]] <- plotly::renderPlotly({
           "<b>Cluster</b>: ", to_plot[ , "cluster" ], "<br>",
           "<b>Transcripts</b>: ", formatC(to_plot[ , "nUMI" ], format = "f", big.mark = ",", digits = 0), "<br>",
           "<b>Expressed genes</b>: ", formatC(to_plot[ , "nGene" ], format = "f", big.mark = ",", digits = 0)
-        )
+        ),
+        source = "overview_projection"
       ) %>%
       plotly::layout(
         scene = list(
@@ -240,7 +241,8 @@ output[["overview_projection"]] <- plotly::renderPlotly({
           "<b>Cluster</b>: ", to_plot[ , "cluster" ], "<br>",
           "<b>Transcripts</b>: ", formatC(to_plot[ , "nUMI" ], format = "f", big.mark = ",", digits = 0), "<br>",
           "<b>Expressed genes</b>: ", formatC(to_plot[ , "nGene" ], format = "f", big.mark = ",", digits = 0)
-        )
+        ),
+        source = "overview_projection"
       ) %>%
       plotly::layout(
         scene = list(
@@ -295,7 +297,8 @@ output[["overview_projection"]] <- plotly::renderPlotly({
           "<b>Cluster</b>: ", to_plot[ , "cluster" ], "<br>",
           "<b>Transcripts</b>: ", formatC(to_plot[ , "nUMI" ], format = "f", big.mark = ",", digits = 0), "<br>",
           "<b>Expressed genes</b>: ", formatC(to_plot[ , "nGene" ], format = "f", big.mark = ",", digits = 0)
-        )
+        ),
+        source = "overview_projection"
       ) %>%
       plotly::layout(
         xaxis = list(
@@ -343,7 +346,8 @@ output[["overview_projection"]] <- plotly::renderPlotly({
           "<b>Cluster</b>: ", to_plot[[ "cluster" ]], "<br>",
           "<b>Transcripts</b>: ", formatC(to_plot[[ "nUMI" ]], format = "f", big.mark = ",", digits = 0), "<br>",
           "<b>Expressed genes</b>: ", formatC(to_plot[[ "nGene" ]], format = "f", big.mark = ",", digits = 0)
-        )
+        ),
+        source = "overview_projection"
       ) %>%
       plotly::layout(
         xaxis = list(
@@ -530,4 +534,262 @@ observeEvent(input[["overview_projection_export"]], {
       type = "error"
     )
   }
+})
+
+##----------------------------------------------------------------------------##
+## Table for details of selected cells.
+##----------------------------------------------------------------------------##
+
+output[["overview_details_selected_cells_table"]] <- DT::renderDataTable(server = FALSE, {
+  req(
+    input[["overview_projection_to_display"]]
+  )
+
+  ## extract cells to plot
+  to_plot <- cbind(
+      sample_data()$projections[[ input[["overview_projection_to_display"]] ]],
+      sample_data()$cells
+    )
+
+  if ( is.null(plotly::event_data("plotly_selected", source = "overview_projection")) ) {
+    table <- tibble(
+      cell_barcode = character(),
+      sample = character(),
+      cluster = character(),
+      nUMI = numeric(),
+      nGene = numeric(),
+      cell_cycle = character()
+    )
+  } else if ( length(plotly::event_data("plotly_selected", source = "overview_projection")) == 0 ) {
+    table <- tibble(
+      cell_barcode = character(),
+      sample = character(),
+      cluster = character(),
+      nUMI = numeric(),
+      nGene = numeric(),
+      cell_cycle = character()
+    )
+  } else {
+    selected_cells <- plotly::event_data("plotly_selected", source = "overview_projection") %>%
+      dplyr::mutate(identifier = paste0(x, '-', y))
+    table <- to_plot %>%
+      dplyr::rename(X1 = 1, X2 = 2) %>%
+      dplyr::mutate(identifier = paste0(X1, '-', X2)) %>%
+      dplyr::filter(identifier %in% selected_cells$identifier) %>%
+      dplyr::select(-c(X1,X2,identifier)) %>%
+      dplyr::select(cell_barcode, sample, cluster, nUMI, nGene, everything())
+    if ( nrow(table) == 0 ) {
+      table <- tibble(
+        cell_barcode = character(),
+        sample = character(),
+        cluster = character(),
+        nUMI = numeric(),
+        nGene = numeric(),
+        cell_cycle = character()
+      )
+    } else {
+      table <- table %>%
+        dplyr::mutate(
+          nUMI = formattable::comma(nUMI, big.mark = ',', digits = 0),
+          nGene = formattable::comma(nGene, big.mark = ',', digits = 0)
+        )
+    }
+  }
+  table %>%
+  dplyr::rename(
+    'Cell barcode' = cell_barcode,
+    'Sample' = sample,
+    'Cluster' = cluster
+  ) %>%
+  formattable::formattable(list(
+    'nUMI' = formattable::color_tile("white", "orange"),
+    'nGene' = formattable::color_tile("white", "orange")
+  )) %>%
+  formattable::as.datatable(
+    filter = "top",
+    selection = "none",
+    escape = FALSE,
+    autoHideNavigation = TRUE,
+    rownames = FALSE,
+    extensions = c("Buttons"),
+    class = "cell-border stripe",
+    options = list(
+      columnDefs = list(list(visible = FALSE, targets = c(6:ncol(table)-1))),
+      dom = "Bfrtip",
+      lengthMenu = c(15, 30, 50, 100),
+      pageLength = 15,
+      buttons = list(
+        "colvis",
+        list(
+          extend = "collection",
+          text = "Download",
+          buttons = list(
+            list(
+              extend = "csv",
+              filename = "overview_details_of_selected_cells",
+              title = "Details of selected cells"
+            ),
+            list(
+              extend = "excel",
+              filename = "overview_details_of_selected_cells",
+              title = "Details of selected cells"
+            )
+          )
+        )
+      )
+    )
+  ) %>%
+  DT::formatStyle(
+    columns = c('Sample','Cluster'),
+    textAlign = 'center'
+  ) %>%
+  DT::formatStyle(
+    columns = c('nUMI', 'nGene'),
+    textAlign = 'right'
+  )
+})
+
+# info box
+# observeEvent(input[["overview_details_selected_cells_table_info"]], {
+#   showModal(
+#     modalDialog(
+#       overview_details_selected_cells_table_info$text,
+#       title = overview_details_selected_cells_table_info$title,
+#       easyClose = TRUE,
+#       footer = NULL
+#     )
+#   )
+# })
+
+##----------------------------------------------------------------------------##
+## Plot for selected cells.
+## - in sync with selected color variable
+##   - if categorical: number of cells in each group
+##   - if numerical: box/violin plot
+##----------------------------------------------------------------------------##
+
+output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
+  req(
+    input[["overview_projection_to_display"]],
+    input[["overview_dot_color"]]
+  )
+
+  ## extract cells to plot
+  to_plot <- cbind(
+      sample_data()$projections[[ input[["overview_projection_to_display"]] ]],
+      sample_data()$cells
+    )
+
+  if (
+    is.null(plotly::event_data("plotly_selected", source = "overview_projection")) |
+    length(plotly::event_data("plotly_selected", source = "overview_projection")) == 0
+  ) {
+    to_plot <- to_plot %>% dplyr::mutate(group = 'not selected')
+  } else {
+    selected_cells <- plotly::event_data("plotly_selected", source = "overview_projection") %>%
+      dplyr::mutate(identifier = paste0(x, '-', y))
+    to_plot <- to_plot %>%
+      dplyr::rename(X1 = 1, X2 = 2) %>%
+      dplyr::mutate(
+        identifier = paste0(X1, '-', X2),
+        group = ifelse(identifier %in% selected_cells$identifier, 'selected', 'not selected'),
+        group = factor(group, levels = c('selected', 'not selected'))
+      )
+  }
+
+  color_variable <- input[["overview_dot_color"]]
+
+  ## if the selected coloring variable is categorical, represent the selected
+  ## cells in a bar chart
+  if (
+    is.factor(to_plot[[ color_variable ]]) ||
+    is.character(to_plot[[ color_variable ]])
+  ) {
+    t <- to_plot %>%
+      dplyr::filter(group == 'selected') %>%
+      dplyr::select(!!! rlang::syms(color_variable)) %>%
+      dplyr::group_by_at(1) %>%
+      dplyr::tally()
+
+    if ( color_variable == 'sample' ) {
+      colors_this_plot <- reactive_colors()$samples
+    } else if ( color_variable == 'cluster' ) {
+      colors_this_plot <- reactive_colors()$clusters
+    } else {
+      colors_this_plot <- setNames(
+        default_colorset[1:length(t[[ 1 ]])],
+        t[[ 1 ]]
+      )
+    }
+
+    plotly::plot_ly(
+      t,
+      x = ~t[[1]],
+      y = ~t[[2]],
+      type = "bar",
+      color = ~t[[1]],
+      colors = colors_this_plot,
+      showlegend = FALSE,
+      hoverinfo = "y"
+    ) %>%
+    plotly::layout(
+      title = "",
+      xaxis = list(
+        title = "",
+        mirror = TRUE,
+        showline = TRUE
+      ),
+      yaxis = list(
+        title = "Number of cells",
+        hoverformat = ".0f",
+        mirror = TRUE,
+        showline = TRUE
+      ),
+      dragmode = "select",
+      hovermode = "compare"
+    )
+
+  ## if the selected coloring variable is not categorical but continuous
+  } else {
+    t <- to_plot %>%
+      dplyr::select(group, !!! rlang::syms(color_variable))
+
+    plotly::plot_ly(
+      t,
+      x = ~t[[1]],
+      y = ~t[[2]],
+      type = "violin",
+      box = list(
+        visible = TRUE
+      ),
+      meanline = list(
+        visible = TRUE
+      ),
+      color = ~t[[1]],
+      colors = setNames(c('#e74c3c','#7f8c8d'),c('selected', 'not selected')),
+      source = "subset",
+      showlegend = FALSE,
+      hoverinfo = "y",
+      marker = list(
+        size = 5
+      )
+    ) %>%
+    plotly::layout(
+      title = "",
+      xaxis = list(
+        title = "",
+        mirror = TRUE,
+        showline = TRUE
+      ),
+      yaxis = list(
+        title = colnames(t)[2],
+        hoverformat = ".0f",
+        mirror = TRUE,
+        showline = TRUE
+      ),
+      dragmode = "select",
+      hovermode = "compare"
+    )
+  }
+
 })
