@@ -52,7 +52,7 @@ tab_gene_expression <- tabItem(
       cerebroBox(
         title = tagList(
           boxTitle("Details of selected cells"),
-          #cerebroInfoButton("expression_by_sample_info")
+          cerebroInfoButton("expression_details_selected_cells_info")
         ),
         DT::dataTableOutput("expression_details_selected_cells")
       )
@@ -60,10 +60,10 @@ tab_gene_expression <- tabItem(
     fluidRow(
       cerebroBox(
         title = tagList(
-          boxTitle("Expression levels of selected cells"),
-          #cerebroInfoButton("expression_by_sample_info")
+          boxTitle("Expression levels in selected cells"),
+          cerebroInfoButton("expression_in_selected_cells_info")
         ),
-        plotly::plotlyOutput("expression_of_selected_cells")
+        plotly::plotlyOutput("expression_in_selected_cells")
       )
     ),
     fluidRow(

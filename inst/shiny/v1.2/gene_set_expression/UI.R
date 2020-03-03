@@ -51,6 +51,24 @@ tab_gene_set_expression <- tabItem(
     fluidRow(
       cerebroBox(
         title = tagList(
+          boxTitle("Details of selected cells"),
+          cerebroInfoButton("geneSetExpression_details_selected_cells_info")
+        ),
+        DT::dataTableOutput("geneSetExpression_details_selected_cells")
+      )
+    ),
+    fluidRow(
+      cerebroBox(
+        title = tagList(
+          boxTitle("Expression levels in selected cells"),
+          cerebroInfoButton("geneSetExpression_in_selected_cells_info")
+        ),
+        plotly::plotlyOutput("geneSetExpression_in_selected_cells")
+      )
+    ),
+    fluidRow(
+      cerebroBox(
+        title = tagList(
           boxTitle("Expression levels by sample"),
           cerebroInfoButton("geneSetExpression_by_sample_info")
         ),
