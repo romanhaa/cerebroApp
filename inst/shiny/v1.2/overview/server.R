@@ -650,16 +650,16 @@ output[["overview_details_selected_cells_table"]] <- DT::renderDataTable(server 
 })
 
 # info box
-# observeEvent(input[["overview_details_selected_cells_table_info"]], {
-#   showModal(
-#     modalDialog(
-#       overview_details_selected_cells_table_info$text,
-#       title = overview_details_selected_cells_table_info$title,
-#       easyClose = TRUE,
-#       footer = NULL
-#     )
-#   )
-# })
+observeEvent(input[["overview_details_selected_cells_table_info"]], {
+  showModal(
+    modalDialog(
+      overview_details_selected_cells_table_info$text,
+      title = overview_details_selected_cells_table_info$title,
+      easyClose = TRUE,
+      footer = NULL
+    )
+  )
+})
 
 ##----------------------------------------------------------------------------##
 ## Plot for selected cells.
@@ -705,12 +705,18 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
     is.factor(to_plot[[ color_variable ]]) ||
     is.character(to_plot[[ color_variable ]])
   ) {
+    ## calculate number of cells in each group
     t <- to_plot %>%
       dplyr::filter(group == 'selected') %>%
       dplyr::select(!!! rlang::syms(color_variable)) %>%
       dplyr::group_by_at(1) %>%
       dplyr::tally()
 
+    ## convert factor to character to avoid empty bars when selecting cells of
+    ## certain groups
+    t[[1]] <- as.character(t[[1]])
+
+    ## create color assignment for groups
     if ( color_variable == 'sample' ) {
       colors_this_plot <- reactive_colors()$samples
     } else if ( color_variable == 'cluster' ) {
@@ -722,6 +728,7 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
       )
     }
 
+    ## make bar chart
     plotly::plot_ly(
       t,
       x = ~t[[1]],
@@ -729,6 +736,7 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
       type = "bar",
       color = ~t[[1]],
       colors = colors_this_plot,
+      source = "subset",
       showlegend = FALSE,
       hoverinfo = "y"
     ) %>%
@@ -751,9 +759,11 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
 
   ## if the selected coloring variable is not categorical but continuous
   } else {
+    ## remove unnecessary columns
     t <- to_plot %>%
       dplyr::select(group, !!! rlang::syms(color_variable))
 
+    ## create violin/box plot
     plotly::plot_ly(
       t,
       x = ~t[[1]],
@@ -791,5 +801,16 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
       hovermode = "compare"
     )
   }
+})
 
+# info box
+observeEvent(input[["overview_details_selected_cells_plot_info"]], {
+  showModal(
+    modalDialog(
+      overview_details_selected_cells_plot_info$text,
+      title = overview_details_selected_cells_plot_info$title,
+      easyClose = TRUE,
+      footer = NULL
+    )
+  )
 })

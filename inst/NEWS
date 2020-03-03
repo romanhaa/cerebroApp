@@ -3,6 +3,8 @@
 
 \section{Changes in version 1.2.1}{
 \itemize{
+    \item New features:
+      \item It is now possible to select cells in the dimensional reduction plots ('Overview', 'Gene expression', and 'Gene set expression' tabs) and retrieve additional info for them. For example, users can get tables of meta data or expression values and save them as a file for further analysis. Also, gene expression can be shown in the selected vs. non-selected cells.
     \item Small changes:
     \itemize{
       \item Scales for expression levels by sample and cluster in "Gene expression" and "Gene set expression" tabs are now set to be from 0 to 1.2 times the highest value. This is to limit the violin plots which cannot be trimed to the actual data range and will extend beyond, giving a false impression of negative values existing in the data.

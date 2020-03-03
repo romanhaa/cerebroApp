@@ -38,7 +38,7 @@ tab_gene_expression <- tabItem(
           ),
           tagList(
             plotly::plotlyOutput(
-              "expression_projection_plotly",
+              "expression_projection",
               width = "auto",
               height = "85vh"
             ),
