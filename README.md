@@ -1,5 +1,6 @@
-[![](https://img.shields.io/github/license/romanhaa/cerebroApp)](LICENSE.md)
-[![](https://img.shields.io/twitter/url/https/twitter.com/fakechek1.svg?label=Follow%20%40fakechek1&style=social)](https://twitter.com/fakechek1)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
+[![Twitter](https://img.shields.io/twitter/url/https/twitter.com/fakechek1.svg?label=Follow%20%40fakechek1&style=social)](https://twitter.com/fakechek1)
 
 <img align="right" width="35%" height="auto" src="vignettes/logo_Cerebro.png">
 
