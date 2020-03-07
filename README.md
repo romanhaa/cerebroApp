@@ -1,6 +1,8 @@
 [![](https://img.shields.io/github/license/romanhaa/cerebroApp)](LICENSE.md)
 [![](https://img.shields.io/twitter/url/https/twitter.com/fakechek1.svg?label=Follow%20%40fakechek1&style=social)](https://twitter.com/fakechek1)
 
+<img align="right" width="35%" height="auto" src="vignettes/logo_Cerebro.png">
+
 # cerebroApp
 
 R package upon which the [Cerebro](https://github.com/romanhaa/Cerebro) is built.

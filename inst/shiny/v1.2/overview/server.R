@@ -710,7 +710,8 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
       dplyr::filter(group == 'selected') %>%
       dplyr::select(!!! rlang::syms(color_variable)) %>%
       dplyr::group_by_at(1) %>%
-      dplyr::tally()
+      dplyr::tally() %>%
+      dplyr::ungroup()
 
     ## convert factor to character to avoid empty bars when selecting cells of
     ## certain groups
