@@ -41,7 +41,8 @@
 #'   column_cluster = 'seurat_clusters',
 #'   thresh_p_val = 0.05,
 #'   thresh_q_val = 0.1,
-#'   parallel.sz = 1
+#'   parallel.sz = 1,
+#'   verbose = FALSE
 #' )
 performGeneSetEnrichmentAnalysis <- function(
   object,

@@ -15,7 +15,7 @@
 #' @export
 #' @return Returns Seurat object with added trajectory. Trajectory info (state,
 #' pseudotime, projection and tree) will be stored in
-#' object@misc$trajectory$monocle2 under the specified name.
+#' `object@misc$trajectory$monocle2` under the specified name.
 #' @importFrom rlang .data
 #' @examples
 #' \dontrun{
