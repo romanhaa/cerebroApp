@@ -7,7 +7,7 @@ tab_about <- tabItem(
   fluidPage(
     fluidRow(
       column(12,
-        titlePanel("About this application")
+        titlePanel("About Cerebro")
       ),
       column(8,
         htmlOutput("about"),

@@ -2,7 +2,7 @@ citHeader('To cite Cerebro in publications use:')
 
 citEntry(
   entry   = 'Article',
-  title   = 'Cerebro: interactive visualization of scRNA-seq data',
+  title   = 'Cerebro: Interactive visualization of scRNA-seq data',
   author  = personList(as.person('Roman Hillje'),
                        as.person('Pier Giuseppe Pelicci'),
                        as.person('Lucilla Luzi')),
@@ -14,6 +14,6 @@ citEntry(
 
   textVersion  =
   paste('Hillje, R., Pelicci, P.G. & Luzi, L.',
-        'Cerebro: interactive visualization of scRNA-seq data.',
+        'Cerebro: Interactive visualization of scRNA-seq data.',
         'Bioinformatics (2019).')
 )
