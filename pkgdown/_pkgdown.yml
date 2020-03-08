@@ -1,3 +1,13 @@
+navbar:
+  components:
+    articles:
+      text: Vignettes
+      menu:
+      - text: The cerebroApp workflow
+        href: articles/cerebroApp_workflow.html
+      - text: The Cerebro interface
+        href: articles/Cerebro_interface.html
+
 reference:
   - title: "Main functions"
     desc: >

@@ -1,22 +1,18 @@
 ---
-title: Introduction to cerebroApp
+title: Introduction to the cerebroApp workflow
 author: Roman Hillje
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
-  rmarkdown::html_vignette:
+  html_document:
     toc: true
     number_sections: true
+    self_contained: yes
+    mode: selfcontained
 vignette: >
   %\VignetteIndexEntry{Introduction to cerebroApp}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-
-```{r, echo = FALSE}
-htmltools::img(src = 'logo_Cerebro.png',
-               alt = 'Cerebro logo',
-               style = 'position:absolute; top:0; right:0; padding: 10px; width: 200px;')
-```
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
