@@ -46,6 +46,7 @@ source(system.file("shiny/v1.0/about/UI.R", package = "cerebroApp"), local = TRU
 ##
 ##----------------------------------------------------------------------------##
 ui <- dashboardPage(
+  title = "Cerebro",
   dashboardHeader(
     title = span("Cerebro ", style = "color: white; font-size: 28px; font-weight: bold")
   ),
