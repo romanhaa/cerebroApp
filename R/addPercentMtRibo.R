@@ -33,7 +33,7 @@ addPercentMtRibo <- function(
   if (!requireNamespace("Seurat", quietly = TRUE))
   {
     stop(
-      "Package 'Seurat' needed for this function to work. Please install it.",
+      "Package 'Seurat' is needed for this function. Please install it.",
       call. = FALSE
     )
   }
