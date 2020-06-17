@@ -276,8 +276,8 @@
   <span class="kw">organism</span> <span class="kw">=</span> <span class="st">'hg'</span>,
   <span class="kw">gene_nomenclature</span> <span class="kw">=</span> <span class="st">'name'</span>
 )
-<span class="co">#&gt; [11:41:58] No mitochondrial genes found in data set.</span>
-<span class="co">#&gt; [11:41:58] Calculate percentage of 1 ribosomal transcript(s) present in the data set...</span></pre></body></html></div>
+<span class="co">#&gt; [16:13:15] No mitochondrial genes found in data set.</span>
+<span class="co">#&gt; [16:13:15] Calculate percentage of 1 ribosomal transcript(s) present in the data set...</span></pre></body></html></div>
 </div>
 <div id="get-most-expressed-genes" class="section level3">
 <h3 class="hasAnchor">
@@ -288,8 +288,8 @@
   <span class="kw">column_sample</span> <span class="kw">=</span> <span class="st">'sample'</span>,
   <span class="kw">column_cluster</span> <span class="kw">=</span> <span class="st">'seurat_clusters'</span>
 )
-<span class="co">#&gt; [11:41:58] Get most expressed genes for 1 sample(s)...</span>
-<span class="co">#&gt; [11:41:58] Get most expressed genes for 2 clusters...</span></pre></body></html></div>
+<span class="co">#&gt; [16:13:15] Get most expressed genes for 1 sample(s)...</span>
+<span class="co">#&gt; [16:13:15] Get most expressed genes for 2 clusters...</span></pre></body></html></div>
 </div>
 <div id="identify-marker-genes" class="section level3">
 <h3 class="hasAnchor">
@@ -303,8 +303,8 @@
   <span class="kw">only_pos</span> <span class="kw">=</span> <span class="fl">TRUE</span>
 )
 <span class="co">#&gt; Cache found</span>
-<span class="co">#&gt; [11:42:13] Sample column provided but only 1 sample found.</span>
-<span class="co">#&gt; [11:42:13] Get marker genes for 2 clusters...</span>
+<span class="co">#&gt; [16:13:19] Sample column provided but only 1 sample found.</span>
+<span class="co">#&gt; [16:13:19] Get marker genes for 2 clusters...</span>
 <span class="co">#&gt; Calculating cluster 0</span>
 <span class="co">#&gt; Calculating cluster 1</span></pre></body></html></div>
 </div>
@@ -319,9 +319,9 @@
   <span class="kw">adj_p_cutoff</span> <span class="kw">=</span> <span class="fl">0.01</span>,
   <span class="kw">max_terms</span> <span class="kw">=</span> <span class="fl">100</span>
 )
-<span class="co">#&gt; [11:42:13] Skipping pathway enrichment for samples because no marker genes were identified for any sample.</span>
-<span class="co">#&gt; [11:42:13] Get enriched pathway for clusters...</span>
-<span class="co">#&gt; [11:42:24] 16 pathways passed the thresholds across all clusters and databases.</span></pre></body></html></div>
+<span class="co">#&gt; [16:13:19] Skipping pathway enrichment for samples because no marker genes were identified for any sample.</span>
+<span class="co">#&gt; [16:13:19] Get enriched pathway for clusters...</span>
+<span class="co">#&gt; [16:13:35] 16 pathways passed the thresholds across all clusters and databases.</span></pre></body></html></div>
 </div>
 <div id="gene-set-enrichment" class="section level3">
 <h3 class="hasAnchor">
@@ -376,18 +376,18 @@
   <span class="kw">column_nUMI</span> <span class="kw">=</span> <span class="st">'nCount_RNA'</span>,
   <span class="kw">column_nGene</span> <span class="kw">=</span> <span class="st">'nFeature_RNA'</span>
 )
-<span class="co">#&gt; [11:42:26] Initializing Cerebro object...</span>
-<span class="co">#&gt; [11:42:26] Collecting available meta data...</span>
-<span class="co">#&gt; [11:42:26] Extracting all meta data columns...</span>
-<span class="co">#&gt; [11:42:26] Extracting tables of most expressed genes...</span>
-<span class="co">#&gt; [11:42:26] Extracting tables of marker genes...</span>
-<span class="co">#&gt; [11:42:26] Extracting pathway enrichment results...</span>
-<span class="co">#&gt; [11:42:26] Extracting dimensional reductions...</span>
-<span class="co">#&gt; [11:42:26] Will export the following dimensional reductions: UMAP, UMAP_3D</span>
-<span class="co">#&gt; [11:42:26] Will export the following trajectories: highly_variable_genes</span>
-<span class="co">#&gt; [11:42:26] Extracting cluster tree...</span>
-<span class="co">#&gt; [11:42:26] Extracting log-normalized expression data...</span>
-<span class="co">#&gt; [11:42:26] Saving Cerebro file...</span></pre></body></html></div>
+<span class="co">#&gt; [16:13:38] Initializing Cerebro object...</span>
+<span class="co">#&gt; [16:13:38] Collecting available meta data...</span>
+<span class="co">#&gt; [16:13:38] Extracting all meta data columns...</span>
+<span class="co">#&gt; [16:13:38] Extracting tables of most expressed genes...</span>
+<span class="co">#&gt; [16:13:38] Extracting tables of marker genes...</span>
+<span class="co">#&gt; [16:13:38] Extracting pathway enrichment results...</span>
+<span class="co">#&gt; [16:13:38] Extracting dimensional reductions...</span>
+<span class="co">#&gt; [16:13:38] Will export the following dimensional reductions: UMAP, UMAP_3D</span>
+<span class="co">#&gt; [16:13:38] Will export the following trajectories: highly_variable_genes</span>
+<span class="co">#&gt; [16:13:38] Extracting cluster tree...</span>
+<span class="co">#&gt; [16:13:38] Extracting log-normalized expression data...</span>
+<span class="co">#&gt; [16:13:38] Saving Cerebro file...</span></pre></body></html></div>
 <p>The Cerebro use interface can be launched using the <code><a href="../reference/launchCerebro.html">launchCerebro()</a></code> function.</p>
 </div>
 </div>
