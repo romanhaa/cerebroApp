@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="bootstrap-toc.css">
+<script src="bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="pkgdown.css" rel="stylesheet">
@@ -53,7 +57,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-title-body">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -67,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">cerebroApp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.2</span>
       </span>
     </div>
 
@@ -103,7 +107,7 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/romanhaa/cerebroApp">
+  <a href="https://github.com/romanhaa/cerebroApp/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -176,44 +180,50 @@
 <div id="testing-which-genes-are-more-variable-than-others-in-a-given-list-of-genes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#testing-which-genes-are-more-variable-than-others-in-a-given-list-of-genes" class="anchor"></a>Testing which genes are more variable than others in a given list of genes</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>list.of.genes &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'Abcc4'</span>,<span class="st">'Abraxas2'</span>,<span class="st">'Actn4'</span>,<span class="st">'Acvr1'</span>,<span class="st">'Adam9'</span>,<span class="st">'Adamts5'</span>,<span class="st">'Ager'</span>,<span class="st">'Amer2'</span>,<span class="st">'Ank2'</span>,<span class="st">'Api5'</span>,<span class="st">'Bach1'</span>,<span class="st">'Baz2b'</span>,<span class="st">'Bcl11a'</span>,<span class="st">'Bcl2l2'</span>,<span class="st">'Bcl9'</span>,<span class="st">'Bmt2'</span>,<span class="st">'1700025G04Rik'</span>,<span class="st">'1190002N15Rik'</span>,<span class="st">'Cacna1c'</span>,<span class="st">'Cebpa'</span>,<span class="st">'Chd4'</span>,<span class="st">'Cit'</span>,<span class="st">'Col23a1'</span>,<span class="st">'Csk'</span>,<span class="st">'Csnk1g3'</span>,<span class="st">'Ctcf'</span>,<span class="st">'Cul3'</span>,<span class="st">'Dazl'</span>,<span class="st">'Dbndd2'</span>,<span class="st">'Dcun1d4'</span>,<span class="st">'Ddx3x'</span>,<span class="st">'Ddx3y'</span>,<span class="st">'Dhx57'</span>,<span class="st">'Dpp4'</span>,<span class="st">'Dscam'</span>,<span class="st">'Dtna'</span>,<span class="st">'E2f3'</span>,<span class="st">'Ehd1'</span>,<span class="st">'Ephb1'</span>,<span class="st">'Erc2'</span>,<span class="st">'Etv3'</span>,<span class="st">'Eya2'</span>,<span class="st">'Fam214a'</span>,<span class="st">'Gabarap'</span>,<span class="st">'Galnt16'</span>,<span class="st">'Gdf6'</span>,<span class="st">'Git1'</span>,<span class="st">'Gys1'</span>,<span class="st">'Hdac4'</span>,<span class="st">'Hnrnph3'</span>,<span class="st">'Hspa13'</span>,<span class="st">'Igfbp5'</span>,<span class="st">'Katnbl1'</span>,<span class="st">'Loxl3'</span>,<span class="st">'Lrrc4'</span>,<span class="st">'Lrrc8e'</span>,<span class="st">'Map3k8'</span>,<span class="st">'Mdga2'</span>,<span class="st">'Mex3c'</span>,<span class="st">'Mgat1'</span>,<span class="st">'Mmd'</span>,<span class="st">'Nkiras2'</span>,<span class="st">'Nr3c1'</span>,<span class="st">'Nsd3'</span>,<span class="st">'Nutf2'</span>,<span class="st">'Ogt'</span>,<span class="st">'Ostm1'</span>,<span class="st">'Pdgfra'</span>,<span class="st">'Pfn1'</span>,<span class="st">'Phf20l1'</span>,<span class="st">'Phyhip'</span>,<span class="st">'Pitx2'</span>,<span class="st">'Ppp1cc'</span>,<span class="st">'R3hdm1'</span>,<span class="st">'Reep1'</span>,<span class="st">'Rnf19a'</span>,<span class="st">'Rtkn2'</span>,<span class="st">'Senp1'</span>,<span class="st">'Siah1a'</span>,<span class="st">'Slc25a13'</span>,<span class="st">'Slc38a2'</span>,<span class="st">'Slc41a2'</span>,<span class="st">'Slf2'</span>,<span class="st">'Slmap'</span>,<span class="st">'Snx2'</span>,<span class="st">'Sox4'</span>,<span class="st">'Srr'</span>,<span class="st">'Stag1'</span>,<span class="st">'Stradb'</span>,<span class="st">'Syt6'</span>,<span class="st">'Taf9b'</span>,<span class="st">'Tbx3'</span>,<span class="st">'Trp53inp2'</span>,<span class="st">'Tshz1'</span>,<span class="st">'Tspan2'</span>,<span class="st">'Tssk2'</span>,<span class="st">'Ttyh2'</span>,<span class="st">'Vegfa'</span>,<span class="st">'Wnt1'</span>,<span class="st">'Yes1'</span>,<span class="st">'Zbed4'</span>,<span class="st">'Zbtb10'</span>,<span class="st">'Zfp182'</span>,<span class="st">'Zfp608'</span>,<span class="st">'Zfp654'</span>)</span>
-<span id="cb1-2"><a href="#cb1-2"></a></span>
-<span id="cb1-3"><a href="#cb1-3"></a>group &lt;-</span>
-<span id="cb1-4"><a href="#cb1-4"></a>table &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="dt">gene=</span><span class="kw"><a href="https://rdrr.io/r/base/character.html">character</a></span>(), <span class="dt">p.value=</span><span class="kw"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span>(), <span class="dt">overall.mean=</span><span class="kw"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span>(), <span class="dt">overall.variance=</span><span class="kw"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span>(), <span class="dt">stringsAsFactors=</span><span class="ot">FALSE</span>)</span>
-<span id="cb1-5"><a href="#cb1-5"></a></span>
-<span id="cb1-6"><a href="#cb1-6"></a>data &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span>(sample_data<span class="op">$</span>expression[ <span class="kw"><a href="https://rdrr.io/r/base/which.html">which</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(sample_data<span class="op">$</span>expression), <span class="dt">pattern=</span><span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">'^'</span>, list.of.genes, <span class="st">'$'</span>, <span class="dt">collapse=</span><span class="st">'|'</span>))),])))</span>
-<span id="cb1-7"><a href="#cb1-7"></a>data<span class="op">$</span>group &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/lapply.html">vapply</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/strsplit.html">strsplit</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(data), <span class="st">'-'</span>), <span class="st">`</span><span class="dt">[</span><span class="st">`</span>, <span class="dv">2</span>, <span class="dt">FUN.VALUE=</span><span class="kw"><a href="https://rdrr.io/r/base/character.html">character</a></span>(<span class="dv">1</span>))</span>
-<span id="cb1-8"><a href="#cb1-8"></a></span>
-<span id="cb1-9"><a href="#cb1-9"></a>list.of.genes &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(data)</span>
-<span id="cb1-10"><a href="#cb1-10"></a></span>
-<span id="cb1-11"><a href="#cb1-11"></a><span class="kw"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span>(numbers <span class="op">~</span><span class="st"> </span>group, data)</span>
-<span id="cb1-12"><a href="#cb1-12"></a></span>
-<span id="cb1-13"><a href="#cb1-13"></a><span class="cf">for</span> ( i <span class="cf">in</span> sample_data<span class="op">$</span>samples<span class="op">$</span>names ) {</span>
-<span id="cb1-14"><a href="#cb1-14"></a>  temp.table &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="st">'.mean'</span>=<span class="kw"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span>(), <span class="st">'.variance'</span>=<span class="kw"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span>())</span>
-<span id="cb1-15"><a href="#cb1-15"></a>  <span class="kw"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(temp.table) &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(i, <span class="kw"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(temp.table))</span>
-<span id="cb1-16"><a href="#cb1-16"></a>  table &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span>(table, temp.table)</span>
-<span id="cb1-17"><a href="#cb1-17"></a>}</span>
-<span id="cb1-18"><a href="#cb1-18"></a></span>
-<span id="cb1-19"><a href="#cb1-19"></a><span class="cf">for</span> ( i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw"><a href="https://rdrr.io/r/base/length.html">length</a></span>(list.of.genes) ) {</span>
-<span id="cb1-20"><a href="#cb1-20"></a>  temp.numbers &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>()</span>
-<span id="cb1-21"><a href="#cb1-21"></a>  <span class="cf">for</span> ( j <span class="cf">in</span> sample_data<span class="op">$</span>samples<span class="op">$</span>names ) {</span>
-<span id="cb1-22"><a href="#cb1-22"></a>    temp.numbers &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(temp.numbers, <span class="kw"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/tapply.html">tapply</a></span>(sample_data<span class="op">$</span>expression[<span class="kw"><a href="https://rdrr.io/r/base/which.html">which</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(sample_data<span class="op">$</span>expression) <span class="op">==</span><span class="st"> </span>list.of.genes[i]),], group, withinRunStats)[[j]]))</span>
-<span id="cb1-23"><a href="#cb1-23"></a>  }</span>
-<span id="cb1-24"><a href="#cb1-24"></a>  temp.data &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="dt">group=</span>group, <span class="dt">numbers=</span>sample_data<span class="op">$</span>expression[<span class="kw"><a href="https://rdrr.io/r/base/which.html">which</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(sample_data<span class="op">$</span>expression) <span class="op">==</span><span class="st"> </span>list.of.genes[i]),])</span>
-<span id="cb1-25"><a href="#cb1-25"></a>  table[i,] &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(</span>
-<span id="cb1-26"><a href="#cb1-26"></a>    list.of.genes[i],</span>
-<span id="cb1-27"><a href="#cb1-27"></a>    <span class="kw"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span>(<span class="kw"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span>(numbers <span class="op">~</span><span class="st"> </span>group, temp.data))[<span class="st">'group'</span>,<span class="st">'Pr(&gt;F)'</span>],</span>
-<span id="cb1-28"><a href="#cb1-28"></a>    <span class="kw"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(sample_data<span class="op">$</span>expression[<span class="kw"><a href="https://rdrr.io/r/base/which.html">which</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(sample_data<span class="op">$</span>expression) <span class="op">==</span><span class="st"> </span>list.of.genes[i]),]),</span>
-<span id="cb1-29"><a href="#cb1-29"></a>    <span class="kw"><a href="https://rdrr.io/r/stats/cor.html">var</a></span>(sample_data<span class="op">$</span>expression[<span class="kw"><a href="https://rdrr.io/r/base/which.html">which</a></span>(<span class="kw"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(sample_data<span class="op">$</span>expression) <span class="op">==</span><span class="st"> </span>list.of.genes[i]),]),</span>
-<span id="cb1-30"><a href="#cb1-30"></a>    temp.numbers</span>
-<span id="cb1-31"><a href="#cb1-31"></a>  )</span>
-<span id="cb1-32"><a href="#cb1-32"></a>}</span>
-<span id="cb1-33"><a href="#cb1-33"></a></span>
-<span id="cb1-34"><a href="#cb1-34"></a>table<span class="op">$</span>p.value &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span>(table<span class="op">$</span>p.value)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><html><pre class="r"><span class="no">list.of.genes</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'Abcc4'</span>,<span class="st">'Abraxas2'</span>,<span class="st">'Actn4'</span>,<span class="st">'Acvr1'</span>,<span class="st">'Adam9'</span>,<span class="st">'Adamts5'</span>,<span class="st">'Ager'</span>,<span class="st">'Amer2'</span>,<span class="st">'Ank2'</span>,<span class="st">'Api5'</span>,<span class="st">'Bach1'</span>,<span class="st">'Baz2b'</span>,<span class="st">'Bcl11a'</span>,<span class="st">'Bcl2l2'</span>,<span class="st">'Bcl9'</span>,<span class="st">'Bmt2'</span>,<span class="st">'1700025G04Rik'</span>,<span class="st">'1190002N15Rik'</span>,<span class="st">'Cacna1c'</span>,<span class="st">'Cebpa'</span>,<span class="st">'Chd4'</span>,<span class="st">'Cit'</span>,<span class="st">'Col23a1'</span>,<span class="st">'Csk'</span>,<span class="st">'Csnk1g3'</span>,<span class="st">'Ctcf'</span>,<span class="st">'Cul3'</span>,<span class="st">'Dazl'</span>,<span class="st">'Dbndd2'</span>,<span class="st">'Dcun1d4'</span>,<span class="st">'Ddx3x'</span>,<span class="st">'Ddx3y'</span>,<span class="st">'Dhx57'</span>,<span class="st">'Dpp4'</span>,<span class="st">'Dscam'</span>,<span class="st">'Dtna'</span>,<span class="st">'E2f3'</span>,<span class="st">'Ehd1'</span>,<span class="st">'Ephb1'</span>,<span class="st">'Erc2'</span>,<span class="st">'Etv3'</span>,<span class="st">'Eya2'</span>,<span class="st">'Fam214a'</span>,<span class="st">'Gabarap'</span>,<span class="st">'Galnt16'</span>,<span class="st">'Gdf6'</span>,<span class="st">'Git1'</span>,<span class="st">'Gys1'</span>,<span class="st">'Hdac4'</span>,<span class="st">'Hnrnph3'</span>,<span class="st">'Hspa13'</span>,<span class="st">'Igfbp5'</span>,<span class="st">'Katnbl1'</span>,<span class="st">'Loxl3'</span>,<span class="st">'Lrrc4'</span>,<span class="st">'Lrrc8e'</span>,<span class="st">'Map3k8'</span>,<span class="st">'Mdga2'</span>,<span class="st">'Mex3c'</span>,<span class="st">'Mgat1'</span>,<span class="st">'Mmd'</span>,<span class="st">'Nkiras2'</span>,<span class="st">'Nr3c1'</span>,<span class="st">'Nsd3'</span>,<span class="st">'Nutf2'</span>,<span class="st">'Ogt'</span>,<span class="st">'Ostm1'</span>,<span class="st">'Pdgfra'</span>,<span class="st">'Pfn1'</span>,<span class="st">'Phf20l1'</span>,<span class="st">'Phyhip'</span>,<span class="st">'Pitx2'</span>,<span class="st">'Ppp1cc'</span>,<span class="st">'R3hdm1'</span>,<span class="st">'Reep1'</span>,<span class="st">'Rnf19a'</span>,<span class="st">'Rtkn2'</span>,<span class="st">'Senp1'</span>,<span class="st">'Siah1a'</span>,<span class="st">'Slc25a13'</span>,<span class="st">'Slc38a2'</span>,<span class="st">'Slc41a2'</span>,<span class="st">'Slf2'</span>,<span class="st">'Slmap'</span>,<span class="st">'Snx2'</span>,<span class="st">'Sox4'</span>,<span class="st">'Srr'</span>,<span class="st">'Stag1'</span>,<span class="st">'Stradb'</span>,<span class="st">'Syt6'</span>,<span class="st">'Taf9b'</span>,<span class="st">'Tbx3'</span>,<span class="st">'Trp53inp2'</span>,<span class="st">'Tshz1'</span>,<span class="st">'Tspan2'</span>,<span class="st">'Tssk2'</span>,<span class="st">'Ttyh2'</span>,<span class="st">'Vegfa'</span>,<span class="st">'Wnt1'</span>,<span class="st">'Yes1'</span>,<span class="st">'Zbed4'</span>,<span class="st">'Zbtb10'</span>,<span class="st">'Zfp182'</span>,<span class="st">'Zfp608'</span>,<span class="st">'Zfp654'</span>)
+
+<span class="no">group</span> <span class="kw">&lt;-</span>
+<span class="no">table</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="kw">gene</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/character.html">character</a></span>(), <span class="kw">p.value</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span>(), <span class="kw">overall.mean</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span>(), <span class="kw">overall.variance</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span>(), <span class="kw">stringsAsFactors</span><span class="kw">=</span><span class="fl">FALSE</span>)
+
+<span class="no">data</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span>(<span class="no">sample_data</span>$<span class="no">expression</span>[ <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="no">sample_data</span>$<span class="no">expression</span>), <span class="kw">pattern</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">'^'</span>, <span class="no">list.of.genes</span>, <span class="st">'$'</span>, <span class="kw">collapse</span><span class="kw">=</span><span class="st">'|'</span>))),])))
+<span class="no">data</span>$<span class="no">group</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">vapply</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/strsplit.html">strsplit</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="no">data</span>), <span class="st">'-'</span>), <span class="no">`[`</span>, <span class="fl">2</span>, <span class="kw">FUN.VALUE</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/character.html">character</a></span>(<span class="fl">1</span>))
+
+<span class="no">list.of.genes</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">data</span>)
+
+<span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span>(<span class="no">numbers</span> ~ <span class="no">group</span>, <span class="no">data</span>)
+
+<span class="kw">for</span> ( <span class="no">i</span> <span class="kw">in</span> <span class="no">sample_data</span>$<span class="no">samples</span>$<span class="no">names</span> ) {
+  <span class="no">temp.table</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="st">'.mean'</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span>(), <span class="st">'.variance'</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span>())
+  <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">temp.table</span>) <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="no">i</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span>(<span class="no">temp.table</span>))
+  <span class="no">table</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span>(<span class="no">table</span>, <span class="no">temp.table</span>)
+}
+
+<span class="kw">for</span> ( <span class="no">i</span> <span class="kw">in</span> <span class="fl">1</span>:<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">list.of.genes</span>) ) {
+  <span class="no">temp.numbers</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>()
+  <span class="kw">for</span> ( <span class="no">j</span> <span class="kw">in</span> <span class="no">sample_data</span>$<span class="no">samples</span>$<span class="no">names</span> ) {
+    <span class="no">temp.numbers</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">temp.numbers</span>, <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/tapply.html">tapply</a></span>(<span class="no">sample_data</span>$<span class="no">expression</span>[<span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="no">sample_data</span>$<span class="no">expression</span>) <span class="kw">==</span> <span class="no">list.of.genes</span>[<span class="no">i</span>]),], <span class="no">group</span>, <span class="no">withinRunStats</span>)<span class="kw">[[</span><span class="no">j</span>]]))
+  }
+  <span class="no">temp.data</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="kw">group</span><span class="kw">=</span><span class="no">group</span>, <span class="kw">numbers</span><span class="kw">=</span><span class="no">sample_data</span>$<span class="no">expression</span>[<span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="no">sample_data</span>$<span class="no">expression</span>) <span class="kw">==</span> <span class="no">list.of.genes</span>[<span class="no">i</span>]),])
+  <span class="no">table</span>[<span class="no">i</span>,] <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(
+    <span class="no">list.of.genes</span>[<span class="no">i</span>],
+    <span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span>(<span class="no">numbers</span> ~ <span class="no">group</span>, <span class="no">temp.data</span>))[<span class="st">'group'</span>,<span class="st">'Pr(&gt;F)'</span>],
+    <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="no">sample_data</span>$<span class="no">expression</span>[<span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="no">sample_data</span>$<span class="no">expression</span>) <span class="kw">==</span> <span class="no">list.of.genes</span>[<span class="no">i</span>]),]),
+    <span class="fu"><a href="https://rdrr.io/r/stats/cor.html">var</a></span>(<span class="no">sample_data</span>$<span class="no">expression</span>[<span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="no">sample_data</span>$<span class="no">expression</span>) <span class="kw">==</span> <span class="no">list.of.genes</span>[<span class="no">i</span>]),]),
+    <span class="no">temp.numbers</span>
+  )
+}
+
+<span class="no">table</span>$<span class="no">p.value</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span>(<span class="no">table</span>$<span class="no">p.value</span>)</pre></html></div>
 </div>
 </div>
 
 
+  </div>
+
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 
 </div>
@@ -226,7 +236,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>
