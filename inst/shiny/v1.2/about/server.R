@@ -5,7 +5,7 @@
 output[["about"]] <- renderText({
   paste0(
     '<b>Version of cerebroApp</b><br>',
-    'v1.2.1<br>
+    'v1.2.2<br>
     <br>
     <b>Author</b><br>
     Roman Hillje<br>

@@ -1,6 +1,14 @@
 \name{NEWS}
 \title{News for Package \pkg{cerebroApp}}
 
+\section{Changes in version 1.2.2}{
+\itemize{
+    \item Hotfixes:
+    \itemize{
+      \item \texttt{getEnrichedPathways()} no longer results in an error when marker genes are present but no database returns any enriched pathways, e.g. because there are too few marker genes. Thanks to \href{@turkeyri}{https://github.com/turkeyri} for pointing it out and suggesting a solution!
+    }
+}}
+
 \section{Changes in version 1.2.1}{
 \itemize{
     \item New features:

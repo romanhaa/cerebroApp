@@ -1,3 +1,9 @@
+# cerebroApp 1.2.2
+
+## Hotfixes
+
+- `getEnrichedPathways()` no longer results in an error when marker genes are present but no database returns any enriched pathways, e.g. because there are too few marker genes. Thanks to @turkeyri for pointing it out and suggesting a solution!
+
 # cerebroApp 1.2.1
 
 ## New features
