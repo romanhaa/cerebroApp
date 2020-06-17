@@ -64,5 +64,5 @@ output[["logo_Cerebro"]] <- renderImage({
     alt = "Cerebro logo",
     align = "right"
   )},
-  deleteFile = TRUE
+  deleteFile = FALSE
 )
