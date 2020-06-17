@@ -173,11 +173,12 @@ percentage of mitochondrial and ribosomal gene expression for each cell.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata/v1.2/seurat_pbmc.rds"</span>,
-  <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"cerebroApp"</span>))</div><div class='output co'>#&gt; <span class='warning'>Warning: running command ''/usr/bin/python3' "/Library/Frameworks/R.framework/Versions/3.6/Resources/library/reticulate/config/config.py" 2&gt;/dev/null' had status 1</span></div><div class='input'><span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'>addPercentMtRibo</span>(
+  <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"cerebroApp"</span>))
+<span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'>addPercentMtRibo</span>(
   <span class='kw'>object</span> <span class='kw'>=</span> <span class='no'>pbmc</span>,
   <span class='kw'>organism</span> <span class='kw'>=</span> <span class='st'>'hg'</span>,
   <span class='kw'>gene_nomenclature</span> <span class='kw'>=</span> <span class='st'>'name'</span>
-)</div><div class='output co'>#&gt; <span class='message'>[11:20:37] No mitochondrial genes found in data set.</span></div><div class='output co'>#&gt; <span class='message'>[11:20:37] Calculate percentage of 1 ribosomal transcript(s) present in the data set...</span></div></pre>
+)</div><div class='output co'>#&gt; <span class='message'>[11:41:02] No mitochondrial genes found in data set.</span></div><div class='output co'>#&gt; <span class='message'>[11:41:02] Calculate percentage of 1 ribosomal transcript(s) present in the data set...</span></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
