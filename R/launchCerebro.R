@@ -27,13 +27,13 @@
 #'   launchCerebro(maxFileSize = 800)
 #' }
 launchCerebro <- function(
-  version = "v1.2",
+  version = "v1.3",
   maxFileSize = 800
 ){
   ##--------------------------------------------------------------------------##
   ##
   ##--------------------------------------------------------------------------##
-  available_versions = c("v1.0","v1.1","v1.2")
+  available_versions = c("v1.0","v1.1","v1.2","v1.3")
   if ( (version %in% available_versions == FALSE ) )
   {
     stop(
@@ -114,7 +114,7 @@ launchCerebro <- function(
     ),
     local = TRUE
   )
-  if ( version %in% c('v1.1','v1.2') ) {
+  if ( version %in% c('v1.1','v1.2','v1.3') ) {
     source(
       system.file(
         paste0("shiny/", version, "/trajectory/info.R"),

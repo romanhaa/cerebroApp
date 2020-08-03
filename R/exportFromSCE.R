@@ -1,24 +1,23 @@
-#' Export Seurat object to Cerebro.
-#' @title Export Seurat object to Cerebro.
-#' @description This function allows to export a Seurat object to visualize in
-#' Cerebro.
-#' @keywords Cerebro scRNAseq Seurat
-#' @param object Seurat object.
-#' @param assay Assay to pull expression values from; defaults to 'RNA'.
-#' @param slot Slot to pull expression values from; defaults to 'data'. It is
-#' recommended to use sparse data (such as log-transformed or raw counts)
+#' Export SingleCellExperiment (SCE) object to Cerebro.
+#' @title Export SingleCellExperiment (SCE) object to Cerebro.
+#' @description This function allows to export a SingleCellExperiment (SCE)
+#' object to visualize in Cerebro.
+#' @keywords Cerebro scRNAseq SingleCellExperiment SCE
+#' @param object SingleCellExperiment (SCE) object.
+#' @param assay Assay to pull expression values from; defaults to 'logcounts'.
+#' It is recommended to use sparse data (such as log-transformed or raw counts)
 #' instead of dense data (such as the 'scaled' slot) to avoid performance
 #' bottlenecks in the Cerebro interface.
 #' @param file Where to save the output.
 #' @param experiment_name Experiment name.
 #' @param organism Organism, e.g. hg (human), mm (mouse), etc.
 #' @param columns_groups Names of grouping variables in meta data
-#' (object@meta.data), e.g. c("sample","cluster"); at least one must be
+#' (colData(object)), e.g. c("sample","cluster"); at least one must be
 #' provided; defaults to NULL.
-#' @param column_nUMI Column in object@meta.data that contains information about
+#' @param column_nUMI Column in colData(object) that contains information about
 #' number of transcripts per cell; defaults to 'nUMI'.
-#' @param column_nGene Column in object@meta.data that contains information
-#' about number of expressed genes per cell; defaults to 'nGene'.
+#' @param column_nGene Column in colData(object) that contains information about
+#' number of expressed genes per cell; defaults to 'nGene'.
 #' @param columns_cell_cycle Names of columns in meta data (object@meta.data)
 #' that contain cell cycle information.e.g. c("Phase"); defaults to NULL.
 #' @param add_all_meta_data If set to TRUE, all further meta data columns will
@@ -29,11 +28,11 @@
 #' @importFrom rlang .data
 #' @importFrom SingleCellExperiment SingleCellExperiment
 #' @examples
-#' pbmc <- readRDS(system.file("extdata/v1.2/seurat_pbmc.rds",
+#' pbmc <- readRDS(system.file("extdata/v1.2/SCE_pbmc.rds",
 #'   package = "cerebroApp"))
-#' exportFromSeurat(
+#' exportFromSCE(
 #'   object = pbmc,
-#'   file = 'pbmc_Seurat.crb',
+#'   file = 'pbmc_SCE.crb',
 #'   experiment_name = 'PBMC',
 #'   organism = 'hg',
 #'   columns_groups = c('sample','cluster'),
@@ -41,10 +40,9 @@
 #'   column_nGene = 'nFeature_RNA',
 #'   columns_cell_cycle = c('Phase')
 #' )
-exportFromSeurat <- function(
+exportFromSCE <- function(
   object,
-  assay = 'RNA',
-  slot = 'data',
+  assay = 'logcounts',
   file,
   experiment_name,
   organism,
@@ -57,48 +55,36 @@ exportFromSeurat <- function(
   ##--------------------------------------------------------------------------##
   ## check provided parameters
   ##--------------------------------------------------------------------------##
-  ## check if Seurat is installed
-  if (!requireNamespace("Seurat", quietly = TRUE))
+  ## check if SingleCellExperiment is installed
+  if (!requireNamespace("SingleCellExperiment", quietly = TRUE))
   {
     stop(
       paste0(
-        "Package 'Seurat' is needed for this function to work. ",
+        "Package 'SingleCellExperiment' is needed for this function to work. ",
         "Please install it."
       ),
       call. = FALSE
     )
   }
-  ## check if provided object is a Seurat object
-  if ( tolower(class(object)) != 'seurat' )
+  ## check if provided object is a SingleCellExperiment object
+  if ( class(object) != 'SingleCellExperiment' )
   {
     stop(
       paste0(
         "The provided object (class `", class(object), "`) does not look ",
-        "like a Seurat object."
-      ),
-      call. = FALSE
-    )
-  }
-  ## check if Seurat object is too old
-  if ( object@version < 3 )
-  {
-    stop(
-      paste0(
-        "Objects created by Seurat versions prior to v3.0 are no longer ",
-        "supported. Please use the `UpdateSeuratObject()` function or use an ",
-        "older version of Cerebro."
+        "like a SingleCellExperiment object."
       ),
       call. = FALSE
     )
   }
   ## `columns_groups`
-  if ( any(columns_groups %in% names(object@meta.data) == FALSE ) )
+  if ( any(columns_groups %in% names(colData(object)) == FALSE ) )
   {
     stop(
       paste0(
         'Some group columns could not be found in meta data: ',
         paste0(
-          columns_groups[which(columns_groups %in% names(object@meta.data) == FALSE)],
+          columns_groups[which(columns_groups %in% names(colData(object)) == FALSE)],
           collapse = ', '
         )
       ),
@@ -106,7 +92,7 @@ exportFromSeurat <- function(
     )
   }
   ## `column_nUMI`
-  if ( ( column_nUMI %in% names(object@meta.data) == FALSE ) )
+  if ( (column_nUMI %in% names(colData(object)) == FALSE ) )
   {
     stop(
       paste0(
@@ -117,7 +103,7 @@ exportFromSeurat <- function(
     )
   }
   ## `column_nGene`
-  if ( (column_nGene %in% names(object@meta.data) == FALSE ) )
+  if ( (column_nGene %in% names(colData(object)) == FALSE ) )
   {
     stop(
       paste0(
@@ -128,13 +114,13 @@ exportFromSeurat <- function(
     )
   }
   ## `columns_cell_cycle`
-  if ( any(columns_cell_cycle %in% names(object@meta.data) == FALSE ) )
+  if ( any(columns_cell_cycle %in% names(colData(object)) == FALSE ) )
   {
     stop(
       paste0(
         'Some cell cycle columns could not be found in meta data: ',
         paste0(
-          columns_cell_cycle[which(columns_cell_cycle %in% names(object@meta.data) == FALSE)],
+          columns_cell_cycle[which(columns_cell_cycle %in% names(colData(object)) == FALSE)],
           collapse = ', '
         )
       ),
@@ -150,25 +136,12 @@ exportFromSeurat <- function(
     )
   )
   ## check if provided assay exists
-  if ( (assay %in% names(object@assays) == FALSE ) )
+  if ( (assay %in% names(assays(object)) == FALSE ) )
   {
     stop(
       paste0(
-        'Specified assay `', assay, '` could not be found in provided Seurat ',
+        'Specified assay `', assay, '` could not be found in provided SCE ',
         'object.'
-      ),
-      call. = FALSE
-    )
-  }
-  expression_data <- try(
-    Seurat::GetAssayData(object, assay = assay, slot = slot),
-    silent = TRUE
-  )
-  ## check if provided slot exists in provided assay
-  if ( class(expression_data) == 'try-error' ) {
-    stop(
-      paste0(
-        'Slot `', slot, '` could not be found in `', assay, '` assay slot.'
       ),
       call. = FALSE
     )
@@ -187,51 +160,51 @@ exportFromSeurat <- function(
 
   ## add expression data
   export$expression <- SingleCellExperiment::SingleCellExperiment(
-    assays = list(expression = expression_data)
+    assays = list(expression = assay(object, assay))
   )
 
   ##--------------------------------------------------------------------------##
   ## collect some more data if present
   ##--------------------------------------------------------------------------##
   ## data of analysis
-  export$addExperiment('date_of_analysis', object@misc$experiment$date_of_analysis)
+  export$addExperiment('date_of_analysis', object@metadata$experiment$date_of_analysis)
 
   ## date of export
   export$addExperiment('date_of_export', Sys.Date())
 
   ## `parameters`
-  if ( !is.null(object@misc$parameters) )
+  if ( !is.null(object@metadata$parameters) )
   {
-    for ( i in seq(length(object@misc$parameters)) )
+    for ( i in seq(length(object@metadata$parameters)) )
     {
       name <- names(object@misc$parameters)[i]
       export$addParameters(
         name,
-        object@misc$parameters[[name]]
+        object@metadata$parameters[[name]]
       )
     }
   }
 
   ## `technical_info`
-  if ( !is.null(object@misc$technical_info) )
+  if ( !is.null(object@metadata$technical_info) )
   {
-    for ( i in seq(length(object@misc$technical_info)) )
+    for ( i in seq(length(object@metadata$technical_info)) )
     {
       export$addTechnicalInfo(
-        names(object@misc$technical_info)[i],
-        object@misc$technical_info[[i]]
+        names(object@metadata$technical_info)[i],
+        object@metadata$technical_info[[i]]
       )
     }
   }
 
   ## `gene_lists`
-  if ( !is.null(object@misc$gene_lists) )
+  if ( !is.null(object@metadata$gene_lists) )
   {
-    for ( i in seq(length(object@misc$gene_lists)) )
+    for ( i in seq(length(object@metadata$gene_lists)) )
     {
       export$addGeneList(
-        names(object@misc$parameters)[i],
-        object@misc$gene_lists[[i]]
+        names(object@metadata$parameters)[i],
+        object@metadata$gene_lists[[i]]
       )
     }
   }
@@ -246,28 +219,28 @@ exportFromSeurat <- function(
   )
 
   ## cell barcodes
-  colData(export$expression)$cell_barcode <- Cells(object)
+  colData(export$expression)$cell_barcode <- colnames(object)
 
   ## factorize group variables and add groups
   for ( i in columns_groups )
   {
-    if ( is.factor(object@meta.data[[i]]) )
+    if ( is.factor(colData(object)[[i]]) )
     {
-      tmp_names <- levels(object@meta.data[[i]])
+      tmp_names <- levels(colData(object)[[i]])
     } else
     {
-      tmp_names <- unique(object@meta.data[[i]])
+      tmp_names <- unique(colData(object)[[i]])
     }
-    colData(export$expression)[[i]] <- factor(object@meta.data[[i]], levels = tmp_names)
+    colData(export$expression)[[i]] <- factor(colData(object)[[i]], levels = tmp_names)
     export$addGroup(i, tmp_names)
   }
 
   ## number of transcripts and expressed genes
-  colData(export$expression)$nUMI = object@meta.data[[column_nUMI]]
-  colData(export$expression)$nGene = object@meta.data[[column_nGene]]
+  colData(export$expression)$nUMI = colData(object)[[column_nUMI]]
+  colData(export$expression)$nGene = colData(object)[[column_nGene]]
 
   ## rest of meta data
-  meta_data_columns <- names(object@meta.data)
+  meta_data_columns <- names(colData(object))
   meta_data_columns <- meta_data_columns[-which(meta_data_columns %in% columns_groups)]
   meta_data_columns <- meta_data_columns[-which(meta_data_columns == column_nUMI)]
   meta_data_columns <- meta_data_columns[-which(meta_data_columns == column_nGene)]
@@ -279,14 +252,14 @@ exportFromSeurat <- function(
   {
     for ( i in columns_cell_cycle )
     {
-      if ( is.factor(object@meta.data[[i]]) )
+      if ( is.factor(colData(object)[[i]]) )
       {
-        tmp_names <- levels(object@meta.data[[i]])
+        tmp_names <- levels(colData(object)[[i]])
       } else
       {
-        tmp_names <- unique(object@meta.data[[i]])
+        tmp_names <- unique(colData(object)[[i]])
       }
-      colData(export$expression)[[i]] <- factor(object@meta.data[[i]], levels = tmp_names)
+      colData(export$expression)[[i]] <- factor(colData(object)[[i]], levels = tmp_names)
     }
     export$setCellCycle(columns_cell_cycle)
     meta_data_columns <- meta_data_columns[-which(meta_data_columns %in% columns_cell_cycle)]
@@ -305,7 +278,7 @@ exportFromSeurat <- function(
     )
     for ( i in meta_data_columns )
     {
-      colData(export$expression)[[i]] <- object@meta.data[[i]]
+      colData(export$expression)[[i]] <- colData(object)[[i]]
     }
   }
 
@@ -315,13 +288,13 @@ exportFromSeurat <- function(
   ##--------------------------------------------------------------------------##
   ## most expressed genes
   ##--------------------------------------------------------------------------##
-  if ( !is.null(object@misc$most_expressed_genes) )
+  if ( !is.null(object@metadata$most_expressed_genes) )
   {
     ## check if it's a list
-    if ( !is.list(object@misc$most_expressed_genes) )
+    if ( !is.list(object@metadata$most_expressed_genes) )
     {
       stop(
-        '`object@misc$most_expressed_genes` is not a list.',
+        '`object@metadata$most_expressed_genes` is not a list.',
         call. = FALSE
       )
     }
@@ -331,11 +304,11 @@ exportFromSeurat <- function(
         '] Extracting tables of most expressed genes...'
       )
     )
-    for ( i in seq(length(object@misc$most_expressed_genes)) )
+    for ( i in seq(length(object@metadata$most_expressed_genes)) )
     {
       export$addMostExpressedGenes(
-        names(object@misc$most_expressed_genes)[i],
-        object@misc$most_expressed_genes[[i]]
+        names(object@metadata$most_expressed_genes)[i],
+        object@metadata$most_expressed_genes[[i]]
       )
     }
   }
@@ -343,13 +316,13 @@ exportFromSeurat <- function(
   ##--------------------------------------------------------------------------##
   ## marker genes
   ##--------------------------------------------------------------------------##
-  if ( !is.null(object@misc$marker_genes) )
+  if ( !is.null(object@metadata$marker_genes) )
   {
     ## check if it's a list
-    if ( !is.list(object@misc$marker_genes) )
+    if ( !is.list(object@metadata$marker_genes) )
     {
       stop(
-        '`object@misc$marker_genes` is not a list.',
+        '`object@metadata$marker_genes` is not a list.',
         call. = FALSE
       )
     }
@@ -360,17 +333,17 @@ exportFromSeurat <- function(
       )
     )
     ## for each method
-    for ( i in seq(length(object@misc$marker_genes)) )
+    for ( i in seq(length(object@metadata$marker_genes)) )
     {
-      method <- names(object@misc$marker_genes)[i]
+      method <- names(object@metadata$marker_genes)[i]
       ## for each group
-      for ( j in seq(length(object@misc$marker_genes[[method]])) )
+      for ( j in seq(length(object@metadata$marker_genes[[method]])) )
       {
-        group <- names(object@misc$marker_genes[[method]])[j]
+        group <- names(object@metadata$marker_genes[[method]])[j]
         export$addMarkerGenes(
           method,
           group,
-          object@misc$marker_genes[[method]][[group]]
+          object@metadata$marker_genes[[method]][[group]]
         )
       }
     }
@@ -379,13 +352,13 @@ exportFromSeurat <- function(
   ##--------------------------------------------------------------------------##
   ## enriched pathways
   ##--------------------------------------------------------------------------##
-  if ( !is.null(object@misc$enriched_pathways) )
+  if ( !is.null(object@metadata$enriched_pathways) )
   {
     ## check if it's a list
-    if ( !is.list(object@misc$enriched_pathways) )
+    if ( !is.list(object@metadata$enriched_pathways) )
     {
       stop(
-        '`object@misc$enriched_pathways` is not a list.',
+        '`object@metadata$enriched_pathways` is not a list.',
         call. = FALSE
       )
     }
@@ -396,17 +369,17 @@ exportFromSeurat <- function(
       )
     )
     ## for each method
-    for ( i in seq(length(object@misc$enriched_pathways)) )
+    for ( i in seq(length(object@metadata$enriched_pathways)) )
     {
-      method <- names(object@misc$enriched_pathways)[i]
+      method <- names(object@metadata$enriched_pathways)[i]
       ## for each group
-      for ( j in seq(length(object@misc$enriched_pathways[[method]])) )
+      for ( j in seq(length(object@metadata$enriched_pathways[[method]])) )
       {
-        group <- names(object@misc$enriched_pathways[[method]])[j]
+        group <- names(object@metadata$enriched_pathways[[method]])[j]
         export$addEnrichedPathways(
           method,
           group,
-          object@misc$enriched_pathways[[method]][[group]]
+          object@metadata$enriched_pathways[[method]][[group]]
         )
       }
     }
@@ -422,7 +395,7 @@ exportFromSeurat <- function(
     )
   )
   projections <- list()
-  projections_available <- names(object@reductions)
+  projections_available <- names(SingleCellExperiment::reducedDims(object))
   projections_available_pca <- projections_available[grep(
     projections_available, pattern = 'pca', ignore.case = TRUE, invert = FALSE
   )]
@@ -436,9 +409,7 @@ exportFromSeurat <- function(
     length(projections_available) == 1 &&
     length(projections_available_pca) == 1 )
   {
-    SingleCellExperiment::reducedDims(export$expression)[[projections_available]] <- as.data.frame(
-      object@reductions[[projections_available]]@cell.embeddings
-    )
+    SingleCellExperiment::reducedDims(export$expression)[[projections_available]] <- SingleCellExperiment::reducedDims(object)[[projections_available]]
     warning(
       paste0(
         'Warning: Only PCA as dimensional reduction found, will export ',
@@ -457,16 +428,14 @@ exportFromSeurat <- function(
     )
     for ( i in projections_available_non_pca )
     {
-      SingleCellExperiment::reducedDims(export$expression)[[i]] <- as.data.frame(
-        object@reductions[[i]]@cell.embeddings
-      )
+      SingleCellExperiment::reducedDims(export$expression)[[i]] <- SingleCellExperiment::reducedDims(object)[[i]]
     }
   }
 
   ##--------------------------------------------------------------------------##
   ## trajectories
   ##--------------------------------------------------------------------------##
-  if ( length(object@misc$trajectory) == 0 )
+  if ( length(object@metadata$trajectory) == 0 )
   {
     message(
       paste0(
@@ -479,20 +448,20 @@ exportFromSeurat <- function(
       paste0(
         '[', format(Sys.time(), '%H:%M:%S'), '] ',
         'Will export the following trajectories: ',
-        paste(names(object@misc$trajectories$monocle2), collapse = ', ')
+        paste(names(object@metadata$trajectories$monocle2), collapse = ', ')
       )
     )
     ## for each method
-    for ( i in seq(length(object@misc$trajectories)) )
+    for ( i in seq(length(object@metadata$trajectories)) )
     {
-      method <- names(object@misc$trajectories)[i]
+      method <- names(object@metadata$trajectories)[i]
       ## for each trajectory
-      for ( j in seq(length(object@misc$trajectories[[i]])) )
+      for ( j in seq(length(object@metadata$trajectories[[i]])) )
       {
         export$addTrajectory(
           method,
-          names(object@misc$trajectories[[i]])[j],
-          object@misc$trajectories[[i]][[j]]
+          names(object@metadata$trajectories[[i]])[j],
+          object@metadata$trajectories[[i]][[j]]
         )
       }
     }
@@ -501,13 +470,13 @@ exportFromSeurat <- function(
   ##--------------------------------------------------------------------------##
   ## group trees
   ##--------------------------------------------------------------------------##
-  if ( !is.null(object@misc$trees) )
+  if ( !is.null(object@metadata$trees) )
   {
     ## check if it's a list
-    if ( !is.list(object@misc$trees) )
+    if ( !is.list(object@metadata$trees) )
     {
       stop(
-        '`object@misc$trees` is not a list.',
+        '`object@metadata$trees` is not a list.',
         call. = FALSE
       )
     }
@@ -516,11 +485,11 @@ exportFromSeurat <- function(
         '[', format(Sys.time(), '%H:%M:%S'), '] Extracting trees...'
       )
     )
-    for ( i in seq(length(object@misc$trees)) )
+    for ( i in seq(length(object@metadata$trees)) )
     {
       export$addTree(
-        names(object@misc$trees)[i],
-        object@misc$trees[[i]]
+        names(object@metadata$trees)[i],
+        object@metadata$trees[[i]]
       )
     }
   }

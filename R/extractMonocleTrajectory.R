@@ -3,7 +3,7 @@
 #' @description This function takes a Monocle object, extracts a trajectory that
 #' was calculated, and stores it in the specified Seurat object. Trajectory info
 #' (state, pseudotime, projection and tree) will be stored in
-#' seurat@misc$trajectory under the specified name.
+#' seurat@misc$trajectories under the specified name.
 #' @keywords Cerebro scRNAseq Seurat Monocle trajectory
 #' @param monocle Monocle object to extract trajectory from.
 #' @param seurat Seurat object to transfer trajectory to.
@@ -15,7 +15,7 @@
 #' @export
 #' @return Returns Seurat object with added trajectory. Trajectory info (state,
 #' pseudotime, projection and tree) will be stored in
-#' `object@misc$trajectory$monocle2` under the specified name.
+#' `object@misc$trajectories$monocle2` under the specified name.
 #' @importFrom rlang .data
 #' @examples
 #' \dontrun{
@@ -111,12 +111,12 @@ extractMonocleTrajectory <- function(
       call. = FALSE
     )
   }
-  if ( !is.null(seurat@misc$trajectory[[trajectory_name]]) )
+  if ( !is.null(seurat@misc$trajectories[[trajectory_name]]) )
   {
     stop(
       paste0(
         "Trajectory with specified name ('", trajectory_name,
-        "') already exists in seurat@misc$trajectory. Please choose a ',
+        "') already exists in seurat@misc$trajectories. Please choose a ',
         'different name or manually remove data from that slot."
       ),
       call. = FALSE
@@ -244,10 +244,10 @@ extractMonocleTrajectory <- function(
   ##--------------------------------------------------------------------------##
   ## Add trajectory info to Seurat object.
   ##--------------------------------------------------------------------------##
-  if ( is.null(seurat@misc$trajectory) ) {
-    seurat@misc$trajectory <- list()
+  if ( is.null(seurat@misc$trajectories) ) {
+    seurat@misc$trajectories <- list()
   }
-  seurat@misc$trajectory$monocle2[[trajectory_name]] <- list(
+  seurat@misc$trajectories$monocle2[[trajectory_name]] <- list(
     meta = trajectory_info,
     edges = edges
   )

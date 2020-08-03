@@ -1,3 +1,20 @@
+# cerebroApp 1.3.0
+
+## Major changes
+
+- With data sets becoming more complex, users often have more than just the two grouping variables Cerebro was initially made to work with ('sample' and 'cluster'). To provide a more generalized interface, users can now specify a list of grouping variables. Consequently, the 'Samples' and 'Clusters' tabs in the Cerebro interface have been replaced with a single 'Groups' interface, where users can select one of the available grouping variables (with the same content as before). This can be useful when you cluster the cells with different methods/settings and want to provide the Cerebro user with both results.
+- Removed support for Seurat objects before v3.0. Users who need to continue working with older version of Seurat have two options: (1) use the `Seurat::UpdateSeuratObject()` function to update their Seurat object before exporting it for visualization in Cerebro; (2) use older Cerebro version. I apologize for the any trouble this may cause.
+- Data loaded into Cerebro is now stored as a `SingleCellExperiment` (SCE) object. This streamlines the internal interaction with the data and ensures a stable structure for future releases.
+- Due to the changes in data structure, files exported with cerebroApp v1.3 can only be visualized in Cerebro v1.3. Moreover, files exported with cerebroApp v1.2 and earlier cannot be loaded into Cerebro v1.3. Again, I apologize for any inconvenience but I believe these changes will lead to more stability coming releases.
+
+## New features
+
+- It is now possible to export single cell data stored in `SingleCellExperiment` (SCE) objects.
+
+## Minor changes
+
+- Hierarchical trees can be useful to show similarities between cell populations. Previously, a tree could only be visualized for clusters. By modifying the cell identities in a Seurat object, the Seurat function `BuildClusterTree()` can be used to calculate trees also for other cell groupings. To allow exporting multiple trees, they need to now be stored as a `list()` in the `@misc` or the `@metadata` slot of Seurat or SingleCellExperiment objects, respectively.
+
 # cerebroApp 1.2.1
 
 ## New features

@@ -165,20 +165,31 @@ getEnrichedPathways <- function(
         results_by_sample[[i]] <- results_by_sample[[i]] %>%
           dplyr::mutate(sample = i)
       }
-      ## merge samples into single table
-      results_by_sample <- do.call(rbind, results_by_sample) %>%
-        dplyr::select('sample', 'db', dplyr::everything()) %>%
-        dplyr::mutate(
-          sample = factor(.data$sample, levels = intersect(sample_names,
-            .data$sample)),
-          db = factor(.data$db, databases)
+      ## check if all databases returned empty lists
+      if ( length(results_by_sample) == 0 ) {
+        results_by_sample <- 'no_markers_found'
+        message(
+          paste0(
+            '[', format(Sys.time(), '%H:%M:%S'), '] 0 pathways passed the ',
+            'thresholds across all samples and databases.'
+          )
         )
-      message(
-        paste0(
-          '[', format(Sys.time(), '%H:%M:%S'), '] ', nrow(results_by_sample),
-          ' pathways passed the thresholds across all samples and databases.'
+      } else {
+        ## merge samples into single table
+        results_by_sample <- do.call(rbind, results_by_sample) %>%
+          dplyr::select('sample', 'db', dplyr::everything()) %>%
+          dplyr::mutate(
+            sample = factor(.data$sample, levels = intersect(sample_names,
+              .data$sample)),
+            db = factor(.data$db, databases)
+          )
+        message(
+          paste0(
+            '[', format(Sys.time(), '%H:%M:%S'), '] ', nrow(results_by_sample),
+            ' pathways passed the thresholds across all samples and databases.'
+          )
         )
-      )
+      }
     } else if ( object@misc$marker_genes$by_sample == 'no_markers_found' )
     {
       message(
@@ -301,20 +312,31 @@ getEnrichedPathways <- function(
         results_by_cluster[[i]] <- results_by_cluster[[i]] %>%
           dplyr::mutate(cluster = i)
       }
-      ## merge clusters into single table
-      results_by_cluster <- do.call(rbind, results_by_cluster) %>%
-        dplyr::select(.data$cluster, .data$db, dplyr::everything()) %>%
-        dplyr::mutate(
-          cluster = factor(.data$cluster, levels = intersect(cluster_names,
-            .data$cluster)),
-          db = factor(.data$db, databases)
+      ## check if all databases returned empty lists
+      if ( length(results_by_cluster) == 0 ) {
+        results_by_cluster <- 'no_markers_found'
+        message(
+          paste0(
+            '[', format(Sys.time(), '%H:%M:%S'), '] 0 pathways passed the ',
+            'thresholds across all samples and databases.'
+          )
         )
-      message(
-        paste0(
-          '[', format(Sys.time(), '%H:%M:%S'), '] ', nrow(results_by_cluster),
-          ' pathways passed the thresholds across all clusters and databases.'
+      } else {
+        ## merge clusters into single table
+        results_by_cluster <- do.call(rbind, results_by_cluster) %>%
+          dplyr::select(.data$cluster, .data$db, dplyr::everything()) %>%
+          dplyr::mutate(
+            cluster = factor(.data$cluster, levels = intersect(cluster_names,
+              .data$cluster)),
+            db = factor(.data$db, databases)
+          )
+        message(
+          paste0(
+            '[', format(Sys.time(), '%H:%M:%S'), '] ', nrow(results_by_cluster),
+            ' pathways passed the thresholds across all clusters and databases.'
+          )
         )
-      )
+      }
     } else if ( object@misc$marker_genes$by_cluster == 'no_markers_found' )
     {
       message(

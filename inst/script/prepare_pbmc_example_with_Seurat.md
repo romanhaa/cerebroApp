@@ -37,5 +37,5 @@ pbmc <- getMarkerGenes(
   column_cluster = 'seurat_clusters'
 )
 
-saveRDS(pbmc, 'inst/extdata/v1.2/seurat_pbmc.rds')
+saveRDS(pbmc, 'inst/extdata/v1.3/pbmc_Seurat.rds')
 ```
