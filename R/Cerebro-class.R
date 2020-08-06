@@ -97,6 +97,11 @@ Cerebro <- setRefClass(
       checkIfColumnExistsInMetadata(group_name)
       return(groups[[group_name]])
     },
+    ## get data frame of cell meta data
+    getMetaData = function()
+    {
+      return(as.data.frame(colData(expression)))
+    },
     ## cell cycle information
     setCellCycle = function(x)
     {
@@ -112,6 +117,20 @@ Cerebro <- setRefClass(
     getExpression = function()
     {
       return(assay(expression, 'expression'))
+    },
+    ## available projections
+    availableProjections = function()
+    {
+      return(reducedDimNames(expression))
+    },
+    ## get projection
+    getProjection = function(name)
+    {
+      if ( name %in% availableProjections() == FALSE ) {
+        stop(paste0('Projection "', name, '" is not available.'), call. = FALSE)
+      } else {
+        return(reducedDim(expression, name))
+      }
     },
     ## most expressed genes
     addMostExpressedGenes = function(group_name, most_expressed_genes)
@@ -262,8 +281,8 @@ Cerebro <- setRefClass(
             paste0(.self$getGroups(), collapse = ', '), '\n',
           'cell cycle variables (', length(cell_cycle), '): ',
             paste0(cell_cycle, collapse = ', '), '\n',
-          'projections (', length(reducedDims(expression)),'): ',
-            paste0(names(reducedDims(expression)), collapse = ', '), '\n',
+          'projections (', length(.self$availableProjections()),'): ',
+            paste0(.self$availableProjections(), collapse = ', '), '\n',
           'trees (', length(trees),'): ',
             paste0(names(trees), collapse = ', '), '\n',
           'most expressed genes: ',

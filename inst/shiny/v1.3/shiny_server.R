@@ -219,6 +219,8 @@ server <- function(input, output, session) {
       dplyr::mutate_if(is.numeric, function(x) ifelse(x == Inf, 999, x)) %>%
       dplyr::mutate_if(is.numeric, function(x) ifelse(x == -Inf, -999, x))
 
+    table_original <- table
+
     ## get column type for alignment in table
     ## factors, characters and logical are centered and numeric columns are
     ## right-aligned
@@ -300,90 +302,12 @@ server <- function(input, output, session) {
       table_buttons <- list()
     }
 
-    ## prepare table with formattable to use colors
-    if ( color_highlighting == TRUE ) {
-
-      ## format numbers (cannot be done with DT because the color formatting of
-      ## formattable messes up number formatting with DT)
-      if ( number_formatting == TRUE ) {
-
-        ## remove digits behind comma for integer columns
-        for ( i in columns_integer ) {
-          table[[i]] <- formattable::comma(table[[i]], big.mark = ",", digits = 0)
-        }
-
-        ## show percentages properly
-        for ( i in columns_percent ) {
-          table[[i]] <- formattable::percent(table[[i]], digits = 2)
-        }
-
-        ## round logFC values
-        for ( i in columns_logFC ) {
-          table[[i]] <- formattable::digits(table[[i]], digits = 3)
-        }
-
-      }
-
-      ## prepare color formatting
-      format_list <- list()
-
-      ## add color indicators for all numeric columns
-      for ( i in columns_numeric ) {
-        format_list[[ colnames(table)[i] ]] <- formattable::color_tile("white", "orange")
-      }
-
-      ## add color indicator for logical columns
-      for ( i in columns_logical ) {
-        format_list[[ colnames(table)[i] ]] <- formattable::formatter(
-          "span",
-          style = x~formattable::style(color = ifelse(x, "green", "red"))
-        )
-      }
-
-      ## show percentages with pink color bar
-      for ( i in columns_percent ) {
-        format_list[[ colnames(table)[i] ]] <- formattable::color_bar("pink")
-      }
-
-      ## no colors for p-values because the range of values is often so large
-      ## that it doesn't seem to help
-
-      ## prepare table
-      table <- formattable::formattable(
-          table,
-          format_list
-        ) %>%
-        formattable::as.datatable(
-          autoHideNavigation = TRUE,
-          class = "stripe table-bordered table-condensed",
-          escape = FALSE,
-          extensions = table_extensions,
-          filter = filter,
-          rownames = FALSE,
-          selection = "single",
-          style = "bootstrap",
-          options = list(
-            buttons = table_buttons,
-            columnDefs = list(
-              list(targets = "_all", className = 'dt-middle'),
-              list(targets = c(columns_hide, columns_with_long_content), visible = FALSE)
-            ),
-            colReorder = list(
-              realtime = FALSE
-            ),
-            dom = dom,
-            lengthMenu = page_length_menu,
-            pageLength = page_length_default,
-            scrollX = TRUE
-          )
-        )
-
-    ## if no color formatting is used, prepare table with DT which has the
-    ## advantage that column filters provide extra functionality for numeric and
-    ## factor columns
-    } else {
-
-      table <- DT::datatable(
+    ## - create table
+    ## - prevent text wrap for characters/factors/logicals
+    ## - align characters in left
+    ## - align factors/logicals in center
+    ## - align numerics to the right
+    table <- DT::datatable(
         table,
         autoHideNavigation = TRUE,
         class = "stripe table-bordered table-condensed",
@@ -407,53 +331,31 @@ server <- function(input, output, session) {
           pageLength = page_length_default,
           scrollX = TRUE
         )
-      )
-
-    }
-
-    ## align characters and numbers
-    table <- table %>%
+      ) %>%
       DT::formatStyle(
-        columns = c(columns_factor, columns_character, columns_logical),
-        textAlign = 'center'
+        columns = c(columns_character),
+        textAlign = 'left',
+        "white-space" = "nowrap"
+      ) %>%
+      DT::formatStyle(
+        columns = c(columns_factor, columns_logical),
+        textAlign = 'center',
+        "white-space" = "nowrap"
       ) %>%
       DT::formatStyle(
         columns = c(columns_numeric, columns_p_value),
         textAlign = 'right'
       )
 
-    ## if automatic number formatting is on, apply formatting to columns which
-    ## seem to contain p-values and logFC values
+    ## if automatic number formatting is on...
+    ## - remove decimals from integers
+    ## - show 3 significant decimals for p-values
+    ## - show 3 decimals for logFC
+    ## - show percentage values with percent symbol and 2 decimals
+    ## - show all other numeric values that are none of the above with 3
+    ##   significant decimals
     if ( number_formatting == TRUE ) {
-      if ( !is.null(columns_p_value) && length(columns_p_value) > 0 ) {
-        table <- table %>%
-          DT::formatSignif(
-            columns = columns_p_value,
-            digits = 3
-          )
-      }
-      if ( !is.null(columns_logFC) && length(columns_logFC) > 0 ) {
-        table <- table %>%
-          DT::formatRound(
-            columns = columns_logFC,
-            digits = 3
-          )
-      }
-      if ( !is.null(columns_only_numeric) && length(columns_only_numeric) > 0 ) {
-        table <- table %>%
-          DT::formatSignif(
-            columns = columns_only_numeric,
-            digits = 3
-          )
-      }
-    }
-
-    ## if automatic number formatting is on but color formatting is off, round
-    ## integers and percentage values as formattable would do it
-    if (
-      number_formatting == TRUE &&
-      color_highlighting == FALSE
-    ) {
+      ## integer values
       if ( !is.null(columns_integer) && length(columns_integer) > 0 ) {
         table <- table %>%
           DT::formatRound(
@@ -463,15 +365,166 @@ server <- function(input, output, session) {
             mark = ","
           )
       }
+      ## p-values
+      if ( !is.null(columns_p_value) && length(columns_p_value) > 0 ) {
+        table <- table %>%
+          DT::formatSignif(
+            columns = columns_p_value,
+            digits = 3
+          )
+      }
+      ## logFC
+      if ( !is.null(columns_logFC) && length(columns_logFC) > 0 ) {
+        table <- table %>%
+          DT::formatRound(
+            columns = columns_logFC,
+            digits = 3
+          )
+      }
+      ## percentage
       if ( !is.null(columns_percent) && length(columns_percent) > 0 ) {
         table <- table %>%
         DT::formatPercentage(
           columns = columns_percent,
           digits = 2
-        )
+        )# %>%
+      }
+      ## numeric but none of the above
+      if ( !is.null(columns_only_numeric) && length(columns_only_numeric) > 0 ) {
+        table <- table %>%
+          DT::formatSignif(
+            columns = columns_only_numeric,
+            digits = 3
+          )
       }
     }
 
+    ## if color highlighting is on...
+    ## - use color bar for percentages
+    ## - use colo bar for p-values (ideally I wanted to use colors with
+    ##   styleInterval(), but styleInterval() cannot handle missing cuts; I'd
+    ##   like to color values based on fixed intervals, e.g. below 0.1, 0.05,
+    ##   etc, but if the column doesn't contain any values for a cut, then the
+    ##   function will results in an error)
+    ## - use color scale for logFC
+    ## - use color scale for integer
+    ## - use color scale for numeric values that are none of the above
+    ## - use colors for logicals
+    ## - use reactive colors for grouping variables
+    ## - use reactive colors for cell cycle assignments
+    if ( color_highlighting == TRUE ) {
+      ## percentage
+      if ( !is.null(columns_percent) && length(columns_percent) > 0 ) {
+        table <- table %>%
+          DT::formatStyle(
+            columns = columns_percent,
+            background = DT::styleColorBar(c(0,1), 'pink'),
+            backgroundSize = '98% 88%',
+            backgroundRepeat = 'no-repeat',
+            backgroundPosition = 'center'
+          )
+      }
+      ## p-values
+      if ( !is.null(columns_p_value) && length(columns_p_value) > 0 ) {
+        table <- table %>%
+          DT::formatStyle(
+            columns = columns_p_value,
+            background = DT::styleColorBar(c(1,0), '#e74c3c'),
+            backgroundSize = '98% 88%',
+            backgroundRepeat = 'no-repeat',
+            backgroundPosition = 'center'
+          )
+      }
+      ## logFC
+      if ( !is.null(columns_logFC) && length(columns_logFC) > 0 ) {
+        for ( i in columns_logFC ) {
+          range <- range(table_original[[i]])
+          table <- table %>%
+            DT::formatStyle(
+              columns = i,
+              backgroundColor = DT::styleInterval(
+                seq(range[1], range[2], (range[2]-range[1])/100),
+                colorRampPalette(colors = c('white', '#e67e22'))(102)
+              )
+            )
+        }
+      }
+      ## integer
+      if ( !is.null(columns_integer) && length(columns_integer) > 0 ) {
+        for ( i in columns_integer ) {
+          range <- range(table_original[[i]])
+          table <- table %>%
+            DT::formatStyle(
+              columns = i,
+              backgroundColor = DT::styleInterval(
+                seq(range[1], range[2], (range[2]-range[1])/100),
+                colorRampPalette(colors = c('white', '#e67e22'))(102)
+              )
+            )
+        }
+      }
+      ## numeric values that are non of the above
+      if ( !is.null(columns_only_numeric) && length(columns_only_numeric) > 0 ) {
+        for ( i in columns_only_numeric ) {
+          range <- range(table_original[[i]])
+          table <- table %>%
+            DT::formatStyle(
+              columns = i,
+              backgroundColor = DT::styleInterval(
+                seq(range[1], range[2], (range[2]-range[1])/100),
+                colorRampPalette(colors = c('white', '#e67e22'))(102)
+              )
+            )
+        }
+      }
+      ## logicals
+      if ( !is.null(columns_logical) && length(columns_logical) > 0 ) {
+        table <- table %>%
+          DT::formatStyle(
+            columns_logical,
+            color = DT::styleEqual(c(TRUE, FALSE), c('#27ae60', '#e74c3c')),
+            fontWeight = DT::styleEqual(c(TRUE, FALSE), c('bold', 'normal'))
+          )
+      }
+      ## grouping variables
+      columns_groups <- which(colnames(table_original) %in% sample_data()$getGroups())
+      if ( length(columns_groups) > 0 ) {
+        for ( i in columns_groups ) {
+          group <- colnames(table_original)[i]
+          if ( all(unique(table_original[[i]]) %in% names(reactive_colors()[[group]])) ) {
+            table <- table %>%
+              DT::formatStyle(
+                i,
+                backgroundColor = DT::styleEqual(
+                  names(reactive_colors()[[group]]),
+                  reactive_colors()[[group]]
+                ),
+                fontWeight = 'bold'
+              )
+          }
+        }
+      }
+      ## cell cycle assignments
+      columns_cell_cycle <- which(colnames(table_original) %in% sample_data()$cell_cycle)
+      if ( length(columns_cell_cycle) > 0 ) {
+        for ( i in columns_cell_cycle ) {
+          method <- colnames(table_original)[i]
+          if ( all(unique(table_original[[i]]) %in% names(reactive_colors()[[method]])) ) {
+            table <- table %>%
+              DT::formatStyle(
+                i,
+                backgroundColor = DT::styleEqual(
+                  names(reactive_colors()[[method]]),
+                  reactive_colors()[[method]]
+                ),
+                fontWeight = 'bold'
+              )
+          }
+        }
+      }
+    }
+
+    ## return the table
     return(table)
 
   }
@@ -501,8 +554,10 @@ server <- function(input, output, session) {
   ## Function to calculate A-by-B tables (e.g. samples by clusters).
   ##--------------------------------------------------------------------------##
   calculateTableAB <- function(groupA, groupB) {
+    ## get cell meta data
+    meta_data <- sample_data()$getMetaData()
     ## check if specified group columns exist in meta data
-    if ( groupA %in% colnames(colData(sample_data()$expression)) == FALSE ) {
+    if ( groupA %in% colnames(meta_data) == FALSE ) {
       stop(
         paste0(
           "Column specified as groupA (`", groupA,
@@ -512,7 +567,7 @@ server <- function(input, output, session) {
       )
     }
 
-    if ( groupB %in% colnames(colData(sample_data()$expression)) == FALSE ) {
+    if ( groupB %in% colnames(meta_data) == FALSE ) {
       stop(
         paste0(
           "Column specified as groupB (`", groupB,
@@ -521,7 +576,7 @@ server <- function(input, output, session) {
         call. = FALSE
       )
     }
-    table <- colData(sample_data()$expression)[,c(groupA, groupB)] %>%
+    table <- meta_data[,c(groupA, groupB)] %>%
       as.data.frame()
 
     ## factorize group columns A and B if not already a factor
@@ -561,6 +616,9 @@ server <- function(input, output, session) {
   ## Colors for groups.
   ##--------------------------------------------------------------------------##
   reactive_colors <- reactive({
+    ## get cell meta data
+    meta_data <- sample_data()$getMetaData()
+
     colors <- list()
 
     ## go through all groups
@@ -590,9 +648,9 @@ server <- function(input, output, session) {
       {
         ## if color selection from the "Color management" tab exist, assign those
         ## colors, otherwise assign colors from cell cycle colorset
-        if ( !is.null(input[[ paste0('color_', column, '_', unique(as.character(colData(sample_data()$expression)[[ column ]]))[1]) ]]) )
+        if ( !is.null(input[[ paste0('color_', column, '_', unique(as.character(meta_data[[ column ]]))[1]) ]]) )
         {
-          for ( state in unique(as.character(colData(sample_data()$expression)[[ column ]])) )
+          for ( state in unique(as.character(meta_data[[ column ]])) )
           {
             ## it seems that special characters are not handled well in input/output
             ## so I replace them with underscores using gsub()
@@ -600,8 +658,8 @@ server <- function(input, output, session) {
           }
         } else
         {
-          colors[[ column ]] <- cell_cycle_colorset[1:length(unique(as.character(colData(sample_data()$expression)[[ column ]])))]
-          names(colors[[ column ]]) <- unique(as.character(colData(sample_data()$expression)[[ column ]]))
+          colors[[ column ]] <- cell_cycle_colorset[1:length(unique(as.character(meta_data[[ column ]])))]
+          names(colors[[ column ]]) <- unique(as.character(meta_data[[ column ]]))
         }
       }
     }

@@ -285,7 +285,7 @@ observeEvent(input[["groups_by_other_group_info"]], {
 
 # UI element
 output[["groups_nUMI_UI"]] <- renderUI({
-  if ( "nUMI" %in% colnames(colData(sample_data()$expression)) ) {
+  if ( "nUMI" %in% colnames(sample_data()$getMetaData()) ) {
     plotly::plotlyOutput("groups_nUMI_plot")
   } else {
     textOutput("groups_nUMI_text")
@@ -297,8 +297,7 @@ output[["groups_nUMI_plot"]] <- plotly::renderPlotly({
   req(
     input[["groups_selected_group"]]
   )
-  colData(sample_data()$expression) %>%
-  as.data.frame() %>%
+  sample_data()$getMetaData() %>%
   plotly::plot_ly(
     x = ~.[[ input[["groups_selected_group"]] ]],
     y = ~nUMI,
@@ -359,7 +358,7 @@ observeEvent(input[["groups_nUMI_info"]], {
 
 ## UI element
 output[["groups_nGene_UI"]] <- renderUI({
-  if ( "nGene" %in% colnames(colData(sample_data()$expression)) ) {
+  if ( "nGene" %in% colnames(sample_data()$getMetaData()) ) {
     plotly::plotlyOutput("groups_nGene_plot")
   } else {
     textOutput("groups_nGene_text")
@@ -369,8 +368,7 @@ output[["groups_nGene_UI"]] <- renderUI({
 ## box plot
 output[["groups_nGene_plot"]] <- plotly::renderPlotly({
   req(input[["groups_selected_group"]])
-  colData(sample_data()$expression) %>%
-  as.data.frame() %>%
+  sample_data()$getMetaData() %>%
   plotly::plot_ly(
     x = ~.[[ input[["groups_selected_group"]] ]],
     y = ~nGene,
@@ -431,7 +429,7 @@ observeEvent(input[["groups_nGene_info"]], {
 
 ## UI element
 output[["groups_percent_mt_UI"]] <- renderUI({
-  if ( "percent_mt" %in% colnames(colData(sample_data()$expression)) ) {
+  if ( "percent_mt" %in% colnames(sample_data()$getMetaData()) ) {
     plotly::plotlyOutput("groups_percent_mt_plot")
   } else {
     textOutput("groups_percent_mt_text")
@@ -441,8 +439,7 @@ output[["groups_percent_mt_UI"]] <- renderUI({
 ## box plot
 output[["groups_percent_mt_plot"]] <- plotly::renderPlotly({
   req(input[["groups_selected_group"]])
-  colData(sample_data()$expression) %>%
-  as.data.frame() %>%
+  sample_data()$getMetaData() %>%
   plotly::plot_ly(
     x = ~.[[ input[["groups_selected_group"]] ]],
     y = ~percent_mt*100,
@@ -504,7 +501,7 @@ observeEvent(input[["groups_percent_mt_info"]], {
 
 ## UI element
 output[["groups_percent_ribo_UI"]] <- renderUI({
-  if ( "percent_ribo" %in% colnames(colData(sample_data()$expression)) ) {
+  if ( "percent_ribo" %in% colnames(sample_data()$getMetaData()) ) {
     plotly::plotlyOutput("groups_percent_ribo_plot")
   } else {
     textOutput("groups_percent_ribo_text")
@@ -514,8 +511,7 @@ output[["groups_percent_ribo_UI"]] <- renderUI({
 ## box plot
 output[["groups_percent_ribo_plot"]] <- plotly::renderPlotly({
   req(input[["groups_selected_group"]])
-  colData(sample_data()$expression) %>%
-  as.data.frame() %>%
+  sample_data()$getMetaData() %>%
   plotly::plot_ly(
     x = ~.[[ input[["groups_selected_group"]] ]],
     y = ~percent_ribo*100,

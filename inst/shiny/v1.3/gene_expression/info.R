@@ -28,14 +28,9 @@ expression_in_selected_cells_info <- list(
   text = p("This plot shows the log-normalised expression of selected genes for cells grouped by whether they were selected using the box or lasso selection tool. If more than 1 gene was provided, this reflects the average across all cells of each sample.")
 )
 
-expression_by_sample_info <- list(
-  title = "Expression levels by sample",
-  text = p("Log-normalised expression of genes inserted above by sample. If more than 1 gene was provided, this reflects the average across all cells of each sample.")
-)
-
-expression_by_cluster_info <- list(
-  title = "Expression levels by cluster",
-  text = p("Log-normalised expression of genes inserted above by cluster. If more than 1 gene was provided, this reflects the average across all cells of each cluster.")
+expression_by_group_info <- list(
+  title = "Expression levels by group",
+  text = p("Log-normalised expression of genes inserted above by group If more than 1 gene was provided, this reflects the average across all cells of each group")
 )
 
 expression_by_gene_info <- list(

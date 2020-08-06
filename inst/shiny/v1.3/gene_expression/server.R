@@ -10,30 +10,30 @@ output[["expression_UI"]] <- renderUI({
     selectizeInput(
       'expression_genes_input',
       label = 'Gene(s)',
-      choices = rownames(sample_data()$expression),
+      choices = rownames(sample_data()$getExpression()),
       options = list(create = TRUE), multiple = TRUE
     ),
     selectInput(
       "expression_projection_to_display",
       label = "Projection",
-      choices = names(sample_data()$projections)
+      choices = sample_data()$availableProjections()
     ),
-    shinyWidgets::pickerInput(
-      "expression_samples_to_display",
-      label = "Samples to display",
-      choices = sample_data()$sample_names,
-      selected = sample_data()$sample_names,
-      options = list("actions-box" = TRUE),
-      multiple = TRUE
-    ),
-    shinyWidgets::pickerInput(
-      "expression_clusters_to_display",
-      label = "Clusters to display",
-      choices = sample_data()$cluster_names,
-      selected = sample_data()$cluster_names,
-      options = list("actions-box" = TRUE),
-      multiple = TRUE
-    ),
+    # shinyWidgets::pickerInput(
+    #   "expression_samples_to_display",
+    #   label = "Samples to display",
+    #   choices = sample_data()$sample_names,
+    #   selected = sample_data()$sample_names,
+    #   options = list("actions-box" = TRUE),
+    #   multiple = TRUE
+    # ),
+    # shinyWidgets::pickerInput(
+    #   "expression_clusters_to_display",
+    #   label = "Clusters to display",
+    #   choices = sample_data()$cluster_names,
+    #   selected = sample_data()$cluster_names,
+    #   options = list("actions-box" = TRUE),
+    #   multiple = TRUE
+    # ),
     sliderInput(
       "expression_percentage_cells_to_show",
       label = "Show % of cells",
@@ -99,12 +99,14 @@ output[["expression_color_scale_range"]] <- renderUI({
 ## UI element for X and Y scales in projection.
 ##----------------------------------------------------------------------------##
 output[["expression_scales"]] <- renderUI({
-  req(input[["expression_projection_to_display"]])
+  req(
+    input[["expression_projection_to_display"]]
+  )
   projection_to_display <- input[["expression_projection_to_display"]]
-  range_x_min <- sample_data()$projections[[ projection_to_display ]][,1] %>% min() %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round()
-  range_x_max <- sample_data()$projections[[ projection_to_display ]][,1] %>% max() %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
-  range_y_min <- sample_data()$projections[[ projection_to_display ]][,2] %>% min() %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round()
-  range_y_max <- sample_data()$projections[[ projection_to_display ]][,2] %>% max() %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
+  range_x_min <- sample_data()$getProjection(projection_to_display)[,1] %>% min() %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round()
+  range_x_max <- sample_data()$getProjection(projection_to_display)[,1] %>% max() %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
+  range_y_min <- sample_data()$getProjection(projection_to_display)[,2] %>% min() %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round()
+  range_y_max <- sample_data()$getProjection(projection_to_display)[,2] %>% max() %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
   tagList(
     sliderInput(
       "expression_projection_scale_x_manual_range",
@@ -140,7 +142,7 @@ genesToPlot <- reactive({
       unique() %>%
       .[. != ""]
   }
-  genesToPlot[["genes_to_display_here"]] <- rownames(sample_data()$expression)[ match(tolower(genesToPlot[["genes_to_display"]]), tolower(rownames(sample_data()$expression))) ]
+  genesToPlot[["genes_to_display_here"]] <- rownames(sample_data()$getExpression())[ match(tolower(genesToPlot[["genes_to_display"]]), tolower(rownames(sample_data()$getExpression()))) ]
   genesToPlot[["genes_to_display_present"]] <- na.omit(genesToPlot[["genes_to_display_here"]])
   genesToPlot[["genes_to_display_missing"]] <- genesToPlot[["genes_to_display"]][ which(is.na(genesToPlot[["genes_to_display_here"]])) ]
   return(genesToPlot)
@@ -163,21 +165,25 @@ output[["expression_genes_displayed"]] <- renderText({
 gene_expression_plot_data <- reactive({
   req(
     input[["expression_projection_to_display"]],
-    input[["expression_samples_to_display"]],
-    input[["expression_clusters_to_display"]],
+    # input[["expression_samples_to_display"]],
+    # input[["expression_clusters_to_display"]],
     input[["expression_percentage_cells_to_show"]],
-    input[["expression_projection_plotting_order"]]
+    input[["expression_projection_plotting_order"]],
+    genesToPlot()
   )
   projection_to_display <- input[["expression_projection_to_display"]]
-  samples_to_display <- input[["expression_samples_to_display"]]
-  clusters_to_display <- input[["expression_clusters_to_display"]]
+  # samples_to_display <- input[["expression_samples_to_display"]]
+  # clusters_to_display <- input[["expression_clusters_to_display"]]
   percentage_cells_show <- input[["expression_percentage_cells_to_show"]]
   plot_order <- input[["expression_projection_plotting_order"]]
+  ## TODO: adapt if necessary
   # check which cells to display
-  cells_to_display <- which(
-      (sample_data()$cells$sample %in% samples_to_display) &
-      (sample_data()$cells$cluster %in% clusters_to_display)
-    )
+  # cells_to_display <- which(
+  #     (sample_data()$cells$sample %in% samples_to_display) &
+  #     (sample_data()$cells$cluster %in% clusters_to_display)
+  #   )
+  cells_to_display <- rownames(sample_data()$getMetaData())
+
   # randomly remove cells
   if ( percentage_cells_show < 100 ) {
     number_of_cells_to_plot <- ceiling(
@@ -186,17 +192,17 @@ gene_expression_plot_data <- reactive({
     cells_to_display <- cells_to_display[ sample(1:length(cells_to_display), number_of_cells_to_plot) ]
   }
   plot <- cbind(
-      sample_data()$projections[[ projection_to_display ]][ cells_to_display , ],
-      sample_data()$cells[ cells_to_display , ]
+      sample_data()$getProjection(projection_to_display)[ cells_to_display , ],
+      sample_data()$getMetaData()[ cells_to_display , ]
     )
   if ( length(genesToPlot()$genes_to_display_present) == 0 ) {
     plot$level <- 0
   } else if ( length(genesToPlot()$genes_to_display_present) == 1 ) {
     plot$level <- genesToPlot()$genes_to_display_present %>%
-      sample_data()$expression[ . , cells_to_display ]
+      sample_data()$getExpression()[ . , cells_to_display ]
   } else {
     plot$level <- genesToPlot()$genes_to_display_present %>%
-      sample_data()$expression[ . , cells_to_display ] %>%
+      sample_data()$getExpression()[ . , cells_to_display ] %>%
       Matrix::colMeans()
   }
   if ( plot_order == "Random" ) {
@@ -213,6 +219,8 @@ gene_expression_plot_data <- reactive({
 ##----------------------------------------------------------------------------##
 
 output[["expression_projection"]] <- plotly::renderPlotly({
+
+  ## don't proceed without these inputs
   req(
     input[["expression_projection_to_display"]],
     input[["expression_projection_dot_size"]],
@@ -222,12 +230,38 @@ output[["expression_projection"]] <- plotly::renderPlotly({
     input[["expression_projection_scale_x_manual_range"]],
     input[["expression_projection_scale_y_manual_range"]]
   )
+
+  ## check selected color scale
+  ## ... selected color scale is "viridis"
   if ( input[["expression_projection_color_scale"]] == 'viridis' ) {
     color_scale <- 'Viridis'
+
+  ## ... selected color scale is anything else than "viridis"
   } else {
     color_scale <- input[["expression_projection_color_scale"]]
   }
-  if ( ncol(sample_data()$projections[[ input[["expression_projection_to_display"]] ]]) == 3 ) {
+
+  ## prepare tooltip/hover info
+  tooltip_info <- paste0(
+    "<b>Cell</b>: ", gene_expression_plot_data()[[ "cell_barcode" ]], "<br>",
+    "<b>Transcripts</b>: ", formatC(gene_expression_plot_data()[[ "nUMI" ]], format = "f", big.mark = ",", digits = 0), "<br>",
+    "<b>Expressed genes</b>: ", formatC(gene_expression_plot_data()[[ "nGene" ]], format = "f", big.mark = ",", digits = 0), "<br>",
+    "<b>Expression level</b>: ", formatC(gene_expression_plot_data()$level, format = "f", big.mark = ",", digits = 3), "<br>"
+  )
+
+  ## add info for known grouping variables to tooltip/hover
+  for ( group in sample_data()$getGroups() ) {
+    tooltip_info <- paste0(
+      tooltip_info,
+      "<b>", group, "</b>: ", gene_expression_plot_data()[[ group ]], "<br>"
+    )
+  }
+
+  ## check if selection projection consists of 2 or 3 dimensions
+  ## ... selection projection consists of 3 dimensions
+  if ( ncol(sample_data()$getProjection(input[["expression_projection_to_display"]])) == 3 ) {
+
+    ## prepare plot
     plotly::plot_ly(
       gene_expression_plot_data(),
       x = gene_expression_plot_data()[,1],
@@ -253,14 +287,7 @@ output[["expression_projection"]] <- plotly::renderPlotly({
         size = input[["expression_projection_dot_size"]]
       ),
       hoverinfo = "text",
-      text = ~paste(
-        "<b>Cell</b>: ", gene_expression_plot_data()$cell_barcode, "<br>",
-        "<b>Sample</b>: ", gene_expression_plot_data()$sample, "<br>",
-        "<b>Cluster</b>: ", gene_expression_plot_data()$cluster, "<br>",
-        "<b>Transcripts</b>: ", formatC(gene_expression_plot_data()$nUMI, format = "f", big.mark = ",", digits = 0), "<br>",
-        "<b>Expressed genes</b>: ", formatC(gene_expression_plot_data()$nGene, format = "f", big.mark = ",", digits = 0), "<br>",
-        "<b>Expression level</b>: ", formatC(gene_expression_plot_data()$level, format = "f", big.mark = ",", digits = 3)
-      ),
+      text = ~tooltip_info,
       source = "expression_projection"
     ) %>%
     plotly::layout(
@@ -292,71 +319,70 @@ output[["expression_projection"]] <- plotly::renderPlotly({
         bgcolor = "lightgrey"
       )
     )
-  } else {
+
+  ## ... selection projection consists of 2 dimensions
+  } else if ( ncol(sample_data()$getProjection(input[["expression_projection_to_display"]])) == 2 ) {
+
+    ## prepare plot
     plot <- plotly::plot_ly(
-      gene_expression_plot_data(),
-      x = gene_expression_plot_data()[,1],
-      y = gene_expression_plot_data()[,2],
-      type = "scatter",
-      mode = "markers",
-      marker = list(
-        colorbar = list(
-          title = "Expression"
+        gene_expression_plot_data(),
+        x = gene_expression_plot_data()[,1],
+        y = gene_expression_plot_data()[,2],
+        type = "scatter",
+        mode = "markers",
+        marker = list(
+          colorbar = list(
+            title = "Expression"
+          ),
+          color = ~level,
+          opacity = input[["expression_projection_dot_opacity"]],
+          colorscale = color_scale,
+          cauto = FALSE,
+          cmin = input[["expression_projection_color_scale_range"]][1],
+          cmax = input[["expression_projection_color_scale_range"]][2],
+          reversescale = TRUE,
+          line = list(
+            color = "rgb(196,196,196)",
+            width = 1
+          ),
+          size = input[["expression_projection_dot_size"]]
         ),
-        color = ~level,
-        opacity = input[["expression_projection_dot_opacity"]],
-        colorscale = color_scale,
-        cauto = FALSE,
-        cmin = input[["expression_projection_color_scale_range"]][1],
-        cmax = input[["expression_projection_color_scale_range"]][2],
-        reversescale = TRUE,
-        line = list(
-          color = "rgb(196,196,196)",
-          width = 1
+        hoverinfo = "text",
+        text = ~tooltip_info,
+        source = "expression_projection"
+      ) %>%
+      plotly::layout(
+        xaxis = list(
+          title = colnames(gene_expression_plot_data())[1],
+          mirror = TRUE,
+          showline = TRUE,
+          zeroline = FALSE,
+          range = c(
+            input[["expression_projection_scale_x_manual_range"]][1],
+            input[["expression_projection_scale_x_manual_range"]][2]
+          )
         ),
-        size = input[["expression_projection_dot_size"]]
-      ),
-      hoverinfo = "text",
-      text = ~paste(
-        "<b>Cell</b>: ", gene_expression_plot_data()$cell_barcode, "<br>",
-        "<b>Sample</b>: ", gene_expression_plot_data()$sample, "<br>",
-        "<b>Cluster</b>: ", gene_expression_plot_data()$cluster, "<br>",
-        "<b>Transcripts</b>: ", formatC(gene_expression_plot_data()$nUMI, format = "f", big.mark = ",", digits = 0), "<br>",
-        "<b>Expressed genes</b>: ", formatC(gene_expression_plot_data()$nGene, format = "f", big.mark = ",", digits = 0), "<br>",
-        "<b>Expression level</b>: ", formatC(gene_expression_plot_data()$level, format = "f", big.mark = ",", digits = 3)
-      ),
-      source = "expression_projection"
-    ) %>%
-    plotly::layout(
-      xaxis = list(
-        title = colnames(gene_expression_plot_data())[1],
-        mirror = TRUE,
-        showline = TRUE,
-        zeroline = FALSE,
-        range = c(
-          input[["expression_projection_scale_x_manual_range"]][1],
-          input[["expression_projection_scale_x_manual_range"]][2]
+        yaxis = list(
+          title = colnames(gene_expression_plot_data())[2],
+          mirror = TRUE,
+          showline = TRUE,
+          zeroline = FALSE,
+          range = c(
+            input[["expression_projection_scale_y_manual_range"]][1],
+            input[["expression_projection_scale_y_manual_range"]][2]
+          )
+        ),
+        dragmode = "pan",
+        hoverlabel = list(
+          font = list(
+            size = 11,
+            color = "black"
+          ),
+          bgcolor = "lightgrey"
         )
-      ),
-      yaxis = list(
-        title = colnames(gene_expression_plot_data())[2],
-        mirror = TRUE,
-        showline = TRUE,
-        zeroline = FALSE,
-        range = c(
-          input[["expression_projection_scale_y_manual_range"]][1],
-          input[["expression_projection_scale_y_manual_range"]][2]
-        )
-      ),
-      dragmode = "pan",
-      hoverlabel = list(
-        font = list(
-          size = 11,
-          color = "black"
-        ),
-        bgcolor = "lightgrey"
       )
-    )
+
+    ## return plot either with WebGL or without, depending on setting
     if ( preferences$use_webgl == TRUE ) {
       plot %>% plotly::toWebGL()
     } else {
@@ -380,9 +406,43 @@ observeEvent(input[["expression_projection_info"]], {
 })
 
 ##----------------------------------------------------------------------------##
+## Number of selected cells.
+##----------------------------------------------------------------------------##
+
+output[["expression_number_of_selected_cells"]] <- renderText({
+
+  ## don't proceed without these inputs
+  req(
+    input[["expression_projection_to_display"]]
+  )
+
+  ## check selection
+  ## ... selection has not been made or there is not cell in it
+  if (
+    is.null(plotly::event_data("plotly_selected", source = "expression_projection")) ||
+    length(plotly::event_data("plotly_selected", source = "expression_projection")) == 0
+  ) {
+
+    ## manually set counter to 0
+    number_of_selected_cells <- 0
+
+  ## ... selection has been made and at least 1 cell is in it
+  } else {
+
+    ## get number of selected cells
+    number_of_selected_cells <- nrow(plotly::event_data("plotly_selected", source = "expression_projection"))
+  }
+
+  ## prepare string to show
+  paste0("<b>Number of selected cells</b>: ", number_of_selected_cells)
+})
+
+##----------------------------------------------------------------------------##
 ## Export function.
 ##----------------------------------------------------------------------------##
 observeEvent(input[["expression_projection_export"]], {
+
+  ## don't proceed without these inputs
   req(
     input[["expression_projection_to_display"]],
     input[["expression_projection_plotting_order"]],
@@ -393,8 +453,30 @@ observeEvent(input[["expression_projection_export"]], {
     input[["expression_projection_scale_x_manual_range"]],
     input[["expression_projection_scale_y_manual_range"]]
   )
-  library("ggplot2")
-  if ( exists("plot_export_path") ) {
+
+  ## open dialog to select where plot should be saved and how the file should
+  ## be named
+  shinyFileSave(
+    input,
+    id = "expression_projection_export",
+    roots = volumes,
+    session = session,
+    restrictions = system.file(package = "base")
+  )
+
+  ## retrieve info from dialog
+  fileinfo <- parseSavePath(volumes, input[["expression_projection_export"]])
+
+  ## only proceed if a path has been provided
+  if ( nrow(fileinfo) > 0 ) {
+
+    ## extract specified file path
+    file_output <- as.character(fileinfo$datapath[1])
+
+    ## make ggplot2 functions available
+    require("ggplot2")
+
+    ## get X and Y scale limits
     xlim <- c(
       input[["expression_projection_scale_x_manual_range"]][1],
       input[["expression_projection_scale_x_manual_range"]][2]
@@ -403,41 +485,52 @@ observeEvent(input[["expression_projection_export"]], {
       input[["expression_projection_scale_y_manual_range"]][1],
       input[["expression_projection_scale_y_manual_range"]][2]
     )
-    if ( length(genesToPlot()$genes_to_display_present) == 0 ) {
-      out_filename <- paste0(
-        plot_export_path, "Cerebro_",
-        sample_data()$experiment$experiment_name, "_gene_expression_none"
-      )
-    } else if ( length(genesToPlot()$genes_to_display_present) == 1 ) {
-      out_filename <- paste0(
-        plot_export_path, "Cerebro_",
-        sample_data()$experiment$experiment_name, "_gene_expression_",
-        genesToPlot()$genes_to_display_present, "_",
-        input[["expression_projection_to_display"]]
-      )
-    } else {
-      out_filename <- paste0(
-        plot_export_path, "Cerebro_",
-        sample_data()$experiment$experiment_name, "_gene_expression_",
-        genesToPlot()$genes_to_display_present[1],
-        "_and_others_", input[["expression_projection_to_display"]]
-      )
-    }
 
-    if ( input[["expression_projection_plotting_order"]] == "Random" ) {
-      out_filename <- paste0(out_filename, "_random_order.pdf")
-    } else if ( input[["expression_projection_plotting_order"]] == "Highest expression on top" ) {
-      out_filename <- paste0(out_filename, "_highest_expression_on_top.pdf")
-    }
+    # ## build file name based on how many genes were selected
+    # if ( length(genesToPlot()$genes_to_display_present) == 0 ) {
+    #   out_filename <- paste0(
+    #     plot_export_path, "Cerebro_",
+    #     sample_data()$experiment$experiment_name, "_gene_expression_none"
+    #   )
+    # } else if ( length(genesToPlot()$genes_to_display_present) == 1 ) {
+    #   out_filename <- paste0(
+    #     plot_export_path, "Cerebro_",
+    #     sample_data()$experiment$experiment_name, "_gene_expression_",
+    #     genesToPlot()$genes_to_display_present, "_",
+    #     input[["expression_projection_to_display"]]
+    #   )
+    # } else {
+    #   out_filename <- paste0(
+    #     plot_export_path, "Cerebro_",
+    #     sample_data()$experiment$experiment_name, "_gene_expression_",
+    #     genesToPlot()$genes_to_display_present[1],
+    #     "_and_others_", input[["expression_projection_to_display"]]
+    #   )
+    # }
 
-    if ( ncol(sample_data()$projections[[ input[["expression_projection_to_display"]] ]]) == 3 ) {
+    # ## add info to file name
+    # if ( input[["expression_projection_plotting_order"]] == "Random" ) {
+    #   out_filename <- paste0(out_filename, "_random_order.pdf")
+    # } else if ( input[["expression_projection_plotting_order"]] == "Highest expression on top" ) {
+    #   out_filename <- paste0(out_filename, "_highest_expression_on_top.pdf")
+    # }
+
+    ## check if selection projection consists of 2 or 3 dimensions
+    ## ... selection projection consists of 3 dimensions
+    if ( ncol(sample_data()$getProjection(input[["expression_projection_to_display"]])) == 3 ) {
+
+      ## give error message
       shinyWidgets::sendSweetAlert(
         session = session,
         title = "Sorry!",
         text = "It's currently not possible to create PDF plots from 3D dimensional reductions. Please use the PNG export button in the panel or a 2D dimensional reduction instead.",
         type = "error"
       )
-    } else {
+
+    ## ... selection projection consists of 2 dimensions
+    } else if ( ncol(sample_data()$getProjection(input[["expression_projection_to_display"]])) == 2 ) {
+
+      ## prepare plot
       p <- ggplot(
           gene_expression_plot_data(),
           aes_q(
@@ -456,7 +549,11 @@ observeEvent(input[["expression_projection_export"]], {
         lims(x = xlim, y = ylim) +
         theme_bw()
 
+        ## check if selected color scale
+        ## ... selected color scale is "viridis"
         if ( input[["expression_projection_color_scale"]] == 'viridis' ) {
+
+          ## add color scale to plot
           p <- p + viridis::scale_fill_viridis(
             option = "viridis",
             limits = input[["expression_projection_color_scale_range"]],
@@ -465,7 +562,11 @@ observeEvent(input[["expression_projection_export"]], {
             name = "Log-normalised\nexpression",
             guide = guide_colorbar(frame.colour = "black", ticks.colour = "black")
           )
+
+        ## ... selected color scale is anything else than "viridis"
         } else {
+
+          ## add color scale to plot
           p <- p + scale_fill_distiller(
             palette = input[["expression_projection_color_scale"]],
             limits = input[["expression_projection_color_scale_range"]],
@@ -476,17 +577,26 @@ observeEvent(input[["expression_projection_export"]], {
           )
         }
 
+      ## save plot
       pdf(NULL)
-      ggsave(out_filename, p, height = 8, width = 11)
+      ggsave(file_output, p, height = 8, width = 11)
 
-      if ( file.exists(out_filename) ) {
+      ## check if file was succesfully saved
+      ## ... successful
+      if ( file.exists(file_output) ) {
+
+        ## give positive message
         shinyWidgets::sendSweetAlert(
           session = session,
           title = "Success!",
-          text = paste0("Plot saved successfully as: ", out_filename),
+          text = paste0("Plot saved successfully as: ", file_output),
           type = "success"
         )
+
+      ## ... failed
       } else {
+
+        ## give negative message
         shinyWidgets::sendSweetAlert(
           session = session,
           title = "Error!",
@@ -495,13 +605,6 @@ observeEvent(input[["expression_projection_export"]], {
         )
       }
     }
-  } else {
-    shinyWidgets::sendSweetAlert(
-      session = session,
-      title = "Error!",
-      text = "Sorry, we couldn't find a place to store the figure. Please submit an issue on GitHub @ https://github.com/romanhaa/cerebroApp",
-      type = "error"
-    )
   }
 })
 
@@ -510,132 +613,61 @@ observeEvent(input[["expression_projection_export"]], {
 ##----------------------------------------------------------------------------##
 
 output[["expression_details_selected_cells"]] <- DT::renderDataTable(server = FALSE, {
-  ## if no selection has been made, return empty table
-  if ( is.null(plotly::event_data("plotly_selected", source = "expression_projection")) ) {
-    #table <- gene_expression_plot_data()
-    #print('no selection made')
-    table <- tibble(
-      cell_barcode = character(),
-      level = numeric(),
-      sample = character(),
-      cluster = character(),
-      nUMI = numeric(),
-      nGene = numeric()
-    )
-  ## if no cells are selected, return empty table
-  } else if ( length(plotly::event_data("plotly_selected", source = "expression_projection")) == 0 ) {
-    #table <- gene_expression_plot_data()
-    #print('selection made but no cells inside')
-    table <- tibble(
-      cell_barcode = character(),
-      level = numeric(),
-      sample = character(),
-      cluster = character(),
-      nUMI = numeric(),
-      nGene = numeric()
-    )
-  # #if at least 1 cell has been selected
+
+  ## check selection
+  ## ... selection has not been made or there is not cell in it
+  if (
+    is.null(plotly::event_data("plotly_selected", source = "expression_projection")) ||
+    length(plotly::event_data("plotly_selected", source = "expression_projection")) == 0
+  ) {
+
+    ## prepare empty table
+    sample_data()$getMetaData() %>%
+    dplyr::slice(0) %>%
+    prepareEmptyTable()
+
+  ## ... selection has been made and at least 1 cell is in it
   } else {
-    #print('selection made and some cells inside')
+
     ## get info of selected cells and create identifier from X-Y coordinates
     selected_cells <- plotly::event_data("plotly_selected", source = "expression_projection") %>%
       dplyr::mutate(identifier = paste0(x, '-', y))
+
     ## filter out non-selected cells with X-Y identifier and select some meta
     ## data
     table <- gene_expression_plot_data() %>%
       dplyr::rename(X1 = 1, X2 = 2) %>%
       dplyr::mutate(identifier = paste0(X1, '-', X2)) %>%
       dplyr::filter(identifier %in% selected_cells$identifier) %>%
-      dplyr::select(cell_barcode, level, sample, cluster, nUMI, nGene)
-    ## if no cells match the selection (e.g. when changing dimensional
-    ## reduction), return empty table
+      dplyr::select(-c(X1, X2, identifier)) %>%
+      dplyr::rename(expression_level = level) %>%
+      dplyr::select(cell_barcode, expression_level, everything())
+
+    ## check how many cells are left after filtering
+    ## ... no cells are left
     if ( nrow(table) == 0 ) {
-      #print('selection made and some cells inside but filtering returned 0 cells')
-      table <- tibble(
-        cell_barcode = character(),
-        level = numeric(),
-        sample = character(),
-        cluster = character(),
-        nUMI = numeric(),
-        nGene = numeric()
-      )
-    ## if some cells have been selected, format numbers
+
+      ## prepare empty table
+      sample_data()$getMetaData() %>%
+      dplyr::slice(0) %>%
+      prepareEmptyTable()
+
+    ## ... at least 1 cell is left
     } else {
-      table <- table %>%
-        dplyr::mutate(
-          level = round(level, digits = 3),
-          nUMI = formattable::comma(nUMI, big.mark = ',', digits = 0),
-          nGene = formattable::comma(nGene, big.mark = ',', digits = 0)
-        )
+
+      ## prepare proper table
+      prettifyTable(
+        table,
+        filter = list(position = "top", clear = TRUE),
+        dom = "Brtlip",
+        show_buttons = TRUE,
+        number_formatting = input[["expression_details_selected_cells_number_formatting"]],
+        color_highlighting = input[["expression_details_selected_cells_color_highlighting"]],
+        hide_long_columns = TRUE,
+        download_file_name = "expression_details_of_selected_cells"
+      )
     }
   }
-  table %>%
-  dplyr::rename(
-    'Cell barcode' = cell_barcode,
-    'Expression of selected genes' = level,
-    'Sample' = sample,
-    'Cluster' = cluster,
-    '# of transcripts' = nUMI,
-    '# of expressed genes' = nGene
-  ) %>%
-  formattable::formattable(list(
-    'Expression of selected genes' = formattable::color_tile("white", "orange"),
-    '# of transcripts' = formattable::color_tile("white", "orange"),
-    '# of expressed genes' = formattable::color_tile("white", "orange")
-  )) %>%
-  formattable::as.datatable(
-    filter = "top",
-    selection = "none",
-    escape = FALSE,
-    autoHideNavigation = TRUE,
-    rownames = FALSE,
-    extensions = c("Buttons"),
-    class = "cell-border stripe",
-    options = list(
-      dom = "Bfrtip",
-      lengthMenu = c(15, 30, 50, 100),
-      pageLength = 15,
-      buttons = list(
-        "colvis",
-        list(
-          extend = "collection",
-          text = "Download",
-          buttons = list(
-            list(
-              extend = "csv",
-              filename = "gene_expression_details_of_selected_cells",
-              title = "Gene expression details of selected cells"
-            ),
-            list(
-              extend = "excel",
-              filename = "gene_expression_details_of_selected_cells",
-              title = "Gene expression details of selected cells"
-            )
-          )
-        )
-      )
-    )
-  ) %>%
-  DT::formatStyle(
-    columns = c('Expression of selected genes', '# of transcripts', '# of expressed genes'),
-    textAlign = 'right'
-  ) %>%
-  DT::formatStyle(
-    columns = 'Sample',
-    textAlign = 'center'#,
-    # backgroundColor = DT::styleEqual(
-    #   names(reactive_colors()$samples),
-    #   reactive_colors()$samples
-    # )
-  ) %>%
-    DT::formatStyle(
-    columns = 'Cluster',
-    textAlign = 'center'#,
-    # color = DT::styleEqual(
-    #   names(reactive_colors()$clusters),
-    #   reactive_colors()$clusters
-    # )
-  )
 })
 
 # info box
@@ -725,14 +757,31 @@ observeEvent(input[["expression_in_selected_cells_info"]], {
 })
 
 ##----------------------------------------------------------------------------##
-## Expression by sample.
+## Expression by group
 ##----------------------------------------------------------------------------##
 
+## UI element to select grouping variable
+output[["expression_by_group_selected_group_UI"]] <- renderUI({
+  selectInput(
+    "expression_by_group_selected_group",
+    label = "Select a group to show expression by:",
+    choices = sample_data()$getGroups(),
+    width = "100%"
+  )
+})
+
 # box plot
-output[["expression_by_sample"]] <- plotly::renderPlotly({
+output[["expression_by_group"]] <- plotly::renderPlotly({
+
+  ## don't proceed without these inputs
+  req(
+    input[["expression_by_group_selected_group"]]
+  )
+
+  ## prepare plot
+  gene_expression_plot_data() %>%
   plotly::plot_ly(
-    gene_expression_plot_data(),
-    x = ~sample,
+    x = ~.[[ input[["expression_by_group_selected_group"]] ]],
     y = ~level,
     type = "violin",
     box = list(
@@ -741,8 +790,8 @@ output[["expression_by_sample"]] <- plotly::renderPlotly({
     meanline = list(
       visible = TRUE
     ),
-    color = ~sample,
-    colors = reactive_colors()$samples,
+    color = ~.[[ input[["expression_by_group_selected_group"]] ]],
+    colors = reactive_colors()[[ input[["expression_by_group_selected_group"]] ]],
     source = "subset",
     showlegend = FALSE,
     hoverinfo = "y",
@@ -770,68 +819,11 @@ output[["expression_by_sample"]] <- plotly::renderPlotly({
 })
 
 # info box
-observeEvent(input[["expression_by_sample_info"]], {
+observeEvent(input[["expression_by_group_info"]], {
   showModal(
     modalDialog(
-      expression_by_sample_info$text,
-      title = expression_by_sample_info$title,
-      easyClose = TRUE,
-      footer = NULL
-    )
-  )
-})
-
-##----------------------------------------------------------------------------##
-## Expression by cluster.
-##----------------------------------------------------------------------------##
-
-# box plot
-output[["expression_by_cluster"]] <- plotly::renderPlotly({
-  plotly::plot_ly(
-    gene_expression_plot_data(),
-    x = ~cluster,
-    y = ~level,
-    type = "violin",
-    box = list(
-      visible = TRUE
-    ),
-    meanline = list(
-      visible = TRUE
-    ),
-    color = ~cluster,
-    colors = reactive_colors()$clusters,
-    source = "subset",
-    showlegend = FALSE,
-    hoverinfo = "y",
-    marker = list(
-      size = 5
-    )
-  ) %>%
-  plotly::layout(
-    title = "",
-    xaxis = list(
-      title = "",
-      mirror = TRUE,
-      showline = TRUE
-    ),
-    yaxis = list(
-      title = "Expression level",
-      range = c(0, max(gene_expression_plot_data()$level) * 1.2),
-      hoverformat = ".2f",
-      mirror = TRUE,
-      showline = TRUE
-    ),
-    dragmode =  "select",
-    hovermode = "compare"
-  )
-})
-
-# info box
-observeEvent(input[["expression_by_cluster_info"]], {
-  showModal(
-    modalDialog(
-      expression_by_cluster_info$text,
-      title = expression_by_cluster_info$title,
+      expression_by_group_info$text,
+      title = expression_by_group_info$title,
       easyClose = TRUE,
       footer = NULL
     )
@@ -842,35 +834,56 @@ observeEvent(input[["expression_by_cluster_info"]], {
 ## Expression by gene.
 ##----------------------------------------------------------------------------##
 
-# bar plot
+## bar plot
 output[["expression_by_gene"]] <- plotly::renderPlotly({
+
+  ## don't proceed without these inputs
   req(
     input[["expression_projection_color_scale"]]
   )
+
+  ## 
+  ## ...
   if ( length(genesToPlot()$genes_to_display_present) == 0 ) {
+
+    ##
     expression_levels <- data.frame(
       "gene" = character(),
       "expression" = integer()
     )
+
+  ## ...
   } else if ( length(genesToPlot()$genes_to_display_present) == 1 ) {
+
+    ##
     expression_levels <- data.frame(
       "gene" = genesToPlot()$genes_to_display_present,
-      "expression" = mean(sample_data()$expression[ genesToPlot()$genes_to_display_present , ])
+      "expression" = mean(sample_data()$getExpression()[ genesToPlot()$genes_to_display_present , ])
     )
+
+  ## ...
   } else {
+
+    ## 
     expression_levels <- data.frame(
-      "gene" = rownames(sample_data()$expression[ genesToPlot()$genes_to_display_present , ]),
-      "expression" = Matrix::rowMeans(sample_data()$expression[ genesToPlot()$genes_to_display_present , ])
+      "gene" = rownames(sample_data()$getExpression()[ genesToPlot()$genes_to_display_present , ]),
+      "expression" = Matrix::rowMeans(sample_data()$getExpression()[ genesToPlot()$genes_to_display_present , ])
     ) %>%
     arrange(-expression) %>%
     top_n(50, expression)
   }
-  # color scale
+
+  ## color scale
+  ## ...
   if ( input[["expression_projection_color_scale"]] == 'viridis' ) {
     color_scale <- 'Viridis'
+
+  ## ...
   } else {
     color_scale <- input[["expression_projection_color_scale"]]
   }
+
+  ##
   plotly::plot_ly(
     expression_levels,
     x = ~gene,
@@ -912,7 +925,7 @@ output[["expression_by_gene"]] <- plotly::renderPlotly({
   )
 })
 
-# info box
+## info box
 observeEvent(input[["expression_by_gene_info"]], {
   showModal(
     modalDialog(

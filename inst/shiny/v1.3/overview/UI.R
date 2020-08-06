@@ -41,7 +41,7 @@ tab_overview <- tabItem(
             title = "Export dimensional reduction to PDF file.",
             filetype = "pdf",
             viewtype = "icon",
-            class = "btn-xs",
+            class = "btn-xs"
           )
         ),
         tagList(
@@ -50,6 +50,7 @@ tab_overview <- tabItem(
             width = "auto",
             height = "85vh"
           ),
+          tags$br(),
           htmlOutput("overview_number_of_selected_cells"),
         )
       )
@@ -80,7 +81,7 @@ tab_overview <- tabItem(
         ),
         shinyWidgets::materialSwitch(
           inputId = "overview_details_selected_cells_table_color_highlighting",
-          label = "Highlight numbers with colors:",
+          label = "Highlight values with colors:",
           value = FALSE,
           status = "primary",
           inline = TRUE

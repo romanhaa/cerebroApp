@@ -52,7 +52,7 @@ output[["color_assignments_UI"]] <- renderUI({
           collapsible = TRUE,
           tagList({
             color_list <- list()
-            for ( state in unique(as.character(colData(sample_data()$expression)[[ column ]])) )
+            for ( state in unique(as.character(sample_data()$getMetaData()[[ column ]])) )
             {
               color_list[[ state ]] <- colourpicker::colourInput(
                 inputId = paste0('color_', column, '_', gsub(state, pattern = '[^[:alnum:]]', replacement = '_')),

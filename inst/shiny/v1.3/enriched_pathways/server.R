@@ -133,7 +133,7 @@ output[["enriched_pathways_table_UI"]] <- renderUI({
         ),
         shinyWidgets::materialSwitch(
           inputId = "enriched_pathways_table_color_highlighting",
-          label = "Highlight numbers with colors:",
+          label = "Highlight values with colors:",
           value = FALSE,
           status = "primary",
           inline = TRUE

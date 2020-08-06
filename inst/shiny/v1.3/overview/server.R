@@ -10,7 +10,7 @@ output[["overview_UI"]] <- renderUI({
     selectInput(
       "overview_projection_to_display",
       label = "Projection",
-      choices = reducedDimNames(sample_data()$expression)
+      choices = sample_data()$availableProjections()
     ),
     ## allow selection of groups based on what group was used to color the cells?
     # shinyWidgets::pickerInput(
@@ -32,7 +32,7 @@ output[["overview_UI"]] <- renderUI({
     selectInput(
       "overview_dot_color",
       label = "Color cells by",
-      choices = colnames(colData(sample_data()$expression))[! colnames(colData(sample_data()$expression)) %in% c("cell_barcode")]
+      choices = colnames(sample_data()$getMetaData())[! colnames(sample_data()$getMetaData()) %in% c("cell_barcode")]
     ),
     sliderInput(
       "overview_dot_size",
@@ -57,16 +57,19 @@ output[["overview_UI"]] <- renderUI({
 ## UI elements for X and Y limits in projection.
 ##----------------------------------------------------------------------------##
 output[["overview_scales"]] <- renderUI({
-  projection_to_display <- if ( is.null(input[["overview_projection_to_display"]]) || is.na(input[["overview_projection_to_display"]]) ) {
-    reducedDimNames(sample_data()$expression)[1]
+  projection_to_display <- if (
+    is.null(input[["overview_projection_to_display"]]) ||
+    is.na(input[["overview_projection_to_display"]])
+  ) {
+    sample_data()$availableProjections()[1]
   } else {
     input[["overview_projection_to_display"]]
   }
 
-  range_x_min <- reducedDim(sample_data()$expression, projection_to_display)[,1] %>% min() %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round()
-  range_x_max <- reducedDim(sample_data()$expression, projection_to_display)[,1] %>% max() %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
-  range_y_min <- reducedDim(sample_data()$expression, projection_to_display)[,2] %>% min() %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round()
-  range_y_max <- reducedDim(sample_data()$expression, projection_to_display)[,2] %>% max() %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
+  range_x_min <- sample_data()$getProjection(projection_to_display)[,1] %>% min() %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round()
+  range_x_max <- sample_data()$getProjection(projection_to_display)[,1] %>% max() %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
+  range_y_min <- sample_data()$getProjection(projection_to_display)[,2] %>% min() %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round()
+  range_y_max <- sample_data()$getProjection(projection_to_display)[,2] %>% max() %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
   tagList(
     sliderInput(
       "overview_scale_x_manual_range",
@@ -91,6 +94,8 @@ output[["overview_scales"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 
 output[["overview_projection"]] <- plotly::renderPlotly({
+
+  ## don't proceed without these inputs
   req(
     input[["overview_projection_to_display"]],
     # input[["overview_samples_to_display"]],
@@ -104,6 +109,7 @@ output[["overview_projection"]] <- plotly::renderPlotly({
   )
 
   projection_to_display <- input[["overview_projection_to_display"]]
+  cells_to_display <- rownames(sample_data()$getMetaData())
   ## TODO: adapt if necessary
   # samples_to_display <- input[["overview_samples_to_display"]]
   # clusters_to_display <- input[["overview_clusters_to_display"]]
@@ -111,7 +117,6 @@ output[["overview_projection"]] <- plotly::renderPlotly({
   #     (sample_data()$cells$sample %in% samples_to_display) &
   #     (sample_data()$cells$cluster %in% clusters_to_display)
   #   )
-  cells_to_display <- rownames(colData(sample_data()$expression))
 
   ## randomly remove cells
   if ( input[["overview_percentage_cells_to_show"]] < 100 ) {
@@ -123,8 +128,8 @@ output[["overview_projection"]] <- plotly::renderPlotly({
 
   ## extract cells to plot
   to_plot <- cbind(
-      reducedDim(sample_data()$expression, projection_to_display)[ cells_to_display , ],
-      colData(sample_data()$expression)[ cells_to_display , ]
+      sample_data()$getProjection(projection_to_display)[ cells_to_display , ],
+      sample_data()$getMetaData()[ cells_to_display , ]
     ) %>% 
     as.data.frame()
   to_plot <- to_plot[ sample(1:nrow(to_plot)) , ]
@@ -148,12 +153,14 @@ output[["overview_projection"]] <- plotly::renderPlotly({
     NULL
   }
 
+  ## prepare tooltip/hover info
   tooltip_info <- paste0(
     "<b>Cell</b>: ", to_plot[[ "cell_barcode" ]], "<br>",
     "<b>Transcripts</b>: ", formatC(to_plot[[ "nUMI" ]], format = "f", big.mark = ",", digits = 0), "<br>",
     "<b>Expressed genes</b>: ", formatC(to_plot[[ "nGene" ]], format = "f", big.mark = ",", digits = 0), "<br>"
   )
 
+  ## add info for known grouping variables to tooltip/hover
   for ( group in sample_data()$getGroups() ) {
     tooltip_info <- paste0(
       tooltip_info,
@@ -161,33 +168,66 @@ output[["overview_projection"]] <- plotly::renderPlotly({
     )
   }
 
-  if ( ncol(reducedDim(sample_data()$expression, projection_to_display)) == 3 ) {
+  ## check if projection consists of 3 or 2 dimensions
+  ## ... selected projection contains 3 dimensions
+  if ( ncol(sample_data()$getProjection(projection_to_display)) == 3 ) {
+
+    ## check if selected coloring variable is categorical or numeric
+    ## ... selected coloring variable is numeric
     if ( is.numeric(to_plot[[ input[["overview_dot_color"]] ]]) ) {
-      plotly::plot_ly(
-        to_plot,
-        x = ~to_plot[,1],
-        y = ~to_plot[,2],
-        z = ~to_plot[,3],
-        type = "scatter3d",
-        mode = "markers",
-        marker = list(
-          colorbar = list(
-            title = input[["overview_dot_color"]]
+      plot <- plotly::plot_ly(
+          to_plot,
+          x = ~to_plot[,1],
+          y = ~to_plot[,2],
+          z = ~to_plot[,3],
+          type = "scatter3d",
+          mode = "markers",
+          marker = list(
+            colorbar = list(
+              title = input[["overview_dot_color"]]
+            ),
+            color = ~to_plot[[ input[["overview_dot_color"]] ]],
+            opacity = input[["overview_dot_opacity"]],
+            colorscale = "YlGnBu",
+            reversescale = TRUE,
+            line = list(
+              color = "rgb(196,196,196)",
+              width = 1
+            ),
+            size = input[["overview_dot_size"]]
           ),
+          hoverinfo = "text",
+          text = ~tooltip_info,
+          source = "overview_projection"
+        )
+
+    ## ... selected coloring variable is not numeric
+    } else {
+      plot <- plotly::plot_ly(
+          to_plot,
+          x = ~to_plot[,1],
+          y = ~to_plot[,2],
+          z = ~to_plot[,3],
           color = ~to_plot[[ input[["overview_dot_color"]] ]],
-          opacity = input[["overview_dot_opacity"]],
-          colorscale = "YlGnBu",
-          reversescale = TRUE,
-          line = list(
-            color = "rgb(196,196,196)",
-            width = 1
+          colors = colors_this_plot,
+          type = "scatter3d",
+          mode = "markers",
+          marker = list(
+            opacity = input[["overview_dot_opacity"]],
+            line = list(
+              color = "rgb(196,196,196)",
+              width = 1
+            ),
+            size = input[["overview_dot_size"]]
           ),
-          size = input[["overview_dot_size"]]
-        ),
-        hoverinfo = "text",
-        text = ~tooltip_info,
-        source = "overview_projection"
-      ) %>%
+          hoverinfo = "text",
+          text = ~tooltip_info,
+          source = "overview_projection"
+        )
+    }
+
+    ## add layout to plot
+    plot <- plot %>%
       plotly::layout(
         scene = list(
           xaxis = list(
@@ -215,53 +255,12 @@ output[["overview_projection"]] <- plotly::renderPlotly({
           )
         )
       )
-    } else {
-      plotly::plot_ly(
-        to_plot,
-        x = ~to_plot[,1],
-        y = ~to_plot[,2],
-        z = ~to_plot[,3],
-        color = ~to_plot[[ input[["overview_dot_color"]] ]],
-        colors = colors_this_plot,
-        type = "scatter3d",
-        mode = "markers",
-        marker = list(
-          opacity = input[["overview_dot_opacity"]],
-          line = list(
-            color = "rgb(196,196,196)",
-            width = 1
-          ),
-          size = input[["overview_dot_size"]]
-        ),
-        hoverinfo = "text",
-        text = ~tooltip_info,
-        source = "overview_projection"
-      ) %>%
-      plotly::layout(
-        scene = list(
-          xaxis = list(
-            title = colnames(to_plot)[1],
-            mirror = TRUE,
-            showline = TRUE,
-            zeroline = FALSE
-          ),
-          yaxis = list(
-            title = colnames(to_plot)[2],
-            mirror = TRUE,
-            showline = TRUE,
-            zeroline = FALSE
-          ),
-          zaxis = list(
-            title = colnames(to_plot)[3],
-            mirror = TRUE,
-            showline = TRUE,
-            zeroline = FALSE
-          )
-        ),
-        hoverlabel = list(font = list(size = 11))
-      )
-    }
-  } else {
+
+  ## ... selection projection consists of 2 dimensions
+  } else if ( ncol(sample_data()$getProjection(projection_to_display)) == 2 ) {
+
+    ## check if selected coloring variable is categorical or numeric
+    ## ... selected coloring variable is numeric
     if ( is.numeric(to_plot[[ input[["overview_dot_color"]] ]]) ) {
       plot <- plotly::plot_ly(
         to_plot,
@@ -286,29 +285,9 @@ output[["overview_projection"]] <- plotly::renderPlotly({
         hoverinfo = "text",
         text = ~tooltip_info,
         source = "overview_projection"
-      ) %>%
-      plotly::layout(
-        xaxis = list(
-          title = colnames(to_plot)[1],
-          mirror = TRUE,
-          showline = TRUE,
-          zeroline = FALSE,
-          range = input[["overview_scale_x_manual_range"]]
-        ),
-        yaxis = list(
-          title = colnames(to_plot)[2],
-          mirror = TRUE,
-          showline = TRUE,
-          zeroline = FALSE,
-          range = input[["overview_scale_y_manual_range"]]
-        ),
-        hoverlabel = list(font = list(size = 11))
       )
-      if ( preferences[["use_webgl"]] == TRUE ) {
-        plot %>% plotly::toWebGL()
-      } else {
-        plot
-      }
+
+    ## ... selected coloring variable is not numeric
     } else {
       plot <- plotly::plot_ly(
         to_plot,
@@ -329,7 +308,11 @@ output[["overview_projection"]] <- plotly::renderPlotly({
         hoverinfo = "text",
         text = ~tooltip_info,
         source = "overview_projection"
-      ) %>%
+      )
+    }
+
+    ## add layout to plot
+    plot <- plot %>%
       plotly::layout(
         xaxis = list(
           title = colnames(to_plot)[1],
@@ -347,11 +330,12 @@ output[["overview_projection"]] <- plotly::renderPlotly({
         ),
         hoverlabel = list(font = list(size = 11))
       )
-      if ( preferences[["use_webgl"]] == TRUE ) {
-        plot %>% plotly::toWebGL()
-      } else {
-        plot
-      }
+
+    ## return plot either with WebGL or without, depending on setting
+    if ( preferences[["use_webgl"]] == TRUE ) {
+      plot %>% plotly::toWebGL()
+    } else {
+      plot
     }
   }
 })
@@ -375,17 +359,30 @@ observeEvent(input[["overview_projection_info"]], {
 ##----------------------------------------------------------------------------##
 
 output[["overview_number_of_selected_cells"]] <- renderText({
+
+  ## don't proceed without these inputs
   req(
     input[["overview_projection_to_display"]]
   )
+
+  ## check selection
+  ## ... selection has not been made or there is not cell in it
   if (
     is.null(plotly::event_data("plotly_selected", source = "overview_projection")) ||
     length(plotly::event_data("plotly_selected", source = "overview_projection")) == 0
   ) {
+
+    ## manually set counter to 0
     number_of_selected_cells <- 0
+
+  ## ... selection has been made and at least 1 cell is in it
   } else {
+
+    ## get number of selected cells
     number_of_selected_cells <- nrow(plotly::event_data("plotly_selected", source = "overview_projection"))
   }
+
+  ## prepare string to show
   paste0("<b>Number of selected cells</b>: ", number_of_selected_cells)
 })
 
@@ -393,6 +390,8 @@ output[["overview_number_of_selected_cells"]] <- renderText({
 ## Export projection.
 ##----------------------------------------------------------------------------##
 observeEvent(input[["overview_projection_export"]], {
+
+  ## don't proceed without these inputs
   req(
     input[["overview_projection_to_display"]],
     # input[["overview_samples_to_display"]],
@@ -427,21 +426,27 @@ observeEvent(input[["overview_projection_export"]], {
     ## ggplot2 functions are necessary to create the plot
     require("ggplot2")
 
+    ## get selected projection
     projection_to_display <- input[["overview_projection_to_display"]]
+    cells_to_display <- rownames(sample_data()$getMetaData())
     # samples_to_display <- input[["overview_samples_to_display"]]
     # clusters_to_display <- input[["overview_clusters_to_display"]]
     # cells_to_display <- which(
     #     (sample_data()$cells$sample %in% samples_to_display) &
     #     (sample_data()$cells$cluster %in% clusters_to_display)
     #   )
-    cells_to_display <- rownames(colData(sample_data()$expression))
 
+    ## merge cell positions in projection and meta data
     to_plot <- cbind(
-        reducedDim(sample_data()$expression, projection_to_display)[ cells_to_display , ],
-        colData(sample_data()$expression)[ cells_to_display , ]
+        sample_data()$getProjection(projection_to_display)[ cells_to_display , ],
+        sample_data()$getMetaData()[ cells_to_display , ]
       ) %>% 
       as.data.frame()
+
+    ## put rows in random order
     to_plot <- to_plot[ sample(1:nrow(to_plot)) , ]
+
+    ## get X and Y scale limits
     xlim <- c(
       input[["overview_scale_x_manual_range"]][1],
       input[["overview_scale_x_manual_range"]][2]
@@ -451,33 +456,67 @@ observeEvent(input[["overview_projection_export"]], {
       input[["overview_scale_y_manual_range"]][2]
     )
 
-    if ( ncol(reducedDim(sample_data()$expression, projection_to_display)) == 3 ) {
+    ## check if selection projection consists of 2 or 3 dimensions
+    ## ... selection projection consists of 3 dimensions
+    if ( ncol(sample_data()$getProjection(projection_to_display)) == 3 ) {
+
+      ## give error message
       shinyWidgets::sendSweetAlert(
         session = session,
         title = "Sorry!",
         text = "It's currently not possible to create PDF plots from 3D dimensional reductions. Please use the PNG export button in the panel or a 2D dimensional reduction instead.",
         type = "error"
       )
-    } else {
-      if ( is.factor(to_plot[[ input[["overview_dot_color"]] ]]) || is.character(to_plot[[ input[["overview_dot_color"]] ]]) ) {
-        ## define colors
+
+    ## ... selection projection consists of 2 dimensions
+    } else if ( ncol(sample_data()$getProjection(projection_to_display)) == 2 ) {
+
+      ## check type of coloring variable
+      ## ... type is of character or factor
+      if (
+        is.factor(to_plot[[ input[["overview_dot_color"]] ]]) ||
+        is.character(to_plot[[ input[["overview_dot_color"]] ]])
+      ) {
+
+        ## check for known groups to retrieve assigned colors
+        ## ... coloring variable is one of the grouping variables
         if ( input[["overview_dot_color"]] %in% sample_data()$getGroups() ) {
+
+          ## retrieve colors
           colors_this_plot <- reactive_colors()[[ input[["overview_dot_color"]] ]]
+
+        ## ... coloring variable is one of the cell cycle variables
         } else if ( input[["overview_dot_color"]] %in% sample_data()$cell_cycle ) {
+
+          ## retrieve colors
           colors_this_plot <- reactive_colors()[[ input[["overview_dot_color"]] ]]
+
+        ## ... coloring variable is type "factor"
         } else if ( is.factor(to_plot[[ input[["overview_dot_color"]] ]]) ) {
+
+          ## assign default colors
           colors_this_plot <- setNames(
             default_colorset[1:length(levels(to_plot[[ input[["overview_dot_color"]] ]]))],
             levels(to_plot[[ input[["overview_dot_color"]] ]])
           )
+
+        ## ... coloring variable is of type "character"
         } else if ( is.character(to_plot[[ input[["overview_dot_color"]] ]]) ) {
+
+          ## assign default colors
           colors_this_plot <- setNames(
             default_colorset[1:length(unique(to_plot[[ input[["overview_dot_color"]] ]]))],
             unique(to_plot[[ input[["overview_dot_color"]] ]])
           )
+
+        ## ... coloring variable is none of the above
         } else {
+
+          ## use default colors
           colors_this_plot <- default_colorset
         }
+
+        ## prepare plot
         p <- ggplot(
             to_plot,
             aes_q(
@@ -496,7 +535,11 @@ observeEvent(input[["overview_projection_export"]], {
           scale_fill_manual(values = colors_this_plot) +
           lims(x = xlim, y = ylim) +
           theme_bw()
+
+      ## ... type is neither character nor factor, most likely numeric
       } else {
+
+        ## prepare plot
         p <- ggplot(
             to_plot,
             aes_q(
@@ -521,31 +564,26 @@ observeEvent(input[["overview_projection_export"]], {
           theme_bw()
       }
 
-      # out_filename <- paste0(
-      #     plot_export_path, "Cerebro_",
-      #     gsub(
-      #       sample_data()$getExperiment()$experiment_name,
-      #       pattern = " ", replacement = "_"
-      #     ),
-      #     "_overview_", input[["overview_projection_to_display"]], "_by_",
-      #     gsub(
-      #       input[["overview_dot_color"]],
-      #       pattern = "\\.", replacement = "_"
-      #     ),
-      #     ".pdf"
-      #   )
-
+      ## save plot
       pdf(NULL)
       ggsave(file_output, p, height = 8, width = 11)
 
+      ## check if file was succesfully saved
+      ## ... successful
       if ( file.exists(file_output) ) {
+
+        ## give positive message
         shinyWidgets::sendSweetAlert(
           session = session,
           title = "Success!",
           text = paste0("Plot saved successfully as: ", file_output),
           type = "success"
         )
+
+      ## ... failed
       } else {
+
+        ## give negative message
         shinyWidgets::sendSweetAlert(
           session = session,
           title = "Error!",
@@ -572,8 +610,8 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
 
   ## extract cells to plot
   to_plot <- cbind(
-      reducedDim(sample_data()$expression, input[["overview_projection_to_display"]]),
-      colData(sample_data()$expression)
+      sample_data()$getProjection(input[["overview_projection_to_display"]]),
+      sample_data()$getMetaData()
     ) %>% 
     as.data.frame()
 
@@ -729,45 +767,59 @@ observeEvent(input[["overview_details_selected_cells_plot_info"]], {
 ##----------------------------------------------------------------------------##
 
 output[["overview_details_selected_cells_table"]] <- DT::renderDataTable(server = FALSE, {
+
+  ## don't proceed without these inputs
   req(
     input[["overview_projection_to_display"]]
   )
 
-  ## extract cells to plot
+  ## extract cells for table
   to_plot <- cbind(
-      reducedDim(sample_data()$expression, input[["overview_projection_to_display"]]),
-      colData(sample_data()$expression)
+      sample_data()$getProjection(input[["overview_projection_to_display"]]),
+      sample_data()$getMetaData()
     ) %>% 
     as.data.frame()
-  ## if no selection is made or no cells are in selection, create empty table
+
+  ## check selection
+  ## ... selection has not been made or there is not cell in it
   if (
     is.null(plotly::event_data("plotly_selected", source = "overview_projection")) ||
     length(plotly::event_data("plotly_selected", source = "overview_projection")) == 0
   ) {
-    colData(sample_data()$expression) %>%
-    as.data.frame() %>%
+
+    ## prepare empty table
+    sample_data()$getMetaData() %>%
     dplyr::slice(0) %>%
     prepareEmptyTable()
-  ## if at least 1 cell has been selected, extract meta data for selected cells
+
+  ## ... selection has been made and at least 1 cell is in it
   } else {
+
+    ## get info of selected cells and create identifier from X-Y coordinates
     selected_cells <- plotly::event_data("plotly_selected", source = "overview_projection") %>%
       dplyr::mutate(identifier = paste0(x, '-', y))
+
+    ## filter out non-selected cells with X-Y identifier
     table <- to_plot %>%
       dplyr::rename(X1 = 1, X2 = 2) %>%
       dplyr::mutate(identifier = paste0(X1, '-', X2)) %>%
       dplyr::filter(identifier %in% selected_cells$identifier) %>%
-      dplyr::select(-c(X1,X2,identifier)) %>%
+      dplyr::select(-c(X1, X2, identifier)) %>%
       dplyr::select(cell_barcode, everything())
-    ## if no cells end up in the table, e.g. because of a problem in cell
-    ## filtering, create empty table
+
+    ## check how many cells are left after filtering
+    ## ... no cells are left
     if ( nrow(table) == 0 ) {
-      colData(sample_data()$expression) %>%
-      as.data.frame() %>%
+
+      ## prepare empty table
+      sample_data()$getMetaData() %>%
       dplyr::slice(0) %>%
       prepareEmptyTable()
-    ## if at least 1 cell remained in the table, as it should, create a proper
-    ## table
+
+    ## ... at least 1 cell is left
     } else {
+
+      ## prepare proper table
       prettifyTable(
         table,
         filter = list(position = "top", clear = TRUE),
