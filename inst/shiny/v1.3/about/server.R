@@ -4,8 +4,8 @@
 
 output[["about"]] <- renderText({
   paste0(
-    '<b>Version of cerebroApp</b><br>',
-    'v1.3.0<br>
+    '<b>Version of cerebroApp</b><br>
+    v1.3.0<br>
     <br>
     <b>Author</b><br>
     Roman Hillje<br>
@@ -33,7 +33,7 @@ output[["about"]] <- renderText({
     <br>
     <b>Credit where credit is due</b><br>
     <ul>
-      <li>Sample and cluster color palettes taken from <a href="https://flatuicolors.com/" title="Flat UI Colors 2" target="_blank">https://flatuicolors.com/</a></li>
+      <li>Color palettes were built using colors from <a href="https://flatuicolors.com/" title="Flat UI Colors 2" target="_blank">https://flatuicolors.com/</a></li>
     </ul>
     <br>
     <b>Preferences</b>'
@@ -66,3 +66,24 @@ output[["logo_Cerebro"]] <- renderImage({
   )},
   deleteFile = FALSE
 )
+
+output[["about_footer"]] <- renderText({
+  paste0(
+    '<br>
+    <div class="text-center">
+      <a target="_blank" href="https://www.twitter.com/fakechek1"><i class="fab fa-twitter" style="color: rgba(0,0,0,.44); font-size: 4rem; margin-left: 10px" aria-hidden="true"></i></a>
+      <a target="_blank" href="https://github.com/romanhaa"><i class="fab fa-github" style="color: rgba(0,0,0,.44); font-size: 4rem; margin-left: 10px" aria-hidden="true"></i></a>
+      <a target="_blank" href="https://gitlab.com/romanhaa"><i class="fab fa-gitlab" style="color: rgba(0,0,0,.44); font-size: 4rem; margin-left: 10px" aria-hidden="true"></i></a>
+      <a target="_blank" href="https://hub.docker.com/u/romanhaa"><i class="fab fa-docker" style="color: rgba(0,0,0,.44); font-size: 4rem; margin-left: 10px" aria-hidden="true"></i></a>
+      <a target="_blank" href="https://linkedin.com/in/roman.hillje"><i class="fab fa-linkedin" style="color: rgba(0,0,0,.44); font-size: 4rem; margin-left: 10px" aria-hidden="true"></i></a>
+    </div>'
+  )
+})
+
+
+
+
+
+
+
+

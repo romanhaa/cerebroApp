@@ -1,31 +1,9 @@
 ##----------------------------------------------------------------------------##
-## Tab: Load data.
+## Tab: Load data
 ##----------------------------------------------------------------------------##
 
 tab_load_data <- tabItem(
   tabName = "loadData",
-  fluidRow(
-    column(12,
-      titlePanel("Load data"),
-      fileInput(
-        inputId = "input_file",
-        label = "Select input data (.crb or .rds file)",
-        multiple = FALSE,
-        accept = c(".rds",".crb",".cerebro"),
-        width = '350px',
-        buttonLabel = "Browse...",
-        placeholder = "No file selected"
-      )
-    )
-  ),
-  fluidRow(
-    valueBoxOutput("load_data_experiment_name"),
-    valueBoxOutput("load_data_number_of_cells"),
-    valueBoxOutput("load_data_number_of_grouping_variables"),
-  ),
-  fluidRow(
-    valueBoxOutput("load_data_organism"),
-    valueBoxOutput("load_data_date_of_analysis"),
-    valueBoxOutput("load_data_date_of_export")
-  )
+  uiOutput("load_data_select_file_UI"),
+  uiOutput("load_data_sample_info_UI")
 )

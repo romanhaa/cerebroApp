@@ -4,7 +4,7 @@
 
 tab_about <- tabItem(
   tabName = "about",
-  fluidPage(
+  tagList(
     fluidRow(
       column(12,
         titlePanel("About Cerebro")
@@ -18,6 +18,9 @@ tab_about <- tabItem(
       column(4,
         imageOutput("logo_Cerebro")
       )
+    ),
+    fluidRow(
+      htmlOutput("about_footer")
     )
   )
 )

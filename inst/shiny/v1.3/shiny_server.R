@@ -1,5 +1,5 @@
 ##----------------------------------------------------------------------------##
-##
+## Server function for Shiny app.
 ##----------------------------------------------------------------------------##
 server <- function(input, output, session) {
 
@@ -32,14 +32,14 @@ server <- function(input, output, session) {
   ##--------------------------------------------------------------------------##
   ## Central parameters.
   ##--------------------------------------------------------------------------##
-  scatter_plot_dot_size <- list(
+  scatter_plot_point_size <- list(
     min = 1,
     max = 20,
     step = 1,
     default = 5
   )
 
-  scatter_plot_dot_opacity <- list(
+  scatter_plot_point_opacity <- list(
     min = 0.1,
     max = 1.0,
     step = 0.1,
@@ -85,12 +85,8 @@ server <- function(input, output, session) {
         icon = icon("sitemap")
       ),
       menuItem(
-        "Gene expression", tabName = "geneExpression",
+        "Gene (set) expression", tabName = "geneExpression",
         icon = icon("signal")
-      ),
-      menuItem(
-        "Gene set expression", tabName = "geneSetExpression",
-        icon = icon("list")
       ),
       menuItem(
         "Trajectory", tabName = "trajectory",
@@ -135,7 +131,6 @@ server <- function(input, output, session) {
   ##--------------------------------------------------------------------------##
   ## Functions to find columns of specific type (for automatic formatting).
   ##--------------------------------------------------------------------------##
-  ## only test numeric columns
   findColumnsInteger <- function(df, columns_to_test) {
     columns_indices <- c()
     for ( i in columns_to_test ) {
@@ -269,8 +264,7 @@ server <- function(input, output, session) {
 
     ## get vector of column indices that contain numeric values which are
     ## neither integer, p-values, percentages, or logFC
-    ## these columns will be rounded to significant digits (can only be done
-    ## with DT so it won't be done with formattable)
+    ## these columns will be rounded to significant digits
     columns_only_numeric <- columns_numeric[ columns_numeric %in% c(
       columns_p_value, columns_percent, columns_integer, columns_p_value,
       columns_logFC) == FALSE ]
@@ -355,6 +349,7 @@ server <- function(input, output, session) {
     ## - show all other numeric values that are none of the above with 3
     ##   significant decimals
     if ( number_formatting == TRUE ) {
+
       ## integer values
       if ( !is.null(columns_integer) && length(columns_integer) > 0 ) {
         table <- table %>%
@@ -365,6 +360,7 @@ server <- function(input, output, session) {
             mark = ","
           )
       }
+
       ## p-values
       if ( !is.null(columns_p_value) && length(columns_p_value) > 0 ) {
         table <- table %>%
@@ -373,6 +369,7 @@ server <- function(input, output, session) {
             digits = 3
           )
       }
+
       ## logFC
       if ( !is.null(columns_logFC) && length(columns_logFC) > 0 ) {
         table <- table %>%
@@ -381,14 +378,16 @@ server <- function(input, output, session) {
             digits = 3
           )
       }
+
       ## percentage
       if ( !is.null(columns_percent) && length(columns_percent) > 0 ) {
         table <- table %>%
         DT::formatPercentage(
           columns = columns_percent,
           digits = 2
-        )# %>%
+        )
       }
+
       ## numeric but none of the above
       if ( !is.null(columns_only_numeric) && length(columns_only_numeric) > 0 ) {
         table <- table %>%
@@ -401,7 +400,7 @@ server <- function(input, output, session) {
 
     ## if color highlighting is on...
     ## - use color bar for percentages
-    ## - use colo bar for p-values (ideally I wanted to use colors with
+    ## - use color bar for p-values (ideally I wanted to use colors with
     ##   styleInterval(), but styleInterval() cannot handle missing cuts; I'd
     ##   like to color values based on fixed intervals, e.g. below 0.1, 0.05,
     ##   etc, but if the column doesn't contain any values for a cut, then the
@@ -412,9 +411,16 @@ server <- function(input, output, session) {
     ## - use colors for logicals
     ## - use reactive colors for grouping variables
     ## - use reactive colors for cell cycle assignments
+    ## NOTES:
+    ## - "styleInterval()" only works when there are at least two values that
+    ##   are not the same, therefore a few tests are necessary to prevent errors
     if ( color_highlighting == TRUE ) {
+
       ## percentage
-      if ( !is.null(columns_percent) && length(columns_percent) > 0 ) {
+      if (
+        !is.null(columns_percent) &&
+        length(columns_percent) > 0
+      ) {
         table <- table %>%
           DT::formatStyle(
             columns = columns_percent,
@@ -424,8 +430,12 @@ server <- function(input, output, session) {
             backgroundPosition = 'center'
           )
       }
+
       ## p-values
-      if ( !is.null(columns_p_value) && length(columns_p_value) > 0 ) {
+      if (
+        !is.null(columns_p_value) &&
+        length(columns_p_value) > 0
+      ) {
         table <- table %>%
           DT::formatStyle(
             columns = columns_p_value,
@@ -435,48 +445,70 @@ server <- function(input, output, session) {
             backgroundPosition = 'center'
           )
       }
+
       ## logFC
-      if ( !is.null(columns_logFC) && length(columns_logFC) > 0 ) {
+      if (
+        !is.null(columns_logFC) &&
+        length(columns_logFC) > 0 &&
+        nrow(table_original) > 1
+      ) {
         for ( i in columns_logFC ) {
           range <- range(table_original[[i]])
-          table <- table %>%
-            DT::formatStyle(
-              columns = i,
-              backgroundColor = DT::styleInterval(
-                seq(range[1], range[2], (range[2]-range[1])/100),
-                colorRampPalette(colors = c('white', '#e67e22'))(102)
+          if ( range[1] != range[2] ) {
+            table <- table %>%
+              DT::formatStyle(
+                columns = i,
+                backgroundColor = DT::styleInterval(
+                  seq(range[1], range[2], (range[2]-range[1])/100),
+                  colorRampPalette(colors = c('white', '#e67e22'))(102)
+                )
               )
-            )
+          }
         }
       }
+
       ## integer
-      if ( !is.null(columns_integer) && length(columns_integer) > 0 ) {
+      if (
+        !is.null(columns_integer) &&
+        length(columns_integer) > 0 &&
+        nrow(table_original) > 1
+      ) {
         for ( i in columns_integer ) {
           range <- range(table_original[[i]])
-          table <- table %>%
-            DT::formatStyle(
-              columns = i,
-              backgroundColor = DT::styleInterval(
-                seq(range[1], range[2], (range[2]-range[1])/100),
-                colorRampPalette(colors = c('white', '#e67e22'))(102)
+          if ( range[1] != range[2] ) {
+            table <- table %>%
+              DT::formatStyle(
+                columns = i,
+                backgroundColor = DT::styleInterval(
+                  seq(range[1], range[2], (range[2]-range[1])/100),
+                  colorRampPalette(colors = c('white', '#e67e22'))(102)
+                )
               )
-            )
+          }
         }
       }
+
       ## numeric values that are non of the above
-      if ( !is.null(columns_only_numeric) && length(columns_only_numeric) > 0 ) {
+      if (
+        !is.null(columns_only_numeric) &&
+        length(columns_only_numeric) > 0 &&
+        nrow(table_original) > 1
+      ) {
         for ( i in columns_only_numeric ) {
           range <- range(table_original[[i]])
-          table <- table %>%
-            DT::formatStyle(
-              columns = i,
-              backgroundColor = DT::styleInterval(
-                seq(range[1], range[2], (range[2]-range[1])/100),
-                colorRampPalette(colors = c('white', '#e67e22'))(102)
+          if ( range[1] != range[2] ) {
+            table <- table %>%
+              DT::formatStyle(
+                columns = i,
+                backgroundColor = DT::styleInterval(
+                  seq(range[1], range[2], (range[2]-range[1])/100),
+                  colorRampPalette(colors = c('white', '#e67e22'))(102)
+                )
               )
-            )
+          }
         }
       }
+
       ## logicals
       if ( !is.null(columns_logical) && length(columns_logical) > 0 ) {
         table <- table %>%
@@ -486,8 +518,9 @@ server <- function(input, output, session) {
             fontWeight = DT::styleEqual(c(TRUE, FALSE), c('bold', 'normal'))
           )
       }
+
       ## grouping variables
-      columns_groups <- which(colnames(table_original) %in% sample_data()$getGroups())
+      columns_groups <- which(colnames(table_original) %in% getGroups())
       if ( length(columns_groups) > 0 ) {
         for ( i in columns_groups ) {
           group <- colnames(table_original)[i]
@@ -504,8 +537,9 @@ server <- function(input, output, session) {
           }
         }
       }
+
       ## cell cycle assignments
-      columns_cell_cycle <- which(colnames(table_original) %in% sample_data()$cell_cycle)
+      columns_cell_cycle <- which(colnames(table_original) %in% getCellCycle())
       if ( length(columns_cell_cycle) > 0 ) {
         for ( i in columns_cell_cycle ) {
           method <- colnames(table_original)[i]
@@ -549,13 +583,96 @@ server <- function(input, output, session) {
     )
   }
 
+  ##--------------------------------------------------------------------------##
+  ## Functions to get sample data.
+  ##
+  ## Never directly interact with sample data: sample_data()
+  ## This ensures that ...
+  ##--------------------------------------------------------------------------##
+  getExperiment <- function() {
+    return(sample_data()$getExperiment())
+  }
+  getParameters <- function() {
+    return(sample_data()$getParameters())
+  }
+  getTechnicalInfo <- function() {
+    return(sample_data()$getTechnicalInfo())
+  }
+  getGeneLists <- function() {
+    return(sample_data()$getGeneLists())
+  }
+  getExpression <- function() {
+    return(sample_data()$getExpression())
+  }
+  getCellIDs <- function() {
+    return(colnames(sample_data()$getExpression()))
+  }
+  getGeneNames <- function() {
+    return(rownames(sample_data()$getExpression()))
+  }
+  getGroups <- function() {
+    return(sample_data()$getGroups())
+  }
+  getGroupLevels <- function(group) {
+    return(sample_data()$getGroupLevels(group))
+  }
+  getCellCycle <- function() {
+    return(sample_data()$getCellCycle())
+  }
+  getMetaData <- function() {
+    return(sample_data()$getMetaData())
+  }
+  availableProjections <- function() {
+    return(sample_data()$availableProjections())
+  }
+  getProjection <- function(name) {
+    return(sample_data()$getProjection(name))
+  }
+  getTree <- function(group) {
+    return(sample_data()$getTree(group))
+  }
+  getGroupsWithMostExpressedGenes <- function() {
+    return(sample_data()$getGroupsWithMostExpressedGenes())
+  }
+  getMostExpressedGenes <- function(group) {
+    return(sample_data()$getMostExpressedGenes(group))
+  }
+  getMethodsForMarkerGenes <- function() {
+    return(sample_data()$getMethodsForMarkerGenes())
+  }
+  getGroupsWithMarkerGenes <- function(method) {
+    return(sample_data()$getGroupsWithMarkerGenes(method))
+  }
+  getMarkerGenes <- function(method, group) {
+    return(sample_data()$getMarkerGenes(method, group))
+  }
+  getMethodsForEnrichedPathways <- function() {
+    return(sample_data()$getMethodsForEnrichedPathways())
+  }
+  getGroupsWithEnrichedPathways <- function(method) {
+    return(sample_data()$getGroupsWithEnrichedPathways(method))
+  }
+  getEnrichedPathways <- function(method, group) {
+    return(sample_data()$getEnrichedPathways(method, group))
+  }
+  getMethodsForTrajectories <- function() {
+    return(sample_data()$getMethodsForTrajectories())
+  }
+  getNamesOfTrajectories <- function(method) {
+    return(sample_data()$getNamesOfTrajectories(method))
+  }
+  getTrajectory <- function(method, name) {
+    return(sample_data()$getTrajectory(method, name))
+  }
 
   ##--------------------------------------------------------------------------##
   ## Function to calculate A-by-B tables (e.g. samples by clusters).
   ##--------------------------------------------------------------------------##
   calculateTableAB <- function(groupA, groupB) {
+
     ## get cell meta data
-    meta_data <- sample_data()$getMetaData()
+    meta_data <- getMetaData()
+
     ## check if specified group columns exist in meta data
     if ( groupA %in% colnames(meta_data) == FALSE ) {
       stop(
@@ -596,16 +713,21 @@ server <- function(input, output, session) {
     ## generate table
     table <- table %>%
       dplyr::group_by_at(c(groupA, groupB)) %>%
-      dplyr::summarize(count = dplyr::n()) %>%
-      tidyr::spread(`groupB`, count, fill = 0) %>%
+      dplyr::summarise(count = dplyr::n(), .groups = 'drop') %>%
+      tidyr::pivot_wider(
+        id_cols = 1,
+        names_from = all_of(groupB),
+        values_from = "count",
+        values_fill = 0
+      ) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(total_cell_count = rowSums(.[c(2:ncol(.))])) %>%
-      dplyr::select(c(`groupA`, 'total_cell_count', dplyr::everything()))
+      dplyr::select(tidyselect::all_of(groupA), 'total_cell_count', dplyr::everything())
 
     ## fix order of columns if cell cycle info was chosen as second group
     if ( 'G1' %in% colnames(table) && 'G2M' %in% colnames(table) && 'S' %in% colnames(table) ) {
       table <- table %>%
-        dplyr::select(c(`groupA`, 'total_cell_count', 'G1', 'S', 'G2M', dplyr::everything()))
+        dplyr::select(tidyselect::all_of(groupA), 'total_cell_count', 'G1', 'S', 'G2M', dplyr::everything())
     }
 
     ## return
@@ -616,19 +738,20 @@ server <- function(input, output, session) {
   ## Colors for groups.
   ##--------------------------------------------------------------------------##
   reactive_colors <- reactive({
+
     ## get cell meta data
-    meta_data <- sample_data()$getMetaData()
+    meta_data <- getMetaData()
 
     colors <- list()
 
     ## go through all groups
-    for ( group_name in sample_data()$getGroups() )
+    for ( group_name in getGroups() )
     {
       ## if color selection from the "Color management" tab exist, assign those
       ## colors, otherwise assign colors from default colorset
-      if ( !is.null(input[[ paste0('color_', group_name, '_', sample_data()$getGroupLevels(group_name)[1]) ]]) )
+      if ( !is.null(input[[ paste0('color_', group_name, '_', getGroupLevels(group_name)[1]) ]]) )
       {
-        for ( group_level in sample_data()$getGroupLevels(group_name) )
+        for ( group_level in getGroupLevels(group_name) )
         {
           ## it seems that special characters are not handled well in input/output
           ## so I replace them with underscores using gsub()
@@ -636,15 +759,15 @@ server <- function(input, output, session) {
         }
       } else
       {
-        colors[[ group_name ]] <- default_colorset[1:length(sample_data()$getGroupLevels(group_name))]
-        names(colors[[ group_name ]]) <- sample_data()$getGroupLevels(group_name)
+        colors[[ group_name ]] <- default_colorset[1:length(getGroupLevels(group_name))]
+        names(colors[[ group_name ]]) <- getGroupLevels(group_name)
       }
     }
 
     ## go through columns with cell cycle info
-    if ( length(sample_data()$cell_cycle) > 0 )
+    if ( length(getCellCycle()) > 0 )
     {
-      for ( column in sample_data()$cell_cycle )
+      for ( column in getCellCycle() )
       {
         ## if color selection from the "Color management" tab exist, assign those
         ## colors, otherwise assign colors from cell cycle colorset
@@ -673,19 +796,17 @@ server <- function(input, output, session) {
   ##--------------------------------------------------------------------------##
   ## Tabs.
   ##--------------------------------------------------------------------------##
-  ## TODO: change path
-  source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/load_data/server.R", local = TRUE)
-  source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/overview/server.R", local = TRUE)
-  source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/groups/server.R", local = TRUE)
-  source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/most_expressed_genes/server.R", local = TRUE)
-  source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/marker_genes/server.R", local = TRUE)
-  source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/enriched_pathways/server.R", local = TRUE)
-  source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/gene_expression/server.R", local = TRUE)
-  source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/gene_set_expression/server.R", local = TRUE)
-  source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/gene_id_conversion/server.R", local = TRUE)
-  source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/trajectory/server.R", local = TRUE)
-  source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/analysis_info/server.R", local = TRUE)
-  source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/color_management/server.R", local = TRUE)
-  source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/about/server.R", local = TRUE)
+  source(paste0(path_to_shiny_files, "/load_data/server.R"), local = TRUE)
+  source(paste0(path_to_shiny_files, "/overview/server.R"), local = TRUE)
+  source(paste0(path_to_shiny_files, "/groups/server.R"), local = TRUE)
+  source(paste0(path_to_shiny_files, "/most_expressed_genes/server.R"), local = TRUE)
+  source(paste0(path_to_shiny_files, "/marker_genes/server.R"), local = TRUE)
+  source(paste0(path_to_shiny_files, "/enriched_pathways/server.R"), local = TRUE)
+  source(paste0(path_to_shiny_files, "/gene_expression/server.R"), local = TRUE)
+  source(paste0(path_to_shiny_files, "/gene_id_conversion/server.R"), local = TRUE)
+  source(paste0(path_to_shiny_files, "/trajectory/server.R"), local = TRUE)
+  source(paste0(path_to_shiny_files, "/analysis_info/server.R"), local = TRUE)
+  source(paste0(path_to_shiny_files, "/color_management/server.R"), local = TRUE)
+  source(paste0(path_to_shiny_files, "/about/server.R"), local = TRUE)
 
 }

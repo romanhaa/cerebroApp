@@ -160,10 +160,18 @@ exportFromSeurat <- function(
       call. = FALSE
     )
   }
+
   expression_data <- try(
     Seurat::GetAssayData(object, assay = assay, slot = slot),
     silent = TRUE
   )
+
+  ## convert expression data to "RleArray" if it is "dgCMatrix"
+  if ( class(expression_data) == 'dgCMatrix' )
+  {
+    expression_data <- as(expression_data, "RleArray")
+  }
+
   ## check if provided slot exists in provided assay
   if ( class(expression_data) == 'try-error' ) {
     stop(
@@ -174,7 +182,7 @@ exportFromSeurat <- function(
     )
   }
   ## create new Cerebro object
-  export <- Cerebro$new()
+  export <- Cerebro_v1.3$new()
 
   ## add experiment name
   export$addExperiment('experiment_name', 'pbmc_Seurat')
@@ -187,7 +195,7 @@ exportFromSeurat <- function(
 
   ## add expression data
   export$expression <- SingleCellExperiment::SingleCellExperiment(
-    assays = list(expression = expression_data)
+    assays = list(counts = expression_data)
   )
 
   ##--------------------------------------------------------------------------##
@@ -230,7 +238,7 @@ exportFromSeurat <- function(
     for ( i in seq(length(object@misc$gene_lists)) )
     {
       export$addGeneList(
-        names(object@misc$parameters)[i],
+        names(object@misc$gene_lists)[i],
         object@misc$gene_lists[[i]]
       )
     }
@@ -466,7 +474,7 @@ exportFromSeurat <- function(
   ##--------------------------------------------------------------------------##
   ## trajectories
   ##--------------------------------------------------------------------------##
-  if ( length(object@misc$trajectory) == 0 )
+  if ( length(object@misc$trajectories) == 0 )
   {
     message(
       paste0(

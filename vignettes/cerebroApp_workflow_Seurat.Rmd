@@ -285,11 +285,11 @@ We extract the trajectory from the generated Monocle object with the `extractMon
 
 ```{r analysis_with_monocle}
 monocle <- newCellDataSet(
-  seurat@assays$RNA@data,
+  seurat@assays$RNA@counts,
   phenoData = new('AnnotatedDataFrame', data = seurat@meta.data),
   featureData = new('AnnotatedDataFrame', data = data.frame(
-    gene_short_name = rownames(seurat@assays$RNA@data),
-    row.names = rownames(seurat@assays$RNA@data))
+    gene_short_name = rownames(seurat@assays$RNA@counts),
+    row.names = rownames(seurat@assays$RNA@counts))
   )
 )
 

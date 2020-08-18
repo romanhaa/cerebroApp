@@ -146,8 +146,15 @@ exportFromSCE <- function(
       call. = FALSE
     )
   }
+
+  ## convert expression data to "RleArray" if it is "dgCMatrix"
+  if ( class(expression_data) == 'dgCMatrix' )
+  {
+    expression_data <- as(expression_data, "RleArray")
+  }
+
   ## create new Cerebro object
-  export <- Cerebro$new()
+  export <- Cerebro_v1.3$new()
 
   ## add experiment name
   export$addExperiment('experiment_name', 'pbmc_Seurat')
@@ -160,7 +167,7 @@ exportFromSCE <- function(
 
   ## add expression data
   export$expression <- SingleCellExperiment::SingleCellExperiment(
-    assays = list(expression = assay(object, assay))
+    assays = list(counts = assay(object, assay))
   )
 
   ##--------------------------------------------------------------------------##
@@ -203,7 +210,7 @@ exportFromSCE <- function(
     for ( i in seq(length(object@metadata$gene_lists)) )
     {
       export$addGeneList(
-        names(object@metadata$parameters)[i],
+        names(object@metadata$gene_lists)[i],
         object@metadata$gene_lists[[i]]
       )
     }
@@ -435,7 +442,7 @@ exportFromSCE <- function(
   ##--------------------------------------------------------------------------##
   ## trajectories
   ##--------------------------------------------------------------------------##
-  if ( length(object@metadata$trajectory) == 0 )
+  if ( length(object@metadata$trajectories) == 0 )
   {
     message(
       paste0(

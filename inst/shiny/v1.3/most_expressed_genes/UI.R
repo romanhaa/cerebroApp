@@ -10,5 +10,6 @@ tab_most_expressed_genes <- tabItem(
     }
     "
   ),
-  uiOutput("most_expressed_genes_UI")
+  uiOutput("most_expressed_genes_select_group_UI"),
+  uiOutput("most_expressed_genes_table_UI")
 )

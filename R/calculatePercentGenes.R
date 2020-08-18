@@ -15,6 +15,7 @@
 #'   package = "cerebroApp"))
 #' calculatePercentGenes(
 #'   object = pbmc,
+#'   assay = 'RNA',
 #'   genes = list('example' = c('FCN1','CD3D'))
 #' )
 calculatePercentGenes <- function(

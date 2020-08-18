@@ -2,8 +2,8 @@
 #' @title Launch Cerebro interface.
 #' @description Launch Cerebro interface.
 #' @keywords Cerebro scRNAseq Seurat
-#' @param version Which version of Cerebro to launch: "v1.0", "v1.1", "v1.2".
-#' Defaults to "v1.2".
+#' @param version Which version of Cerebro to launch: "v1.0", "v1.1", "v1.2",
+#' "v1.3"; defaults to "v1.3".
 #' @param maxFileSize Maximum size of input file; defaults to 800 MB.
 #' @export
 #' @return Shiny application.
@@ -28,12 +28,13 @@
 #' }
 launchCerebro <- function(
   version = "v1.3",
+  mode = "open",
   maxFileSize = 800
 ){
   ##--------------------------------------------------------------------------##
   ##
   ##--------------------------------------------------------------------------##
-  available_versions = c("v1.0","v1.1","v1.2","v1.3")
+  available_versions <- c("v1.0","v1.1","v1.2","v1.3")
   if ( (version %in% available_versions == FALSE ) )
   {
     stop(
@@ -41,94 +42,30 @@ launchCerebro <- function(
       call. = FALSE
     )
   }
-  ##--------------------------------------------------------------------------##
-  ## define path to export plots to
-  ##--------------------------------------------------------------------------##
-  if ( grepl(tolower(Sys.info()["sysname"]), pattern = "^win") )
-  {
-    plot_export_path <- paste0(Sys.getenv("USERPROFILE"), "\\Desktop\\")
-  } else if ( "DOCKER" %in% names(Sys.getenv()) )
-  {
-    plot_export_path <- "/plots"
-  } else if ( grepl(tolower(Sys.info()["sysname"]), pattern = "darwin") )
-  {
-    plot_export_path <- "~/Desktop/"
-  }
 
   ##--------------------------------------------------------------------------##
   ##
   ##--------------------------------------------------------------------------##
-  source(
-    system.file(
-      paste0("shiny/", version, "/overview/info.R"),
-      package = "cerebroApp"
-    ),
-    local = TRUE
+  Cerebro.options <<- list(
+    "mode" = mode
   )
-  source(
-    system.file(
-      paste0("shiny/", version, "/samples/info.R"),
-      package = "cerebroApp"
-    ),
-    local = TRUE
-  )
-  source(
-    system.file(
-      paste0("shiny/", version, "/clusters/info.R"),
-      package = "cerebroApp"
-    ),
-    local = TRUE
-  )
-  source(
-    system.file(
-      paste0("shiny/", version, "/most_expressed_genes/info.R"),
-      package = "cerebroApp"
-    ),
-    local = TRUE
-  )
-  source(
-    system.file(
-      paste0("shiny/", version, "/marker_genes/info.R"),
-      package = "cerebroApp"
-    ),
-    local = TRUE
-  )
-  source(
-    system.file(
-      paste0("shiny/", version, "/enriched_pathways/info.R"),
-      package = "cerebroApp"
-    ),
-    local = TRUE
-  )
-  source(
-    system.file(
-      paste0("shiny/", version, "/gene_expression/info.R"),
-      package = "cerebroApp"
-    ),
-    local = TRUE
-  )
-  source(
-    system.file(
-      paste0("shiny/", version, "/gene_set_expression/info.R"),
-      package = "cerebroApp"
-    ),
-    local = TRUE
-  )
-  if ( version %in% c('v1.1','v1.2','v1.3') ) {
-    source(
-      system.file(
-        paste0("shiny/", version, "/trajectory/info.R"),
-        package = "cerebroApp"
-      ),
-      local = TRUE
-    )
-    source(
-      system.file(
-        paste0("shiny/", version, "/color_management/info.R"),
-        package = "cerebroApp"
-      ),
-      local = TRUE
-    )
+
+  ##--------------------------------------------------------------------------##
+  ## define path to export plots to
+  ## only necessary in old Cerebro version because a dialog is opened to choose
+  ## file destination since v1.3
+  ##--------------------------------------------------------------------------##
+  if ( version %in% c("v1.0","v1.1","v1.2") ) {
+    if ( grepl(tolower(Sys.info()["sysname"]), pattern = "^win") )
+    {
+      plot_export_path <- paste0(Sys.getenv("USERPROFILE"), "\\Desktop\\")
+    } else if ( "DOCKER" %in% names(Sys.getenv()) )
+    {
+      plot_export_path <- "/plots"
+    } else if ( grepl(tolower(Sys.info()["sysname"]), pattern = "darwin") )
+    {
+      plot_export_path <- "~/Desktop/"
+    }
   }
 
   ##--------------------------------------------------------------------------##

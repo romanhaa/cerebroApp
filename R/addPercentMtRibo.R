@@ -20,6 +20,7 @@
 #'   package = "cerebroApp"))
 #' pbmc <- addPercentMtRibo(
 #'   object = pbmc,
+#'   assay = 'RNA',
 #'   organism = 'hg',
 #'   gene_nomenclature = 'name'
 #' )

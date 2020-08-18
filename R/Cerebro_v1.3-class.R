@@ -1,8 +1,8 @@
 setOldClass(Classes = 'package_version')
 
 ## muste be initialized with expressed data as SCE object
-Cerebro <- setRefClass(
-  'Cerebro',
+Cerebro_v1.3 <- setRefClass(
+  'Cerebro_v1.3',
   fields = list(
     version = 'package_version',
     experiment = 'list',
@@ -108,15 +108,24 @@ Cerebro <- setRefClass(
       checkIfColumnExistsInMetadata(x)
       cell_cycle <<- x
     },
+    ## get names of columns that contain cell cycle information
+    getCellCycle = function()
+    {
+      return(cell_cycle)
+    },
     ## custom gene lists
     addGeneList = function(name, genes)
     {
       gene_lists[[name]] <<- genes
     },
+    getGeneLists = function()
+    {
+      return(gene_lists)
+    },
     ## expression data
     getExpression = function()
     {
-      return(assay(expression, 'expression'))
+      return(counts(expression))
     },
     ## available projections
     availableProjections = function()
@@ -253,6 +262,14 @@ Cerebro <- setRefClass(
       }
       paste0(p, collapse = ', ')
     },
+    getMethodsForTrajectories = function()
+    {
+      return(names(trajectories))
+    },
+    getNamesOfTrajectories = function(method)
+    {
+      return(names(trajectories[[method]]))
+    },
     getTrajectory = function(method, name)
     {
       return(trajectories[[method]][[name]])
@@ -262,8 +279,8 @@ Cerebro <- setRefClass(
     {
       message(
         paste0(
-          'class: Cerebro', '\n',
-          'version: ',
+          'class: Cerebro_v1.3', '\n',
+          'cerebroApp version: ',
             .self$getVersion(), '\n',
           'experiment name: ',
             .self$getExperiment()$experiment_name, '\n',

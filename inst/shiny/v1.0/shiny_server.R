@@ -4,6 +4,59 @@
 server <- function(input, output, session) {
 
   ##--------------------------------------------------------------------------##
+  ## Load info texts.
+  ##--------------------------------------------------------------------------##
+  source(
+    system.file(
+      paste0("shiny/", version, "/overview/info.R"),
+      package = "cerebroApp"
+    ),
+    local = TRUE
+  )
+  source(
+    system.file(
+      paste0("shiny/", version, "/samples/info.R"),
+      package = "cerebroApp"
+    ),
+    local = TRUE
+  )
+  source(
+    system.file(
+      paste0("shiny/", version, "/clusters/info.R"),
+      package = "cerebroApp"
+    ),
+    local = TRUE
+  )
+  source(
+    system.file(
+      paste0("shiny/", version, "/most_expressed_genes/info.R"),
+      package = "cerebroApp"
+    ),
+    local = TRUE
+  )
+  source(
+    system.file(
+      paste0("shiny/", version, "/marker_genes/info.R"),
+      package = "cerebroApp"
+    ),
+    local = TRUE
+  )
+  source(
+    system.file(
+      paste0("shiny/", version, "/enriched_pathways/info.R"),
+      package = "cerebroApp"
+    ),
+    local = TRUE
+  )
+  source(
+    system.file(
+      paste0("shiny/", version, "/gene_expression/info.R"),
+      package = "cerebroApp"
+    ),
+    local = TRUE
+  )
+
+  ##--------------------------------------------------------------------------##
   ## Color management.
   ##--------------------------------------------------------------------------##
   # Dutch palette from flatuicolors.com

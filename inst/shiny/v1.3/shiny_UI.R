@@ -27,25 +27,23 @@ boxTitle <- function(title) {
 }
 
 ##----------------------------------------------------------------------------##
-##
+## Load UI content for each tab.
 ##----------------------------------------------------------------------------##
-## TODO: change path
-source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/load_data/UI.R", local = TRUE)
-source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/overview/UI.R", local = TRUE)
-source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/groups/UI.R", local = TRUE)
-source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/most_expressed_genes/UI.R", local = TRUE)
-source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/marker_genes/UI.R", local = TRUE)
-source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/enriched_pathways/UI.R", local = TRUE)
-source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/gene_expression/UI.R", local = TRUE)
-source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/gene_set_expression/UI.R", local = TRUE)
-source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/trajectory/UI.R", local = TRUE)
-source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/gene_id_conversion/UI.R", local = TRUE)
-source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/analysis_info/UI.R", local = TRUE)
-source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/color_management/UI.R", local = TRUE)
-source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/about/UI.R", local = TRUE)
+source(paste0(path_to_shiny_files, "/load_data/UI.R"), local = TRUE)
+source(paste0(path_to_shiny_files, "/overview/UI.R"), local = TRUE)
+source(paste0(path_to_shiny_files, "/groups/UI.R"), local = TRUE)
+source(paste0(path_to_shiny_files, "/most_expressed_genes/UI.R"), local = TRUE)
+source(paste0(path_to_shiny_files, "/marker_genes/UI.R"), local = TRUE)
+source(paste0(path_to_shiny_files, "/enriched_pathways/UI.R"), local = TRUE)
+source(paste0(path_to_shiny_files, "/gene_expression/UI.R"), local = TRUE)
+source(paste0(path_to_shiny_files, "/trajectory/UI.R"), local = TRUE)
+source(paste0(path_to_shiny_files, "/gene_id_conversion/UI.R"), local = TRUE)
+source(paste0(path_to_shiny_files, "/analysis_info/UI.R"), local = TRUE)
+source(paste0(path_to_shiny_files, "/color_management/UI.R"), local = TRUE)
+source(paste0(path_to_shiny_files, "/about/UI.R"), local = TRUE)
 
 ##----------------------------------------------------------------------------##
-##
+## Create dashboard with different tabs.
 ##----------------------------------------------------------------------------##
 ui <- dashboardPage(
   title = "Cerebro",
@@ -68,7 +66,6 @@ ui <- dashboardPage(
       tab_marker_genes,
       tab_enriched_pathways,
       tab_gene_expression,
-      tab_gene_set_expression,
       tab_trajectory,
       tab_gene_id_conversion,
       tab_analysis_info,
