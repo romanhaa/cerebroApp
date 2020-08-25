@@ -11,8 +11,7 @@ output[["color_assignments_UI"]] <- renderUI({
   fluidRow(
     tagList({
       group_list <- list()
-      for ( group_name in getGroups() )
-      {
+      for ( group_name in getGroups() ) {
         group_list[[ group_name ]] <- box(
           title = tagList(
             boxTitle(group_name),
@@ -39,10 +38,8 @@ output[["color_assignments_UI"]] <- renderUI({
 
       ## if there are columns with cell cycle info, add color selection elements
       ## also for those
-      if ( length(getCellCycle()) > 0 )
-      {
-        for ( column in getCellCycle() )
-        {
+      if ( length(getCellCycle()) > 0 ) {
+        for ( column in getCellCycle() ) {
           group_list[[ column ]] <- box(
             title = tagList(
               boxTitle(column),
@@ -85,7 +82,8 @@ observeEvent(input[["color_assignments_info"]],
       color_assignments_info[["text"]],
       title = color_assignments_info[["title"]],
       easyClose = TRUE,
-      footer = NULL
+      footer = NULL,
+      size = "l"
     )
   )
 })

@@ -27,7 +27,7 @@ output[["expression_details_selected_cells_UI"]] <- renderUI({
         shinyWidgets::materialSwitch(
           inputId = "expression_details_selected_cells_color_highlighting",
           label = "Highlight values with colors:",
-          value = FALSE,
+          value = TRUE,
           status = "primary",
           inline = TRUE
         ),
@@ -121,7 +121,8 @@ observeEvent(input[["expression_details_selected_cells_info"]], {
       expression_details_selected_cells_info$text,
       title = expression_details_selected_cells_info$title,
       easyClose = TRUE,
-      footer = NULL
+      footer = NULL,
+      size = "l"
     )
   )
 })
@@ -132,5 +133,16 @@ observeEvent(input[["expression_details_selected_cells_info"]], {
 
 expression_details_selected_cells_info <- list(
   title = "Details of selected cells",
-  text = p("Table containing (average) expression values of selected genes as well as selected meta data (sample, cluster, number of transcripts, number of expressed genes) for cells selected in the plot using the box or lasso selection tool. If you want the table to contain all cells in the data set, you must select all cells in the plot. The table can be saved to disk in CSV or Excel format for further analysis.")
+  text = HTML("
+    Table containing (average) expression values of selected genes as well as selected meta data (sample, cluster, number of transcripts, number of expressed genes) for cells selected in the plot using the box or lasso selection tool. If you want the table to contain all cells in the data set, you must select all cells in the plot. The table can be saved to disk in CSV or Excel format for further analysis.
+    <h4>Options</h4>
+    <b>Show results for all subgroups (no filtering)</b><br>
+    When active, the subgroup section element will disappear and instead the table will be shown for all subgroups. Subgroups can still be selected through the dedicated column filter, which also allows to select multiple subgroups at once. While using the column filter is more elegant, it can become laggy with very large tables, hence to option to filter the table beforehand.<br>
+    <b>Automatically format numbers</b><br>
+    When active, columns in the table that contain different types of numeric values will be formatted based on what they <u>seem</u> to be. The algorithm will look for integers (no decimal values), percentages, p-values, log-fold changes and apply different formatting schemes to each of them. Importantly, this process does that always work perfectly. If it fails and hinders working with the table, automatic formatting can be deactivated.<br>
+    <b>Highlight values with colors</b><br>
+    Similar to the automatic formatting option, when active, Cerebro will look for known columns in the table (those that contain grouping variables), try to interpret column content, and use colors and other stylistic elements to facilitate quick interpretation of the values. If you prefer the table without colors and/or the identification does not work properly, you can simply deactivate this feature.<br>
+    <br>
+    <em>Columns can be re-ordered by dragging their respective header.</em>"
+  )
 )

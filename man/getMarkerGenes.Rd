@@ -2,14 +2,14 @@
 % Please edit documentation in R/getMarkerGenes.R
 \name{getMarkerGenes}
 \alias{getMarkerGenes}
-\title{Get marker genes for every sample and cluster in Seurat object.}
+\title{Get marker genes for specified grouping variables in Seurat object.}
 \usage{
 getMarkerGenes(
   object,
   assay = "RNA",
   organism = NULL,
-  column_sample = "sample",
-  column_cluster = "cluster",
+  groups = NULL,
+  name = "cerebro_seurat",
   only_pos = TRUE,
   min_pct = 0.7,
   thresh_logFC = 0.25,
@@ -22,18 +22,17 @@ getMarkerGenes(
 \arguments{
 \item{object}{Seurat object.}
 
-\item{assay}{Assay to pull counts from; defaults to 'RNA'. Only relevant in
-Seurat v3.0 or higher since the concept of assays wasn't implemented before.}
+\item{assay}{Assay to pull transcripts counts from; defaults to 'RNA'.}
 
 \item{organism}{Organism information for pulling info about presence of
 marker genes of cell surface; can be omitted if already saved in Seurat
 object; defaults to NULL.}
 
-\item{column_sample}{Column in object@meta.data that contains information
-about sample; defaults to 'sample'.}
+\item{groups}{Grouping variables (columns) in object@meta.data for which
+marker genes should be calculated.}
 
-\item{column_cluster}{Column in object@meta.data that contains information
-about cluster; defaults to 'cluster'.}
+\item{name}{Name of list that should be used to store the results in
+object@misc$marker_genes$<name>; defaults to 'cerebro_seurat'.}
 
 \item{only_pos}{Identify only over-expressed genes; defaults to TRUE.}
 
@@ -53,24 +52,25 @@ defaults to 0.25.}
 Seurat::FindAllMakers().}
 }
 \value{
-Seurat object with marker gene results for samples and clusters
-stored in object@misc$marker_genes.
+Seurat object with marker gene results for the specified grouping
+variables stored in object@misc$marker_genes.
 }
 \description{
-This function gets marker genes for every sample and cluster of
-the Seurat object.
+This function gets marker genes for one or multiple
+grouping variables in the meta data of the provided Seurat object.
 }
 \details{
-Get marker genes for every sample and cluster in Seurat object.
+Get marker genes for specified grouping variables in Seurat object.
 }
 \examples{
-pbmc <- readRDS(system.file("extdata/v1.2/seurat_pbmc.rds",
+pbmc <- readRDS(system.file("extdata/v1.3/seurat_pbmc.rds",
   package = "cerebroApp"))
 pbmc <- getMarkerGenes(
   object = pbmc,
+  assay = 'RNA',
   organism = 'hg',
-  column_sample = 'sample',
-  column_cluster = 'seurat_clusters',
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  name = 'cerebro_seurat',
   only_pos = TRUE,
   min_pct = 0.7,
   thresh_logFC = 0.25,

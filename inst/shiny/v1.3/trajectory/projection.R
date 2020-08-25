@@ -31,12 +31,13 @@ output[["trajectory_projection_UI"]] <- renderUI({
               title = "Show additional information for this panel.",
               style = "margin-right: 5px"
             ),
-            actionButton(
-              inputId = "trajectory_projection_export",
+            shinyFiles::shinySaveButton(
+              "trajectory_projection_export",
               label = "export to PDF",
-              icon = NULL,
-              class = "btn-xs",
-              title = "Export trajectory to PDF file."
+              title = "Export trajectory to PDF file.",
+              filetype = "pdf",
+              viewtype = "icon",
+              class = "btn-xs"
             )
           ),
           tagList(
@@ -59,10 +60,81 @@ output[["trajectory_projection_UI"]] <- renderUI({
 })
 
 ##----------------------------------------------------------------------------##
+##
+##----------------------------------------------------------------------------##
+
+# output[["trajectory_projection_coloring_type_UI"]] <- renderUI({
+#   shinyWidgets::radioGroupButtons(
+#    inputId = "trajectory_coloring_type",
+#    label = NULL,
+#    choices = c("Meta data", "Gene expression"),
+#    status = "primary",
+#    justified = TRUE,
+#    width = "100%"
+#   )
+# })
+
+##----------------------------------------------------------------------------##
+##
+##----------------------------------------------------------------------------##
+
+# output[["trajectory_projection_coloring_input_UI"]] <- renderUI({
+
+#   ##
+#   req(
+#     input[["trajectory_coloring_type"]]
+#   )
+
+#   ##
+#   if ( input[["trajectory_coloring_type"]] == "Meta data" ) {
+
+#   } else if ( input[["trajectory_coloring_type"]] == "Gene expression" ) {
+#     shinyWidgets::radioGroupButtons(
+#       inputId = "trajectory_expression_mode",
+#       label = NULL,
+#       choices = c("Gene(s)", "Gene set"),
+#       status = "primary",
+#       justified = TRUE,
+#       width = "100%"
+#     )
+#   }
+# })
+
+##----------------------------------------------------------------------------##
+##
+##----------------------------------------------------------------------------##
+
+# output[["trajectory_projection_expression_input_UI"]] <- renderUI({
+
+#   ##
+#   req(
+#     input[["trajectory_expression_mode"]]
+#   )
+
+#   ##
+#   if ( input[["trajectory_expression_mode"]] == "Gene(s)" ) {
+#     selectizeInput(
+#       'trajectory_point_color',
+#       label = 'Gene(s)',
+#       choices = data.table::as.data.table(data.frame("Genes" = getGeneNames())),
+#       multiple = TRUE
+#     )
+#   } else if ( input[["trajectory_expression_mode"]] == "Gene set" ) {
+#     selectizeInput(
+#       'trajectory_point_color',
+#       label = 'Gene set',
+#       choices = data.table::as.data.table(data.frame("Gene sets" = c("-", msigdbr:::msigdbr_genesets$gs_name))),
+#       multiple = FALSE
+#     )
+#   }
+# })
+
+##----------------------------------------------------------------------------##
 ## UI elements for input parameters of projection plot.
 ##----------------------------------------------------------------------------##
 
 output[["trajectory_projection_input"]] <- renderUI({
+
   tagList(
     selectInput(
       "trajectory_point_color",
@@ -121,23 +193,15 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
     input[["trajectory_selected_name"]]
   )
 
-  cells_to_display <- getCellIDs()
-
-  ## randomly remove cells
-  if ( input[["trajectory_percentage_cells_to_show"]] < 100 ) {
-    number_of_cells_to_plot <- ceiling(
-      input[["trajectory_percentage_cells_to_show"]] / 100 * length(cells_to_display)
-    )
-    cells_to_display <- cells_to_display[ sample(1:length(cells_to_display), number_of_cells_to_plot) ]
-  }
-
-  ## extract cells to plot
-  to_plot <- cbind(
-      trajectory_data[["meta"]][ cells_to_display , ],
-      getMetaData()[ cells_to_display , ]
-    ) %>%
+  ## build data frame with data
+  cells_df <- cbind(trajectory_data[["meta"]], getMetaData()) %>%
     dplyr::filter(!is.na(pseudotime))
-  to_plot <- to_plot[ sample(1:nrow(to_plot)) , ]
+
+  ## randomly remove cells (if necessary)
+  cells_df <- randomlySubsetCells(cells_df, input[["trajectory_percentage_cells_to_show"]])
+
+  ## put rows in random order
+  cells_df <- cells_df[ sample(1:nrow(cells_df)) , ]
 
   ## convert edges of trajectory into list format to plot with plotly
   trajectory_edges <- trajectory_data[["edges"]]
@@ -156,51 +220,25 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
     trajectory_lines <- c(trajectory_lines, list(line))
   }
 
-  ## prepare tooltip/hover info
-  tooltip_info <- paste0(
-    "<b>Cell</b>: ", to_plot[[ "cell_barcode" ]], "<br>",
-    "<b>Transcripts</b>: ", formatC(to_plot[[ "nUMI" ]], format = "f", big.mark = ",", digits = 0), "<br>",
-    "<b>Expressed genes</b>: ", formatC(to_plot[[ "nGene" ]], format = "f", big.mark = ",", digits = 0), "<br>"
-  )
-
-  ## add info for known grouping variables to tooltip/hover
-  for ( group in getGroups() ) {
-    tooltip_info <- paste0(
-      tooltip_info,
-      "<b>", group, "</b>: ", to_plot[[ group ]], "<br>"
-    )
-  }
+  ## prepare hover info
+  hover_info <- buildHoverInfoForProjections(cells_df)
 
   ##
   if (
-    is.factor(to_plot[[ input[["trajectory_point_color"]] ]]) ||
-    is.character(to_plot[[ input[["trajectory_point_color"]] ]])
+    is.factor(cells_df[[ input[["trajectory_point_color"]] ]]) ||
+    is.character(cells_df[[ input[["trajectory_point_color"]] ]])
   ) {
 
-    ##
-    if ( input[["trajectory_point_color"]] %in% getGroups() ) {
-      colors_this_plot <- reactive_colors()[[ input[["trajectory_point_color"]] ]]
-    } else if ( input[["trajectory_point_color"]] %in% getCellCycle() ) {
-      colors_this_plot <- reactive_colors()[[ input[["trajectory_point_color"]] ]]
-    } else if ( is.factor(to_plot[[ input[["trajectory_point_color"]] ]]) ) {
-      colors_this_plot <- setNames(
-        default_colorset[1:length(levels(to_plot[[ input[["trajectory_point_color"]] ]]))],
-        levels(to_plot[[ input[["trajectory_point_color"]] ]])
-      )
-    } else if ( is.character(to_plot[[ input[["trajectory_point_color"]] ]]) ) {
-      colors_this_plot <- setNames(
-        default_colorset[1:length(unique(to_plot[[ input[["trajectory_point_color"]] ]]))],
-        unique(to_plot[[ input[["trajectory_point_color"]] ]])
-      )
-    }
+    ## get colors for groups
+    colors_for_groups <- assignColorsToGroups(cells_df, input[["trajectory_point_color"]])
 
     ##
     plot <- plotly::plot_ly(
-      to_plot,
+      cells_df,
       x = ~DR_1,
       y = ~DR_2,
-      color = ~to_plot[[ input[["trajectory_point_color"]] ]],
-      colors = colors_this_plot,
+      color = ~cells_df[[ input[["trajectory_point_color"]] ]],
+      colors = colors_for_groups,
       type = "scatter",
       mode = "markers",
       marker = list(
@@ -212,7 +250,7 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
         size = input[["trajectory_point_size"]]
       ),
       hoverinfo = "text",
-      text = ~tooltip_info,
+      text = ~hover_info,
       source = "trajectory_projection"
     )
 
@@ -221,16 +259,16 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
 
     ##
     plot <- plotly::plot_ly(
-      data = to_plot,
+      data = cells_df,
       x = ~DR_1,
       y = ~DR_2,
       type = "scatter",
       mode = "markers",
       marker = list(
         colorbar = list(
-          title = colnames(to_plot)[which(colnames(to_plot) == input[["trajectory_point_color"]])]
+          title = colnames(cells_df)[which(colnames(cells_df) == input[["trajectory_point_color"]])]
         ),
-        color = ~to_plot[[ input[["trajectory_point_color"]] ]],
+        color = ~cells_df[[ input[["trajectory_point_color"]] ]],
         opacity = input[["trajectory_point_opacity"]],
         colorscale = "YlGnBu",
         reversescale = TRUE,
@@ -241,7 +279,7 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
         size = input[["trajectory_point_size"]]
       ),
       hoverinfo = "text",
-      text = ~tooltip_info,
+      text = ~hover_info,
       source = "trajectory_projection"
     )
   }
@@ -254,13 +292,13 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
         mirror = TRUE,
         showline = TRUE,
         zeroline = FALSE,
-        range = range(to_plot$DR_1) * 1.1
+        range = range(cells_df$DR_1) * 1.1
       ),
       yaxis = list(
         mirror = TRUE,
         showline = TRUE,
         zeroline = FALSE,
-        range = range(to_plot$DR_2) * 1.1
+        range = range(cells_df$DR_2) * 1.1
       ),
       hoverlabel = list(font = list(size = 11))
     )
@@ -284,7 +322,8 @@ observeEvent(input[["trajectory_projection_info"]], {
       trajectory_projection_info[["text"]],
       title = trajectory_projection_info[["title"]],
       easyClose = TRUE,
-      footer = NULL
+      footer = NULL,
+      size = "l"
     )
   )
 })
@@ -339,18 +378,17 @@ observeEvent(input[["trajectory_projection_export"]], {
 
   ##
   req(
-    input[["trajectory_to_display"]],
-    input[["trajectory_samples_to_display"]],
-    input[["trajectory_clusters_to_display"]],
-    input[["trajectory_percentage_cells_to_show"]],
+    input[["trajectory_selected_method"]],
+    input[["trajectory_selected_name"]],
     input[["trajectory_point_color"]],
+    input[["trajectory_percentage_cells_to_show"]],
     input[["trajectory_point_size"]],
     input[["trajectory_point_opacity"]]
   )
 
   ## open dialog to select where plot should be saved and how the file should
   ## be named
-  shinyFileSave(
+  shinyFiles::shinyFileSave(
     input,
     id = "trajectory_projection_export",
     roots = volumes,
@@ -359,13 +397,13 @@ observeEvent(input[["trajectory_projection_export"]], {
   )
 
   ## retrieve info from dialog
-  fileinfo <- parseSavePath(volumes, input[["overview_projection_export"]])
+  save_file_input <- shinyFiles::parseSavePath(volumes, input[["trajectory_projection_export"]])
 
   ## only proceed if a path has been provided
-  if ( nrow(fileinfo) > 0 ) {
+  if ( nrow(save_file_input) > 0 ) {
 
     ## extract specified file path
-    file_output <- as.character(fileinfo$datapath[1])
+    save_file_path <- as.character(save_file_input$datapath[1])
 
     ## ggplot2 functions are necessary to create the plot
     require("ggplot2")
@@ -375,96 +413,81 @@ observeEvent(input[["trajectory_projection_export"]], {
       input[["trajectory_selected_name"]]
     )
 
-    cells_to_display <- getCellIDs()
-
-    to_plot <- cbind(
-        trajectory_data[[ "meta" ]][ cells_to_display , ],
-        getMetaData()[ cells_to_display , ]
-      ) %>%
+    ## build data frame with data
+    cells_df <- cbind(trajectory_data[["meta"]], getMetaData()) %>%
       dplyr::filter(!is.na(pseudotime))
-    to_plot <- to_plot[ sample(1:nrow(to_plot)) , ]
 
-    ##
-    input[["trajectory_point_color"]] <- input[["trajectory_point_color"]]
+    ## randomly remove cells (if necessary)
+    cells_df <- randomlySubsetCells(cells_df, input[["trajectory_percentage_cells_to_show"]])
 
+    ## put rows in random order
+    cells_df <- cells_df[ sample(1:nrow(cells_df)) , ]
+
+    ## start building the plot
+    plot <- ggplot() +
+      geom_point(
+        data = cells_df,
+        aes_string(
+          x = colnames(cells_df)[1],
+          y = colnames(cells_df)[2],
+          fill = input[["trajectory_point_color"]]
+        ),
+        shape = 21,
+        size = input[["trajectory_point_size"]]/3,
+        stroke = 0.2,
+        color = "#c4c4c4",
+        alpha = input[["trajectory_point_opacity"]]
+      ) +
+      geom_segment(
+        data = trajectory_data[["edges"]],
+        aes(
+          source_dim_1,
+          source_dim_2,
+          xend = target_dim_1,
+          yend = target_dim_2
+        ),
+        size = 0.75, linetype = "solid", na.rm = TRUE
+      ) +
+      theme_bw()
+
+    ## depending on type of cell coloring, add different color scale
+    ## ... categorical
     if (
-      is.factor(to_plot[[ input[["trajectory_point_color"]] ]]) ||
-      is.character(to_plot[[ input[["trajectory_point_color"]] ]])
+      is.factor(cells_df[[ input[["trajectory_point_color"]] ]]) ||
+      is.character(cells_df[[ input[["trajectory_point_color"]] ]])
     ) {
 
-      ##
-      if ( input[["trajectory_point_color"]] %in% getGroups() ) {
-        colors_this_plot <- reactive_colors()[[ input[["trajectory_point_color"]] ]]
-      } else if ( input[["trajectory_point_color"]] %in% getCellCycle() ) {
-        colors_this_plot <- reactive_colors()[[ input[["trajectory_point_color"]] ]]
-      } else if ( is.factor(to_plot[[ input[["trajectory_point_color"]] ]]) ) {
-        colors_this_plot <- setNames(
-          default_colorset[1:length(levels(to_plot[[ input[["trajectory_point_color"]] ]]))],
-          levels(to_plot[[ input[["trajectory_point_color"]] ]])
-        )
-      } else if ( is.character(to_plot[[ input[["trajectory_point_color"]] ]]) ) {
-        colors_this_plot <- setNames(
-          default_colorset[1:length(unique(to_plot[[ input[["trajectory_point_color"]] ]]))],
-          unique(to_plot[[ input[["trajectory_point_color"]] ]])
-        )
-      } else {
-        colors_this_plot <- default_colorset
-      }
+      ## get colors for groups
+      colors_for_groups <- assignColorsToGroups(cells_df, input[["trajectory_point_color"]])
 
-      p <- ggplot() +
-        geom_point(
-          data = to_plot,
-          aes_string(x = colnames(to_plot)[1], y = colnames(to_plot)[2], fill = input[["trajectory_point_color"]]),
-          shape = 21,
-          size = input[["trajectory_point_size"]]/3,
-          stroke = 0.2,
-          color = "#c4c4c4",
-          alpha = input[["trajectory_point_opacity"]]
-        ) +
-        geom_segment(
-          data = trajectory_data[["edges"]],
-          aes(source_dim_1, source_dim_2, xend = target_dim_1, yend = target_dim_2),
-          size = 0.75, linetype = "solid", na.rm = TRUE
-        ) +
-        scale_fill_manual(values = colors_this_plot) +
-        theme_bw()
+      ## add color assignments
+      plot <- plot + scale_fill_manual(values = colors_for_groups)
+
+    ## ... not categorical (probably numerical)
     } else {
-      p <- ggplot() +
-        geom_point(
-          data = to_plot,
-          aes_string(x = colnames(to_plot)[1], y = colnames(to_plot)[2], fill = input[["trajectory_point_color"]]),
-          shape = 21,
-          size = input[["trajectory_point_size"]]/3,
-          stroke = 0.2,
-          color = "#c4c4c4",
-          alpha = input[["trajectory_point_opacity"]]
-        ) +
-        geom_segment(
-          data = trajectory_data[["edges"]],
-          aes(source_dim_1, source_dim_2, xend = target_dim_1, yend = target_dim_2),
-          size = 0.75, linetype = "solid", na.rm = TRUE
-        ) +
+
+      ## add continuous color scale
+      plot <- plot +
         scale_fill_distiller(
           palette = "YlGnBu",
           direction = 1,
           guide = guide_colorbar(frame.colour = "black", ticks.colour = "black")
-        ) +
-        theme_bw()
+        )
     }
 
     ## save plot
     pdf(NULL)
-    ggsave(file_output, p, height = 8, width = 11)
+    ggsave(save_file_path, plot, height = 8, width = 11)
 
     ## check if file was succesfully saved
     ## ... successful
-    if ( file.exists(file_output) ) {
+    if ( file.exists(save_file_path) ) {
 
       ## give positive message
       shinyWidgets::sendSweetAlert(
         session = session,
         title = "Success!",
-        text = paste0("Plot saved successfully as: ", file_output),
+        text = paste0("Plot saved successfully as: ", save_file_path),
         type = "success"
       )
 

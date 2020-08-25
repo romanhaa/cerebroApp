@@ -10,18 +10,34 @@
 ##----------------------------------------------------------------------------##
 
 output[["enriched_pathways_select_method_and_group_UI"]] <- renderUI({
-  tagList(
-    fluidRow(
-      column(
-        6,
-        uiOutput("enriched_pathways_selected_method_UI")
-      ),
-      column(
-        6,
-        uiOutput("enriched_pathways_selected_group_UI")
+
+  ## ...
+  if (
+    !is.null(getMethodsForEnrichedPathways()) &&
+    length(getMethodsForEnrichedPathways()) > 0
+  ) {
+    tagList(
+      fluidRow(
+        column(
+          6,
+          uiOutput("enriched_pathways_selected_method_UI")
+        ),
+        column(
+          6,
+          uiOutput("enriched_pathways_selected_group_UI")
+        )
       )
     )
-  )
+
+  ## ...
+  } else {
+    fluidRow(
+      cerebroBox(
+        title = boxTitle("Enriched pathways"),
+        textOutput("enriched_pathways_message_no_method_found")
+      )
+    )
+  }
 })
 
 ##----------------------------------------------------------------------------##
@@ -73,4 +89,12 @@ output[["enriched_pathways_selected_group_UI"]] <- renderUI({
       column(2)
     )
   )
+})
+
+##----------------------------------------------------------------------------##
+## Alternative text message if data is missing.
+##----------------------------------------------------------------------------##
+
+output[["enriched_pathways_message_no_method_found"]] <- renderText({
+  "No data available."
 })

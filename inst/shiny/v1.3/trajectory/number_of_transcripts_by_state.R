@@ -39,8 +39,8 @@ output[["states_nUMI_plot"]] <- plotly::renderPlotly({
   )
   
   ##
-  colors_this_plot <- setNames(
-    default_colorset[1:length(levels(trajectory_data[["meta"]]$state))],
+  state_colors <- setNames(
+    default_colorset[seq_along(levels(trajectory_data[["meta"]]$state))],
     levels(trajectory_data[["meta"]]$state)
   )
 
@@ -61,7 +61,7 @@ output[["states_nUMI_plot"]] <- plotly::renderPlotly({
       visible = TRUE
     ),
     color = ~state,
-    colors = colors_this_plot,
+    colors = state_colors,
     source = "subset",
     showlegend = FALSE,
     hoverinfo = "y",
@@ -97,7 +97,8 @@ observeEvent(input[["states_nUMI_info"]], {
       states_nUMI_info[["text"]],
       title = states_nUMI_info[["title"]],
       easyClose = TRUE,
-      footer = NULL
+      footer = NULL,
+      size = "l"
     )
   )
 })

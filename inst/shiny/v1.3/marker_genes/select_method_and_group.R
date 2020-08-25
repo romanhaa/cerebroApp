@@ -10,18 +10,34 @@
 ##----------------------------------------------------------------------------##
 
 output[["marker_genes_select_method_and_group_UI"]] <- renderUI({
-  tagList(
-    fluidRow(
-      column(
-        6,
-        uiOutput("marker_genes_selected_method_UI")
-      ),
-      column(
-        6,
-        uiOutput("marker_genes_selected_group_UI")
+
+  ## ...
+   if (
+    !is.null(getMethodsForMarkerGenes()) &&
+    length(getMethodsForMarkerGenes()) > 0
+  ) {
+    tagList(
+      fluidRow(
+        column(
+          6,
+          uiOutput("marker_genes_selected_method_UI")
+        ),
+        column(
+          6,
+          uiOutput("marker_genes_selected_group_UI")
+        )
       )
     )
-  )
+
+  ## ...
+  } else {
+    fluidRow(
+      cerebroBox(
+        title = boxTitle("Marker genes"),
+        textOutput("marker_genes_message_no_method_found")
+      )
+    )
+  }
 })
 
 ##----------------------------------------------------------------------------##
@@ -77,4 +93,12 @@ output[["marker_genes_selected_group_UI"]] <- renderUI({
       column(2)
     )
   )
+})
+
+##----------------------------------------------------------------------------##
+## Alternative text message if data is missing.
+##----------------------------------------------------------------------------##
+
+output[["marker_genes_message_no_method_found"]] <- renderText({
+  "No data available."
 })

@@ -9,6 +9,13 @@
 ##----------------------------------------------------------------------------##
 
 output[["marker_genes_table_UI"]] <- renderUI({
+
+  ##
+  req(
+    input[["marker_genes_selected_method"]],
+    input[["marker_genes_selected_group"]]
+  )
+
   fluidRow(
     cerebroBox(
       title = tagList(
@@ -35,13 +42,13 @@ output[["marker_genes_table_or_text_UI"]] <- renderUI({
   )
 
   ## fetch results
-  results <- getMarkerGenes(
+  results_type <- getMarkerGenes(
     input[["marker_genes_selected_method"]],
     input[["marker_genes_selected_group"]]
   )
 
-  if ( length(results) > 0 ) {
-    if ( is.data.frame(results) ) {
+  if ( length(results_type) > 0 ) {
+    if ( is.data.frame(results_type) ) {
       fluidRow(
         column(12,
           shinyWidgets::materialSwitch(
@@ -61,7 +68,7 @@ output[["marker_genes_table_or_text_UI"]] <- renderUI({
           shinyWidgets::materialSwitch(
             inputId = "marker_genes_table_color_highlighting",
             label = "Highlight values with colors:",
-            value = FALSE,
+            value = TRUE,
             status = "primary",
             inline = TRUE
           )
@@ -73,7 +80,7 @@ output[["marker_genes_table_or_text_UI"]] <- renderUI({
           DT::dataTableOutput("marker_genes_table")
         )
       )
-    } else if ( results == "no_markers_found" ) {
+    } else if ( results_type == "no_markers_found" ) {
       textOutput("marker_genes_table_no_markers_found")
     }
   } else {
@@ -93,6 +100,19 @@ output[["marker_genes_filter_subgroups_UI"]] <- renderUI({
     input[["marker_genes_selected_group"]]
   )
 
+  ## fetch results
+  results_df <- getMarkerGenes(
+    input[["marker_genes_selected_method"]],
+    input[["marker_genes_selected_group"]]
+  )
+
+  ## check for which groups results exist
+  if ( is.character(results_df[[1]]) ) {
+    available_groups <- unique(results_df[[1]])
+  } else if ( is.factor(results_df[[1]]) ) {
+    available_groups <- levels(results_df[[1]])
+  }
+
   ##
   if ( input[["marker_genes_table_filter_switch"]] == TRUE ) {
     fluidRow()
@@ -102,7 +122,7 @@ output[["marker_genes_filter_subgroups_UI"]] <- renderUI({
         selectInput(
           "marker_genes_table_select_group_level",
           label = "Filter results for subgroup:",
-          choices = getGroupLevels(input[["marker_genes_selected_group"]])
+          choices = available_groups
         )
       )
     )
@@ -123,34 +143,34 @@ output[["marker_genes_table"]] <- DT::renderDataTable(server = FALSE, {
   )
 
   ## fetch results
-  table <- getMarkerGenes(
+  results_df <- getMarkerGenes(
     input[["marker_genes_selected_method"]],
     input[["marker_genes_selected_group"]]
   )
 
   req(
-    is.data.frame(table)
+    is.data.frame(results_df)
   )
 
   ## filter the table for a specific subgroup only if specified by the user
   ## (otherwise show all results)
   if ( input[["marker_genes_table_filter_switch"]] == FALSE ) {
-    table <- table %>%
+    results_df <- results_df %>%
       dplyr::filter_at(1, dplyr::all_vars(. == input[["marker_genes_table_select_group_level"]]))
   }
 
   ## if the table is empty, e.g. because the filtering of results for a specific
   ## subgroup did not work properly, skip the processing and show and empty
   ## table (otherwise the procedure would result in an error)
-  if ( nrow(table) == 0 ) {
-    table %>%
+  if ( nrow(results_df) == 0 ) {
+    results_df %>%
     as.data.frame() %>%
     dplyr::slice(0) %>%
     prepareEmptyTable()
   ## if there is at least 1 row, create proper table
   } else {
     prettifyTable(
-      table,
+      results_df,
       filter = list(position = "top", clear = TRUE),
       dom = "Bfrtlip",
       show_buttons = TRUE,
@@ -173,14 +193,14 @@ output[["marker_genes_table"]] <- DT::renderDataTable(server = FALSE, {
 ##----------------------------------------------------------------------------##
 
 output[["marker_genes_table_no_markers_found"]] <- renderText({
-  "No marker genes identified for any of the groups."
+  "No marker genes were identified for any of the subpopulations of this grouping variable."
 })
 
 ##----------------------------------------------------------------------------##
 ## Alternative text message if data is missing.
 ##----------------------------------------------------------------------------##
 
-output[["marker_genes_no_data"]] <- renderText({
+output[["marker_genes_table_no_data"]] <- renderText({
   "Data not available. Possible reasons: Only 1 group in this data set or data not generated."
 })
 
@@ -194,7 +214,8 @@ observeEvent(input[["marker_genes_info"]], {
       marker_genes_info[["text"]],
       title = marker_genes_info[["title"]],
       easyClose = TRUE,
-      footer = NULL
+      footer = NULL,
+      size = "l"
     )
   )
 })
@@ -203,8 +224,20 @@ observeEvent(input[["marker_genes_info"]], {
 ## Text in info box.
 ##----------------------------------------------------------------------------##
 
-## TODO: update description
 marker_genes_info <- list(
   title = "Marker genes",
-  text = p("Shown here are the marker genes identified for each group - resembling bulk RNA-seq. These genes should help to identify the cell type in this sample or find new markers to purify it. In this analysis, each group is compared to all other samples combined. Only genes with a positive average log-fold change of at least 0.25 are reported - meaning only over-expressed genes are shown. Also, marker genes must be expressed in at least 70% of the cells of the respective sample. Statistical analysis is performed using a classical t-test as it has been shown to be very accurate in single cell RNA-seq. Finally, if data is available, the last column reports for each gene if it is associated with gene ontology term GO:0009986 which is an indicator that the respective gene is present on the cell surface (which could make it more interesting to purify a given population).")
+  text = HTML("
+    Shown here are the marker genes identified for each group - resembling bulk RNA-seq. These genes should help to functionally interpret the role of a given group of cells or find new markers to purify it.<br>
+    Cerebro performs this analysis with the 'FindAllMarkers()' function by Seurat, which compares each group to all other groups combined. Only genes that pass thresholds for log-fold change, the percentage of cells that express the gene, p-value, and adjusted p-values are reported. Statistical analysis can be done using different tests Finally, if data is available, the last column reports for each gene if it is associated with gene ontology term GO:0009986 which is an indicator that the respective gene is present on the cell surface (which could make it more interesting to purify a given population).<br>
+    Results from other methods and tools can be manually added to the Cerebro object in which case the description above might not be applicable.
+    <h4>Options</h4>
+    <b>Show results for all subgroups (no filtering)</b><br>
+    When active, the subgroup section element will disappear and instead the table will be shown for all subgroups. Subgroups can still be selected through the dedicated column filter, which also allows to select multiple subgroups at once. While using the column filter is more elegant, it can become laggy with very large tables, hence to option to filter the table beforehand.<br>
+    <b>Automatically format numbers</b><br>
+    When active, columns in the table that contain different types of numeric values will be formatted based on what they <u>seem</u> to be. The algorithm will look for integers (no decimal values), percentages, p-values, log-fold changes and apply different formatting schemes to each of them. Importantly, this process does that always work perfectly. If it fails and hinders working with the table, automatic formatting can be deactivated.<br>
+    <b>Highlight values with colors</b><br>
+    Similar to the automatic formatting option, when active, Cerebro will look for known columns in the table (those that contain grouping variables), try to interpret column content, and use colors and other stylistic elements to facilitate quick interpretation of the values. If you prefer the table without colors and/or the identification does not work properly, you can simply deactivate this feature.<br>
+    <br>
+    <em>Columns can be re-ordered by dragging their respective header.</em>"
+  )
 )

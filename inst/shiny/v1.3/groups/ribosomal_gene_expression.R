@@ -94,7 +94,8 @@ observeEvent(input[["groups_percent_ribo_info"]], {
       groups_percent_ribo_info[["text"]],
       title = groups_percent_ribo_info[["title"]],
       easyClose = TRUE,
-      footer = NULL
+      footer = NULL,
+      size = "l"
     )
   )
 })

@@ -13,18 +13,48 @@ output[["groups_tree_UI"]] <- renderUI({
     cerebroBox(
       title = tagList(
         boxTitle("Relationship tree"),
-        cerebroInfoButton("groups_tree_info")
-        # shinyWidgets::dropdownButton(
-        #   tags$div(
-        #     style = "color: black !important;",
-        #     class = "pull-right",
-        #     selectInput("sel", "Select:", LETTERS)
-        #   ),
-        #   circle = FALSE,
-        #   icon = icon("cog"),
-        #   inline = TRUE,
-        #   size = "xs"
-        # )
+        cerebroInfoButton("groups_tree_info"),
+        shinyWidgets::dropdownButton(
+          tags$div(
+            style = "color: black !important;",
+            class = "pull-right",
+            tagList(
+              sliderInput(
+                "groups_tree_edge_width",
+                label = "Edge width:",
+                min = 1,
+                max = 5,
+                step = 1,
+                value = 2
+              ),
+              sliderInput(
+                "groups_tree_label_size",
+                label = "Label size:",
+                min = 1,
+                max = 5,
+                step = 1,
+                value = 2
+              ),
+              sliderInput(
+                "groups_tree_label_offset",
+                label = "Label offset:",
+                min = 0,
+                max = 5,
+                step = 0.5,
+                value = 0.5
+              ),
+              checkboxInput(
+                inputId = "groups_tree_margin",
+                label = "Extend margin",
+                value = TRUE
+              )
+            )
+          ),
+          circle = FALSE,
+          icon = icon("cog"),
+          inline = TRUE,
+          size = "xs"
+        )
       ),
       uiOutput("groups_tree_plot_or_message")
     )
@@ -68,6 +98,15 @@ output[["groups_tree_plot_or_message"]] <- renderUI({
 
 output[["groups_tree_plot"]] <- renderPlot({
 
+  ##
+  req(
+    input[["groups_selected_group"]],
+    input[["groups_tree_edge_width"]],
+    input[["groups_tree_label_size"]],
+    input[["groups_tree_label_offset"]],
+    !is.null(input[["groups_tree_margin"]])
+  )
+
   ## only proceed if tree is present (this check is necessary because it can
   ## otherwise result in an error when switching between groups)
   if ( !is.null(getTree( input[["groups_selected_group"]] )) ) {
@@ -76,36 +115,36 @@ output[["groups_tree_plot"]] <- renderPlot({
     tree <- getTree( input[["groups_selected_group"]] )
 
     ## get colors for tips
-    colors_tree <- reactive_colors()[[ input[["groups_selected_group"]] ]]
+    tip_colors <- reactive_colors()[[ input[["groups_selected_group"]] ]]
 
     ##
     if ( input[["groups_tree_plot_type"]] == "Unrooted" ) {
       ape::plot.phylo(
-        cerebro_seurat$trees$seurat_clusters,
+        tree,
         type = 'unrooted',
         lab4ut = 'axial',
         align.tip.label = TRUE,
-        edge.width = 2,
-        label.offset = 1,
-        tip.color = colors_tree,
+        edge.width = input[["groups_tree_edge_width"]],
+        label.offset = input[["groups_tree_label_offset"]],
+        tip.color = tip_colors,
         font = 1,
-        cex = 2,
-        no.margin = TRUE
+        cex = input[["groups_tree_label_size"]],
+        no.margin = input[["groups_tree_margin"]]
       )
 
     ##
     } else if ( input[["groups_tree_plot_type"]] == "Phylogram" ) {
       ape::plot.phylo(
-        cerebro_seurat$trees$seurat_clusters,
+        tree,
         type = 'phylogram',
         direction = "downwards",
         align.tip.label = TRUE,
-        edge.width = 2,
-        label.offset = 1,
-        tip.color = colors_tree,
+        edge.width = input[["groups_tree_edge_width"]],
+        label.offset = input[["groups_tree_label_offset"]],
+        tip.color = tip_colors,
         font = 1,
-        cex = 2,
-        no.margin = TRUE,
+        cex = input[["groups_tree_label_size"]],
+        no.margin = input[["groups_tree_margin"]],
         srt = 90,
         adj = 0.5
       )
@@ -129,7 +168,8 @@ observeEvent(input[["groups_tree_info"]], {
       groups_tree_info[["text"]],
       title = groups_tree_info[["title"]],
       easyClose = TRUE,
-      footer = NULL
+      footer = NULL,
+      size = "l"
     )
   )
 })

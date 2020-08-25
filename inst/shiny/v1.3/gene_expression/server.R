@@ -2,11 +2,11 @@
 ## Tab: Gene (set) expression
 ##----------------------------------------------------------------------------##
 
-source(paste0(path_to_shiny_files, "/gene_expression/expression_projection.R"), local = TRUE)
-source(paste0(path_to_shiny_files, "/gene_expression/expression_details_selected_cells.R"), local = TRUE)
-source(paste0(path_to_shiny_files, "/gene_expression/expression_in_selected_cells.R"), local = TRUE)
-source(paste0(path_to_shiny_files, "/gene_expression/expression_by_group.R"), local = TRUE)
-source(paste0(path_to_shiny_files, "/gene_expression/expression_by_gene.R"), local = TRUE)
+source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/gene_expression/projection.R"), local = TRUE)
+source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/gene_expression/table_of_selected_cells.R"), local = TRUE)
+source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/gene_expression/expression_in_selected_cells.R"), local = TRUE)
+source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/gene_expression/expression_by_group.R"), local = TRUE)
+source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/gene_expression/expression_by_gene.R"), local = TRUE)
 
 ##----------------------------------------------------------------------------##
 ## Reactive data that holds genes provided by user or in selected gene set.
@@ -76,26 +76,18 @@ gene_expression_plot_data <- reactive({
     input[["expression_projection_to_display"]],
     input[["expression_percentage_cells_to_show"]],
     input[["expression_projection_plotting_order"]],
+    !is.null(input[["expression_projection_show_genes_in_separate_panels"]]),
     genesToPlot()
   )
 
-  ## get names of all cells in data set
-  cells_to_display <- getCellIDs()
+  ## build data frame with data
+  cells_df <- cbind(
+      getProjection(input[["expression_projection_to_display"]]),
+      getMetaData()
+    )
 
   ## randomly remove cells (if necessary)
-  percentage_cells_show <- input[["expression_percentage_cells_to_show"]]
-  if ( percentage_cells_show < 100 ) {
-    number_of_cells_to_plot <- ceiling(
-      percentage_cells_show / 100 * length(cells_to_display)
-    )
-    cells_to_display <- cells_to_display[ sample(1:length(cells_to_display), number_of_cells_to_plot) ]
-  }
-
-  ## get position in projection and meta data for selected cells
-  plot <- cbind(
-      getProjection(input[["expression_projection_to_display"]])[ cells_to_display , ],
-      getMetaData()[ cells_to_display , ]
-    )
+  cells_df <- randomlySubsetCells(cells_df, input[["expression_percentage_cells_to_show"]])
 
   ## get expression values that will be plotted; depends on how many genes are
   ## available
@@ -103,26 +95,61 @@ gene_expression_plot_data <- reactive({
   if ( length(genesToPlot()$genes_to_display_present) == 0 ) {
 
     ## set expression level to 0
-    plot$level <- 0
+    cells_df$level <- 0
 
   ## ... 1 gene is available
   } else if ( length(genesToPlot()$genes_to_display_present) == 1 ) {
 
     ## retrieve expression values for that gene
-    plot$level <- getExpression()[
+    cells_df$level <- getExpression()[
         genesToPlot()$genes_to_display_present ,
-        cells_to_display
+        rownames(cells_df)
       ]
 
   ## ... at least 2 genes are available
   } else {
 
-    ## calculate mean across all genes for each cell
-    plot$level <- getExpression()[
-        genesToPlot()$genes_to_display_present ,
-        cells_to_display
-      ] %>%
-      Matrix::colMeans()
+    ## check if user requested to show expression in separate panels
+    ## ... separate panels requested, at least 2 genes but not more than 8
+    ##     genes selected
+    if (
+      input[["expression_projection_show_genes_in_separate_panels"]] == TRUE &&
+      length(genesToPlot()$genes_to_display_present) >= 2 &&
+      length(genesToPlot()$genes_to_display_present) <= 8
+    ) {
+
+      ## - get expression values
+      ## - transform matrix
+      ## - convert to data frame with genes as columns and cells as rows
+      ## - add projection coordinates (only first two columns because 3D is not
+      ##   supported anyway)
+      ## - bring data in longer format
+      ## NOTE: I don't merge the expression value with cell meta data because
+      ##       hover info doesn't work properly anyway so like this the data
+      ##       frame stays smaller, especially with large data sets
+      cells_df <- getExpression()[
+          genesToPlot()$genes_to_display_present ,
+          rownames(cells_df)
+        ] %>%
+        Matrix::t() %>%
+        as.data.frame() %>%
+        cbind(cells_df[,1:2], .) %>%
+        tidyr::pivot_longer(
+          cols = tidyselect::all_of(genesToPlot()$genes_to_display_present),
+          names_to = "gene",
+          values_to = "level"
+        )
+
+    ## ... if proper conditions for separate panels are not met
+    } else {
+
+      ## calculate mean across all genes for each cell
+      cells_df$level <- getExpression()[
+          genesToPlot()$genes_to_display_present ,
+          rownames(cells_df)
+        ] %>%
+        Matrix::colMeans()
+    }
   }
 
   ## set plotting order, depending on user input
@@ -132,14 +159,14 @@ gene_expression_plot_data <- reactive({
   if ( plot_order == "Random" ) {
 
     ## randomize row order
-    plot <- plot[ sample(1:nrow(plot), nrow(plot)) , ]
+    cells_df <- cells_df[ sample(1:nrow(cells_df), nrow(cells_df)) , ]
 
   ## ... if plotting order is from high to low
   } else if ( plot_order == "Highest expression on top" ) {
 
     ## sort rows by expression level from low to high
-    plot <- plot[ order(plot$level, decreasing = FALSE) , ]
+    cells_df <- cells_df[ order(cells_df$level, decreasing = FALSE) , ]
   }
 
-  return(plot)
+  return(cells_df)
 })

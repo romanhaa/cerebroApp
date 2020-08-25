@@ -95,7 +95,8 @@ observeEvent(input[["groups_nGene_info"]], {
       groups_nGene_info[["text"]],
       title = groups_nGene_info[["title"]],
       easyClose = TRUE,
-      footer = NULL
+      footer = NULL,
+      size = "l"
     )
   )
 })

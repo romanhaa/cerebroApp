@@ -44,7 +44,8 @@ observeEvent(input[["geneIdConversion_info"]], {
       geneIdConversion_info[["text"]],
       title = geneIdConversion_info[["title"]],
       easyClose = TRUE,
-      footer = NULL
+      footer = NULL,
+      size = "l"
     )
   )
 })

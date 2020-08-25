@@ -126,7 +126,8 @@ observeEvent(input[["expression_by_gene_info"]], {
       expression_by_gene_info[["text"]],
       title = expression_by_gene_info[["title"]],
       easyClose = TRUE,
-      footer = NULL
+      footer = NULL,
+      size = "l"
     )
   )
 })

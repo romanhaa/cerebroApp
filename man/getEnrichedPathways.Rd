@@ -6,8 +6,7 @@
 \usage{
 getEnrichedPathways(
   object,
-  column_sample = "sample",
-  column_cluster = "cluster",
+  marker_genes_input = "cerebro_seurat",
   databases = c("GO_Biological_Process_2018", "GO_Cellular_Component_2018",
     "GO_Molecular_Function_2018", "KEGG_2016", "WikiPathways_2016", "Reactome_2016",
     "Panther_2016", "Human_Gene_Atlas", "Mouse_Gene_Atlas"),
@@ -19,11 +18,10 @@ getEnrichedPathways(
 \arguments{
 \item{object}{Seurat object.}
 
-\item{column_sample}{Column in object@meta.data that contains information
-about sample; defaults to 'sample'.}
-
-\item{column_cluster}{Column in object@meta.data that contains information
-about cluster; defaults to 'cluster'.}
+\item{marker_genes_input}{Name of list of marker gene tables that will be
+used as input. This could be the "name" parameter used in "getMarkerGenes()".
+Enriched pathways will be calculated for every group level of every grouping
+variable. Defaults to "cerebro_seurat".}
 
 \item{databases}{Which databases to query. Use enrichR::listEnrichrDbs() to
 check what databases are available.}
@@ -39,12 +37,13 @@ original is out-of-service; defaults to
 'http://amp.pharm.mssm.edu/Enrichr/enrich'.}
 }
 \value{
-Seurat object with Enrichr results for samples and clusters stored in
-object@misc$enriched_pathways$enrichr
+Seurat object with Enrichr results for all provided grouping
+variables, stored in
+object@misc$enriched_pathways$<marker_genes_input>_enrichr
 }
 \description{
 This function uses the enrichR API to look for enriched pathways
-in marker gene sets of samples and clusters.
+in marker gene sets of all available grouping variables.
 }
 \details{
 Get enriched pathways based on marker genes from EnrichR.
@@ -54,8 +53,7 @@ pbmc <- readRDS(system.file("extdata/v1.2/seurat_pbmc.rds",
   package = "cerebroApp"))
 pbmc <- getEnrichedPathways(
   object = pbmc,
-  column_sample = 'sample',
-  column_cluster = 'seurat_clusters',
+  marker_genes_input = 'cerebro_seurat',
   databases = c('GO_Biological_Process_2018','GO_Cellular_Component_2018'),
   adj_p_cutoff = 0.01,
   max_terms = 100,

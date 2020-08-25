@@ -11,6 +11,11 @@
 ##----------------------------------------------------------------------------##
 
 output[["trajectory_select_method_and_name_UI"]] <- renderUI({
+
+  ## currently, only trajectories from monocle2 are supported
+  available_methods <- getMethodsForTrajectories()
+  available_methods <- available_methods[available_methods %in% c('monocle2')]
+
   if ( length(getMethodsForTrajectories()) == 0 ) {
     fluidRow(
       cerebroBox(
@@ -18,7 +23,7 @@ output[["trajectory_select_method_and_name_UI"]] <- renderUI({
         textOutput("trajectory_missing")
       )
     )
-  } else if ( length(getMethodsForTrajectories()) > 0 ) {
+  } else if ( length(available_methods) > 0 ) {
     tagList(
       fluidRow(
         column(
@@ -39,6 +44,11 @@ output[["trajectory_select_method_and_name_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 
 output[["trajectory_selected_method_UI"]] <- renderUI({
+
+  ## currently, only trajectories from monocle2 are supported
+  available_methods <- getMethodsForTrajectories()
+  available_methods <- available_methods[available_methods %in% c('monocle2')]
+
   tagList(
     div(
       HTML('<h3 style="text-align: center; margin-top: 0"><strong>Choose a method:</strong></h2>')
@@ -49,7 +59,7 @@ output[["trajectory_selected_method_UI"]] <- renderUI({
         selectInput(
           "trajectory_selected_method",
           label = NULL,
-          choices = getMethodsForTrajectories(),
+          choices = available_methods,
           width = "100%"
         )
       ),

@@ -28,50 +28,74 @@
 #' )
 #' }
 extractMonocleTrajectory <- function(
-    monocle,
-    seurat,
-    trajectory_name,
-    column_state = 'State',
-    column_pseudotime = 'Pseudotime'
-  ) {
+  monocle,
+  seurat,
+  trajectory_name,
+  column_state = 'State',
+  column_pseudotime = 'Pseudotime'
+) {
+
+  ##--------------------------------------------------------------------------##
+  ## safety checks before starting to do anything
+  ##--------------------------------------------------------------------------##
+
   ## check if Seurat is installed
-  if (!requireNamespace("Seurat", quietly = TRUE))
-  {
+  if ( !requireNamespace("Seurat", quietly = TRUE) ) {
     stop(
-      "Package 'Seurat' needed for this function to work. Please install it.",
+      "The 'Seurat' package is needed for this function to work. Please install it.",
       call. = FALSE
     )
   }
+
+  ## check that Seurat package is at least v3.0
+  if ( utils::packageVersion('Seurat') < 3 ) {
+    stop(
+      paste0(
+        "The installed Seurat package is of version `", utils::packageVersion('Seurat'),
+        "`, but at least v3.0 is required."
+      ),
+      call. = FALSE
+    )
+  }
+
   ## check if monocle is installed
-  if (!requireNamespace("monocle", quietly = TRUE))
-  {
+  if ( !requireNamespace("monocle", quietly = TRUE) ) {
     stop(
-      "Package 'monocle' needed for this function to work. Please install it.",
+      "The 'monocle' package is needed for this function to work. Please install it.",
       call. = FALSE
     )
   }
-  ##--------------------------------------------------------------------------##
-  ## Check if...
-  ## - provided Monocle and Seurat objects are of correct type
-  ## - required data is present in Monocle object
-  ## - number of cells is equal on Monocle and Seurat objects
-  ##--------------------------------------------------------------------------##
-  if ( !methods::is(monocle, 'CellDataSet') )
-  {
+
+  ## check if provided Seurat object is of class "Seurat"
+  if ( class(object) != "Seurat" ) {
+    stop(
+      paste0(
+        "Provided object is of class `", class(object), "` but must be of class 'Seurat'."
+      ),
+      call. = FALSE
+    )
+  }
+
+  ## check version of Seurat object and stop if it is lower than 3
+  if ( object@version < 3 ) {
+    stop(
+      paste0(
+        "Provided Seurat object has version `", object@version, "` but must be at least 3.0."
+      ),
+      call. = FALSE
+    )
+  }
+
+  ## check if provided monocle object is of class "CellDataSet"
+  if ( !methods::is(monocle, 'CellDataSet') ) {
     stop(
       "The provided object for 'monocle' is not of type 'CellDataSet'.",
       call. = FALSE
     )
   }
-  if ( !(class(seurat) %in% c('seurat','Seurat')) )
-  {
-    stop(
-      "The provided object for 'seurat' doesn't seem to be a Seurat object.",
-      call. = FALSE
-    )
-  }
-  if ( (column_state %in% colnames(monocle@phenoData@data)) == FALSE )
-  {
+
+  ## check if "column_state" exists in monocle object
+  if ( (column_state %in% colnames(monocle@phenoData@data)) == FALSE ) {
     stop(
       paste0(
         "Specified column for state info ('", column_state,
@@ -80,8 +104,9 @@ extractMonocleTrajectory <- function(
       call. = FALSE
     )
   }
-  if ( (column_pseudotime %in% colnames(monocle@phenoData@data)) == FALSE )
-  {
+
+  ## check if "column_pseudotime" exists in monocle object
+  if ( (column_pseudotime %in% colnames(monocle@phenoData@data)) == FALSE ) {
     stop(
       paste0(
         "Specified column for pseudotime info ('", column_pseudotime,
@@ -90,29 +115,34 @@ extractMonocleTrajectory <- function(
       call. = FALSE
     )
   }
-  if ( length(monocle@minSpanningTree) == 0 )
-  {
+
+  ## check if "minSpanningTree" exists in monocle object
+  if ( length(monocle@minSpanningTree) == 0 ) {
     stop(
       'monocle@minSpanningTree appears to be empty but is required.',
       call. = FALSE
     )
   }
-  if ( length(monocle@reducedDimK) == 0 )
-  {
-    stop(
-      'monocle@reducedDimK appears to be empty but is required.',
-      call. = FALSE
-    )
-  }
-  if ( length(monocle@reducedDimS) == 0 )
-  {
+
+  ## check if "reducedDimS" exists in monocle object
+  if ( length(monocle@reducedDimS) == 0 ) {
     stop(
       'monocle@reducedDimS appears to be empty but is required.',
       call. = FALSE
     )
   }
-  if ( !is.null(seurat@misc$trajectories[[trajectory_name]]) )
-  {
+
+  ## check if "reducedDimK" exists in monocle object
+  if ( length(monocle@reducedDimK) == 0 ) {
+    stop(
+      'monocle@reducedDimK appears to be empty but is required.',
+      call. = FALSE
+    )
+  }
+
+  ## check if a trajectory with name "trajectory_name" already exists in the
+  ## Seurat object
+  if ( !is.null(seurat@misc$trajectories[[trajectory_name]]) ) {
     stop(
       paste0(
         "Trajectory with specified name ('", trajectory_name,
@@ -122,8 +152,10 @@ extractMonocleTrajectory <- function(
       call. = FALSE
     )
   }
-  if ( nrow(monocle@phenoData@data) > nrow(seurat@meta.data) )
-  {
+
+  ## check if the monocle object contains more cells than the Seurat object
+  ## (monocle object is only allowed to contain the same cells or a subset)
+  if ( nrow(monocle@phenoData@data) > nrow(seurat@meta.data) ) {
     stop(
       paste0(
         'Number of cells in monocle object (', nrow(monocle@phenoData@data),
@@ -133,6 +165,9 @@ extractMonocleTrajectory <- function(
       call. = FALSE
     )
   }
+
+  ## check if monocle object contains cells that are not present in the Seurat
+  ## object
   if (
     length(which(rownames(monocle@phenoData@data) %in%
     rownames(seurat@meta.data))) != nrow(monocle@phenoData@data) )
@@ -147,15 +182,18 @@ extractMonocleTrajectory <- function(
       call. = FALSE
     )
   }
-  if ( nrow(monocle@reducedDimK) > 2 )
-  {
+
+  ## check if trajectory in monocle object is two-dimensional
+  if ( nrow(monocle@reducedDimK) > 2 ) {
     stop(
       'Currently only two-dimensional reductions are supported.',
       call. = FALSE
     )
   }
-  if ( nrow(monocle@phenoData@data) < nrow(seurat@meta.data) )
-  {
+
+  ## check if monocle object contains a subset of cells in the Seurat object and
+  ## print warning if that is the case
+  if ( nrow(monocle@phenoData@data) < nrow(seurat@meta.data) ) {
     warning(
       paste0(
         'There are ', nrow(seurat@meta.data) - nrow(monocle@phenoData@data),
@@ -169,6 +207,7 @@ extractMonocleTrajectory <- function(
   ##--------------------------------------------------------------------------##
   ## Prepare reducedDimK.
   ##--------------------------------------------------------------------------##
+
   temp_reducedDimK <- monocle@reducedDimK %>%
     t() %>%
     as.data.frame() %>%
@@ -180,6 +219,7 @@ extractMonocleTrajectory <- function(
   ##--------------------------------------------------------------------------##
   ## Transform trajectory into plottable edges.
   ##--------------------------------------------------------------------------##
+
   edges <- monocle@minSpanningTree %>%
     igraph::as_data_frame() %>%
     dplyr::rename(source = 'from', target = 'to')
@@ -209,6 +249,7 @@ extractMonocleTrajectory <- function(
   ##--------------------------------------------------------------------------##
   ## Extract state and pseudotime info and cell position in projection.
   ##--------------------------------------------------------------------------##
+
   trajectory_meta_from_monocle <- data.frame(
     cell = rownames(monocle@phenoData@data),
     pseudotime = monocle@phenoData@data[[column_pseudotime]],
@@ -244,6 +285,7 @@ extractMonocleTrajectory <- function(
   ##--------------------------------------------------------------------------##
   ## Add trajectory info to Seurat object.
   ##--------------------------------------------------------------------------##
+
   if ( is.null(seurat@misc$trajectories) ) {
     seurat@misc$trajectories <- list()
   }
@@ -252,5 +294,8 @@ extractMonocleTrajectory <- function(
     edges = edges
   )
 
+  ##--------------------------------------------------------------------------##
+  ## return Seurat object
+  ##--------------------------------------------------------------------------##
   return(seurat)
 }

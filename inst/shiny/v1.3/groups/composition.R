@@ -112,13 +112,14 @@ output[["groups_by_other_group_plot"]] <- plotly::renderPlotly({
   if ( input[[ "groups_selected_group" ]] != input[[ "groups_by_other_group_second_group" ]] ) {
 
     ## calculate table (must be merged later if user chooses to display as percent)
-    temp_table_original <- calculateTableAB(
+    table_wide <- calculateTableAB(
+      getMetaData(),
       input[[ "groups_selected_group" ]],
       input[[ "groups_by_other_group_second_group" ]]
     )
 
     ## process table
-    temp_table_to_plot <- temp_table_original %>%
+    table_long <- table_wide %>%
       dplyr::select(-total_cell_count) %>%
       tidyr::pivot_longer(
         cols = 2:ncol(.),
@@ -127,8 +128,8 @@ output[["groups_by_other_group_plot"]] <- plotly::renderPlotly({
       )
 
     ## factorize second group
-    temp_table_to_plot[[ input[[ "groups_by_other_group_second_group" ]] ]] <- factor(
-      temp_table_to_plot[[ input[[ "groups_by_other_group_second_group" ]] ]],
+    table_long[[ input[[ "groups_by_other_group_second_group" ]] ]] <- factor(
+      table_long[[ input[[ "groups_by_other_group_second_group" ]] ]],
       levels = getGroupLevels(input[[ "groups_by_other_group_second_group" ]])
     )
 
@@ -139,7 +140,7 @@ output[["groups_by_other_group_plot"]] <- plotly::renderPlotly({
       if ( input[["groups_by_other_group_show_as_percent"]] != TRUE ) {
 
         ## generate bar plot with actual cell counts
-        temp_table_to_plot %>%
+        table_long %>%
         plotly::plot_ly(
           x = ~.[[ input[[ "groups_selected_group" ]] ]],
           y = ~cells,
@@ -173,13 +174,13 @@ output[["groups_by_other_group_plot"]] <- plotly::renderPlotly({
       } else {
 
         ## normalize counts to 100% and generate bar plot in percent
-        temp_table_to_plot %>%
-        left_join(
+        table_long %>%
+        dplyr::left_join(
           .,
-          temp_table_original[ , c(input[[ "groups_selected_group" ]], "total_cell_count") ],
+          table_wide[ , c(input[[ "groups_selected_group" ]], "total_cell_count") ],
           by = input[[ "groups_selected_group" ]]
         ) %>%
-        mutate(pct = cells / total_cell_count * 100) %>%
+        dplyr::mutate(pct = cells / total_cell_count * 100) %>%
         plotly::plot_ly(
           x = ~.[[ input[[ "groups_selected_group" ]] ]],
           y = ~pct,
@@ -215,16 +216,16 @@ output[["groups_by_other_group_plot"]] <- plotly::renderPlotly({
     } else if ( input[["groups_by_other_group_plot_type"]] == "Sankey plot" ) {
 
       ## transform factor levels to integers (necessary for plotly)
-      temp_table_to_plot[["source"]] <- as.numeric(temp_table_to_plot[[1]]) - 1
-      temp_table_to_plot[["target"]] <- as.numeric(temp_table_to_plot[[2]]) - 1 + length(unique(temp_table_to_plot[[1]]))
+      table_long[["source"]] <- as.numeric(table_long[[1]]) - 1
+      table_long[["target"]] <- as.numeric(table_long[[2]]) - 1 + length(unique(table_long[[1]]))
 
       ## combine all factor levels in a single vector
-      all_groups <- c(levels(temp_table_to_plot[[1]]), levels(temp_table_to_plot[[2]]))
+      all_groups <- c(levels(table_long[[1]]), levels(table_long[[2]]))
 
       ## get color code for all group levels (from both groups)
       colors_for_groups <- c(
-          reactive_colors()[[ input[[ "groups_selected_group" ]] ]][ levels(temp_table_to_plot[[1]]) ],
-          reactive_colors()[[ input[[ "groups_by_other_group_second_group" ]] ]][ levels(temp_table_to_plot[[2]]) ]
+          reactive_colors()[[ input[[ "groups_selected_group" ]] ]][ levels(table_long[[1]]) ],
+          reactive_colors()[[ input[[ "groups_by_other_group_second_group" ]] ]][ levels(table_long[[2]]) ]
         )
 
       ## match color codes to group levels (from both groups)
@@ -252,9 +253,9 @@ output[["groups_by_other_group_plot"]] <- plotly::renderPlotly({
           )
         ),
         link = list(
-          source = temp_table_to_plot[["source"]],
-          target = temp_table_to_plot[["target"]],
-          value =  temp_table_to_plot[[3]],
+          source = table_long[["source"]],
+          target = table_long[["target"]],
+          value =  table_long[[3]],
           hoverinfo = "all",
           hovertemplate = paste0(
             "<b>", input[["groups_selected_group"]], ":</b> %{source.label}<br>",
@@ -274,6 +275,8 @@ output[["groups_by_other_group_plot"]] <- plotly::renderPlotly({
 ##----------------------------------------------------------------------------##
 
 output[["groups_by_other_group_table"]] <- DT::renderDataTable({
+
+  ##
   req(
     input[[ "groups_selected_group" ]],
     input[[ "groups_by_other_group_second_group" ]]
@@ -281,11 +284,11 @@ output[["groups_by_other_group_table"]] <- DT::renderDataTable({
 
   ## only proceed if the two groups are not the same (otherwise it can give an
   ## error when switching between groups)
-  if ( input[[ "groups_selected_group" ]] != input[[ "groups_by_other_group_second_group" ]] )
-  {
+  if ( input[[ "groups_selected_group" ]] != input[[ "groups_by_other_group_second_group" ]] ) {
 
     ## generate table
-    temp_table <- calculateTableAB(
+    composition_df <- calculateTableAB(
+      getMetaData(),
       input[[ "groups_selected_group" ]],
       input[[ "groups_by_other_group_second_group" ]]
     )
@@ -294,19 +297,19 @@ output[["groups_by_other_group_table"]] <- DT::renderDataTable({
     if ( input[["groups_by_other_group_show_as_percent"]] == TRUE ) {
 
       ## normalize counts to 100% percent
-      for ( i in 3:ncol(temp_table) ) {
-        temp_table[,i] <- temp_table[,i] / temp_table$total_cell_count
+      for ( i in 3:ncol(composition_df) ) {
+        composition_df[,i] <- composition_df[,i] / composition_df$total_cell_count
       }
 
       ##
-      columns_percentage <- c(3:ncol(temp_table))
+      columns_percentage <- c(3:ncol(composition_df))
 
     ##
     } else {
       columns_percentage <- NULL
     }
 
-    temp_table %>%
+    composition_df %>%
     dplyr::rename("# of cells" = total_cell_count) %>%
     prettifyTable(
       filter = "none",
@@ -317,7 +320,6 @@ output[["groups_by_other_group_table"]] <- DT::renderDataTable({
       hide_long_columns = TRUE,
       columns_percentage = columns_percentage
     )
-
   }
 })
 
@@ -331,7 +333,8 @@ observeEvent(input[["groups_by_other_group_info"]], {
       groups_by_other_group_info[["text"]],
       title = groups_by_other_group_info[["title"]],
       easyClose = TRUE,
-      footer = NULL
+      footer = NULL,
+      size = "l"
     )
   )
 })
@@ -340,8 +343,7 @@ observeEvent(input[["groups_by_other_group_info"]], {
 ## Text in info box.
 ##----------------------------------------------------------------------------##
 
-## TODO: update description
 groups_by_other_group_info <- list(
-  title = "Samples by cluster",
-  text = p("Percentage bar plot representation of the table shown above. Allows to see which groups contribute most strongly to each sample. Groups can be removed from the plot by clicking on them in the legend.")
+  title = "Composition of group by another group",
+  text = p("This plot allows to see how cell groups are related to each other. This can be represented as a bar char or a Sankey plot. Optionally, a table can be shown below. To highlight composition in very small cell groups, results can be shown as percentages rather than actual cell counts. Groups can be removed from the plot by clicking on them in the legend.")
 )

@@ -96,7 +96,8 @@ observeEvent(input[["groups_percent_mt_info"]], {
       groups_percent_mt_info[["text"]],
       title = groups_percent_mt_info[["title"]],
       easyClose = TRUE,
-      footer = NULL
+      footer = NULL,
+      size = "l"
     )
   )
 })

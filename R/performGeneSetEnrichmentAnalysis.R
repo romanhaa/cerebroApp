@@ -1,7 +1,7 @@
 #' Perform gene set enrichment analysis with GSVA.
 #' @title Perform gene set enrichment analysis with GSVA.
 #' @description This function calculates enrichment scores, p- and q-value
-#' statistics for provided gene sets for samples and clusters of cells in given
+#' statistics for provided gene sets for specified groups of cells in given
 #' Seurat object using gene set variation analysis (GSVA). Calculation of p- and
 #' q-values for gene sets is performed as done in "Evaluation of methods to
 #' assign cell type labels to cell clusters from single-cell RNA-sequencing
@@ -13,19 +13,19 @@
 #' @param GMT_file Path to GMT file containing the gene sets to be tested.
 #' The Broad Institute provides many gene sets which can be downloaded:
 #' http://software.broadinstitute.org/gsea/msigdb/index.jsp
-#' @param column_sample Column in object@meta.data that contains information
-#' about sample; defaults to 'sample'.
-#' @param column_cluster Column in object@meta.data that contains information
-#' about cluster; defaults to 'cluster'.
+#' @param groups Grouping variables (columns) in object@meta.data for which
+#' gene set enrichment analysis should be performed
+#' @param name Name of list that should be used to store the results in
+#' object@misc$enriched_pathways$<name>; defaults to 'cerebro_GSVA'.
 #' @param thresh_p_val Threshold for p-value, defaults to 0.05.
 #' @param thresh_q_val Threshold for q-value, defaults to 0.1.
 #' @param ... Further parameters can be passed to control GSVA::gsva().
 #' @export
-#' @return Seurat object with GSVA results for samples and clusters stored in
-#' object@misc$enriched_pathways$GSVA.
+#' @return Seurat object with GSVA results for the specified grouping variables
+#' stored in object@misc$enriched_pathways$<name>
 #' @import dplyr
 #' @importFrom GSVA gsva
-#' @importFrom Matrix colSums
+#' @importFrom Matrix colMeans colSums rowSums t
 #' @importFrom qvalue qvalue
 #' @importFrom rlang .data
 #' @importFrom tibble tibble
@@ -37,8 +37,7 @@
 #' pbmc <- performGeneSetEnrichmentAnalysis(
 #'   object = pbmc,
 #'   GMT_file = example_gene_set,
-#'   column_sample = 'sample',
-#'   column_cluster = 'seurat_clusters',
+#'   groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
 #'   thresh_p_val = 0.05,
 #'   thresh_q_val = 0.1,
 #'   parallel.sz = 1,
@@ -48,45 +47,104 @@ performGeneSetEnrichmentAnalysis <- function(
   object,
   assay = 'RNA',
   GMT_file,
-  column_sample = 'sample',
-  column_cluster = 'cluster',
+  groups = NULL,
+  name = 'cerebro_GSVA',
   thresh_p_val = 0.05,
   thresh_q_val = 0.1,
   ...
-)
-{
+) {
+
+  ##--------------------------------------------------------------------------##
+  ## safety checks before starting to do anything
+  ##--------------------------------------------------------------------------##
+
   ## check if Seurat is installed
-  if (!requireNamespace("Seurat", quietly = TRUE))
-  {
+  if ( !requireNamespace("Seurat", quietly = TRUE) ) {
     stop(
-      "Package 'Seurat' needed for this function to work. Please install it.",
+      "The 'Seurat' package is needed for this function to work. Please install it.",
       call. = FALSE
     )
   }
-  ##---------------------------------------------------------------------------#
-  ## check input parameters
-  ##---------------------------------------------------------------------------#
-  if ( !file.exists(GMT_file) )
-  {
+
+  ## check that Seurat package is at least v3.0
+  if ( utils::packageVersion('Seurat') < 3 ) {
+    stop(
+      paste0(
+        "The installed Seurat package is of version `", utils::packageVersion('Seurat'),
+        "`, but at least v3.0 is required."
+      ),
+      call. = FALSE
+    )
+  }
+
+  ## check if provided object is of class "Seurat"
+  if ( class(object) != "Seurat" ) {
+    stop(
+      paste0(
+        "Provided object is of class `", class(object), "` but must be of class 'Seurat'."
+      ),
+      call. = FALSE
+    )
+  }
+
+  ## check version of Seurat object and stop if it is lower than 3
+  if ( object@version < 3 ) {
+    stop(
+      paste0(
+        "Provided Seurat object has version `", object@version, "` but must be at least 3.0."
+      ),
+      call. = FALSE
+    )
+  }
+
+  ## check if provided assay exists
+  if ( assay %in% names(object@assays) == FALSE ) {
+    stop(
+      paste0(
+        'Specified assay slot `', assay, '` could not be found in provided Seurat object.'
+      ),
+      call. = FALSE
+    )
+  }
+
+  ## check if `data` matrix exist in provided assay
+  if ( is.null(object@assays[[assay]]@data) ) {
+    stop(
+      paste0(
+        '`data` matrix could not be found in `', assay, '` assay slot of the provided Seurat object.'
+      ),
+      call. = FALSE
+    )
+  }
+
+  ## check if specified GMT files exists
+  if ( !file.exists(GMT_file) ) {
     stop("Specified GMT file with gene sets cannot be found.", call. = FALSE)
   }
-  if ( (column_sample %in% colnames(object@meta.data)) == FALSE )
-  {
-    stop("Specified sample column doesn't exist in meta data.", call. = FALSE)
+
+  ## check if provided groups are present in meta data
+  if ( any(which(groups %in% colnames(object@meta.data) == FALSE)) ) {
+    missing_groups <- groups[which(groups %in% colnames(object@meta.data) == FALSE)]
+    stop(
+      paste0(
+        "Group(s) `", paste0(missing_groups, collapse = '`, `'), "` were not ",
+        "found in meta data of provided Seurat object. Only grouping variables ",
+        "that are present in the meta data can be used."
+      ),
+      call. = FALSE
+    )
   }
-  if ( (column_cluster %in% colnames(object@meta.data)) == FALSE )
-  {
-    stop("Specified cluster column doesn't exist in meta data.", call. = FALSE)
-  }
-  if ( thresh_p_val < 0 | thresh_p_val > 1 )
-  {
+
+  ## check if specified p-value thresholds are between 0 and 1
+  if ( thresh_p_val < 0 | thresh_p_val > 1 ) {
     stop(
       "Specified threshold for p-value must be between 0 and 1.",
       call. = FALSE
     )
   }
-  if ( thresh_q_val < 0 | thresh_q_val > 1 )
-  {
+
+  ## check if specified q-value thresholds are between 0 and 1
+  if ( thresh_q_val < 0 | thresh_q_val > 1 ) {
     stop(
       "Specified threshold for q-value must be between 0 and 1.",
       call. = FALSE
@@ -96,6 +154,7 @@ performGeneSetEnrichmentAnalysis <- function(
   ##---------------------------------------------------------------------------#
   ## preparation
   ##---------------------------------------------------------------------------#
+
   ## load gene sets from GMT file
   message(
     paste0(
@@ -104,9 +163,10 @@ performGeneSetEnrichmentAnalysis <- function(
   )
   gene_sets <- .read_GMT_file(GMT_file)
 
+  ## get names of gene sets
   names(gene_sets$genesets) <- gene_sets$geneset.names
 
-  ## make tibble that contains name, description and list of genes for each set
+  ## make tibble that contains name and description for each set
   gene_sets_tibble <- tibble::tibble(
       name = gene_sets$geneset.names,
       description = gene_sets$geneset.description,
@@ -114,14 +174,15 @@ performGeneSetEnrichmentAnalysis <- function(
       genes = NA
     )
 
-  for ( i in seq_len(length(gene_sets$genesets)) )
-  {
+  ## add number of genes and collapsed gene list to tibble of gene sets
+  for ( i in seq_along(gene_sets$genesets) ) {
     gene_sets_tibble$length[i] <- gene_sets$genesets[[i]] %>% length()
     gene_sets_tibble$genes[i] <- gene_sets$genesets[[i]] %>%
       unlist() %>%
       paste(.data, collapse = ',')
   }
 
+  ## log message
   message(
     paste0(
       '[', format(Sys.time(), '%H:%M:%S'), '] Loaded ',
@@ -129,354 +190,208 @@ performGeneSetEnrichmentAnalysis <- function(
     )
   )
 
-  ## extract transcript count matrix (log-scale) from Seurat object
-  message(
-    paste0(
-      '[', format(Sys.time(), '%H:%M:%S'), '] Extracting transcript counts...'
-    )
-  )
-  if ( object@version < 3 )
-  {
-    ## check if `data` matrix exist in provided Seurat object
-    if ( is.null(object@data) )
-    {
-      stop(
-        paste0(
-          '`data` matrix could not be found in provided Seurat ',
-          'object.'
-        ),
-        call. = FALSE
-      )
-    }
-    matrix_full <- object@data %>%
-      as.matrix() %>%
-      t() %>%
-      as.data.frame()
-  } else
-  {
-    ## check if provided assay exists
-    if ( (assay %in% names(object@assays) == FALSE ) )
-    {
-      stop(
-        paste0(
-          'Assay slot `', assay, '` could not be found in provided Seurat ',
-          'object.'
-        ),
-        call. = FALSE
-      )
-    }
-    ## check if `data` matrix exist in provided assay
-    if ( is.null(object@assays[[assay]]@data) )
-    {
-      stop(
-        paste0(
-          '`data` matrix could not be found in `', assay, '` assay slot.'
-        ),
-        call. = FALSE
-      )
-    }
-    matrix_full <- object@assays[[assay]]@data %>%
-      as.matrix() %>%
-      t() %>%
-      as.data.frame()
-  }
-
-  ## remove genes with zero counts across all cells
-  message(
-    paste0(
-      '[', format(Sys.time(), '%H:%M:%S'), '] Removing non-expressed genes...'
-    )
-  )
-  expressed_genes <- matrix_full %>%
-    Matrix::colSums()
+  ## check which genes are not expressed in any cell
+  expressed_genes <- Matrix::rowSums(object@assays[[assay]]@data)
   expressed_genes <- which(expressed_genes != 0)
-  matrix_full <- matrix_full[,expressed_genes]
 
-  ##---------------------------------------------------------------------------#
-  ## workflow for samples
-  ##---------------------------------------------------------------------------#
-  if ( object@meta.data[[column_sample]] %>% unique() %>% length() > 1 ) {
-    message(
-      paste0(
-        '[', format(Sys.time(), '%H:%M:%S'), '] Performing GSVA for samples...'
-      )
-    )
-
-    ## get sample names
-    if ( is.factor(object@meta.data[[column_sample]]) )
-    {
-      sample_names <- levels(object@meta.data[[column_sample]])
-    } else
-    {
-      sample_names <- unique(object@meta.data[[column_sample]])
-    }
-
-    ## add group information as column to expression matrix
-    temp_matrix_full <- matrix_full %>%
-      dplyr::mutate(group = object@meta.data[[column_sample]])
-
-    ## calculate mean log counts per group of cells
-    matrix_merged <- temp_matrix_full %>%
-      dplyr::group_by(.data$group) %>%
-      dplyr::summarise_all(mean)
-
-    ## keep order of groups for later
-    groups <- matrix_merged$group
-
-    ## remove group information from count matrix and transpose for GSVA
-    matrix_merged <- matrix_merged %>%
-      dplyr::select(-'group') %>%
-      as.matrix() %>%
-      t()
-
-    ## add group info back to count matrix as column names
-    colnames(matrix_merged) <- groups
-
-    ## get enrichment score for each gene set in every cell group
-    enrichment_scores <- GSVA::gsva(
-        expr = matrix_merged,
-        gset.idx.list = gene_sets$genesets,
-        ...
-      )
-
-    ## calculate statistics for enrichment scores and filter those which don't
-    ## pass the specified tresholds
-    message(
-      paste0(
-        '[', format(Sys.time(), '%H:%M:%S'), '] Filtering results based on ',
-        'specified thresholds...'
-      )
-    )
-    results_by_sample <- tibble::tibble(
-        group = character(),
-        name = character(),
-        enrichment_score = numeric(),
-        p_value = numeric(),
-        q_value = numeric()
-      )
-    for ( i in seq_len(ncol(enrichment_scores)) )
-    {
-      temp_results <- tibble::tibble(
-          group = colnames(matrix_merged)[i],
-          name = rownames(enrichment_scores),
-          enrichment_score = enrichment_scores[,i]
-        )
-      if ( nrow(temp_results) < 2 )
-      {
-        message(
-          paste0(
-            '[', format(Sys.time(), '%H:%M:%S'), '] Only 1 gene set ',
-            'available, therefore no p- and q-values can be calculated and no ',
-            'filtering of the results will be performed.'
-          )
-        )
-        temp_results <- temp_results %>%
-          dplyr::mutate(p_value = NA, q_value = NA)
-      } else
-      {
-        message(
-          paste0(
-            '[', format(Sys.time(), '%H:%M:%S'), '] Filtering results based on ',
-            'specified thresholds...'
-          )
-        )
-        temp_results <- temp_results %>%
-          dplyr::mutate(
-            p_value = stats::pnorm(-abs(scale(.data$enrichment_score)[,1])),
-            q_value = qvalue::qvalue(.data$p_value, pi0 = 1)$lfdr
-          ) %>%
-          dplyr::filter(
-            .data$p_value <= thresh_p_val,
-            .data$q_value <= thresh_q_val
-          )
-      }
-      results_by_sample <- dplyr::bind_rows(results_by_sample, temp_results) %>%
-        dplyr::arrange(.data$q_value)
-    }
-
-    ## add description, number of genes and list of genes to results
-    results_by_sample <- dplyr::left_join(
-        results_by_sample,
-        gene_sets_tibble,
-        by = 'name'
-      ) %>%
-      dplyr::select(c('group','name','description','length','genes',
-        'enrichment_score','p_value','q_value')) %>%
-      dplyr::mutate(group = factor(.data$group, levels = intersect(sample_names,
-        .data$group)))
-
-    ## print number of enriched gene sets
-    message(
-      paste0(
-        '[', format(Sys.time(), '%H:%M:%S'), '] ', nrow(results_by_sample),
-        ' gene sets passed the thresholds across all samples.'
-      )
-    )
-
-    ## test if any gene sets passed the filtering
-    if ( nrow(results_by_sample) == 0 )
-    {
-      results_by_sample <- 'no_gene_sets_enriched'
-    }
-  } else
-  {
-    message(
-      paste0(
-        '[', format(Sys.time(), '%H:%M:%S'), '] Only 1 sample in the data ',
-        'set, will skip analysis by sample...'
-      )
-    )
-    results_by_sample <- 'only_one_sample_in_data_set'
-  }
-
-  ##---------------------------------------------------------------------------#
-  ## workflow for clusters
-  ##---------------------------------------------------------------------------#
-  if ( object@meta.data[[column_cluster]] %>% unique() %>% length() > 1 )
-  {
-    message(
-      paste0(
-        '[', format(Sys.time(), '%H:%M:%S'), '] Performing GSVA for clusters...'
-      )
-    )
-
-    ## get cluster names
-    if ( is.factor(object@meta.data[[column_cluster]]) )
-    {
-      cluster_names <- levels(object@meta.data[[column_cluster]])
-    } else
-    {
-      cluster_names <- unique(object@meta.data[[column_cluster]])
-    }
-
-    ## add group information as column to expression matrix
-    temp_matrix_full <- matrix_full %>%
-      dplyr::mutate(group = object@meta.data[[column_cluster]])
-
-    ## calculate mean log counts per group of cells
-    matrix_merged <- temp_matrix_full %>%
-      dplyr::group_by(.data$group) %>%
-      dplyr::summarise_all(mean)
-
-    ## keep order of groups for later
-    groups <- matrix_merged$group
-
-    ## remove group information from count matrix and transpose for GSVA
-    matrix_merged <- matrix_merged %>%
-      dplyr::select(-'group') %>%
-      as.matrix() %>%
-      t()
-
-    ## add group info back to count matrix as column names
-    colnames(matrix_merged) <- groups
-
-    ## get enrichment score for each gene set in every cell group
-    enrichment_scores <- GSVA::gsva(
-        expr = matrix_merged,
-        gset.idx.list = gene_sets$genesets,
-        ...
-      )
-
-    ## calculate statistics for enrichment scores and filter those which don't
-    ## pass the specified tresholds
-    results_by_cluster <- tibble::tibble(
-        group = character(),
-        name = character(),
-        enrichment_score = numeric(),
-        p_value = numeric(),
-        q_value = numeric()
-      )
-    for ( i in seq_len(ncol(enrichment_scores)) )
-    {
-      temp_results <- tibble::tibble(
-          group = colnames(matrix_merged)[i],
-          name = rownames(enrichment_scores),
-          enrichment_score = enrichment_scores[,i]
-        )
-      if ( nrow(temp_results) < 2 )
-      {
-        message(
-          paste0(
-            '[', format(Sys.time(), '%H:%M:%S'), '] Only 1 gene set ',
-            'available, therefore no p- and q-values can be calculated and no ',
-            'filtering of the results will be performed.'
-          )
-        )
-        temp_results <- temp_results %>%
-          dplyr::mutate(p_value = NA, q_value = NA)
-      } else
-      {
-        message(
-          paste0(
-            '[', format(Sys.time(), '%H:%M:%S'), '] Filtering results based on ',
-            'specified thresholds...'
-          )
-        )
-        temp_results <- temp_results %>%
-          dplyr::mutate(
-            p_value = stats::pnorm(-abs(scale(.data$enrichment_score)[,1])),
-            q_value = qvalue::qvalue(.data$p_value, pi0 = 1)$lfdr
-          ) %>%
-          dplyr::filter(
-            .data$p_value <= thresh_p_val,
-            .data$q_value <= thresh_q_val
-          )
-      }
-      results_by_cluster <- dplyr::bind_rows(
-          results_by_cluster,
-          temp_results
-        ) %>%
-        dplyr::arrange(.data$q_value)
-    }
-
-    ## add description, number of genes and list of genes to results
-    results_by_cluster <- dplyr::left_join(
-        results_by_cluster,
-        gene_sets_tibble,
-        by = 'name'
-      ) %>%
-      dplyr::select(c('group','name','description','length','genes',
-        'enrichment_score','p_value','q_value')) %>%
-      dplyr::mutate(group = factor(.data$group, levels = intersect(
-        cluster_names, .data$group)))
-
-    ## print number of enriched gene sets
-    message(
-      paste0(
-        '[', format(Sys.time(), '%H:%M:%S'), '] ', nrow(results_by_cluster),
-        ' gene sets passed the thresholds across all clusters.'
-      )
-    )
-
-    ## test if any gene sets passed the filtering
-    if ( nrow(results_by_cluster) == 0 )
-    {
-      results_by_cluster <- 'no_gene_sets_enriched'
-    }
-  } else
-  {
-    message(
-      paste0(
-        '[', format(Sys.time(), '%H:%M:%S'), '] Only 1 cluster in the data ',
-        'set, will skip analysis by cluster...'
-      )
-    )
-    results_by_cluster <- 'only_one_cluster_in_data_set'
-  }
-
-  ##---------------------------------------------------------------------------#
-  ## merge results, add to Seurat object and return Seurat object
-  ##---------------------------------------------------------------------------#
-  results <- list(
-    by_sample = results_by_sample,
-    by_cluster = results_by_cluster,
-    parameters = list(
-      GMT_file = basename(GMT_file),
-      thresh_p_val = thresh_p_val,
-      thresh_q_val = thresh_q_val
+  ## extract transcript counts for expressed genes from Seurat object
+  message(
+    paste0(
+      '[', format(Sys.time(), '%H:%M:%S'), '] Extracting transcript counts ',
+      'from `data` slot of `', assay, '` assay...'
     )
   )
-  object@misc$enriched_pathways$GSVA <- results
+  matrix_full <- object@assays[[assay]]@data[expressed_genes,]
+
+  ##---------------------------------------------------------------------------#
+  ## perform gene set enrichment analysis for each group
+  ##---------------------------------------------------------------------------#
+
+  ## create slot for results
+  object@misc$enriched_pathways[[ name ]] <- list()
+
+  ##
+  for ( i in seq_along(groups) ) {
+
+    ## get current group
+    current_group <- groups[i]
+
+    ## collect group levels
+    ## ... column contains factors
+    if ( is.factor(object@meta.data[[ current_group ]]) ) {
+
+      ## get factor levels
+      group_levels <- levels(object@meta.data[[ current_group ]])
+
+    ## ... column contains characters
+    } else if ( is.character(object@meta.data[[ current_group ]]) ) {
+
+      ## get unique entries in column
+      group_levels <- unique(object@meta.data[[ current_group ]])
+
+      ## check for NA values
+      ## ... if at least 1 group level is NA
+      if ( any(is.na(group_levels)) ) {
+
+        ## get number of cells with NA as group assignment
+        number_of_cells_without_group_assignment <- object@meta.data[[ current_group ]] %>%
+          is.na() %>%
+          which(. == TRUE) %>%
+          length()
+
+        ## remove NA entries from group levels
+        group_levels <- stats::na.omit(group_levels)
+
+        ## issue warning to user
+        warning(
+          paste0(
+            'Found ', number_of_cells_without_group_assignment, ' cell(s) ',
+            'without group assignment (NA) for `', current_group,
+            '`. These cells will be ignored during the analysis.'
+          ),
+          call. = FALSE
+        )
+      }
+    }
+
+    ## check number of group levels
+    ## ... if only 1 group level is present, show warning and move to next
+    ##     grouping variable
+    if ( length(group_levels) == 1 ) {
+      message(
+        paste0(
+          '[', format(Sys.time(), '%H:%M:%S'), '] Only one group level found ',
+          'for group `', current_group, '`. Will skip this group and proceed ',
+          'to next.'
+        ),
+        call. = FALSE
+      )
+      results <- NULL
+
+    ## ... more than 1 group level is available
+    } else if ( length(group_levels) > 1 ) {
+
+      ## get results
+      matrix_mean_by_group <- future.apply::future_sapply(
+        group_levels, USE.NAMES = TRUE, simplify = TRUE,
+        future.globals = FALSE, function(x)
+      {
+        cells_in_this_group <- which(object@meta.data[[ current_group ]] == x)
+        Matrix::rowMeans(matrix_full[,cells_in_this_group])
+      })
+
+      ## get enrichment score for each gene set in every cell group
+      enrichment_scores <- GSVA::gsva(
+          expr = matrix_mean_by_group,
+          gset.idx.list = gene_sets$genesets,
+          ...
+        )
+
+      ## log message
+      message(
+        paste0(
+          '[', format(Sys.time(), '%H:%M:%S'), '] Filtering results based on ',
+          'specified thresholds...'
+        )
+      )
+
+      ## create empty tibble for results
+      results <- tibble::tibble(
+          group = character(),
+          name = character(),
+          enrichment_score = numeric(),
+          p_value = numeric(),
+          q_value = numeric()
+        )
+
+      ## calculate statistics for enrichment scores and filter those which don't
+      ## pass the specified tresholds
+      for ( i in seq_len(ncol(enrichment_scores)) ) {
+
+        ## collect enrichment scores
+        temp_results <- tibble::tibble(
+            group = colnames(matrix_mean_by_group)[i],
+            name = rownames(enrichment_scores),
+            enrichment_score = enrichment_scores[,i]
+          )
+
+        ## check how many gene sets are available
+        ## ... fewer than 2 gene sets available
+        if ( nrow(temp_results) < 2 ) {
+
+          ## log message
+          message(
+            paste0(
+              '[', format(Sys.time(), '%H:%M:%S'), '] Only 1 gene set ',
+              'available, therefore p- and q-values cannot be calculated.'
+            )
+          )
+
+          ## p- and q-value cannot be computed, add NA instead
+          temp_results <- temp_results %>%
+            dplyr::mutate(p_value = NA, q_value = NA)
+
+        ## ... at least 2 gene sets are available
+        } else if ( nrow(temp_results) >= 2 ) {
+
+          ## log message
+          message(
+            paste0(
+              '[', format(Sys.time(), '%H:%M:%S'), '] Filtering results based ',
+              'on specified thresholds...'
+            )
+          )
+
+          ## calculate p- and q-values and filter gene sets based on the results
+          temp_results <- temp_results %>%
+            dplyr::mutate(
+              p_value = stats::pnorm(-abs(scale(.data$enrichment_score)[,1])),
+              q_value = qvalue::qvalue(.data$p_value, pi0 = 1)$lfdr
+            ) %>%
+            dplyr::filter(
+              .data$p_value <= thresh_p_val,
+              .data$q_value <= thresh_q_val
+            )
+        }
+
+        ## merge and sort results
+        results <- dplyr::bind_rows(results, temp_results) %>%
+          dplyr::arrange(.data$q_value)
+      }
+
+      ## - add description, number of genes and list of genes to results
+      ## - put columns in right order
+      ## - rename group column
+      results <- dplyr::left_join(results, gene_sets_tibble, by = 'name') %>%
+        dplyr::select(c('group','name','description','length','genes',
+          'enrichment_score','p_value','q_value')) %>%
+        dplyr::rename(!!current_group := .data$group)
+
+      ## factorize group column
+      group_levels_with_results <- group_levels[group_levels %in% results[[ current_group ]]]
+      results[[ current_group ]] <- factor(results[[ current_group ]], levels = group_levels_with_results)
+
+      ## print number of enriched gene sets
+      message(
+        paste0(
+          '[', format(Sys.time(), '%H:%M:%S'), '] ', nrow(results),
+          ' gene sets passed the thresholds across all samples.'
+        )
+      )
+
+      ## test if any gene sets passed the filtering
+      if ( nrow(results) == 0 ) {
+        results <- 'no_gene_sets_enriched'
+      }
+
+      ## add results to Seurat object
+      object@misc[["enriched_pathways"]][[ name ]][[ current_group ]] <- results
+    }
+  }
+
+  ##--------------------------------------------------------------------------##
+  ## return Seurat object
+  ##--------------------------------------------------------------------------##
   return(object)
 }
 

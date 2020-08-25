@@ -40,44 +40,60 @@ output[["expression_by_group"]] <- plotly::renderPlotly({
     input[["expression_by_group_selected_group"]]
   )
 
-  ## prepare plot
-  gene_expression_plot_data() %>%
-  plotly::plot_ly(
-    x = ~.[[ input[["expression_by_group_selected_group"]] ]],
-    y = ~level,
-    type = "violin",
-    box = list(
-      visible = TRUE
-    ),
-    meanline = list(
-      visible = TRUE
-    ),
-    color = ~.[[ input[["expression_by_group_selected_group"]] ]],
-    colors = reactive_colors()[[ input[["expression_by_group_selected_group"]] ]],
-    source = "subset",
-    showlegend = FALSE,
-    hoverinfo = "y",
-    marker = list(
-      size = 5
-    )
-  ) %>%
-  plotly::layout(
-    title = "",
-    xaxis = list(
+  ## check if user requested to show expression in separate panels
+  ## ... separate panels requested and "gene" column present (which means
+  ##     expression was actually split by gene)
+  if (
+    input[["expression_projection_show_genes_in_separate_panels"]] == TRUE &&
+    "gene" %in% colnames(gene_expression_plot_data()) == TRUE
+  ) {
+
+    ## don't plot anything because data is not present
+    ## even if I merged all meta data in the data frame, it wouldn't be correct
+    ## because cells are plotted once per gene
+
+  ## ...
+  } else {
+
+    ## prepare plot
+    gene_expression_plot_data() %>%
+    plotly::plot_ly(
+      x = ~.[[ input[["expression_by_group_selected_group"]] ]],
+      y = ~level,
+      type = "violin",
+      box = list(
+        visible = TRUE
+      ),
+      meanline = list(
+        visible = TRUE
+      ),
+      color = ~.[[ input[["expression_by_group_selected_group"]] ]],
+      colors = reactive_colors()[[ input[["expression_by_group_selected_group"]] ]],
+      source = "subset",
+      showlegend = FALSE,
+      hoverinfo = "y",
+      marker = list(
+        size = 5
+      )
+    ) %>%
+    plotly::layout(
       title = "",
-      mirror = TRUE,
-      showline = TRUE
-    ),
-    yaxis = list(
-      title = "Expression level",
-      range = c(0, max(gene_expression_plot_data()$level) * 1.2),
-      hoverformat = ".2f",
-      mirror = TRUE,
-      showline = TRUE
-    ),
-    dragmode = "select",
-    hovermode = "compare"
-  )
+      xaxis = list(
+        title = "",
+        mirror = TRUE,
+        showline = TRUE
+      ),
+      yaxis = list(
+        title = "Expression level",
+        range = c(0, max(gene_expression_plot_data()$level) * 1.2),
+        hoverformat = ".2f",
+        mirror = TRUE,
+        showline = TRUE
+      ),
+      dragmode = "select",
+      hovermode = "compare"
+    )
+  }
 })
 
 ##----------------------------------------------------------------------------##
@@ -90,7 +106,8 @@ observeEvent(input[["expression_by_group_info"]], {
       expression_by_group_info$text,
       title = expression_by_group_info$title,
       easyClose = TRUE,
-      footer = NULL
+      footer = NULL,
+      size = "l"
     )
   )
 })

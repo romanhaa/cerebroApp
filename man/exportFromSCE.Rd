@@ -14,7 +14,8 @@ exportFromSCE(
   column_nUMI = "nUMI",
   column_nGene = "nGene",
   columns_cell_cycle = NULL,
-  add_all_meta_data = TRUE
+  add_all_meta_data = TRUE,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -46,6 +47,9 @@ that contain cell cycle information.e.g. c("Phase"); defaults to NULL.}
 
 \item{add_all_meta_data}{If set to TRUE, all further meta data columns will
 be extracted as well.}
+
+\item{verbose}{Set this to TRUE if you want additional log messages; defaults
+to FALSE.}
 }
 \value{
 No data returned.

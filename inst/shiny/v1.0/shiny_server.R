@@ -8,49 +8,49 @@ server <- function(input, output, session) {
   ##--------------------------------------------------------------------------##
   source(
     system.file(
-      paste0("shiny/", version, "/overview/info.R"),
+      paste0("shiny/v1.0/overview/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE
   )
   source(
     system.file(
-      paste0("shiny/", version, "/samples/info.R"),
+      paste0("shiny/v1.0/samples/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE
   )
   source(
     system.file(
-      paste0("shiny/", version, "/clusters/info.R"),
+      paste0("shiny/v1.0/clusters/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE
   )
   source(
     system.file(
-      paste0("shiny/", version, "/most_expressed_genes/info.R"),
+      paste0("shiny/v1.0/most_expressed_genes/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE
   )
   source(
     system.file(
-      paste0("shiny/", version, "/marker_genes/info.R"),
+      paste0("shiny/v1.0/marker_genes/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE
   )
   source(
     system.file(
-      paste0("shiny/", version, "/enriched_pathways/info.R"),
+      paste0("shiny/v1.0/enriched_pathways/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE
   )
   source(
     system.file(
-      paste0("shiny/", version, "/gene_expression/info.R"),
+      paste0("shiny/v1.0/gene_expression/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE

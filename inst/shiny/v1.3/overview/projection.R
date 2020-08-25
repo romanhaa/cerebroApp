@@ -8,12 +8,25 @@
 ## Layout of the UI elements.
 ##----------------------------------------------------------------------------##
 
+## TODO: add info button for input parameters
+
 output[["overview_projection_UI"]] <- renderUI({
   fluidRow(
     ## selections and parameters
     column(width = 3, offset = 0, style = "padding: 0px;",
       cerebroBox(
-        title = "Input parameters",
+        title = 
+          tagList(
+            "Input parameters",
+          actionButton(
+            inputId = "overview_projection_parameters_info",
+            label = "info",
+            icon = NULL,
+            class = "btn-xs",
+            title = "Show additional information for this panel.",
+            style = "margin-right: 5px"
+          )
+        ),
         tagList(
           uiOutput("overview_projection_parameters_UI"),
           uiOutput("overview_projection_scales_UI")
@@ -33,7 +46,7 @@ output[["overview_projection_UI"]] <- renderUI({
             title = "Show additional information for this panel.",
             style = "margin-right: 5px"
           ),
-          shinySaveButton(
+          shinyFiles::shinySaveButton(
             "overview_projection_export",
             label = "export to PDF",
             title = "Export dimensional reduction to PDF file.",
@@ -120,22 +133,44 @@ output[["overview_projection_scales_UI"]] <- renderUI({
   range_y_min <- getProjection(projection_to_display)[,2] %>% min() %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round()
   range_y_max <- getProjection(projection_to_display)[,2] %>% max() %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
   tagList(
+    hr(),
     sliderInput(
       "overview_scale_x_manual_range",
-      label = "X axis",
+      label = "Range of X axis",
       min = range_x_min,
       max = range_x_max,
       value = c(range_x_min, range_x_max)
     ),
     sliderInput(
       "overview_scale_y_manual_range",
-      label = "Y axis",
+      label = "Range of Y axis",
       min = range_y_min,
       max = range_y_max,
       value = c(range_y_min, range_y_max)
     )
   )
 })
+
+##----------------------------------------------------------------------------##
+## Text in info box.
+##----------------------------------------------------------------------------##
+
+overview_projection_parameters_info <- list(
+  title = "Parameters for projection",
+  text = HTML("
+    The elements in this panel allow you to control what and how results are displayed across the whole tab.
+    <ul>
+      <li><b>Projection:</b> Select here which projection you want to see in the scatter plot on the right.</li>
+      <li><b>Color cells by:</b> Select which variable, categorical or continuous, from the meta data should be used to color the cells.</li>
+      <li><b>Show % of cells:</b> Using the slider, you can randomly remove a fraction of cells from the plot. This can be useful for large data sets and/or computers with limited resources.</li>
+      <li><b>Point size:</b> Controls how large the cells should be.</li>
+      <li><b>Point opacity:</b> Controls the transparency of the cells.</li>
+      <li><b>Range of color scale:</b> Using the sliders, you can set the limits for the color scale. Values outside the scale will be shown in the color corresponding to the min/max value, respectively.</li>
+      <li><b>Range of X/Y axis:</b> Set the X/Y axis limits. This is useful when you want to change the aspect ratio of the plot.</li>
+    </ul>
+    "
+  )
+)
 
 ##----------------------------------------------------------------------------##
 ## Plotly plot of the selected projection.
@@ -155,59 +190,21 @@ output[["overview_projection"]] <- plotly::renderPlotly({
   )
 
   projection_to_display <- input[["overview_projection_to_display"]]
-  cells_to_display <- getCellIDs()
 
-  ## randomly remove cells
-  if ( input[["overview_percentage_cells_to_show"]] < 100 ) {
-    number_of_cells_to_plot <- ceiling(
-      input[["overview_percentage_cells_to_show"]] / 100 * length(cells_to_display)
-    )
-    cells_to_display <- cells_to_display[ sample(1:length(cells_to_display), number_of_cells_to_plot) ]
-  }
+  ## build data frame with data
+  cells_df <- cbind(getProjection(projection_to_display), getMetaData())
 
-  ## extract cells to plot
-  to_plot <- cbind(
-      getProjection(projection_to_display)[ cells_to_display , ],
-      getMetaData()[ cells_to_display , ]
-    ) %>% 
-    as.data.frame()
+  ## randomly remove cells (if necessary)
+  cells_df <- randomlySubsetCells(cells_df, input[["overview_percentage_cells_to_show"]])
 
   ## put rows in random order
-  to_plot <- to_plot[ sample(1:nrow(to_plot)) , ]
+  cells_df <- cells_df[ sample(1:nrow(cells_df)) , ]
 
-  ## define colors
-  if ( input[["overview_point_color"]] %in% getGroups() ) {
-    colors_this_plot <- reactive_colors()[[ input[["overview_point_color"]] ]]
-  } else if ( input[["overview_point_color"]] %in% getCellCycle() ) {
-    colors_this_plot <- reactive_colors()[[ input[["overview_point_color"]] ]]
-  } else if ( is.factor(to_plot[[ input[["overview_point_color"]] ]]) ) {
-    colors_this_plot <- setNames(
-      default_colorset[1:length(levels(to_plot[[ input[["overview_point_color"]] ]]))],
-      levels(to_plot[[ input[["overview_point_color"]] ]])
-    )
-  } else if ( is.character(to_plot[[ input[["overview_point_color"]] ]]) ) {
-    colors_this_plot <- setNames(
-      default_colorset[1:length(unique(to_plot[[ input[["overview_point_color"]] ]]))],
-      unique(to_plot[[ input[["overview_point_color"]] ]])
-    )
-  } else {
-    NULL
-  }
+  ## get colors for groups
+  colors_for_groups <- assignColorsToGroups(cells_df, input[["overview_point_color"]])
 
-  ## prepare tooltip/hover info
-  tooltip_info <- paste0(
-    "<b>Cell</b>: ", to_plot[[ "cell_barcode" ]], "<br>",
-    "<b>Transcripts</b>: ", formatC(to_plot[[ "nUMI" ]], format = "f", big.mark = ",", digits = 0), "<br>",
-    "<b>Expressed genes</b>: ", formatC(to_plot[[ "nGene" ]], format = "f", big.mark = ",", digits = 0), "<br>"
-  )
-
-  ## add info for known grouping variables to tooltip/hover
-  for ( group in getGroups() ) {
-    tooltip_info <- paste0(
-      tooltip_info,
-      "<b>", group, "</b>: ", to_plot[[ group ]], "<br>"
-    )
-  }
+  ## prepare hover info
+  hover_info <- buildHoverInfoForProjections(cells_df)
 
   ## check if projection consists of 3 or 2 dimensions
   ## ... selected projection contains 3 dimensions
@@ -215,19 +212,19 @@ output[["overview_projection"]] <- plotly::renderPlotly({
 
     ## check if selected coloring variable is categorical or numeric
     ## ... selected coloring variable is numeric
-    if ( is.numeric(to_plot[[ input[["overview_point_color"]] ]]) ) {
+    if ( is.numeric(cells_df[[ input[["overview_point_color"]] ]]) ) {
       plot <- plotly::plot_ly(
-          to_plot,
-          x = ~to_plot[,1],
-          y = ~to_plot[,2],
-          z = ~to_plot[,3],
+          cells_df,
+          x = ~cells_df[,1],
+          y = ~cells_df[,2],
+          z = ~cells_df[,3],
           type = "scatter3d",
           mode = "markers",
           marker = list(
             colorbar = list(
               title = input[["overview_point_color"]]
             ),
-            color = ~to_plot[[ input[["overview_point_color"]] ]],
+            color = ~cells_df[[ input[["overview_point_color"]] ]],
             opacity = input[["overview_point_opacity"]],
             colorscale = "YlGnBu",
             reversescale = TRUE,
@@ -238,19 +235,19 @@ output[["overview_projection"]] <- plotly::renderPlotly({
             size = input[["overview_point_size"]]
           ),
           hoverinfo = "text",
-          text = ~tooltip_info,
+          text = ~hover_info,
           source = "overview_projection"
         )
 
     ## ... selected coloring variable is not numeric
     } else {
       plot <- plotly::plot_ly(
-          to_plot,
-          x = ~to_plot[,1],
-          y = ~to_plot[,2],
-          z = ~to_plot[,3],
-          color = ~to_plot[[ input[["overview_point_color"]] ]],
-          colors = colors_this_plot,
+          cells_df,
+          x = ~cells_df[,1],
+          y = ~cells_df[,2],
+          z = ~cells_df[,3],
+          color = ~cells_df[[ input[["overview_point_color"]] ]],
+          colors = colors_for_groups,
           type = "scatter3d",
           mode = "markers",
           marker = list(
@@ -262,7 +259,7 @@ output[["overview_projection"]] <- plotly::renderPlotly({
             size = input[["overview_point_size"]]
           ),
           hoverinfo = "text",
-          text = ~tooltip_info,
+          text = ~hover_info,
           source = "overview_projection"
         )
     }
@@ -272,19 +269,19 @@ output[["overview_projection"]] <- plotly::renderPlotly({
       plotly::layout(
         scene = list(
           xaxis = list(
-            title = colnames(to_plot)[1],
+            title = colnames(cells_df)[1],
             mirror = TRUE,
             showline = TRUE,
             zeroline = FALSE
           ),
           yaxis = list(
-            title = colnames(to_plot)[2],
+            title = colnames(cells_df)[2],
             mirror = TRUE,
             showline = TRUE,
             zeroline = FALSE
           ),
           zaxis = list(
-            title = colnames(to_plot)[3],
+            title = colnames(cells_df)[3],
             mirror = TRUE,
             showline = TRUE,
             zeroline = FALSE
@@ -302,18 +299,18 @@ output[["overview_projection"]] <- plotly::renderPlotly({
 
     ## check if selected coloring variable is categorical or numeric
     ## ... selected coloring variable is numeric
-    if ( is.numeric(to_plot[[ input[["overview_point_color"]] ]]) ) {
+    if ( is.numeric(cells_df[[ input[["overview_point_color"]] ]]) ) {
       plot <- plotly::plot_ly(
-        to_plot,
-        x = ~to_plot[,1],
-        y = ~to_plot[,2],
+        cells_df,
+        x = ~cells_df[,1],
+        y = ~cells_df[,2],
         type = "scatter",
         mode = "markers",
         marker = list(
           colorbar = list(
             title = input[["overview_point_color"]]
           ),
-          color = ~to_plot[[ input[["overview_point_color"]] ]],
+          color = ~cells_df[[ input[["overview_point_color"]] ]],
           opacity = input[["overview_point_opacity"]],
           colorscale = "YlGnBu",
           reversescale = TRUE,
@@ -324,18 +321,18 @@ output[["overview_projection"]] <- plotly::renderPlotly({
           size = input[["overview_point_size"]]
         ),
         hoverinfo = "text",
-        text = ~tooltip_info,
+        text = ~hover_info,
         source = "overview_projection"
       )
 
     ## ... selected coloring variable is not numeric
     } else {
       plot <- plotly::plot_ly(
-        to_plot,
-        x = ~to_plot[,1],
-        y = ~to_plot[,2],
-        color = ~to_plot[[ input[["overview_point_color"]] ]],
-        colors = colors_this_plot,
+        cells_df,
+        x = ~cells_df[,1],
+        y = ~cells_df[,2],
+        color = ~cells_df[[ input[["overview_point_color"]] ]],
+        colors = colors_for_groups,
         type = "scatter",
         mode = "markers",
         marker = list(
@@ -347,7 +344,7 @@ output[["overview_projection"]] <- plotly::renderPlotly({
           size = input[["overview_point_size"]]
         ),
         hoverinfo = "text",
-        text = ~tooltip_info,
+        text = ~hover_info,
         source = "overview_projection"
       )
     }
@@ -356,14 +353,14 @@ output[["overview_projection"]] <- plotly::renderPlotly({
     plot <- plot %>%
       plotly::layout(
         xaxis = list(
-          title = colnames(to_plot)[1],
+          title = colnames(cells_df)[1],
           mirror = TRUE,
           showline = TRUE,
           zeroline = FALSE,
           range = input[["overview_scale_x_manual_range"]]
         ),
         yaxis = list(
-          title = colnames(to_plot)[2],
+          title = colnames(cells_df)[2],
           mirror = TRUE,
           showline = TRUE,
           zeroline = FALSE,
@@ -423,7 +420,8 @@ observeEvent(input[["overview_projection_info"]], {
       overview_projection_info[["text"]],
       title = overview_projection_info[["title"]],
       easyClose = TRUE,
-      footer = NULL
+      footer = NULL,
+      size = "l"
     )
   )
 })
@@ -434,17 +432,17 @@ observeEvent(input[["overview_projection_info"]], {
 
 overview_projection_info <- list(
   title = "Dimensional reduction",
-  text = p(
-    "Interactive projection of cells into 2-dimensional space based on their expression profile.",
-    tags$ul(
-      tags$li("Both tSNE and UMAP are frequently used algorithms for dimensional reduction in single cell transcriptomics. While they generally allow to make similar conclusions, some differences exist between the two (please refer to Google and/or literature, such as Becht E. et al., Dimensionality reduction for visualizing single-cell data using UMAP. Nature Biotechnology, 2018, 37, 38-44)."),
-      tags$li("Cells can be colored by the sample they came from, the cluster they were assigned, the number of transcripts or expressed genes, percentage of mitochondrial and ribosomal gene expression, an apoptotic score (calculated based on the expression of few marker genes; more info in the 'Sample info' tab on the left), or cell cycle status (determined using the Seurat and Cyclone method)."),
-      tags$li("Confidence ellipses show the 95% confidence regions."),
-      tags$li("Samples and clusters can be removed from the plot individually to highlight a contrast of interest."),
-      tags$li("By default, the point size is set to 15 without any transparency but both these attributes can be changed using the sliders on the left. The point size can also be set to reflect the number of transcripts or expressed genes."),
-      tags$li("The last 2 slider elements on the left can be used to resize the projection axes. This can be particularly useful when a projection contains a population of cell that is very far away from the rest and therefore creates a big empty space (which is not uncommon for UMAPs).")
-    ),
-    "The plot is interactive (drag and zoom) but depending on the computer of the user and the number of cells displayed it can become very slow."
+  text = HTML("
+    Interactive projection of cells into 2-dimensional space based on their expression profile.
+    <ul>
+      <li>Both tSNE and UMAP are frequently used algorithms for dimensional reduction in single cell transcriptomics. While they generally allow to make similar conclusions, some differences exist between the two (please refer to Google and/or literature, such as Becht E. et al., Dimensionality reduction for visualizing single-cell data using UMAP. Nature Biotechnology, 2018, 37, 38-44).</li>
+      <li>Cells can be colored by the sample they came from, the cluster they were assigned, the number of transcripts or expressed genes, percentage of mitochondrial and ribosomal gene expression, an apoptotic score (calculated based on the expression of few marker genes; more info in the 'Sample info' tab on the left), or cell cycle status (determined using the Seurat and Cyclone method).</li>
+      <li>Confidence ellipses show the 95% confidence regions.</li>
+      <li>Samples and clusters can be removed from the plot individually to highlight a contrast of interest.</li>
+      <li>By default, the point size is set to 15 without any transparency but both these attributes can be changed using the sliders on the left. The point size can also be set to reflect the number of transcripts or expressed genes.</li>
+      <li>The last two slider elements on the left can be used to resize the projection axes. This can be particularly useful when a projection contains a population of cell that is very far away from the rest and therefore creates a big empty space (which is not uncommon for UMAPs)</li>
+    </ul>
+    The plot is interactive (drag and zoom) but depending on the computer of the user and the number of cells displayed it can become very slow."
   )
 )
 
@@ -467,7 +465,7 @@ observeEvent(input[["overview_projection_export"]], {
 
   ## open dialog to select where plot should be saved and how the file should
   ## be named
-  shinyFileSave(
+  shinyFiles::shinyFileSave(
     input,
     id = "overview_projection_export",
     roots = volumes,
@@ -476,30 +474,28 @@ observeEvent(input[["overview_projection_export"]], {
   )
 
   ## retrieve info from dialog
-  fileinfo <- parseSavePath(volumes, input[["overview_projection_export"]])
+  save_file_input <- shinyFiles::parseSavePath(volumes, input[["overview_projection_export"]])
 
   ## only proceed if a path has been provided
-  if ( nrow(fileinfo) > 0 ) {
+  if ( nrow(save_file_input) > 0 ) {
 
     ## extract specified file path
-    file_output <- as.character(fileinfo$datapath[1])
+    save_file_path <- as.character(save_file_input$datapath[1])
 
     ## ggplot2 functions are necessary to create the plot
     require("ggplot2")
 
     ## get selected projection
     projection_to_display <- input[["overview_projection_to_display"]]
-    cells_to_display <- getCellIDs()
 
     ## merge cell positions in projection and meta data
-    to_plot <- cbind(
-        getProjection(projection_to_display)[ cells_to_display , ],
-        getMetaData()[ cells_to_display , ]
-      ) %>% 
-      as.data.frame()
+    cells_df <- cbind(getProjection(projection_to_display), getMetaData())
+
+    ## randomly remove cells (if necessary)
+    cells_df <- randomlySubsetCells(cells_df, input[["overview_percentage_cells_to_show"]])
 
     ## put rows in random order
-    to_plot <- to_plot[ sample(1:nrow(to_plot)) , ]
+    cells_df <- cells_df[ sample(1:nrow(cells_df)) , ]
 
     ## get X and Y scale limits
     xlim <- c(
@@ -526,112 +522,63 @@ observeEvent(input[["overview_projection_export"]], {
     ## ... selection projection consists of 2 dimensions
     } else if ( ncol(getProjection(projection_to_display)) == 2 ) {
 
-      ## check type of coloring variable
-      ## ... type is of character or factor
+      ## start building the plot
+      plot <- ggplot(
+          cells_df,
+          aes_q(
+            x = as.name(colnames(cells_df)[1]),
+            y = as.name(colnames(cells_df)[2]),
+            fill = as.name(input[["overview_point_color"]])
+          )
+        ) +
+        geom_point(
+          shape = 21,
+          size = input[["overview_point_size"]]/3,
+          stroke = 0.2,
+          color = "#c4c4c4",
+          alpha = input[["overview_point_opacity"]]
+        ) +
+        lims(x = xlim, y = ylim) +
+        theme_bw()
+
+      ## depending on type of cell coloring, add different color scale
+      ## ... categorical
       if (
-        is.factor(to_plot[[ input[["overview_point_color"]] ]]) ||
-        is.character(to_plot[[ input[["overview_point_color"]] ]])
+        is.factor(cells_df[[ input[["overview_point_color"]] ]]) ||
+        is.character(cells_df[[ input[["overview_point_color"]] ]])
       ) {
 
-        ## check for known groups to retrieve assigned colors
-        ## ... coloring variable is one of the grouping variables
-        if ( input[["overview_point_color"]] %in% getGroups() ) {
+        ## get colors for groups
+        colors_for_groups <- assignColorsToGroups(cells_df, input[["overview_point_color"]])
 
-          ## retrieve colors
-          colors_this_plot <- reactive_colors()[[ input[["overview_point_color"]] ]]
+        ## add color assignments
+        plot <- plot + scale_fill_manual(values = colors_for_groups)
 
-        ## ... coloring variable is one of the cell cycle variables
-        } else if ( input[["overview_point_color"]] %in% getCellCycle() ) {
-
-          ## retrieve colors
-          colors_this_plot <- reactive_colors()[[ input[["overview_point_color"]] ]]
-
-        ## ... coloring variable is type "factor"
-        } else if ( is.factor(to_plot[[ input[["overview_point_color"]] ]]) ) {
-
-          ## assign default colors
-          colors_this_plot <- setNames(
-            default_colorset[1:length(levels(to_plot[[ input[["overview_point_color"]] ]]))],
-            levels(to_plot[[ input[["overview_point_color"]] ]])
-          )
-
-        ## ... coloring variable is of type "character"
-        } else if ( is.character(to_plot[[ input[["overview_point_color"]] ]]) ) {
-
-          ## assign default colors
-          colors_this_plot <- setNames(
-            default_colorset[1:length(unique(to_plot[[ input[["overview_point_color"]] ]]))],
-            unique(to_plot[[ input[["overview_point_color"]] ]])
-          )
-
-        ## ... coloring variable is none of the above
-        } else {
-
-          ## use default colors
-          colors_this_plot <- default_colorset
-        }
-
-        ## prepare plot
-        p <- ggplot(
-            to_plot,
-            aes_q(
-              x = as.name(colnames(to_plot)[1]),
-              y = as.name(colnames(to_plot)[2]),
-              fill = as.name(input[["overview_point_color"]])
-            )
-          ) +
-          geom_point(
-            shape = 21,
-            size = input[["overview_point_size"]]/3,
-            stroke = 0.2,
-            color = "#c4c4c4",
-            alpha = input[["overview_point_opacity"]]
-          ) +
-          scale_fill_manual(values = colors_this_plot) +
-          lims(x = xlim, y = ylim) +
-          theme_bw()
-
-      ## ... type is neither character nor factor, most likely numeric
+      ## ... not categorical (probably numerical)
       } else {
 
-        ## prepare plot
-        p <- ggplot(
-            to_plot,
-            aes_q(
-              x = as.name(colnames(to_plot)[1]),
-              y = as.name(colnames(to_plot)[2]),
-              fill = as.name(input[["overview_point_color"]])
-            )
-          ) +
-          geom_point(
-            shape = 21,
-            size = input[["overview_point_size"]]/3,
-            stroke = 0.2,
-            color = "#c4c4c4",
-            alpha = input[["overview_point_opacity"]]
-          ) +
+        ## add continuous color scale
+        plot <- plot +
           scale_fill_distiller(
             palette = "YlGnBu",
             direction = 1,
             guide = guide_colorbar(frame.colour = "black", ticks.colour = "black")
-          ) +
-          lims(x = xlim, y = ylim) +
-          theme_bw()
+          )
       }
 
       ## save plot
       pdf(NULL)
-      ggsave(file_output, p, height = 8, width = 11)
+      ggsave(save_file_path, plot, height = 8, width = 11)
 
       ## check if file was succesfully saved
       ## ... successful
-      if ( file.exists(file_output) ) {
+      if ( file.exists(save_file_path) ) {
 
         ## give positive message
         shinyWidgets::sendSweetAlert(
           session = session,
           title = "Success!",
-          text = paste0("Plot saved successfully as: ", file_output),
+          text = paste0("Plot saved successfully as: ", save_file_path),
           type = "success"
         )
 

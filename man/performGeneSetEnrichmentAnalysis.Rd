@@ -8,8 +8,8 @@ performGeneSetEnrichmentAnalysis(
   object,
   assay = "RNA",
   GMT_file,
-  column_sample = "sample",
-  column_cluster = "cluster",
+  groups = NULL,
+  name = "cerebro_GSVA",
   thresh_p_val = 0.05,
   thresh_q_val = 0.1,
   ...
@@ -25,11 +25,11 @@ Seurat v3.0 or higher since the concept of assays wasn't implemented before.}
 The Broad Institute provides many gene sets which can be downloaded:
 http://software.broadinstitute.org/gsea/msigdb/index.jsp}
 
-\item{column_sample}{Column in object@meta.data that contains information
-about sample; defaults to 'sample'.}
+\item{groups}{Grouping variables (columns) in object@meta.data for which
+gene set enrichment analysis should be performed}
 
-\item{column_cluster}{Column in object@meta.data that contains information
-about cluster; defaults to 'cluster'.}
+\item{name}{Name of list that should be used to store the results in
+object@misc$enriched_pathways$<name>; defaults to 'cerebro_GSVA'.}
 
 \item{thresh_p_val}{Threshold for p-value, defaults to 0.05.}
 
@@ -38,12 +38,12 @@ about cluster; defaults to 'cluster'.}
 \item{...}{Further parameters can be passed to control GSVA::gsva().}
 }
 \value{
-Seurat object with GSVA results for samples and clusters stored in
-object@misc$enriched_pathways$GSVA.
+Seurat object with GSVA results for the specified grouping variables
+stored in object@misc$enriched_pathways$<name>
 }
 \description{
 This function calculates enrichment scores, p- and q-value
-statistics for provided gene sets for samples and clusters of cells in given
+statistics for provided gene sets for specified groups of cells in given
 Seurat object using gene set variation analysis (GSVA). Calculation of p- and
 q-values for gene sets is performed as done in "Evaluation of methods to
 assign cell type labels to cell clusters from single-cell RNA-sequencing
@@ -60,8 +60,7 @@ example_gene_set <- system.file("extdata/example_gene_set.gmt",
 pbmc <- performGeneSetEnrichmentAnalysis(
   object = pbmc,
   GMT_file = example_gene_set,
-  column_sample = 'sample',
-  column_cluster = 'seurat_clusters',
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
   thresh_p_val = 0.05,
   thresh_q_val = 0.1,
   parallel.sz = 1,

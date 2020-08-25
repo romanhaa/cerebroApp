@@ -8,63 +8,63 @@ server <- function(input, output, session) {
   ##--------------------------------------------------------------------------##
   source(
     system.file(
-      paste0("shiny/", version, "/overview/info.R"),
+      paste0("shiny/v1.1/overview/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE
   )
   source(
     system.file(
-      paste0("shiny/", version, "/samples/info.R"),
+      paste0("shiny/v1.1/samples/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE
   )
   source(
     system.file(
-      paste0("shiny/", version, "/clusters/info.R"),
+      paste0("shiny/v1.1/clusters/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE
   )
   source(
     system.file(
-      paste0("shiny/", version, "/most_expressed_genes/info.R"),
+      paste0("shiny/v1.1/most_expressed_genes/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE
   )
   source(
     system.file(
-      paste0("shiny/", version, "/marker_genes/info.R"),
+      paste0("shiny/v1.1/marker_genes/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE
   )
   source(
     system.file(
-      paste0("shiny/", version, "/enriched_pathways/info.R"),
+      paste0("shiny/v1.1/enriched_pathways/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE
   )
   source(
     system.file(
-      paste0("shiny/", version, "/gene_expression/info.R"),
+      paste0("shiny/v1.1/gene_expression/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE
   )
   source(
     system.file(
-      paste0("shiny/", version, "/gene_set_expression/info.R"),
+      paste0("shiny/v1.1/gene_set_expression/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE
   )
   source(
     system.file(
-      paste0("shiny/", version, "/trajectory/info.R"),
+      paste0("shiny/v1.1/trajectory/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE

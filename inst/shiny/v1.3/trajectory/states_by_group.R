@@ -91,15 +91,12 @@ output[["states_by_group_plot"]] <- plotly::renderPlotly({
   )
   
   ## merge trajectory data with meta data
-  temp_data <- cbind(
-    trajectory_data[["meta"]],
-    getMetaData()
-  )
+  cells_df <- cbind(trajectory_data[["meta"]], getMetaData())
 
   ## if the selected variable to color cells by contains numeric values, show
   ## cell counts by state, otherwise split the cell counts by the selected
   ## (categorical) variable
-  if ( is.numeric(temp_data[[ input[["trajectory_point_color"]] ]]) ) {
+  if ( is.numeric(cells_df[[ input[["trajectory_point_color"]] ]]) ) {
     grouping_variable <- "state"
   } else {
     grouping_variable <- input[["trajectory_point_color"]]
@@ -109,7 +106,7 @@ output[["states_by_group_plot"]] <- plotly::renderPlotly({
   ## - group table by state and selected variable
   ## - count number of cells for each combination of groups
   ## - add total cell count per state to each combination of groups
-  temp_data <- temp_data %>%
+  cells_df <- cells_df %>%
     dplyr::filter(!is.na(pseudotime)) %>%
     dplyr::group_by_at(c("state", grouping_variable)) %>%
     dplyr::summarise(count = n(), .groups = "drop") %>%
@@ -118,23 +115,8 @@ output[["states_by_group_plot"]] <- plotly::renderPlotly({
     dplyr::mutate(total = sum(count)) %>%
     dplyr::ungroup()
 
-  ## if the selected grouping variable is present in reactive_colors(), take
-  ## color assignments from there, otherwise use default_colorset
-  if ( grouping_variable %in% names(reactive_colors()) ) {
-    colors_this_plot <- reactive_colors()[[ grouping_variable ]]
-  } else {
-    if ( is.factor(temp_data[[ grouping_variable ]]) ) {
-      colors_this_plot <- setNames(
-        default_colorset[1:length(levels(temp_data[[ grouping_variable ]]))],
-        levels(temp_data[[ grouping_variable ]])
-      )
-    } else if ( is.character(temp_data[[ grouping_variable ]]) ) {
-      colors_this_plot <- setNames(
-        default_colorset[1:length(unique(temp_data[[ grouping_variable ]]))],
-        unique(temp_data[[ grouping_variable ]])
-      )
-    }
-  }
+  ## get colors for groups
+  colors_for_groups <- assignColorsToGroups(cells_df, grouping_variable)
 
   ## check which plot type is chosen
   ## ... bar chart
@@ -148,13 +130,13 @@ output[["states_by_group_plot"]] <- plotly::renderPlotly({
     if ( input[["states_by_group_show_as_percent"]] != TRUE ) {
 
       ## prepare plot
-      temp_data %>%
+      cells_df %>%
       plotly::plot_ly(
         x = ~state,
         y = ~count,
         type = "bar",
-        color = temp_data[[ grouping_variable ]],
-        colors = colors_this_plot,
+        color = cells_df[[ grouping_variable ]],
+        colors = colors_for_groups,
         hoverinfo = "text",
         text = ~paste0("<b>", .[[2]], ":</b> ", formatC(.$count, big.mark = ','))
       ) %>%
@@ -180,14 +162,14 @@ output[["states_by_group_plot"]] <- plotly::renderPlotly({
 
       ## - convert count to percentages
       ## - prepare plot
-      temp_data %>%
+      cells_df %>%
       dplyr::mutate(pct = count / total * 100) %>%
       plotly::plot_ly(
         x = ~state,
         y = ~pct,
         type = "bar",
-        color = temp_data[[ grouping_variable ]],
-        colors = colors_this_plot,
+        color = cells_df[[ grouping_variable ]],
+        colors = colors_for_groups,
         hoverinfo = "text",
         text = ~paste0("<b>", .[[2]], ":</b> ", format(round(.$pct, 1), nsmall = 1), "%")
       ) %>%
@@ -214,22 +196,22 @@ output[["states_by_group_plot"]] <- plotly::renderPlotly({
   } else if ( input[["states_by_group_plot_type"]] == "Sankey plot" ) {
 
     ## transform factor levels to integers (necessary for plotly)
-    temp_data[["source"]] <- as.numeric(temp_data[[1]]) - 1
-    temp_data[["target"]] <- as.numeric(temp_data[[2]]) - 1 + length(unique(temp_data[[1]]))
+    cells_df[["source"]] <- as.numeric(cells_df[[1]]) - 1
+    cells_df[["target"]] <- as.numeric(cells_df[[2]]) - 1 + length(unique(cells_df[[1]]))
 
     ## combine all factor levels in a single vector
-    all_groups <- c(levels(temp_data[[1]]), levels(temp_data[[2]]))
+    all_groups <- c(levels(cells_df[[1]]), levels(cells_df[[2]]))
 
     ##
     colors_states <- setNames(
-      default_colorset[1:length(levels(trajectory_data[["meta"]]$state))],
+      default_colorset[seq_along(levels(trajectory_data[["meta"]]$state))],
       levels(trajectory_data[["meta"]]$state)
     )
 
     ## get color code for all group levels (from both groups)
     colors_for_groups <- c(
         colors_states,
-        colors_this_plot
+        colors_for_groups
       )
 
     ## match color codes to group levels (from both groups)
@@ -257,9 +239,9 @@ output[["states_by_group_plot"]] <- plotly::renderPlotly({
         )
       ),
       link = list(
-        source = temp_data[["source"]],
-        target = temp_data[["target"]],
-        value =  temp_data[[3]],
+        source = cells_df[["source"]],
+        target = cells_df[["target"]],
+        value =  cells_df[[3]],
         hoverinfo = "all",
         hovertemplate = paste0(
           "<b>State:</b> %{source.label}<br>",
@@ -294,15 +276,12 @@ output[["states_by_group_table"]] <- DT::renderDataTable({
   )
   
   ## merge trajectory data with meta data
-  temp_data <- cbind(
-    trajectory_data[["meta"]],
-    getMetaData()
-  )
+  cells_df <- cbind(trajectory_data[["meta"]], getMetaData())
 
   ## if the selected variable to color cells by contains numeric values, show
   ## cell counts by state, otherwise split the cell counts by the selected
   ## (categorical) variable
-  if ( is.numeric(temp_data[[ input[["trajectory_point_color"]] ]]) ) {
+  if ( is.numeric(cells_df[[ input[["trajectory_point_color"]] ]]) ) {
     grouping_variable <- "state"
   } else {
     grouping_variable <- input[["trajectory_point_color"]]
@@ -312,7 +291,7 @@ output[["states_by_group_table"]] <- DT::renderDataTable({
   ## - group table by state and selected variable
   ## - count number of cells for each combination of groups
   ## - add total cell count per state to each combination of groups
-  temp_data <- temp_data %>%
+  cells_df <- cells_df %>%
     dplyr::filter(!is.na(pseudotime)) %>%
     dplyr::group_by_at(c("state", grouping_variable)) %>%
     dplyr::summarise(count = n(), .groups = "drop") %>%
@@ -323,12 +302,12 @@ output[["states_by_group_table"]] <- DT::renderDataTable({
 
   ## if percentages should be shown, normalize counts (to 100%)
   if ( input[["states_by_group_show_as_percent"]] == TRUE ) {
-    temp_data <- dplyr::mutate(temp_data, count = count / total)
+    cells_df <- dplyr::mutate(cells_df, count = count / total)
   }
 
   ## if grouping variable is not "state", spread the table by grouping variable
   if ( grouping_variable != "state" ) {
-    temp_data <- temp_data %>%
+    cells_df <- cells_df %>%
       tidyr::pivot_wider(
         id_cols = c("state", "total"),
         names_from = 2,
@@ -341,13 +320,13 @@ output[["states_by_group_table"]] <- DT::renderDataTable({
 
     ## if percentages should be shown, reorder and rename columns
     if ( input[["states_by_group_show_as_percent"]] == TRUE ) {
-      temp_data <- temp_data %>%
+      cells_df <- cells_df %>%
         dplyr::select(state, total, dplyr::everything()) %>%
         dplyr::rename("Percent" = count)
 
     ## if cell counts should be shown, remove "count" column
     } else {
-      temp_data <- temp_data %>%
+      cells_df <- cells_df %>%
         dplyr::select(-count)
     }
   }
@@ -355,13 +334,13 @@ output[["states_by_group_table"]] <- DT::renderDataTable({
   ## if percentages should be shown, set which columns contain percentage values,
   ## otherwise create empty vector
   if ( input[["states_by_group_show_as_percent"]] == TRUE ) {
-    columns_percentage <- c(3:ncol(temp_data))
+    columns_percentage <- c(3:ncol(cells_df))
   } else {
     columns_percentage <- NULL
   }
 
   ## rename columns and create table
-  temp_data %>%
+  cells_df %>%
   dplyr::rename(
     State = state,
     "# of cells" = total
@@ -387,7 +366,8 @@ observeEvent(input[["states_by_group_info"]], {
       states_by_group_info[["text"]],
       title = states_by_group_info[["title"]],
       easyClose = TRUE,
-      footer = NULL
+      footer = NULL,
+      size = "l"
     )
   )
 })
@@ -396,18 +376,7 @@ observeEvent(input[["states_by_group_info"]], {
 ## Text in info box.
 ##----------------------------------------------------------------------------##
 
-## TODO: update
 states_by_group_info <- list(
-  title = "Composition of states by sample",
-  text = p("Percentage bar plot representation of the composition of states by sample. Allows to see which samples contribute most strongly to each state. Samples can be removed from the plot by clicking on them in the legend.")
-)
-
-trajectory_number_of_cells_by_state_info <- list(
-  title = "Number of cells by state",
-  text = p("This table shows how many cells are assigned to each state. If the variable selected to color the cells in the projection is categorical, e.g. 'sample' or 'cluster', the number of cells in each state is also split into the subgroups.")
-)
-
-states_by_cell_cycle_seurat_info <- list(
-  title = "Composition of states by cell cycle (Seurat)",
-  text = p("Cell cycle distribution by sample using the method embedded in the Seurat framework. For each cell, it calculates scores for both G2M and S phase based on lists of genes (see 'Analysis info' tab on the left) and assigns the cell cycle phase on the basis of these scores.")
+  title = "Composition of states by another group",
+  text = p("This plot allows to see how state assignments relate to other cells groupings, e.g. clusters or cell cycle assignments. The grouping that the states are compared to depends on the variable that was selected to color cells in the projection plot. If you selected a continuous variable, e.g. the number of transcripts per cell (nUMI), then only the states will be shown. The composition of states by another group can be represented as a bar char or a Sankey plot. Optionally, a table can be shown below. To highlight composition in very small cell groups, results can be shown as percentages rather than actual cell counts. Groups can be removed from the plot by clicking on them in the legend.")
 )

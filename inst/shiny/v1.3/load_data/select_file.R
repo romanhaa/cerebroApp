@@ -9,7 +9,11 @@
 ##----------------------------------------------------------------------------##
 
 output[["load_data_select_file_UI"]] <- renderUI({
-  if ( .GlobalEnv$Cerebro.options[["mode"]] == "open" ) {
+  if (
+    exists('Cerebro.options') &&
+    !is.null(Cerebro.options[['mode']]) &&
+    .GlobalEnv$Cerebro.options[["mode"]] == "open"
+  ) {
     tagList(
       fluidRow(
         htmlOutput("load_data_mode_open")

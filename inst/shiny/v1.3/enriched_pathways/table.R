@@ -9,6 +9,14 @@
 ##----------------------------------------------------------------------------##
 
 output[["enriched_pathways_table_UI"]] <- renderUI({
+
+  ##
+  req(
+    input[["enriched_pathways_selected_method"]],
+    input[["enriched_pathways_selected_group"]]
+  )
+
+  ##
   fluidRow(
     cerebroBox(
       title = tagList(
@@ -34,30 +42,29 @@ output[["enriched_pathways_table_or_text_UI"]] <- renderUI({
   )
 
   ## fetch results
-  results <- getEnrichedPathways(
+  results_type <- getEnrichedPathways(
     input[["enriched_pathways_selected_method"]],
     input[["enriched_pathways_selected_group"]]
   )
 
-  ## TODO: probably some of these outputs are not needed anymore, check with
-  ##       function that generates the output
+  ## depending on the content of the results slot, show a text message or
+  ## switches and table
   if (
-    is.character(results) &&
-    results == "no_markers_found"
+    is.character(results_type) &&
+    results_type == "no_markers_found"
   ) {
     textOutput("enriched_pathways_message_no_markers_found")
   } else if (
-    is.character(results) &&
-    results == "no_gene_sets_enriched"
+    is.character(results_type) &&
+    results_type == "no_pathways_found"
+  ) {
+    textOutput("enriched_pathways_message_no_pathways_found")
+  } else if (
+    is.character(results_type) &&
+    results_type == "no_gene_sets_enriched"
   ) {
     textOutput("enriched_pathways_message_no_gene_sets_enriched")
-  } else if (
-    is.character(results) &&
-    ## TODO: adjust output of function to catch this message
-    results == "only_one_group_level"
-  ) {
-    textOutput("enriched_pathways_message_only_one_group_level")
-  } else if ( is.data.frame(results) ) {
+  } else if ( is.data.frame(results_type) ) {
     fluidRow(
       column(12,
         shinyWidgets::materialSwitch(
@@ -77,7 +84,7 @@ output[["enriched_pathways_table_or_text_UI"]] <- renderUI({
         shinyWidgets::materialSwitch(
           inputId = "enriched_pathways_table_color_highlighting",
           label = "Highlight values with colors:",
-          value = FALSE,
+          value = TRUE,
           status = "primary",
           inline = TRUE
         )
@@ -99,10 +106,27 @@ output[["enriched_pathways_table_or_text_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 
 output[["enriched_pathways_filter_subgroups_UI"]] <- renderUI({
+
+  ##
   req(
     input[["enriched_pathways_selected_method"]],
     input[["enriched_pathways_selected_group"]]
   )
+
+  ## fetch results
+  results_df <- getEnrichedPathways(
+    input[["enriched_pathways_selected_method"]],
+    input[["enriched_pathways_selected_group"]]
+  )
+
+  ## check for which groups results exist
+  if ( is.character(results_df[[1]]) ) {
+    available_groups <- unique(results_df[[1]])
+  } else if ( is.factor(results_df[[1]]) ) {
+    available_groups <- levels(results_df[[1]])
+  }
+
+  ##
   if ( input[["enriched_pathways_table_filter_switch"]] == TRUE ) {
     fluidRow()
   } else {
@@ -111,7 +135,7 @@ output[["enriched_pathways_filter_subgroups_UI"]] <- renderUI({
         selectInput(
           "enriched_pathways_table_select_group_level",
           label = "Filter results for subgroup:",
-          choices = getGroupLevels(input[["enriched_pathways_selected_group"]])
+          choices = available_groups
         )
       )
     )
@@ -132,47 +156,48 @@ output[["enriched_pathways_table"]] <- DT::renderDataTable(server = FALSE, {
   )
 
   ## fetch results
-  table <- getEnrichedPathways(
+  results_df <- getEnrichedPathways(
     input[["enriched_pathways_selected_method"]],
     input[["enriched_pathways_selected_group"]]
   )
 
   req(
-    is.data.frame(table)
+    is.data.frame(results_df)
   )
 
   ## filter the table for a specific subgroup only if specified by the user
   ## (otherwise show all results)
   if ( input[["enriched_pathways_table_filter_switch"]] == FALSE ) {
-    table <- table %>%
+    results_df <- results_df %>%
       dplyr::filter_at(1, dplyr::all_vars(. == input[["enriched_pathways_table_select_group_level"]]))
   }
 
   ## if the table is empty, e.g. because the filtering of results for a specific
   ## subgroup did not work properly, skip the processing and show and empty
   ## table (otherwise the procedure would result in an error)
-  if ( nrow(table) == 0 ) {
-    table %>%
+  if ( nrow(results_df) == 0 ) {
+    results_df %>%
     as.data.frame() %>%
     dplyr::slice(0) %>%
     prepareEmptyTable()
-  ## if there is at least 1 row, create proper table
-  } else if ( nrow(table) > 0 ) {
+
+  ## ... if there is at least 1 row, create proper table
+  } else if ( nrow(results_df) > 0 ) {
 
     ## check if data frame comes from the enrichR cerebroApp function
     columns_hide <- c()
     if (
-      any(grepl(colnames(table), pattern = "Term")) &&
-      any(grepl(colnames(table), pattern = "Old.P.value")) &&
-      any(grepl(colnames(table), pattern = "Old.Adjusted.P.value"))
+      any(grepl(colnames(results_df), pattern = "Term")) &&
+      any(grepl(colnames(results_df), pattern = "Old.P.value")) &&
+      any(grepl(colnames(results_df), pattern = "Old.Adjusted.P.value"))
     ) {
       columns_hide <- c()
-      columns_hide <- c(columns_hide, grep(colnames(table), pattern = "Old.P.value"))
-      columns_hide <- c(columns_hide, grep(colnames(table), pattern = "Old.Adjusted.P.value"))
+      columns_hide <- c(columns_hide, grep(colnames(results_df), pattern = "Old.P.value"))
+      columns_hide <- c(columns_hide, grep(colnames(results_df), pattern = "Old.Adjusted.P.value"))
     }
 
     prettifyTable(
-      table,
+      results_df,
       filter = list(position = "top", clear = TRUE),
       dom = "Bfrtlip",
       show_buttons = TRUE,
@@ -189,7 +214,6 @@ output[["enriched_pathways_table"]] <- DT::renderDataTable(server = FALSE, {
       page_length_menu = c(20, 50, 100)
     )
   }
-
 })
 
 ##----------------------------------------------------------------------------##
@@ -197,23 +221,23 @@ output[["enriched_pathways_table"]] <- DT::renderDataTable(server = FALSE, {
 ##----------------------------------------------------------------------------##
 
 output[["enriched_pathways_message_no_markers_found"]] <- renderText({
-  "No marker genes were identified for this group, which are required to perform pathway enrichment analysis with Enrichr."
+  "No marker genes were identified for any of the subpopulations of this grouping variable, which are required to perform pathway enrichment analysis with Enrichr."
 })
 
 ##----------------------------------------------------------------------------##
-## Alternative text message if no pathways were enriched.
+## Alternative text message if no pathways were enriched (Enrichr).
+##----------------------------------------------------------------------------##
+
+output[["enriched_pathways_message_no_pathways_found"]] <- renderText({
+  "Enrichr did not find any pathway to be enriched in any subpopulation of this grouping variable."
+})
+
+##----------------------------------------------------------------------------##
+## Alternative text message if no gene sets were enriched (GSVA).
 ##----------------------------------------------------------------------------##
 
 output[["enriched_pathways_message_no_gene_sets_enriched"]] <- renderText({
-  "No gene sets were found to be enriched (with the selected statistical thresholds) in any group."
-})
-
-##----------------------------------------------------------------------------##
-## Alternative text message if there is only one level in the group.
-##----------------------------------------------------------------------------##
-
-output[["enriched_pathways_message_only_one_group_level"]] <- renderText({
-  "The selected grouping variable consists of a single level which means pathway enrichment analysis cannot be applied."
+  "No gene sets were found to be enriched (considering the selected statistical thresholds) by GSVA in any of the subpopulations of this grouping variable."
 })
 
 ##----------------------------------------------------------------------------##
@@ -234,7 +258,8 @@ observeEvent(input[["enriched_pathways_info"]], {
       enriched_pathways_info[["text"]],
       title = enriched_pathways_info[["title"]],
       easyClose = TRUE,
-      footer = NULL
+      footer = NULL,
+      size = "l"
     )
   )
 })
@@ -243,16 +268,24 @@ observeEvent(input[["enriched_pathways_info"]], {
 ## Text in info box.
 ##----------------------------------------------------------------------------##
 
-## TODO: update description
 enriched_pathways_info <- list(
   title = "Enriched pathways",
-  text = HTML(
-    "<p>At the moment, Cerebro supports to perform pathway enrichment analysis through two methods which work in different ways: Enrichr, GSVA.<br>
+  text = HTML("
+    At the moment, Cerebro supports two different ways to perform pathway enrichment analysis (Enrichr, GSVA). However, in principle results from any method or tool can be added to the Cerebro object.<br>
     <br>
     <b>Enrichr</b><br>
-    Using all marker genes identified for a respective sample, gene list enrichment analysis is performed using the Enrichr API, including gene ontology terms, KEGG and Wiki Pathways, BioCarta and many others. Terms are sorted based on the combined score. By default, the genes that overlap between the marker gene list and a term are not shown (for better visibility) but the column can be added using the 'Column visibility' button. For the details on the combined score is calculated, please refer to the <a target='_blank' href='http://amp.pharm.mssm.edu/Enrichr/'>Enrichr website</a> and publication.<br>
+    Using all marker genes identified for a respective group of cells, gene list enrichment analysis is performed using the Enrichr API, including gene ontology terms, KEGG and Wiki Pathways, BioCarta and many others. Terms are sorted based on the combined score. By default, the genes that overlap between the marker gene list and a term are not shown (for better visibility) but the column can be added using the 'Column visibility' button. For the details on the combined score is calculated, please refer to the <a target='_blank' href='http://amp.pharm.mssm.edu/Enrichr/'>Enrichr website</a> and publication.<br>
     <br>
     <b>GSVA</b><br>
-    GSVA (Gene Set Variation Analysis) is a method to perform gene set enrichment analysis. Diaz-Mejia and colleagues found GSVA to perform well compared to other tools ('Evaluation of methods to assign cell type labels to cell clusters from single-cell RNA-sequencing data' F1000Research, 2019). Statistics (p-value and adj. p-value) are calculated as done by Diaz-Mejia et al. Columns with the gene lists for each term and the enrichment score are hidden by default but can be made visible through the 'Column visibility' button. More details about GSVA can be found on the <a target='_blank', href='https://bioconductor.org/packages/release/bioc/html/GSVA.html'>GSVA Bioconductor page</a>."
+    GSVA (Gene Set Variation Analysis) is a method to perform gene set enrichment analysis. Diaz-Mejia and colleagues found GSVA to perform well compared to other tools ('Evaluation of methods to assign cell type labels to cell clusters from single-cell RNA-sequencing data' F1000Research, 2019). Statistics (p-value and adj. p-value) are calculated as done by Diaz-Mejia et al. Columns with the gene lists for each term and the enrichment score are hidden by default but can be made visible through the 'Column visibility' button. More details about GSVA can be found on the <a target='_blank', href='https://bioconductor.org/packages/release/bioc/html/GSVA.html'>GSVA Bioconductor page</a>.
+    <h4>Options</h4>
+    <b>Show results for all subgroups (no filtering)</b><br>
+    When active, the subgroup section element will disappear and instead the table will be shown for all subgroups. Subgroups can still be selected through the dedicated column filter, which also allows to select multiple subgroups at once. While using the column filter is more elegant, it can become laggy with very large tables, hence to option to filter the table beforehand.<br>
+    <b>Automatically format numbers</b><br>
+    When active, columns in the table that contain different types of numeric values will be formatted based on what they <u>seem</u> to be. The algorithm will look for integers (no decimal values), percentages, p-values, log-fold changes and apply different formatting schemes to each of them. Importantly, this process does that always work perfectly. If it fails and hinders working with the table, automatic formatting can be deactivated.<br>
+    <b>Highlight values with colors</b><br>
+    Similar to the automatic formatting option, when active, Cerebro will look for known columns in the table (those that contain grouping variables), try to interpret column content, and use colors and other stylistic elements to facilitate quick interpretation of the values. If you prefer the table without colors and/or the identification does not work properly, you can simply deactivate this feature.<br>
+    <br>
+    <em>Columns can be re-ordered by dragging their respective header.</em>"
   )
 )

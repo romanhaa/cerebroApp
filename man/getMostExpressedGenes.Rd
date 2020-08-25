@@ -2,46 +2,37 @@
 % Please edit documentation in R/getMostExpressedGenes.R
 \name{getMostExpressedGenes}
 \alias{getMostExpressedGenes}
-\title{Get most expressed genes for every sample and cluster in Seurat
+\title{Get most expressed genes for specified grouping variables in Seurat
 object.}
 \usage{
-getMostExpressedGenes(
-  object,
-  assay = "RNA",
-  column_sample = "sample",
-  column_cluster = "cluster"
-)
+getMostExpressedGenes(object, assay = "RNA", groups = NULL)
 }
 \arguments{
 \item{object}{Seurat object.}
 
-\item{assay}{Assay to pull counts from; defaults to 'RNA'. Only relevant in
-Seurat v3.0 or higher since the concept of assays wasn't implemented before.}
+\item{assay}{Assay to pull transcripts counts from; defaults to 'RNA'.}
 
-\item{column_sample}{Column in object@meta.data that contains information
-about sample; defaults to 'sample'.}
-
-\item{column_cluster}{Column in object@meta.data that contains information
-about cluster; defaults to 'cluster'.}
+\item{groups}{Grouping variables (columns) in object@meta.data for which most
+expressed genes should be calculated; defaults to NULL.}
 }
 \value{
-Seurat object with most expressed genes stored for every sample and
-cluster stored in object@misc$most_expressed_genes.
+Seurat object with most expressed genes stored for every group level
+of the specified groups stored in object@misc$most_expressed_genes.
 }
 \description{
-This function calculates the most expressed genes for every
-sample and cluster of the Seurat object.
+This function calculates the most expressed genes for one or
+multiple grouping variables in the meta data of the provided Seurat object.
 }
 \details{
-Get most expressed genes for every sample and cluster in Seurat object.
+Get most expressed genes for specified grouping variables in Seurat object.
 }
 \examples{
-pbmc <- readRDS(system.file("extdata/v1.2/seurat_pbmc.rds",
+pbmc <- readRDS(system.file("extdata/v1.3/seurat_pbmc.rds",
   package = "cerebroApp"))
 pbmc <- getMostExpressedGenes(
   object = pbmc,
-  column_sample = 'sample',
-  column_cluster = 'seurat_clusters'
+  assay = 'RNA',
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main')
 )
 }
 \keyword{Cerebro}

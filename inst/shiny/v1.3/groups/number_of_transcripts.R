@@ -97,7 +97,8 @@ observeEvent(input[["groups_nUMI_info"]], {
       groups_nUMI_info[["text"]],
       title = groups_nUMI_info[["title"]],
       easyClose = TRUE,
-      footer = NULL
+      footer = NULL,
+      size = "l"
     )
   )
 })

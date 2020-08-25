@@ -34,6 +34,7 @@ pbmc <- readRDS(system.file("extdata/v1.2/seurat_pbmc.rds",
   package = "cerebroApp"))
 pbmc <- addPercentMtRibo(
   object = pbmc,
+  assay = 'RNA',
   organism = 'hg',
   gene_nomenclature = 'name'
 )

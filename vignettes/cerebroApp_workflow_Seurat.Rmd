@@ -1,6 +1,6 @@
 ---
-title: Introduction to the cerebroApp workflow
-author: Roman Hillje
+title: "Introduction to the cerebroApp workflow (Seurat)"
+author: "Roman Hillje"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   html_document:
@@ -49,6 +49,7 @@ library(BiocManager)
 
 if ( 'cerebroApp' %in% installed.packages() == FALSE ) install('cerebroApp')
 if ( 'Seurat' %in% installed.packages() == FALSE ) install('Seurat')
+if ( 'SingleR' %in% installed.packages() == FALSE ) install('SingleR')
 if ( 'monocle' %in% installed.packages() == FALSE ) install('monocle')
 ```
 
@@ -61,11 +62,34 @@ Apart from the packages we just installed, we will also load the dplyr and devto
 ```{r setup, message=FALSE, warning=FALSE}
 library(dplyr)
 library(Seurat)
+library(SingleR)
 library(monocle)
-library(cerebroApp)
+# library(cerebroApp)
 library(devtools)
 
 set.seed(1234567)
+```
+
+This is just for testing (TODO: remove).
+
+```{r}
+library(shiny)
+library(shinydashboard)
+library(SingleCellExperiment)
+```
+
+This is just for testing (TODO: remove).
+
+```{r}
+source('~/Research/GitHub/cerebroApp_v1.3/R/Cerebro_v1.3-class.R')
+source('~/Research/GitHub/cerebroApp_v1.3/R/getMostExpressedGenes.R')
+source('~/Research/GitHub/cerebroApp_v1.3/R/getMarkerGenes.R')
+source('~/Research/GitHub/cerebroApp_v1.3/R/send_enrichr_query.r')
+source('~/Research/GitHub/cerebroApp_v1.3/R/getEnrichedPathways.R')
+source('~/Research/GitHub/cerebroApp_v1.3/R/read_GMT_file.R')
+source('~/Research/GitHub/cerebroApp_v1.3/R/performGeneSetEnrichmentAnalysis.R')
+source('~/Research/GitHub/cerebroApp_v1.3/R/exportFromSeurat.R')
+source('~/Research/GitHub/cerebroApp_v1.3/R/exportFromSCE.R')
 ```
 
 ## Load count data
@@ -182,7 +206,6 @@ seurat@misc$parameters <- list(
   keep_mitochondrial_genes = TRUE,
   variables_to_regress_out = 'nUMI',
   number_PCs = 30,
-  tSNE_perplexity = 30,
   cluster_resolution = 0.5
 )
 
@@ -193,9 +216,69 @@ seurat@misc$parameters$filtering <- list(
   genes_max = Inf
 )
 
+seurat@misc$technical_info$cerebroApp_version <- utils::packageVersion('cerebroApp')
+seurat@misc$technical_info$Seurat <- utils::packageVersion('Seurat')
 seurat@misc$technical_info <- list(
   'R' = capture.output(session_info())
 )
+```
+
+## Assign cell types
+
+TODO: add description here
+
+```{r cell_type_assignment}
+singler_ref <- BlueprintEncodeData()
+
+singler_results_blueprintencode_main <- SingleR(
+  test = GetAssayData(seurat, assay = 'RNA', slot = 'data'),
+  ref = singler_ref,
+  labels = singler_ref@colData@listData$label.main
+)
+
+seurat@meta.data$cell_type_singler_blueprintencode_main <- singler_results_blueprintencode_main@listData$labels
+
+singler_scores <- singler_results_blueprintencode_main@listData$scores %>%
+  as_tibble() %>%
+  dplyr::mutate(assigned_score = NA)
+
+for ( i in seq_len(nrow(singler_scores)) ) {
+  singler_scores$assigned_score[i] <- singler_scores[[singler_results_blueprintencode_main@listData$labels[i]]][i]
+}
+
+seurat@meta.data$cell_type_singler_blueprintencode_main_score <- singler_scores$assigned_score
+```
+
+## Calculate relationship trees
+
+TODO: add description here
+
+### Clusters
+
+```{r build_phylogenetic_tree_for_clusters}
+Idents(pbmc_Seurat) <- "seurat_clusters"
+pbmc_Seurat <- BuildClusterTree(
+  pbmc_Seurat,
+  dims = 1:30,
+  reorder = TRUE,
+  reorder.numeric = TRUE,
+  verbose = FALSE
+)
+pbmc_Seurat@misc$trees$seurat_clusters <- pbmc_Seurat@tools$BuildClusterTree
+```
+
+### Cell types
+
+```{r build_phylogenetic_tree_for_cell_types}
+Idents(pbmc_Seurat) <- "cell_type_singler_blueprintencode_main"
+pbmc_Seurat <- BuildClusterTree(
+  pbmc_Seurat,
+  dims = 1:30,
+  reorder = FALSE,
+  reorder.numeric = FALSE,
+  verbose = FALSE
+)
+pbmc_Seurat@misc$trees$cell_type_singler_blueprintencode_main <- pbmc_Seurat@tools$BuildClusterTree
 ```
 
 ## cerebroApp functions (optional but recommended)
@@ -220,10 +303,10 @@ Another interesting perspective is to look at the 100 most expressed genes in ev
 This can help in understanding the transcriptional activity of a given cell population.
 
 ```{r getMostExpressedGenes}
-seurat <- getMostExpressedGenes(
+seurat <- pbmc_Seurat <- getMostExpressedGenes(
   seurat,
-  column_sample = 'sample',
-  column_cluster = 'seurat_clusters'
+  assay = 'RNA',
+  groups = c('seurat_clusters','cell_type_singler_blueprintencode_main')
 )
 ```
 
@@ -236,9 +319,10 @@ We can identify marker genes using the `getMarkerGenes()` function which interna
 ```{r getMarkerGenes}
 seurat <- getMarkerGenes(
   seurat,
+  assay = 'RNA',
   organism = 'hg',
-  column_sample = 'sample',
-  column_cluster = 'seurat_clusters',
+  groups = c('seurat_clusters','cell_type_singler_blueprintencode_main'),
+  name = 'cerebro_seurat',
   only_pos = TRUE
 )
 ```
@@ -251,8 +335,7 @@ The function will internally use the [Enrichr](https://amp.pharm.mssm.edu/Enrich
 ```{r getEnrichedPathways}
 seurat <- getEnrichedPathways(
   seurat,
-  column_sample = 'sample',
-  column_cluster = 'seurat_clusters',
+  marker_genes_input = 'cerebro_seurat',
   adj_p_cutoff = 0.01,
   max_terms = 100
 )
@@ -268,13 +351,9 @@ example_gene_set <- system.file("extdata/example_gene_set.gmt", package = "cereb
 
 seurat <- performGeneSetEnrichmentAnalysis(
   seurat,
+  assay = 'RNA',
   GMT_file = example_gene_set,
-  column_sample = 'sample',
-  column_cluster = 'seurat_clusters',
-  thresh_p_val = 0.05,
-  thresh_q_val = 0.1,
-  parallel.sz = 1,
-  verbose = FALSE
+  groups = c('seurat_clusters','cell_type_singler_blueprintencode_main')
 )
 ```
 
@@ -309,12 +388,16 @@ Finally, we use the `exportFromSeurat()` function of cerebroApp to export our Se
 ```{r export_data}
 exportFromSeurat(
   seurat,
-  experiment_name = 'pbmc',
+  assay = 'RNA',
+  slot = 'data',
   file = paste0('cerebro_pbmc_', Sys.Date(), '.crb'),
+  experiment_name = 'pbmc',
   organism = 'hg',
-  column_cluster = 'seurat_clusters',
+  columns_groups = c('seurat_clusters','cell_type_singler_blueprintencode_main'),
   column_nUMI = 'nCount_RNA',
-  column_nGene = 'nFeature_RNA'
+  column_nGene = 'nFeature_RNA',
+  add_all_meta_data = TRUE,
+  verbose = FALSE
 )
 ```
 

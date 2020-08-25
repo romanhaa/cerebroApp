@@ -4,13 +4,14 @@
 \alias{launchCerebro}
 \title{Launch Cerebro interface.}
 \usage{
-launchCerebro(version = "v1.2", maxFileSize = 800)
+launchCerebro(version = "v1.3", ...)
 }
 \arguments{
-\item{version}{Which version of Cerebro to launch: "v1.0", "v1.1", "v1.2".
-Defaults to "v1.2".}
+\item{version}{Which version of Cerebro to launch: "v1.0", "v1.1", "v1.2",
+"v1.3"; defaults to "v1.3".}
 
-\item{maxFileSize}{Maximum size of input file; defaults to 800 MB.}
+\item{...}{Further parameters that are used by the specific versions of
+Cerebro. See `launchCerebroV1.x()` for details.}
 }
 \value{
 Shiny application.
@@ -23,7 +24,7 @@ Launch Cerebro interface.
 }
 \examples{
 if ( interactive() ) {
-  launchCerebro(maxFileSize = 800)
+  launchCerebro(version = "v1.3")
 }
 }
 \keyword{Cerebro}

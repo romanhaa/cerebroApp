@@ -44,13 +44,13 @@ output[["data_set_info_general"]] <- renderText({
   parameters_raw <- getParameters()
   parameters_content <- c()
   ## go through list of parameters
-  for ( i in 1:length(parameters_raw)) {
+  for ( i in seq_along(parameters_raw)) {
     ## ... if item is a list itself
     if ( is.list(parameters_raw[[i]]) ) {
       ## prepare sub-header and initiate new list
       temp_parameters_content <- c("<li><b>", names(parameters_raw)[i],":</b><ul>")
       ## add items to new list
-      for ( j in 1:length(parameters_raw[[i]])) {
+      for ( j in seq_along(parameters_raw[[i]])) {
         ## prepare HTML version of info
         temp_parameters_content_sub <- paste0(
           "<li><b>", names(parameters_raw[[i]])[j], ":</b> ", parameters_raw[[i]][[j]]
@@ -81,7 +81,7 @@ output[["data_set_info_general"]] <- renderText({
   ## collect gene lists
   gene_lists_raw <- getGeneLists()
   gene_lists_content <- c()
-  for ( i in 1:length(gene_lists_raw)) {
+  for ( i in seq_along(gene_lists_raw)) {
     temp_gene_lists_content <- paste0(
       "<li><b>", names(gene_lists_raw)[i], ":</b> ",
       paste0(gene_lists_raw[[i]], collapse = ", ")
@@ -95,51 +95,16 @@ output[["data_set_info_general"]] <- renderText({
     "</ul>"
   )
 
-  # "<strong><u>Marker genes</u></strong>",
-  # "<ul>",
-  #   "<li><b>Only positive:</b> ",
-  #   sample_data()$marker_genes$parameters$only_positive,
-  #   "<li><b>Fraction of cells in group of interest that must express marker gene:</b> ",
-  #   sample_data()$marker_genes$parameters$minimum_percentage,
-  #   "<li><b>LogFC threshold:</b> ",
-  #   sample_data()$marker_genes$parameters$logFC_threshold,
-  #   "<li><b>p-value threshold:</b> ",
-  #   sample_data()$marker_genes$parameters$p_value_threshold,
-  #   "<li><b>Test:</b> ",
-  #   sample_data()$marker_genes$parameters$test,
-  # "</ul>",
-  # "<strong><u>Pathway enrichment</u></strong>",
-  # "<ul>",
-  #   "<li><b>Enrichr:</b>",
-  #   "<ul>",
-  #     "<li><b>Databases:</b> ",
-  #     paste0(sample_data()$enriched_pathways$enrichr$parameters$databases, collapse = ", "),
-  #     "<li><b>Adj. p-value cut-off:</b> ",
-  #     sample_data()$enriched_pathways$enrichr$parameters$adj_p_cutoff,
-  #     "<li><b>Max. terms:</b> ",
-  #     sample_data()$enriched_pathways$enrichr$parameters$max_terms,
-  #   "</ul>",
-  #   "<li><b>GSVA:</b>",
-  #   "<ul>",
-  #     "<li><b>GMT file:</b> ",
-  #     sample_data()$enriched_pathways$GSVA$parameters$GMT_file,
-  #     "<li><b>p-value cut-off:</b> ",
-  #     sample_data()$enriched_pathways$GSVA$parameters$thresh_p_val,
-  #     "<li><b>q-value cut-off:</b> ",
-  #     sample_data()$enriched_pathways$GSVA$parameters$thresh_q_val,
-  #   "</ul>",
-  # "</ul>"
-
   ## collect technical info
   technical_info_raw <- getTechnicalInfo()
   info_R_raw <- technical_info_raw$R
   info_R <- c()
-  for ( i in 1:length(info_R_raw) ) {
+  for ( i in seq_along(info_R_raw) ) {
     info_R <- paste(info_R, "<br>", info_R_raw[i])
   }
   technical_info_raw$R <- NULL
   technical_info_content <- c()
-  for ( i in 1:length(technical_info_raw)) {
+  for ( i in seq_along(technical_info_raw) ) {
     temp_technical_info_content <- paste0(
       "<li><b>", names(technical_info_raw)[i], ":</b> ", technical_info_raw[[i]]
     )
@@ -155,21 +120,6 @@ output[["data_set_info_general"]] <- renderText({
     info_R,
     "</pre>"
   )
-
-
-  # technical_info <- paste0(
-  #   "<strong><u>Technical info</u></strong>",
-  #   "<ul>",
-  #     "<li><strong>cerebroApp version:</strong> ",
-  #     getTechnicalInfo()$cerebroApp_version,
-  #     "<li><strong>Seurat version:</strong> ",
-  #     getTechnicalInfo()$seurat_version,
-  #     "<li><strong>R session info:</strong> ",
-  #   "</ul>",
-  #   "<pre>",
-  #   info_R,
-  #   "</pre>"
-  # )
 
   ## merge all parts
   paste0(

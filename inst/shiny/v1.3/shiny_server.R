@@ -112,20 +112,47 @@ server <- function(input, output, session) {
   })
 
   ##--------------------------------------------------------------------------##
-  ## Sample data.
+  ## Load data set.
   ##--------------------------------------------------------------------------##
-  sample_data <- reactive({
-    if ( is.null(input[["input_file"]]) || is.na(input[["input_file"]]) ) {
-      sample_data <- readRDS(
-        # system.file("extdata/v1.3/example.rds", package = "cerebroApp")
-        ## TODO: change path
-        "~/Dropbox/Cerebro_development/pbmc_Seurat.crb"
+
+  data_set <- reactive({
+
+    ## check what data to load
+    ## ... a .crb file was specified to be loaded into Cerebro on launch and
+    ##     the file exists
+    if (
+      !is.null(.GlobalEnv$Cerebro.options[["crb_file_to_load"]]) &&
+      file.exists(.GlobalEnv$Cerebro.options[["crb_file_to_load"]])
+    ) {
+
+      ## load the specified file
+      data <- readRDS(.GlobalEnv$Cerebro.options[["crb_file_to_load"]])
+
+    ## ... no file was specified to be loaded
+    } else if (
+      is.null(input[["input_file"]]) ||
+      is.na(input[["input_file"]])
+    ) {
+
+      ## load small example data set
+      data <- readRDS(
+        system.file("extdata/v1.3/example.rds", package = "cerebroApp")
       )
+
+    ## ... none of the above
     } else {
-      req(input[["input_file"]])
-      sample_data <- readRDS(input[["input_file"]]$datapath)
+
+      ## wait until input file was specified in "Load data" element
+      req(
+        input[["input_file"]]
+      )
+
+      ## load specified file
+      data <- readRDS(input[["input_file"]]$datapath)
     }
-    return(sample_data)
+
+    ## return loaded data
+    return(data)
   })
 
   ##--------------------------------------------------------------------------##
@@ -584,97 +611,95 @@ server <- function(input, output, session) {
   }
 
   ##--------------------------------------------------------------------------##
-  ## Functions to get sample data.
+  ## Functions to interact with data set.
   ##
-  ## Never directly interact with sample data: sample_data()
+  ## Never directly interact with data set: data_set()
   ## This ensures that ...
   ##--------------------------------------------------------------------------##
   getExperiment <- function() {
-    return(sample_data()$getExperiment())
+    return(data_set()$getExperiment())
   }
   getParameters <- function() {
-    return(sample_data()$getParameters())
+    return(data_set()$getParameters())
   }
   getTechnicalInfo <- function() {
-    return(sample_data()$getTechnicalInfo())
+    return(data_set()$getTechnicalInfo())
   }
   getGeneLists <- function() {
-    return(sample_data()$getGeneLists())
+    return(data_set()$getGeneLists())
   }
   getExpression <- function() {
-    return(sample_data()$getExpression())
+    return(data_set()$getExpression())
   }
   getCellIDs <- function() {
-    return(colnames(sample_data()$getExpression()))
+    return(colnames(data_set()$getExpression()))
   }
   getGeneNames <- function() {
-    return(rownames(sample_data()$getExpression()))
+    return(rownames(data_set()$getExpression()))
   }
   getGroups <- function() {
-    return(sample_data()$getGroups())
+    return(data_set()$getGroups())
   }
   getGroupLevels <- function(group) {
-    return(sample_data()$getGroupLevels(group))
+    return(data_set()$getGroupLevels(group))
   }
   getCellCycle <- function() {
-    return(sample_data()$getCellCycle())
+    return(data_set()$getCellCycle())
   }
   getMetaData <- function() {
-    return(sample_data()$getMetaData())
+    return(data_set()$getMetaData())
   }
   availableProjections <- function() {
-    return(sample_data()$availableProjections())
+    return(data_set()$availableProjections())
   }
   getProjection <- function(name) {
-    return(sample_data()$getProjection(name))
+    return(data_set()$getProjection(name))
   }
   getTree <- function(group) {
-    return(sample_data()$getTree(group))
+    return(data_set()$getTree(group))
   }
   getGroupsWithMostExpressedGenes <- function() {
-    return(sample_data()$getGroupsWithMostExpressedGenes())
+    return(data_set()$getGroupsWithMostExpressedGenes())
   }
   getMostExpressedGenes <- function(group) {
-    return(sample_data()$getMostExpressedGenes(group))
+    return(data_set()$getMostExpressedGenes(group))
   }
   getMethodsForMarkerGenes <- function() {
-    return(sample_data()$getMethodsForMarkerGenes())
+    return(data_set()$getMethodsForMarkerGenes())
   }
   getGroupsWithMarkerGenes <- function(method) {
-    return(sample_data()$getGroupsWithMarkerGenes(method))
+    return(data_set()$getGroupsWithMarkerGenes(method))
   }
   getMarkerGenes <- function(method, group) {
-    return(sample_data()$getMarkerGenes(method, group))
+    return(data_set()$getMarkerGenes(method, group))
   }
   getMethodsForEnrichedPathways <- function() {
-    return(sample_data()$getMethodsForEnrichedPathways())
+    return(data_set()$getMethodsForEnrichedPathways())
   }
   getGroupsWithEnrichedPathways <- function(method) {
-    return(sample_data()$getGroupsWithEnrichedPathways(method))
+    return(data_set()$getGroupsWithEnrichedPathways(method))
   }
   getEnrichedPathways <- function(method, group) {
-    return(sample_data()$getEnrichedPathways(method, group))
+    return(data_set()$getEnrichedPathways(method, group))
   }
   getMethodsForTrajectories <- function() {
-    return(sample_data()$getMethodsForTrajectories())
+    return(data_set()$getMethodsForTrajectories())
   }
   getNamesOfTrajectories <- function(method) {
-    return(sample_data()$getNamesOfTrajectories(method))
+    return(data_set()$getNamesOfTrajectories(method))
   }
   getTrajectory <- function(method, name) {
-    return(sample_data()$getTrajectory(method, name))
+    return(data_set()$getTrajectory(method, name))
   }
 
   ##--------------------------------------------------------------------------##
-  ## Function to calculate A-by-B tables (e.g. samples by clusters).
+  ## Function to calculate A-by-B tables, e.g. samples by clusters.
   ##--------------------------------------------------------------------------##
-  calculateTableAB <- function(groupA, groupB) {
 
-    ## get cell meta data
-    meta_data <- getMetaData()
+  calculateTableAB <- function(table, groupA, groupB) {
 
-    ## check if specified group columns exist in meta data
-    if ( groupA %in% colnames(meta_data) == FALSE ) {
+    ## check if specified group columns exist in table
+    if ( groupA %in% colnames(table) == FALSE ) {
       stop(
         paste0(
           "Column specified as groupA (`", groupA,
@@ -684,7 +709,7 @@ server <- function(input, output, session) {
       )
     }
 
-    if ( groupB %in% colnames(meta_data) == FALSE ) {
+    if ( groupB %in% colnames(table) == FALSE ) {
       stop(
         paste0(
           "Column specified as groupB (`", groupB,
@@ -693,8 +718,9 @@ server <- function(input, output, session) {
         call. = FALSE
       )
     }
-    table <- meta_data[,c(groupA, groupB)] %>%
-      as.data.frame()
+
+    ## subset columns
+    table <- table[,c(groupA, groupB)]
 
     ## factorize group columns A and B if not already a factor
     if ( is.character(table[,groupA]) ) {
@@ -716,18 +742,28 @@ server <- function(input, output, session) {
       dplyr::summarise(count = dplyr::n(), .groups = 'drop') %>%
       tidyr::pivot_wider(
         id_cols = 1,
-        names_from = all_of(groupB),
+        names_from = tidyselect::all_of(groupB),
         values_from = "count",
         values_fill = 0
       ) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(total_cell_count = rowSums(.[c(2:ncol(.))])) %>%
-      dplyr::select(tidyselect::all_of(groupA), 'total_cell_count', dplyr::everything())
+      dplyr::select(
+        tidyselect::all_of(groupA), 'total_cell_count',
+        dplyr::everything()
+      )
 
     ## fix order of columns if cell cycle info was chosen as second group
-    if ( 'G1' %in% colnames(table) && 'G2M' %in% colnames(table) && 'S' %in% colnames(table) ) {
+    if (
+      'G1' %in% colnames(table) &&
+      'G2M' %in% colnames(table) &&
+      'S' %in% colnames(table)
+    ) {
       table <- table %>%
-        dplyr::select(tidyselect::all_of(groupA), 'total_cell_count', 'G1', 'S', 'G2M', dplyr::everything())
+        dplyr::select(
+          tidyselect::all_of(groupA), 'total_cell_count', 'G1', 'S', 'G2M',
+          dplyr::everything()
+        )
     }
 
     ## return
@@ -737,6 +773,7 @@ server <- function(input, output, session) {
   ##--------------------------------------------------------------------------##
   ## Colors for groups.
   ##--------------------------------------------------------------------------##
+
   reactive_colors <- reactive({
 
     ## get cell meta data
@@ -745,43 +782,34 @@ server <- function(input, output, session) {
     colors <- list()
 
     ## go through all groups
-    for ( group_name in getGroups() )
-    {
+    for ( group_name in getGroups() ) {
       ## if color selection from the "Color management" tab exist, assign those
       ## colors, otherwise assign colors from default colorset
-      if ( !is.null(input[[ paste0('color_', group_name, '_', getGroupLevels(group_name)[1]) ]]) )
-      {
-        for ( group_level in getGroupLevels(group_name) )
-        {
+      if ( !is.null(input[[ paste0('color_', group_name, '_', getGroupLevels(group_name)[1]) ]]) ) {
+        for ( group_level in getGroupLevels(group_name) ) {
           ## it seems that special characters are not handled well in input/output
           ## so I replace them with underscores using gsub()
           colors[[ group_name ]][ group_level ] <- input[[ paste0('color_', group_name, '_', gsub(group_level, pattern = '[^[:alnum:]]', replacement = '_')) ]]
         }
-      } else
-      {
-        colors[[ group_name ]] <- default_colorset[1:length(getGroupLevels(group_name))]
+      } else {
+        colors[[ group_name ]] <- default_colorset[seq_along(getGroupLevels(group_name))]
         names(colors[[ group_name ]]) <- getGroupLevels(group_name)
       }
     }
 
     ## go through columns with cell cycle info
-    if ( length(getCellCycle()) > 0 )
-    {
-      for ( column in getCellCycle() )
-      {
+    if ( length(getCellCycle()) > 0 ) {
+      for ( column in getCellCycle() ) {
         ## if color selection from the "Color management" tab exist, assign those
         ## colors, otherwise assign colors from cell cycle colorset
-        if ( !is.null(input[[ paste0('color_', column, '_', unique(as.character(meta_data[[ column ]]))[1]) ]]) )
-        {
-          for ( state in unique(as.character(meta_data[[ column ]])) )
-          {
+        if ( !is.null(input[[ paste0('color_', column, '_', unique(as.character(meta_data[[ column ]]))[1]) ]]) ) {
+          for ( state in unique(as.character(meta_data[[ column ]])) ) {
             ## it seems that special characters are not handled well in input/output
             ## so I replace them with underscores using gsub()
             colors[[ column ]][ state ] <- input[[ paste0('color_', column, '_', gsub(state, pattern = '[^[:alnum:]]', replacement = '_')) ]]
           }
-        } else
-        {
-          colors[[ column ]] <- cell_cycle_colorset[1:length(unique(as.character(meta_data[[ column ]])))]
+        } else {
+          colors[[ column ]] <- cell_cycle_colorset[seq_along(unique(as.character(meta_data[[ column ]])))]
           names(colors[[ column ]]) <- unique(as.character(meta_data[[ column ]]))
         }
       }
@@ -790,23 +818,133 @@ server <- function(input, output, session) {
     return(colors)
   })
 
-  ## TODO: add description
-  volumes <- c(Home = "~", getVolumes()())
+  ##--------------------------------------------------------------------------##
+  ## Define and identify available volumes for saving plots.
+  ##--------------------------------------------------------------------------##
+
+  volumes <- c(
+    Home = "~",
+    shinyFiles::getVolumes()()
+  )
+
+  ##--------------------------------------------------------------------------##
+  ## Assign colors to groups.
+  ##--------------------------------------------------------------------------##
+
+  assignColorsToGroups <- function(table, grouping_variable) {
+
+    ## check if colors are already assigned in reactive_colors()
+    ## ... already assigned
+    if ( grouping_variable %in% names(reactive_colors()) ) {
+
+      ## take colors from reactive_colors()
+      colors_for_groups <- reactive_colors()[[ grouping_variable ]]
+
+    ## ... not assigned but values are either factors or characters
+    } else if (
+      is.factor(table[[ grouping_variable ]]) ||
+      is.character(table[[ grouping_variable ]])
+    ) {
+
+      ## check type of values
+      ## ... factors
+      if ( is.factor(table[[ grouping_variable ]]) ) {
+
+        ## get factor levels and assign colors
+        colors_for_groups <- setNames(
+          default_colorset[seq_along(levels(table[[ grouping_variable ]]))],
+          levels(table[[ grouping_variable ]])
+        )
+
+      ## ... characters
+      } else if ( is.character(table[[ grouping_variable ]]) ) {
+
+        ## get unique values and assign colors
+        colors_for_groups <- setNames(
+          default_colorset[seq_along(unique(table[[ grouping_variable ]]))],
+          unique(table[[ grouping_variable ]])
+        )
+      }
+
+    ## ... none of the above (e.g. numeric values)
+    } else {
+      colors_for_groups <- NULL
+    }
+
+    ##
+    return(colors_for_groups)
+  }
+
+  ##--------------------------------------------------------------------------##
+  ## Build hover info for projections.
+  ##--------------------------------------------------------------------------##
+
+  buildHoverInfoForProjections <- function(table) {
+
+    ## put together cell ID, number of transcripts and number of expressed genes
+    hover_info <- paste0(
+      "<b>Cell</b>: ", table[[ "cell_barcode" ]], "<br>",
+      "<b>Transcripts</b>: ", formatC(table[[ "nUMI" ]], format = "f", big.mark = ",", digits = 0), "<br>",
+      "<b>Expressed genes</b>: ", formatC(table[[ "nGene" ]], format = "f", big.mark = ",", digits = 0), "<br>"
+    )
+
+    ## add info for known grouping variables
+    for ( group in getGroups() ) {
+      hover_info <- paste0(
+        hover_info,
+        "<b>", group, "</b>: ", table[[ group ]], "<br>"
+      )
+    }
+
+    ##
+    return(hover_info)
+  }
+
+  ##--------------------------------------------------------------------------##
+  ## Randomly subset cells in data frame, if necessary.
+  ##--------------------------------------------------------------------------##
+
+  randomlySubsetCells <- function(table, percentage) {
+
+    ## check if subsetting is necessary
+    ## ... percentage is less than 100
+    if ( percentage < 100 ) {
+
+      ## calculate how many cells should be left after subsetting
+      size_of_subset <- ceiling(percentage / 100 * nrow(table))
+
+      ## get IDs of all cells
+      cell_ids <- rownames(table)
+
+      ## subset cell IDs
+      subset_of_cell_ids <- cell_ids[ sample(seq_along(cell_ids), size_of_subset) ]
+
+      ## subset table and return
+      return(table[subset_of_cell_ids,])
+
+    ## ... percentage is 100 -> no subsetting needed
+    } else {
+
+      ## return original table
+      return(table)
+    }
+  }
 
   ##--------------------------------------------------------------------------##
   ## Tabs.
   ##--------------------------------------------------------------------------##
-  source(paste0(path_to_shiny_files, "/load_data/server.R"), local = TRUE)
-  source(paste0(path_to_shiny_files, "/overview/server.R"), local = TRUE)
-  source(paste0(path_to_shiny_files, "/groups/server.R"), local = TRUE)
-  source(paste0(path_to_shiny_files, "/most_expressed_genes/server.R"), local = TRUE)
-  source(paste0(path_to_shiny_files, "/marker_genes/server.R"), local = TRUE)
-  source(paste0(path_to_shiny_files, "/enriched_pathways/server.R"), local = TRUE)
-  source(paste0(path_to_shiny_files, "/gene_expression/server.R"), local = TRUE)
-  source(paste0(path_to_shiny_files, "/gene_id_conversion/server.R"), local = TRUE)
-  source(paste0(path_to_shiny_files, "/trajectory/server.R"), local = TRUE)
-  source(paste0(path_to_shiny_files, "/analysis_info/server.R"), local = TRUE)
-  source(paste0(path_to_shiny_files, "/color_management/server.R"), local = TRUE)
-  source(paste0(path_to_shiny_files, "/about/server.R"), local = TRUE)
+
+  source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/load_data/server.R"), local = TRUE)
+  source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/overview/server.R"), local = TRUE)
+  source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/groups/server.R"), local = TRUE)
+  source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/most_expressed_genes/server.R"), local = TRUE)
+  source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/marker_genes/server.R"), local = TRUE)
+  source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/enriched_pathways/server.R"), local = TRUE)
+  source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/gene_expression/server.R"), local = TRUE)
+  source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/gene_id_conversion/server.R"), local = TRUE)
+  source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/trajectory/server.R"), local = TRUE)
+  source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/analysis_info/server.R"), local = TRUE)
+  source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/color_management/server.R"), local = TRUE)
+  source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/about/server.R"), local = TRUE)
 
 }

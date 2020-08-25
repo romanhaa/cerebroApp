@@ -26,7 +26,7 @@ output[["trajectory_selected_cells_table_UI"]] <- renderUI({
         shinyWidgets::materialSwitch(
           inputId = "trajectory_details_selected_cells_table_color_highlighting",
           label = "Highlight values with colors:",
-          value = FALSE,
+          value = TRUE,
           status = "primary",
           inline = TRUE
         ),
@@ -74,14 +74,11 @@ output[["trajectory_details_selected_cells_table"]] <- DT::renderDataTable(serve
       dplyr::mutate(identifier = paste0(x, '-', y))
 
     ## extract cells for table
-    to_plot <- cbind(
-        trajectory_data[["meta"]],
-        getMetaData()
-      ) %>%
+    cells_df <- cbind(trajectory_data[["meta"]], getMetaData()) %>%
       dplyr::filter(!is.na(pseudotime))
   
     ## filter out non-selected cells with X-Y identifier
-    table <- to_plot %>%
+    cells_df <- cells_df %>%
       dplyr::rename(X1 = 1, X2 = 2) %>%
       dplyr::mutate(identifier = paste0(X1, '-', X2)) %>%
       dplyr::filter(identifier %in% selected_cells$identifier) %>%
@@ -90,7 +87,7 @@ output[["trajectory_details_selected_cells_table"]] <- DT::renderDataTable(serve
 
     ## check how many cells are left after filtering
     ## ... no cells are left
-    if ( nrow(table) == 0 ) {
+    if ( nrow(cells_df) == 0 ) {
 
       ## prepare empty table
       getMetaData() %>%
@@ -102,7 +99,7 @@ output[["trajectory_details_selected_cells_table"]] <- DT::renderDataTable(serve
 
       ## prepare proper table
       prettifyTable(
-        table,
+        cells_df,
         filter = list(position = "top", clear = TRUE),
         dom = "Brtlip",
         show_buttons = TRUE,
@@ -125,7 +122,8 @@ observeEvent(input[["trajectory_details_selected_cells_table_info"]], {
       trajectory_details_selected_cells_table_info$text,
       title = trajectory_details_selected_cells_table_info$title,
       easyClose = TRUE,
-      footer = NULL
+      footer = NULL,
+      size = "l"
     )
   )
 })
@@ -134,8 +132,18 @@ observeEvent(input[["trajectory_details_selected_cells_table_info"]], {
 ## Text in info box.
 ##----------------------------------------------------------------------------##
 
-## TODO: update text
 trajectory_details_selected_cells_table_info <- list(
   title = "Details of selected cells",
-  text = p("Table containing meta data (some columns may be hidden, check the 'Column visibility' button) for cells selected in the plot using the box or lasso selection tool. If you want the table to contain all cells in the data set, you must select all cells in the plot. The table can be saved to disk in CSV or Excel format for further analysis.")
+  text = HTML("
+    Table containing meta data (some columns may be hidden, check the 'Column visibility' button) for cells selected in the plot using the box or lasso selection tool. If you want the table to contain all cells in the data set, you must select all cells in the plot. The table can be saved to disk in CSV or Excel format for further analysis.
+    <h4>Options</h4>
+    <b>Show results for all subgroups (no filtering)</b><br>
+    When active, the subgroup section element will disappear and instead the table will be shown for all subgroups. Subgroups can still be selected through the dedicated column filter, which also allows to select multiple subgroups at once. While using the column filter is more elegant, it can become laggy with very large tables, hence to option to filter the table beforehand.<br>
+    <b>Automatically format numbers</b><br>
+    When active, columns in the table that contain different types of numeric values will be formatted based on what they <u>seem</u> to be. The algorithm will look for integers (no decimal values), percentages, p-values, log-fold changes and apply different formatting schemes to each of them. Importantly, this process does that always work perfectly. If it fails and hinders working with the table, automatic formatting can be deactivated.<br>
+    <b>Highlight values with colors</b><br>
+    Similar to the automatic formatting option, when active, Cerebro will look for known columns in the table (those that contain grouping variables), try to interpret column content, and use colors and other stylistic elements to facilitate quick interpretation of the values. If you prefer the table without colors and/or the identification does not work properly, you can simply deactivate this feature.<br>
+    <br>
+    <em>Columns can be re-ordered by dragging their respective header.</em>"
+  )
 )

@@ -34,21 +34,20 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
   )
 
   ## extract cells to plot
-  to_plot <- cbind(
+  cells_df <- cbind(
       getProjection(input[["overview_projection_to_display"]]),
       getMetaData()
-    ) %>% 
-    as.data.frame()
+    )
 
   if (
     is.null(plotly::event_data("plotly_selected", source = "overview_projection")) ||
     length(plotly::event_data("plotly_selected", source = "overview_projection")) == 0
   ) {
-    to_plot <- to_plot %>% dplyr::mutate(group = 'not selected')
+    cells_df <- cells_df %>% dplyr::mutate(group = 'not selected')
   } else {
     selected_cells <- plotly::event_data("plotly_selected", source = "overview_projection") %>%
       dplyr::mutate(identifier = paste0(x, '-', y))
-    to_plot <- to_plot %>%
+    cells_df <- cells_df %>%
       dplyr::rename(X1 = 1, X2 = 2) %>%
       dplyr::mutate(
         identifier = paste0(X1, '-', X2),
@@ -62,20 +61,20 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
   ## if the selected coloring variable is categorical, represent the selected
   ## cells in a bar chart
   if (
-    is.factor(to_plot[[ color_variable ]]) ||
-    is.character(to_plot[[ color_variable ]])
+    is.factor(cells_df[[ color_variable ]]) ||
+    is.character(cells_df[[ color_variable ]])
   ) {
 
-    ## calculate number of cells in each group
-    t <- to_plot %>%
+    ## filter table for selected cells
+    cells_df <- cells_df %>%
       dplyr::filter(group == 'selected')
 
     ## prepare table, depending on whether at least a single cell is selected
     ## ... at least 1 cell is selected
-    if ( nrow(t) > 0 ) {
+    if ( nrow(cells_df) > 0 ) {
 
       ## count the number of cells by selected meta data column
-      t <- t %>%
+      cells_df <- cells_df %>%
         dplyr::select(!!! rlang::syms(color_variable)) %>%
         dplyr::group_by_at(1) %>%
         dplyr::tally() %>%
@@ -100,7 +99,7 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
       }
 
       ## create empty table to show
-      t <- data.frame(
+      cells_df <- data.frame(
           group = group_levels,
           n = 0
         ) %>%
@@ -110,28 +109,19 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
 
     ## convert factor to character to avoid empty bars when selecting cells of
     ## certain groups
-    t[[1]] <- as.character(t[[1]])
+    cells_df[[1]] <- as.character(cells_df[[1]])
 
-    ## create color assignment for groups
-    if ( input[["overview_point_color"]] %in% getGroups() ) {
-      colors_this_plot <- reactive_colors()[[ input[["overview_point_color"]] ]]
-    } else if ( input[["overview_point_color"]] %in% getCellCycle() ) {
-      colors_this_plot <- reactive_colors()[[ input[["overview_point_color"]] ]]
-    } else {
-      colors_this_plot <- setNames(
-        default_colorset[1:length(t[[ 1 ]])],
-        t[[ 1 ]]
-      )
-    }
+    ## get colors for groups
+    colors_for_groups <- assignColorsToGroups(cells_df, input[["overview_point_color"]])
 
     ## make bar chart
     plotly::plot_ly(
-      t,
-      x = ~t[[1]],
-      y = ~t[[2]],
+      cells_df,
+      x = ~cells_df[[1]],
+      y = ~cells_df[[2]],
       type = "bar",
-      color = ~t[[1]],
-      colors = colors_this_plot,
+      color = ~cells_df[[1]],
+      colors = colors_for_groups,
       source = "subset",
       showlegend = FALSE,
       hoverinfo = "y"
@@ -153,17 +143,18 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
       hovermode = "compare"
     )
 
-  ## if the selected coloring variable is not categorical but continuous
-  } else {
+  ## if the selected coloring variable is numeric/continuous
+  } else if ( is.numeric(cells_df[[ color_variable ]]) ) {
+
     ## remove unnecessary columns
-    t <- to_plot %>%
+    cells_df <- cells_df %>%
       dplyr::select(group, !!! rlang::syms(color_variable))
 
     ## create violin/box plot
     plotly::plot_ly(
-      t,
-      x = ~t[[1]],
-      y = ~t[[2]],
+      cells_df,
+      x = ~cells_df[[1]],
+      y = ~cells_df[[2]],
       type = "violin",
       box = list(
         visible = TRUE
@@ -171,7 +162,7 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
       meanline = list(
         visible = TRUE
       ),
-      color = ~t[[1]],
+      color = ~cells_df[[1]],
       colors = setNames(c('#e74c3c','#7f8c8d'), c('selected', 'not selected')),
       source = "subset",
       showlegend = FALSE,
@@ -209,7 +200,8 @@ observeEvent(input[["overview_details_selected_cells_plot_info"]], {
       overview_details_selected_cells_plot_info$text,
       title = overview_details_selected_cells_plot_info$title,
       easyClose = TRUE,
-      footer = NULL
+      footer = NULL,
+      size = "l"
     )
   )
 })

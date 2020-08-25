@@ -22,7 +22,7 @@
 #' pbmc <- getMostExpressedGenes(
 #'   object = pbmc,
 #'   assay = 'RNA',
-#'   groups = c('sample','seurat_clusters')
+#'   groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main')
 #' )
 getMostExpressedGenes <- function(
   object,
@@ -37,7 +37,18 @@ getMostExpressedGenes <- function(
   ## check if Seurat is installed
   if ( !requireNamespace("Seurat", quietly = TRUE) ) {
     stop(
-      "Package 'Seurat' needed for this function to work. Please install it.",
+      "The 'Seurat' package is needed for this function to work. Please install it.",
+      call. = FALSE
+    )
+  }
+
+  ## check that Seurat package is at least v3.0
+  if ( utils::packageVersion('Seurat') < 3 ) {
+    stop(
+      paste0(
+        "The installed Seurat package is of version `", utils::packageVersion('Seurat'),
+        "`, but at least v3.0 is required."
+      ),
       call. = FALSE
     )
   }
@@ -108,7 +119,7 @@ getMostExpressedGenes <- function(
   ##--------------------------------------------------------------------------##
 
   ##
-  for ( i in 1:length(groups) ) {
+  for ( i in seq_along(groups) ) {
 
     current_group <- groups[i]
 
@@ -141,8 +152,9 @@ getMostExpressedGenes <- function(
         ## issue warning to user
         warning(
           paste0(
-            'Found ', number_of_cells_without_group_assignment, ' cell(s) without group assignment  (NA) for `', current_group, '`. These cells will be ignored during the ',
-            'analysis.'
+            'Found ', number_of_cells_without_group_assignment,
+            ' cell(s) without group assignment  (NA) for `', current_group,
+            '`. These cells will be ignored during the analysis.'
           ),
           call. = FALSE
         )
@@ -158,7 +170,9 @@ getMostExpressedGenes <- function(
       ## group level was found
       warning(
         paste0(
-          'Only 1 group levels was found (`', group_levels, '`) for current grouping variable (`', current_group, '`). Will proceed with next grouping variable.'
+          'Only 1 group levels was found (`', group_levels,
+          '`) for current grouping variable (`', current_group,
+          '`). Will proceed with next grouping variable.'
         ),
         call. = FALSE
       )
@@ -169,7 +183,8 @@ getMostExpressedGenes <- function(
       ## log message
       message(
         paste0(
-          '[', format(Sys.time(), '%H:%M:%S'), '] Get most expressed genes for ', length(group_levels), ' groups in `', current_group, '`...'
+          '[', format(Sys.time(), '%H:%M:%S'), '] Get most expressed genes for ',
+          length(group_levels), ' groups in `', current_group, '`...'
         )
       )
 

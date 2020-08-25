@@ -10,6 +10,8 @@
 #' object; defaults to NULL.
 #' @param groups Grouping variables (columns) in object@meta.data for which
 #' marker genes should be calculated.
+#' @param name Name of list that should be used to store the results in
+#' object@misc$marker_genes$<name>; defaults to 'cerebro_seurat'.
 #' @param only_pos Identify only over-expressed genes; defaults to TRUE.
 #' @param min_pct Only keep genes that are expressed in at least n\% of current
 #' group of cells, defaults to 0.70 (70\%).
@@ -35,7 +37,8 @@
 #'   object = pbmc,
 #'   assay = 'RNA',
 #'   organism = 'hg',
-#'   groups = c('sample','seurat_clusters'),
+#'   groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+#'   name = 'cerebro_seurat',
 #'   only_pos = TRUE,
 #'   min_pct = 0.7,
 #'   thresh_logFC = 0.25,
@@ -48,6 +51,7 @@ getMarkerGenes <- function(
   assay = 'RNA',
   organism = NULL,
   groups = NULL,
+  name = 'cerebro_seurat',
   only_pos = TRUE,
   min_pct = 0.70,
   thresh_logFC = 0.25,
@@ -75,6 +79,16 @@ getMarkerGenes <- function(
       paste0(
         "The installed Seurat package is of version `", utils::packageVersion('Seurat'),
         "`, but at least v3.0 is required."
+      ),
+      call. = FALSE
+    )
+  }
+
+  ## check if provided object is of class "Seurat"
+  if ( class(object) != "Seurat" ) {
+    stop(
+      paste0(
+        "Provided object is of class `", class(object), "` but must be of class 'Seurat'."
       ),
       call. = FALSE
     )
@@ -121,6 +135,11 @@ getMarkerGenes <- function(
       ),
       call. = FALSE
     )
+  }
+
+  ## check if 'marker_genes' slot already exists and create it if not
+  if ( is.null(object@misc$marker_genes) ) {
+    object@misc$marker_genes <- list()
   }
 
   ##--------------------------------------------------------------------------##
@@ -185,20 +204,16 @@ getMarkerGenes <- function(
   }
 
   ##--------------------------------------------------------------------------##
-  ## create slot for results in Seurat object if not already existing
-  ##--------------------------------------------------------------------------##
-
-  if ( is.null(object@misc$marker_genes) ) {
-    object@misc$marker_genes <- list()
-  }
-
-  ##--------------------------------------------------------------------------##
   ## get marker genes for each group level in every group
   ##--------------------------------------------------------------------------##
 
-  ##
-  for ( i in 1:length(groups) ) {
+  ## create slot for results
+  object@misc$marker_genes[[ name ]] <- list()
 
+  ##
+  for ( i in seq_along(groups) ) {
+
+    ## get current group
     current_group <- groups[i]
 
     ## collect group levels
@@ -230,8 +245,9 @@ getMarkerGenes <- function(
         ## issue warning to user
         warning(
           paste0(
-            'Found ', number_of_cells_without_group_assignment, ' cell(s) without group assignment (NA) for `', current_group, '`. These cells will be ignored during the ',
-            'analysis.'
+            'Found ', number_of_cells_without_group_assignment,
+            ' cell(s) without group assignment (NA) for `', current_group,
+            '`. These cells will be ignored during the analysis.'
           ),
           call. = FALSE
         )
@@ -239,12 +255,25 @@ getMarkerGenes <- function(
     }
 
     ## check number of group levels
-    if ( length(group_levels) > 1 ) {
+    ## ... if only 1 group level is present, show warning and move to next
+    ##     grouping variable
+    if ( length(group_levels) == 1 ) {
+      warning(
+        paste0(
+          'Only one group level found for group `', current_group,
+          '`. Will skip this group and proceed to next.'
+        ),
+        call. = FALSE
+      )
+
+    ## ... more than 1 group level is available
+    } else if ( length(group_levels) > 1 ) {
 
       ## log message
       message(
         paste0(
-          '[', format(Sys.time(), '%H:%M:%S'), '] Get marker genes for ', length(group_levels), ' groups in `', current_group, '`...'
+          '[', format(Sys.time(), '%H:%M:%S'), '] Get marker genes for ',
+          length(group_levels), ' groups in `', current_group, '`...'
         )
       )
 
@@ -297,22 +326,11 @@ getMarkerGenes <- function(
       if ( "cluster" %in% colnames(results) ) {
         results <- results %>%
           dplyr::rename(!!current_group := .data$cluster) %>%
-          dplyr::select(tidyselect::all_of(current_group), tidyselect::any_of("gene"), tidyselect::any_of("lol"), dplyr::everything())
+          dplyr::select(tidyselect::all_of(current_group), tidyselect::any_of("gene"), dplyr::everything())
       }
 
       ## add results to Seurat object
-      object@misc[["marker_genes"]][[ current_group ]] <- results
-
-    ## ... if only 1 group level is present, show warning and move to next
-    ##     grouping variable
-    } else if ( length(group_levels) > 1 ) {
-      warning(
-        paste0(
-          'Only one group level found for group `', current_group,
-          '`. Will skip this group and proceed to next.'
-        ),
-        call. = FALSE
-      )
+      object@misc[["marker_genes"]][[ name ]][[ current_group ]] <- results
     }
   }
 

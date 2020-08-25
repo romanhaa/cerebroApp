@@ -13,9 +13,29 @@ output[["trajectory_distribution_along_pseudotime_UI"]] <- renderUI({
     cerebroBox(
       title = tagList(
         boxTitle("Distribution along pseudotime"),
-        cerebroInfoButton("trajectory_density_info")
+        cerebroInfoButton("trajectory_distribution_along_pseudotime_info"),
+        shinyWidgets::dropdownButton(
+          tags$div(
+            style = "color: black !important;",
+            class = "pull-right",
+            tagList(
+              sliderInput(
+                "trajectory_distribution_along_pseudotime_opacity",
+                label = "Opacity of curve:",
+                min = 0,
+                max = 1,
+                step = 0.1,
+                value = 0.6
+              )
+            )
+          ),
+          circle = FALSE,
+          icon = icon("cog"),
+          inline = TRUE,
+          size = "xs"
+        )
       ),
-      plotly::plotlyOutput("trajectory_density_plot")
+      plotly::plotlyOutput("trajectory_distribution_along_pseudotime_plot")
     )
   )
 })
@@ -24,13 +44,14 @@ output[["trajectory_distribution_along_pseudotime_UI"]] <- renderUI({
 ## Plot.
 ##----------------------------------------------------------------------------##
 
-output[["trajectory_density_plot"]] <- plotly::renderPlotly({
+output[["trajectory_distribution_along_pseudotime_plot"]] <- plotly::renderPlotly({
 
   ## don't do anything before these inputs are selected
   req(
     input[["trajectory_selected_method"]],
     input[["trajectory_selected_name"]],
-    input[["trajectory_point_color"]]
+    input[["trajectory_point_color"]],
+    input[["trajectory_distribution_along_pseudotime_opacity"]]
   )
 
   ## collect trajectory data
@@ -40,14 +61,11 @@ output[["trajectory_density_plot"]] <- plotly::renderPlotly({
   )
   
   ## extract cells to plot
-  to_plot <- cbind(
-      trajectory_data[["meta"]],
-      getMetaData()
-    ) %>%
+  cells_df <- cbind(trajectory_data[["meta"]], getMetaData()) %>%
     dplyr::filter(!is.na(pseudotime))
 
   ## put rows in random order
-  to_plot <- to_plot[ sample(1:nrow(to_plot)) , ]
+  cells_df <- cells_df[ sample(1:nrow(cells_df)) , ]
 
   ## grab column name for cell coloring
   color_variable <- input[["trajectory_point_color"]]
@@ -55,63 +73,42 @@ output[["trajectory_density_plot"]] <- plotly::renderPlotly({
   ## ... cells are colored by a categorical variable; the Y axis will show the
   ##     density of the group along pseudotime
   if (
-    is.factor(to_plot[[ color_variable ]]) ||
-    is.character(to_plot[[ color_variable ]])
+    is.factor(cells_df[[ color_variable ]]) ||
+    is.character(cells_df[[ color_variable ]])
   ) {
 
-    ## set colors for groups
-    ## ... coloring variable is one of the grouping variables
-    if ( input[["trajectory_point_color"]] %in% getGroups() ) {
-      colors_this_plot <- reactive_colors()[[ input[["trajectory_point_color"]] ]]
-    ## ... coloring variable is one of the cell cycle assignments
-    } else if ( input[["trajectory_point_color"]] %in% getCellCycle() ) {
-      colors_this_plot <- reactive_colors()[[ input[["trajectory_point_color"]] ]]
-    ## ... coloring variable contains factors
-    } else if ( is.factor(to_plot[[ input[["trajectory_point_color"]] ]]) ) {
-      colors_this_plot <- setNames(
-        default_colorset[1:length(levels(to_plot[[ input[["trajectory_point_color"]] ]]))],
-        levels(to_plot[[ input[["trajectory_point_color"]] ]])
-      )
-    ## ... coloring variable containts characters
-    } else if ( is.character(to_plot[[ input[["trajectory_point_color"]] ]]) ) {
-      colors_this_plot <- setNames(
-        default_colorset[1:length(unique(to_plot[[ input[["trajectory_point_color"]] ]]))],
-        unique(to_plot[[ input[["trajectory_point_color"]] ]])
-      )
-    ## ... none of the above
-    } else {
-      colors_this_plot <- default_colorset
-    }
+    ## get colors for groups
+    colors_for_groups <- assignColorsToGroups(cells_df, input[["trajectory_point_color"]])
 
     ## get group levels
-    if ( is.factor(to_plot[[ color_variable ]]) ) {
-      group_levels <- levels(to_plot[[ color_variable ]])
-    } else if ( is.character(to_plot[[ color_variable ]]) ) {
-      group_levels <- unique(to_plot[[ color_variable ]])
+    if ( is.factor(cells_df[[ color_variable ]]) ) {
+      group_levels <- levels(cells_df[[ color_variable ]])
+    } else if ( is.character(cells_df[[ color_variable ]]) ) {
+      group_levels <- unique(cells_df[[ color_variable ]])
     }
 
     ## create empty plot
     plot <- plotly::plot_ly()
 
     ## add trace to plot for every group level
-    for ( i in 1:length(group_levels) ) {
+    for ( i in seq_along(group_levels) ) {
 
       ## get name of current group level
       current_group <- group_levels[i]
 
       ## filter cells for those that are in current group
-      temp_data <- to_plot[which(to_plot[[ color_variable ]] == current_group),]
+      temp_data <- cells_df[which(cells_df[[ color_variable ]] == current_group),]
 
       ## calculate density over pseudotime
       temp_density <- stats::density(temp_data[["pseudotime"]], kernel = "gaussian")
 
       ## add alpha value to hex colors
-      temp_color <- grDevices::col2rgb(colors_this_plot[i])
+      temp_color <- grDevices::col2rgb(colors_for_groups[i])
       temp_color <- grDevices::rgb(
         red = temp_color[1],
         green = temp_color[2],
         blue = temp_color[3],
-        alpha = 175,
+        alpha = input[["trajectory_distribution_along_pseudotime_opacity"]]/1*255,
         maxColorValue = 255
       )
 
@@ -127,7 +124,7 @@ output[["trajectory_density_plot"]] <- plotly::renderPlotly({
           fillcolor = temp_color,
           line = list(
             width = 0.5,
-            color = colors_this_plot[i]
+            color = colors_for_groups[i]
           ),
           hoverinfo = 'text',
           text = paste0(
@@ -146,14 +143,15 @@ output[["trajectory_density_plot"]] <- plotly::renderPlotly({
         mirror = TRUE,
         showline = TRUE,
         zeroline = FALSE,
-        range = range(to_plot[["pseudotime"]])
+        range = range(cells_df[["pseudotime"]])
       ),
       yaxis = list(
         title = "Density",
         mirror = TRUE,
         showline = TRUE,
         zeroline = FALSE
-      )
+      ),
+      hovermode = "compare"
     )
 
   ## ... cells should be colored by a numeric variable; instead of showing the
@@ -161,38 +159,28 @@ output[["trajectory_density_plot"]] <- plotly::renderPlotly({
   ##     the Y axis
   } else {
 
-    ## set colors for states
-    colors_this_plot <- setNames(
-      default_colorset[1:length(levels(trajectory_data[["meta"]]$state))],
-      levels(trajectory_data[["meta"]]$state)
-    )
+    ## get colors for states
+    colors_for_groups <- assignColorsToGroups(trajectory_data[["meta"]], "state")
 
-    ## prepare tooltip/hover info
-    tooltip_info <- paste0(
-      "<b>Cell</b>: ", to_plot[[ "cell_barcode" ]], "<br>",
-      "<b>Transcripts</b>: ", formatC(to_plot[[ "nUMI" ]], format = "f", big.mark = ",", digits = 0), "<br>",
-      "<b>Expressed genes</b>: ", formatC(to_plot[[ "nGene" ]], format = "f", big.mark = ",", digits = 0), "<br>",
-      "<b>Pseudotime</b>: ", formatC(to_plot[[ "pseudotime" ]], format = "f", big.mark = ",", digits = 2), "<br>",
-      "<b>State</b>: ", to_plot[[ "state" ]], "<br>"
-    )
+    ## prepare hover info
+    hover_info <- buildHoverInfoForProjections(cells_df)
 
-    ## add info for known grouping variables to tooltip/hover
-    for ( group in getGroups() ) {
-      tooltip_info <- paste0(
-        tooltip_info,
-        "<b>", group, "</b>: ", to_plot[[ group ]], "<br>"
-      )
-    }
+    ## add expression levels to hover info
+    hover_info <- paste0(
+      hover_info,
+      "<b>Pseudotime</b>: ", formatC(cells_df[[ "pseudotime" ]], format = "f", big.mark = ",", digits = 2), "<br>",
+      "<b>State</b>: ", cells_df[[ "state" ]], "<br>"
+    )
 
     ## prepare plot
     plot <- plotly::plot_ly(
-      data = to_plot,
+      data = cells_df,
       x = ~pseudotime,
-      y = ~to_plot[[ color_variable ]],
+      y = ~cells_df[[ color_variable ]],
       type = "scatter",
       mode = "markers",
       color = ~state,
-      colors = colors_this_plot,
+      colors = colors_for_groups,
       marker = list(
         opacity = input[["trajectory_point_opacity"]],
         line = list(
@@ -202,7 +190,7 @@ output[["trajectory_density_plot"]] <- plotly::renderPlotly({
         size = input[["trajectory_point_size"]]
       ),
       hoverinfo = "text",
-      text = ~tooltip_info
+      text = ~hover_info
     ) %>%
     plotly::layout(
       xaxis = list(
@@ -233,13 +221,14 @@ output[["trajectory_density_plot"]] <- plotly::renderPlotly({
 ## Info box that gets shown when pressing the "info" button.
 ##----------------------------------------------------------------------------##
 
-observeEvent(input[["trajectory_density_info"]], {
+observeEvent(input[["trajectory_distribution_along_pseudotime_info"]], {
   showModal(
     modalDialog(
-      trajectory_density_info[["text"]],
-      title = trajectory_density_info[["title"]],
+      trajectory_distribution_along_pseudotime_info[["text"]],
+      title = trajectory_distribution_along_pseudotime_info[["title"]],
       easyClose = TRUE,
-      footer = NULL
+      footer = NULL,
+      size = "l"
     )
   )
 })
@@ -248,7 +237,7 @@ observeEvent(input[["trajectory_density_info"]], {
 ## Text in info box.
 ##----------------------------------------------------------------------------##
 
-trajectory_density_info <- list(
+trajectory_distribution_along_pseudotime_info <- list(
   title = "Distribution along pseudotime",
   text = p("This plot shows the distribution of the variable selected above to color cells by along pseudotime. If this is a categorical variable, e.g. 'sample' or 'cluster', you will see a density plot. In contrast, if you have selected a continuous variable, e.g. nUMI or nGene, cells will be colored by the state they belong to.")
 )

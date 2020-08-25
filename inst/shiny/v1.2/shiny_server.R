@@ -8,70 +8,70 @@ server <- function(input, output, session) {
   ##--------------------------------------------------------------------------##
   source(
     system.file(
-      paste0("shiny/", version, "/overview/info.R"),
+      paste0("shiny/v1.2/overview/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE
   )
   source(
     system.file(
-      paste0("shiny/", version, "/samples/info.R"),
+      paste0("shiny/v1.2/samples/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE
   )
   source(
     system.file(
-      paste0("shiny/", version, "/clusters/info.R"),
+      paste0("shiny/v1.2/clusters/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE
   )
   source(
     system.file(
-      paste0("shiny/", version, "/most_expressed_genes/info.R"),
+      paste0("shiny/v1.2/most_expressed_genes/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE
   )
   source(
     system.file(
-      paste0("shiny/", version, "/marker_genes/info.R"),
+      paste0("shiny/v1.2/marker_genes/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE
   )
   source(
     system.file(
-      paste0("shiny/", version, "/enriched_pathways/info.R"),
+      paste0("shiny/v1.2/enriched_pathways/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE
   )
   source(
     system.file(
-      paste0("shiny/", version, "/gene_expression/info.R"),
+      paste0("shiny/v1.2/gene_expression/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE
   )
   source(
     system.file(
-      paste0("shiny/", version, "/gene_set_expression/info.R"),
+      paste0("shiny/v1.2/gene_set_expression/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE
   )
   source(
     system.file(
-      paste0("shiny/", version, "/trajectory/info.R"),
+      paste0("shiny/v1.2/trajectory/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE
   )
   source(
     system.file(
-      paste0("shiny/", version, "/color_management/info.R"),
+      paste0("shiny/v1.2/color_management/info.R"),
       package = "cerebroApp"
     ),
     local = TRUE

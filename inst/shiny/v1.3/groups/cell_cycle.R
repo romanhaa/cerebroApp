@@ -103,14 +103,15 @@ output[["groups_by_cell_cycle_plot"]] <- plotly::renderPlotly({
   )
 
   ## calculate table (must be merged later if user chooses to display as percent)
-  temp_table_original <- calculateTableAB(
+  table_wide <- calculateTableAB(
+    getMetaData(),
     input[[ "groups_selected_group" ]],
     input[[ "groups_by_cell_cycle_column" ]]
   )
 
   ## process table
-  temp_table_to_plot <- temp_table_original %>%
-    select(-total_cell_count) %>%
+  table_long <- table_wide %>%
+    dplyr::select(-total_cell_count) %>%
     tidyr::pivot_longer(
       cols = 2:ncol(.),
       names_to = input[[ "groups_by_cell_cycle_column" ]],
@@ -118,9 +119,9 @@ output[["groups_by_cell_cycle_plot"]] <- plotly::renderPlotly({
     )
 
   ## factorize second group
-  temp_table_to_plot[[ input[[ "groups_by_cell_cycle_column" ]] ]] <- factor(
-    temp_table_to_plot[[ input[[ "groups_by_cell_cycle_column" ]] ]],
-    levels = unique(temp_table_to_plot[[ input[[ "groups_by_cell_cycle_column" ]] ]])
+  table_long[[ input[[ "groups_by_cell_cycle_column" ]] ]] <- factor(
+    table_long[[ input[[ "groups_by_cell_cycle_column" ]] ]],
+    levels = unique(table_long[[ input[[ "groups_by_cell_cycle_column" ]] ]])
   )
 
   ##
@@ -128,7 +129,7 @@ output[["groups_by_cell_cycle_plot"]] <- plotly::renderPlotly({
 
     ##
     if ( input[["groups_by_cell_cycle_show_as_percent"]] != TRUE ) {
-      temp_table_to_plot %>%
+      table_long %>%
       plotly::plot_ly(
         x = ~.[[ input[[ "groups_selected_group" ]] ]],
         y = ~cells,
@@ -155,13 +156,13 @@ output[["groups_by_cell_cycle_plot"]] <- plotly::renderPlotly({
         hovermode = "compare"
       )
     } else {
-      temp_table_to_plot %>%
-      left_join(
-        .,
-        temp_table_original[ , c(input[[ "groups_selected_group" ]], "total_cell_count") ],
+      table_long %>%
+      dplyr::left_join(
+        .data,
+        table_wide[ , c(input[[ "groups_selected_group" ]], "total_cell_count") ],
         by = input[[ "groups_selected_group" ]]
       ) %>%
-      mutate(pct = cells / total_cell_count * 100) %>%
+      dplyr::mutate(pct = cells / total_cell_count * 100) %>%
       plotly::plot_ly(
         x = ~.[[ input[[ "groups_selected_group" ]] ]],
         y = ~pct,
@@ -194,16 +195,16 @@ output[["groups_by_cell_cycle_plot"]] <- plotly::renderPlotly({
   } else if ( input[["groups_by_cell_cycle_plot_type"]] == "Sankey plot" ) {
 
     ## transform factor levels to integers (necessary for plotly)
-    temp_table_to_plot[["source"]] <- as.numeric(temp_table_to_plot[[1]]) - 1
-    temp_table_to_plot[["target"]] <- as.numeric(temp_table_to_plot[[2]]) - 1 + length(unique(temp_table_to_plot[[1]]))
+    table_long[["source"]] <- as.numeric(table_long[[1]]) - 1
+    table_long[["target"]] <- as.numeric(table_long[[2]]) - 1 + length(unique(table_long[[1]]))
 
     ## combine all factor levels in a single vector
-    all_groups <- c(levels(temp_table_to_plot[[1]]), levels(temp_table_to_plot[[2]]))
+    all_groups <- c(levels(table_long[[1]]), levels(table_long[[2]]))
 
     ## get color code for all group levels (from both groups)
     colors_for_groups <- c(
-        reactive_colors()[[ input[[ "groups_selected_group" ]] ]][ levels(temp_table_to_plot[[1]]) ],
-        reactive_colors()[[ input[[ "groups_by_cell_cycle_column" ]] ]][ levels(temp_table_to_plot[[2]]) ]
+        reactive_colors()[[ input[[ "groups_selected_group" ]] ]][ levels(table_long[[1]]) ],
+        reactive_colors()[[ input[[ "groups_by_cell_cycle_column" ]] ]][ levels(table_long[[2]]) ]
       )
 
     ## match color codes to group levels (from both groups)
@@ -231,9 +232,9 @@ output[["groups_by_cell_cycle_plot"]] <- plotly::renderPlotly({
         )
       ),
       link = list(
-        source = temp_table_to_plot[["source"]],
-        target = temp_table_to_plot[["target"]],
-        value =  temp_table_to_plot[[3]],
+        source = table_long[["source"]],
+        target = table_long[["target"]],
+        value =  table_long[[3]],
         hoverinfo = "all",
         hovertemplate = paste0(
           "<b>", input[["groups_selected_group"]], ":</b> %{source.label}<br>",
@@ -252,27 +253,32 @@ output[["groups_by_cell_cycle_plot"]] <- plotly::renderPlotly({
 ##----------------------------------------------------------------------------##
 
 output[["groups_by_cell_cycle_table"]] <- DT::renderDataTable({
+
+  ##
   req(
-    input[[ "groups_selected_group" ]],
-    input[[ "groups_by_cell_cycle_column" ]],
+    input[["groups_selected_group"]],
+    input[["groups_by_cell_cycle_column"]],
   )
 
-  temp_table <- calculateTableAB(
-    input[[ "groups_selected_group" ]],
-    input[[ "groups_by_cell_cycle_column" ]]
+  ##
+  composition_df <- calculateTableAB(
+    getMetaData(),
+    input[["groups_selected_group"]],
+    input[["groups_by_cell_cycle_column"]]
   )
 
+  ##
   if ( input[["groups_by_cell_cycle_show_as_percent"]] == TRUE ) {
-    for ( i in 3:ncol(temp_table) ) {
-      # temp_table[,i] <- round(temp_table[,i] / temp_table$total_cell_count * 100, digits = 1)
-      temp_table[,i] <- temp_table[,i] / temp_table$total_cell_count
+    for ( i in 3:ncol(composition_df) ) {
+      composition_df[,i] <- composition_df[,i] / composition_df$total_cell_count
     }
-    columns_percentage <- c(3:ncol(temp_table))
+    columns_percentage <- c(3:ncol(composition_df))
   } else {
     columns_percentage <- NULL
   }
 
-  temp_table %>%
+  ##
+  composition_df %>%
   dplyr::rename("# of cells" = total_cell_count) %>%
   prettifyTable(
     filter = "none",
@@ -283,7 +289,6 @@ output[["groups_by_cell_cycle_table"]] <- DT::renderDataTable({
     hide_long_columns = TRUE,
     columns_percentage = columns_percentage
   )
-
 })
 
 ##----------------------------------------------------------------------------##
@@ -291,7 +296,7 @@ output[["groups_by_cell_cycle_table"]] <- DT::renderDataTable({
 ##----------------------------------------------------------------------------##
 
 output[["groups_by_cell_cycle_text"]] <- renderText({
-  "Data not available."
+  "No cell cycle assignments available."
 })
 
 ##----------------------------------------------------------------------------##
@@ -304,7 +309,8 @@ observeEvent(input[["groups_by_cell_cycle_info"]], {
       groups_by_cell_cycle_info[["text"]],
       title = groups_by_cell_cycle_info[["title"]],
       easyClose = TRUE,
-      footer = NULL
+      footer = NULL,
+      size = "l"
     )
   )
 })
@@ -315,5 +321,5 @@ observeEvent(input[["groups_by_cell_cycle_info"]], {
 
 groups_by_cell_cycle_info <- list(
   title = "Cell cycle analysis",
-  text = p("Cell cycle distribution by sample using the method embedded in the Seurat framework. For each cell, it calculates scores for both G2M and S phase based on lists of genes (see 'Analysis info' tab on the left) and assigns the cell cycle phase on the basis of these scores.")
+  text = p("Shown here is the relationship between the subpopulations of the selected grouping variable and the selected cell cycle assignments. If these assignments were generated with the method embedded in the Seurat framework, for each cell, a score is calculated for both G2M and S phase based on lists of genes (see 'Analysis info' tab on the left). The cell cycle phase is then assigned on the basis of these scores.")
 )

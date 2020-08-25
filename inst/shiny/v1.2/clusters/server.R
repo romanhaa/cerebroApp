@@ -20,7 +20,7 @@ output[["clusters_tree_plot"]] <- renderPlot({
   tree <- sample_data()$clusters$tree
   tree$tip.label <- paste0("Cluster ", tree$tip.label)
   colors_tree <- reactive_colors()$clusters
-  ggtree::ggree(tree, aes(x, y)) +
+  ggtree::ggtree(tree, aes(x, y)) +
     scale_y_reverse() +
     ggtree::geom_tree() +
     ggtree::theme_tree() +
