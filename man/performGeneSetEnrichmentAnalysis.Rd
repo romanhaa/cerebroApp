@@ -53,18 +53,16 @@ data", Diaz-Mejia et al., F1000Research (2019).
 Perform gene set enrichment analysis with GSVA.
 }
 \examples{
-pbmc <- readRDS(system.file("extdata/v1.2/seurat_pbmc.rds",
+pbmc <- readRDS(system.file("extdata/v1.3/pbmc_seurat.rds",
   package = "cerebroApp"))
 example_gene_set <- system.file("extdata/example_gene_set.gmt",
   package = "cerebroApp")
 pbmc <- performGeneSetEnrichmentAnalysis(
   object = pbmc,
   GMT_file = example_gene_set,
-  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  groups = c('sample','seurat_clusters'),
   thresh_p_val = 0.05,
-  thresh_q_val = 0.1,
-  parallel.sz = 1,
-  verbose = FALSE
+  thresh_q_val = 0.1
 )
 }
 \keyword{Cerebro}

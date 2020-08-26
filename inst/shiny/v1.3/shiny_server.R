@@ -118,9 +118,21 @@ server <- function(input, output, session) {
   data_set <- reactive({
 
     ## check what data to load
-    ## ... a .crb file was specified to be loaded into Cerebro on launch and
-    ##     the file exists
+    ## ... file was selected in the "Load data" UI element and it also
     if (
+      !is.null(input[["input_file"]]) &&
+      !is.na(input[["input_file"]]) &&
+      file.exists(input[["input_file"]]$datapath)
+    ) {
+
+      ## load specified file
+      data <- readRDS(input[["input_file"]]$datapath)
+
+    ## ... a .crb file was specified to be loaded into Cerebro on launch, the
+    ##     file exists, and no selection has been made through the "Load data"
+    ##     UI element
+    } else if (
+      exists('Cerebro.options') &&
       !is.null(.GlobalEnv$Cerebro.options[["crb_file_to_load"]]) &&
       file.exists(.GlobalEnv$Cerebro.options[["crb_file_to_load"]])
     ) {
@@ -128,27 +140,14 @@ server <- function(input, output, session) {
       ## load the specified file
       data <- readRDS(.GlobalEnv$Cerebro.options[["crb_file_to_load"]])
 
-    ## ... no file was specified to be loaded
-    } else if (
-      is.null(input[["input_file"]]) ||
-      is.na(input[["input_file"]])
-    ) {
+    ## ... no file was specified to be loaded and no file has been selected in
+    ##     the "Load data" UI element
+    } else {
 
       ## load small example data set
       data <- readRDS(
-        system.file("extdata/v1.3/example.rds", package = "cerebroApp")
+        system.file("extdata/v1.3/example.crb", package = "cerebroApp")
       )
-
-    ## ... none of the above
-    } else {
-
-      ## wait until input file was specified in "Load data" element
-      req(
-        input[["input_file"]]
-      )
-
-      ## load specified file
-      data <- readRDS(input[["input_file"]]$datapath)
     }
 
     ## return loaded data

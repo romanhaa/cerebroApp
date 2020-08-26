@@ -35,7 +35,17 @@ output[["trajectory_distribution_along_pseudotime_UI"]] <- renderUI({
           size = "xs"
         )
       ),
-      plotly::plotlyOutput("trajectory_distribution_along_pseudotime_plot")
+      tagList(
+        selectInput(
+          "trajectory_distribution_along_pseudotime_select_variable",
+          label = "Variable to show along pseudotime:",
+          choices = c(
+            "state", "pseudotime",
+            colnames(getMetaData())[! colnames(getMetaData()) %in% c("cell_barcode")]
+          )
+        ),
+        plotly::plotlyOutput("trajectory_distribution_along_pseudotime_plot")
+      )
     )
   )
 })
@@ -50,7 +60,7 @@ output[["trajectory_distribution_along_pseudotime_plot"]] <- plotly::renderPlotl
   req(
     input[["trajectory_selected_method"]],
     input[["trajectory_selected_name"]],
-    input[["trajectory_point_color"]],
+    input[["trajectory_distribution_along_pseudotime_select_variable"]],
     input[["trajectory_distribution_along_pseudotime_opacity"]]
   )
 
@@ -68,7 +78,7 @@ output[["trajectory_distribution_along_pseudotime_plot"]] <- plotly::renderPlotl
   cells_df <- cells_df[ sample(1:nrow(cells_df)) , ]
 
   ## grab column name for cell coloring
-  color_variable <- input[["trajectory_point_color"]]
+  color_variable <- input[["trajectory_distribution_along_pseudotime_select_variable"]]
 
   ## ... cells are colored by a categorical variable; the Y axis will show the
   ##     density of the group along pseudotime
@@ -78,7 +88,7 @@ output[["trajectory_distribution_along_pseudotime_plot"]] <- plotly::renderPlotl
   ) {
 
     ## get colors for groups
-    colors_for_groups <- assignColorsToGroups(cells_df, input[["trajectory_point_color"]])
+    colors_for_groups <- assignColorsToGroups(cells_df, color_variable)
 
     ## get group levels
     if ( is.factor(cells_df[[ color_variable ]]) ) {

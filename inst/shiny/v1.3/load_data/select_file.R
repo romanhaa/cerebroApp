@@ -11,8 +11,8 @@
 output[["load_data_select_file_UI"]] <- renderUI({
   if (
     exists('Cerebro.options') &&
-    !is.null(Cerebro.options[['mode']]) &&
-    .GlobalEnv$Cerebro.options[["mode"]] == "open"
+    !is.null(.GlobalEnv$Cerebro.options[['mode']]) &&
+    .GlobalEnv$Cerebro.options[["mode"]] != "closed"
   ) {
     tagList(
       fluidRow(

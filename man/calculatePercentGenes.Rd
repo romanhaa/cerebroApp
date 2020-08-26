@@ -26,7 +26,7 @@ transcripts per cell.
 Calculate percentage of transcripts of gene list.
 }
 \examples{
-pbmc <- readRDS(system.file("extdata/v1.2/seurat_pbmc.rds",
+pbmc <- readRDS(system.file("extdata/v1.3/pbmc_seurat.rds",
   package = "cerebroApp"))
 pbmc <- calculatePercentGenes(
   object = pbmc,

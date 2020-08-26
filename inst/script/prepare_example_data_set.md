@@ -7,10 +7,11 @@ Download raw data from Cerebro GitHub repository: <https://github.com/romanhaa/C
 ## Preparation
 
 ```r
-library('dplyr')
-library('Seurat')
-library('monocle')
-library('cerebroApp')
+library(dplyr)
+library(Seurat)
+library(SingleR)
+library(monocle)
+library(cerebroApp)
 
 options(width = 100)
 set.seed(1234567)
@@ -19,7 +20,7 @@ set.seed(1234567)
 ## Load and randomly downsample data to 501 cells
 
 ```r
-feature_matrix <- Read10X_h5('filtered_feature_bc_matrix.h5')
+feature_matrix <- Read10X_h5('~/Downloads/filtered_feature_bc_matrix.h5')
 feature_matrix <- feature_matrix[ , sample(1:ncol(feature_matrix), 501) ]
 ```
 
@@ -31,26 +32,19 @@ seurat <- CreateSeuratObject(
   counts = feature_matrix,
   min.cells = 10
 )
-seurat <- subset(seurat, subset = nCount_RNA > 100 & nFeature_RNA > 50)
+seurat <- subset(seurat, subset = nCount_RNA >= 100 & nFeature_RNA >= 50)
 seurat <- NormalizeData(seurat)
 seurat <- FindVariableFeatures(seurat)
 seurat <- ScaleData(seurat, vars.to.regress = 'nCount_RNA')
 seurat <- RunPCA(seurat, npcs = 30, features = seurat@assays$RNA@var.features)
+```
+
+## Clustering
+
+```r
 seurat <- FindNeighbors(seurat)
 seurat <- FindClusters(seurat, resolution = 0.5)
-seurat <- BuildClusterTree(
-  seurat,
-  dims = 1:30,
-  reorder = TRUE,
-  reorder.numeric = TRUE
-)
-seurat[['cluster']] <- factor(
-  as.character(seurat@meta.data$tree.ident),
-  levels = sort(unique(seurat@meta.data$tree.ident))
-)
-seurat@meta.data$seurat_clusters <- NULL
 seurat@meta.data$RNA_snn_res.0.5 <- NULL
-seurat@meta.data$tree.ident <- NULL
 ```
 
 ## Randomly assign cells to samples
@@ -119,7 +113,7 @@ seurat <- RunUMAP(
 )
 ```
 
-## Meta data
+## Curate meta data
 
 ```r
 seurat@misc$experiment <- list(
@@ -134,8 +128,8 @@ seurat@misc$parameters <- list(
   keep_mitochondrial_genes = TRUE,
   variables_to_regress_out = 'nUMI',
   number_PCs = 30,
-  tSNE_perplexity = 30,
-  cluster_resolution = 0.5
+  cluster_resolution = 0.5,
+  tSNE_perplexity = 30
 )
 
 seurat@misc$parameters$filtering <- list(
@@ -145,50 +139,120 @@ seurat@misc$parameters$filtering <- list(
   genes_max = Inf
 )
 
+seurat@misc$technical_info$cerebroApp_version <- utils::packageVersion('cerebroApp')
+seurat@misc$technical_info$Seurat <- utils::packageVersion('Seurat')
 seurat@misc$technical_info <- list(
   'R' = capture.output(devtools::session_info())
 )
 ```
 
-## cerebroApp functions (optional but recommended)
+## Assign cell types
 
 ```r
-seurat <- cerebroApp::addPercentMtRibo(
+singler_ref <- BlueprintEncodeData()
+
+singler_results_blueprintencode_main <- SingleR(
+  test = GetAssayData(seurat, assay = 'RNA', slot = 'data'),
+  ref = singler_ref,
+  labels = singler_ref@colData@listData$label.main
+)
+
+seurat@meta.data$cell_type_singler_blueprintencode_main <- singler_results_blueprintencode_main@listData$labels
+
+singler_scores <- singler_results_blueprintencode_main@listData$scores %>%
+  as_tibble() %>%
+  dplyr::mutate(assigned_score = NA)
+
+for ( i in seq_len(nrow(singler_scores)) ) {
+  singler_scores$assigned_score[i] <- singler_scores[[singler_results_blueprintencode_main@listData$labels[i]]][i]
+}
+
+seurat@meta.data$cell_type_singler_blueprintencode_main_score <- singler_scores$assigned_score
+```
+
+## Calculate relationship trees
+
+### Samples
+
+```r
+Idents(seurat) <- "sample"
+seurat <- BuildClusterTree(
+  seurat,
+  dims = 1:30,
+  reorder = FALSE,
+  reorder.numeric = FALSE
+)
+
+seurat@misc$trees$sample <- seurat@tools$BuildClusterTree
+```
+
+### Clusters
+
+```r
+Idents(seurat) <- "seurat_clusters"
+seurat <- BuildClusterTree(
+  seurat,
+  dims = 1:30,
+  reorder = FALSE,
+  reorder.numeric = FALSE
+)
+
+seurat@misc$trees$seurat_clusters <- seurat@tools$BuildClusterTree
+```
+
+### Cell types
+
+```r
+Idents(seurat) <- "cell_type_singler_blueprintencode_main"
+seurat <- BuildClusterTree(
+  seurat,
+  dims = 1:30,
+  reorder = FALSE,
+  reorder.numeric = FALSE,
+  verbose = FALSE
+)
+
+seurat@misc$trees$cell_type_singler_blueprintencode_main <- seurat@tools$BuildClusterTree
+```
+
+## cerebroApp functions
+
+```r
+seurat <- addPercentMtRibo(
   seurat,
   organism = 'hg',
   gene_nomenclature = 'name'
 )
 
-seurat <- cerebroApp::getMostExpressedGenes(
+seurat <- getMostExpressedGenes(
   seurat,
-  column_sample = 'sample',
-  column_cluster = 'cluster'
+  assay = 'RNA',
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main')
 )
 
-seurat <- cerebroApp::getMarkerGenes(
+seurat <- getMarkerGenes(
   seurat,
+  assay = 'RNA',
   organism = 'hg',
-  column_sample = 'sample',
-  column_cluster = 'cluster'
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  name = 'cerebro_seurat',
+  only_pos = TRUE
 )
 
-seurat <- cerebroApp::getEnrichedPathways(
+seurat <- getEnrichedPathways(
   seurat,
-  column_sample = 'sample',
-  column_cluster = 'cluster',
+  marker_genes_input = 'cerebro_seurat',
   adj_p_cutoff = 0.01,
   max_terms = 100
 )
 
-seurat <- cerebroApp::performGeneSetEnrichmentAnalysis(
+example_gene_set <- system.file("extdata/example_gene_set.gmt", package = "cerebroApp")
+
+seurat <- performGeneSetEnrichmentAnalysis(
   seurat,
-  GMT_file = 'c2.all.v7.0.symbols.gmt',
-  column_sample = 'sample',
-  column_cluster = 'cluster',
-  thresh_p_val = 0.05,
-  thresh_q_val = 0.1,
-  parallel.sz = 1,
-  verbose = FALSE
+  assay = 'RNA',
+  GMT_file = example_gene_set,
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main')
 )
 ```
 
@@ -198,11 +262,11 @@ seurat <- cerebroApp::performGeneSetEnrichmentAnalysis(
 
 ```r
 monocle_all_cells <- newCellDataSet(
-  seurat@assays$RNA@data,
+  seurat@assays$RNA@counts,
   phenoData = new('AnnotatedDataFrame', data = seurat@meta.data),
   featureData = new('AnnotatedDataFrame', data = data.frame(
-    gene_short_name = rownames(seurat@assays$RNA@data),
-    row.names = rownames(seurat@assays$RNA@data))
+    gene_short_name = rownames(seurat@assays$RNA@counts),
+    row.names = rownames(seurat@assays$RNA@counts))
   )
 )
 
@@ -212,7 +276,7 @@ monocle_all_cells <- setOrderingFilter(monocle_all_cells, seurat@assays$RNA@var.
 monocle_all_cells <- reduceDimension(monocle_all_cells, max_components = 2, method = 'DDRTree')
 monocle_all_cells <- orderCells(monocle_all_cells)
 
-seurat <- cerebroApp::extractMonocleTrajectory(monocle_all_cells, seurat, 'all_cells')
+seurat <- extractMonocleTrajectory(monocle_all_cells, seurat, 'all_cells')
 ```
 
 ### Cells in G1 phase
@@ -221,11 +285,11 @@ seurat <- cerebroApp::extractMonocleTrajectory(monocle_all_cells, seurat, 'all_c
 G1_cells <- which(seurat@meta.data$Phase == 'G1')
 
 monocle_subset_of_cells <- newCellDataSet(
-  seurat@assays$RNA@data[,G1_cells],
+  seurat@assays$RNA@counts[,G1_cells],
   phenoData = new('AnnotatedDataFrame', data = seurat@meta.data[G1_cells,]),
   featureData = new('AnnotatedDataFrame', data = data.frame(
-    gene_short_name = rownames(seurat@assays$RNA@data),
-    row.names = rownames(seurat@assays$RNA@data))
+    gene_short_name = rownames(seurat@assays$RNA@counts),
+    row.names = rownames(seurat@assays$RNA@counts))
   )
 )
 
@@ -235,7 +299,7 @@ monocle_subset_of_cells <- setOrderingFilter(monocle_subset_of_cells, seurat@ass
 monocle_subset_of_cells <- reduceDimension(monocle_subset_of_cells, max_components = 2, method = 'DDRTree')
 monocle_subset_of_cells <- orderCells(monocle_subset_of_cells)
 
-seurat <- cerebroApp::extractMonocleTrajectory(monocle_subset_of_cells, seurat, 'subset_of_cells')
+seurat <- extractMonocleTrajectory(monocle_subset_of_cells, seurat, 'subset_of_cells')
 ```
 
 ## Randomly downsample genes to 1000
@@ -247,13 +311,17 @@ seurat@assays$RNA@data <- seurat@assays$RNA@data[ sample(1:nrow(seurat@assays$RN
 ## Export to Cerebro format
 
 ```r
-cerebroApp::exportFromSeurat(
+exportFromSeurat(
   seurat,
-  experiment_name = 'pbmc_10k_v3',
+  assay = 'RNA',
+  slot = 'data',
   file = 'example.crb',
+  experiment_name = 'pbmc_10k_v3',
   organism = 'hg',
+  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
   column_nUMI = 'nCount_RNA',
   column_nGene = 'nFeature_RNA',
-  column_cell_cycle_seurat = 'Phase'
+  columns_cell_cycle = c('Phase'),
+  add_all_meta_data = TRUE
 )
 ```

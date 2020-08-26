@@ -2,8 +2,6 @@
 ## Tab: Trajectory
 ##----------------------------------------------------------------------------##
 
-# TODO: let user show gene expression as well? probably more complicated
-
 source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/trajectory/select_method_and_name.R"), local = TRUE)
 source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/trajectory/projection.R"), local = TRUE)
 source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/trajectory/selected_cells_table.R"), local = TRUE)

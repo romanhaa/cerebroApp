@@ -62,17 +62,16 @@ object to visualize in Cerebro.
 Export SingleCellExperiment (SCE) object to Cerebro.
 }
 \examples{
-pbmc <- readRDS(system.file("extdata/v1.2/SCE_pbmc.rds",
+pbmc <- readRDS(system.file("extdata/v1.3/pbmc_SCE.rds",
   package = "cerebroApp"))
 exportFromSCE(
   object = pbmc,
   file = 'pbmc_SCE.crb',
   experiment_name = 'PBMC',
   organism = 'hg',
-  columns_groups = c('sample','cluster'),
+  columns_groups = c('sample','seurat_clusters'),
   column_nUMI = 'nCount_RNA',
-  column_nGene = 'nFeature_RNA',
-  columns_cell_cycle = c('Phase')
+  column_nGene = 'nFeature_RNA'
 )
 }
 \keyword{Cerebro}

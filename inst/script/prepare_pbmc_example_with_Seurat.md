@@ -11,7 +11,11 @@ pbmc_counts <- read.table(
 
 pbmc <- CreateSeuratObject(counts = pbmc_counts)
 
-pbmc@meta.data$sample <- factor('A', levels = 'A')
+sample_info <- rep(NA, nrow(pbmc@meta.data))
+sample_info[1:ceiling(length(sample_info)/2)] <- 'pbmc_1'
+sample_info[ceiling(length(sample_info)/2):length(sample_info)] <- 'pbmc_2'
+sample_info <- factor(sample_info, levels = c('pbmc_1','pbmc_2'))
+pbmc@meta.data$sample <- sample_info
 
 pbmc <- NormalizeData(object = pbmc)
 pbmc <- FindVariableFeatures(object = pbmc)
@@ -37,5 +41,5 @@ pbmc <- getMarkerGenes(
   column_cluster = 'seurat_clusters'
 )
 
-saveRDS(pbmc, 'inst/extdata/v1.3/pbmc_Seurat.rds')
+saveRDS(pbmc, 'inst/extdata/v1.3/pbmc_seurat.rds')
 ```

@@ -52,6 +52,16 @@ launchCerebroV1.3 <- function(
   require("SingleCellExperiment")
 
   ##--------------------------------------------------------------------------##
+  ## Check validity of 'mode' parameter.
+  ##--------------------------------------------------------------------------##
+  if ( mode %in% c('open','closed') == FALSE ) {
+    stop(
+      "'mode' parameter must be set to either 'open' or 'closed'.",
+      call. = FALSE
+    )
+  }
+
+  ##--------------------------------------------------------------------------##
   ## Create global variable with options that need to be available inside the
   ## Shiny app.
   ##--------------------------------------------------------------------------##

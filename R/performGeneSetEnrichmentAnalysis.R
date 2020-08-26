@@ -30,18 +30,16 @@
 #' @importFrom rlang .data
 #' @importFrom tibble tibble
 #' @examples
-#' pbmc <- readRDS(system.file("extdata/v1.2/seurat_pbmc.rds",
+#' pbmc <- readRDS(system.file("extdata/v1.3/pbmc_seurat.rds",
 #'   package = "cerebroApp"))
 #' example_gene_set <- system.file("extdata/example_gene_set.gmt",
 #'   package = "cerebroApp")
 #' pbmc <- performGeneSetEnrichmentAnalysis(
 #'   object = pbmc,
 #'   GMT_file = example_gene_set,
-#'   groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+#'   groups = c('sample','seurat_clusters'),
 #'   thresh_p_val = 0.05,
-#'   thresh_q_val = 0.1,
-#'   parallel.sz = 1,
-#'   verbose = FALSE
+#'   thresh_q_val = 0.1
 #' )
 performGeneSetEnrichmentAnalysis <- function(
   object,
@@ -276,8 +274,23 @@ performGeneSetEnrichmentAnalysis <- function(
         group_levels, USE.NAMES = TRUE, simplify = TRUE,
         future.globals = FALSE, function(x)
       {
+
+        ## get indices of cells in this group level
         cells_in_this_group <- which(object@meta.data[[ current_group ]] == x)
-        Matrix::rowMeans(matrix_full[,cells_in_this_group])
+
+        ## check how many cells are in the group level
+        ## ... only 1 cell
+        if ( length(cells_in_this_group) == 1 ) {
+
+          ## return expression values from the single cell
+          matrix_full[,cells_in_this_group]
+
+        ## ... at least 2 cells
+        } else {
+
+          ## calculate mean expression for each gene across cells
+          Matrix::rowMeans(matrix_full[,cells_in_this_group])
+        }
       })
 
       ## get enrichment score for each gene set in every cell group
@@ -342,11 +355,15 @@ performGeneSetEnrichmentAnalysis <- function(
             )
           )
 
-          ## calculate p- and q-values and filter gene sets based on the results
+          ## calculate p- and q-values
+          temp_p_values <- stats::pnorm(-abs(scale(temp_results$enrichment_score)[,1]))
+          temp_q_values <- suppressWarnings(qvalue::qvalue(temp_p_values, pi0 = 1, ties=min)$lfdr)
+
+          ## assign p- and q-values and filter gene sets based on the results
           temp_results <- temp_results %>%
             dplyr::mutate(
-              p_value = stats::pnorm(-abs(scale(.data$enrichment_score)[,1])),
-              q_value = qvalue::qvalue(.data$p_value, pi0 = 1)$lfdr
+              p_value = temp_p_values,
+              q_value = temp_q_values
             ) %>%
             dplyr::filter(
               .data$p_value <= thresh_p_val,

@@ -26,7 +26,7 @@
 #' @importFrom rlang .data
 #' @importFrom tidyselect all_of
 #' @examples
-#' pbmc <- readRDS(system.file("extdata/v1.2/seurat_pbmc.rds",
+#' pbmc <- readRDS(system.file("extdata/v1.3/pbmc_seurat.rds",
 #'   package = "cerebroApp"))
 #' pbmc <- getEnrichedPathways(
 #'   object = pbmc,
@@ -199,10 +199,21 @@ getEnrichedPathways <- function(
         )
       )
 
-      ## get group levels
+      ## get group levels based on value type
+      ## ... group levels are factors
       if ( is.factor(current_marker_genes[[ current_group ]]) ) {
+
+        ## get factor levels
         group_levels <- levels(current_marker_genes[[ current_group ]])
+
+        ## subset factor levels for those that actually exist in the data frame
+        ## and therefore have at least 1 marker gene
+        group_levels <- group_levels[group_levels %in% current_marker_genes[[ current_group ]]]
+
+      ## ... group levels are characters
       } else if ( is.character(current_marker_genes[[ current_group ]]) ) {
+
+        ## get unique values
         group_levels <- unique(current_marker_genes[[ current_group ]])
       }
 
@@ -239,21 +250,19 @@ getEnrichedPathways <- function(
         }
 
         ## check data from enrichr
-        ## ... data is not a data frame or doesn't contain required column with
-        ##     adjusted p-values
+        ## ... data is not a list, doesn't contain first database, or
+        ##     'Adjusted.P.value' column is missing from first list entry
         if (
-          # !is.data.frame(data_from_enrichr) ||
-          # 'Adjusted.P.value' %in% colnames(data_from_enrichr) == FALSE
           !is.list(data_from_enrichr) ||
-          databases[1] %in% names(data_from_enrichr) == FALSE
+          databases[1] %in% names(data_from_enrichr) == FALSE ||
+          'Adjusted.P.value' %in% colnames(data_from_enrichr[[1]]) == FALSE
         ) {
           message(
             paste0(
               '[', format(Sys.time(), '%H:%M:%S'),
-              '] Data returned by Enrichr for group `', current_group,
-              '`, does not appear to be in the right format (not a data frame ',
-              'and does not contain column with adjusted p-values). Will ',
-              'proceed with next group.'
+              '] Data returned by Enrichr for subgroup `', x, '` of group `',
+              current_group, '`, does not appear to be in the right format. ',
+              'Will proceed with next subgroup.'
             )
           )
 

@@ -46,7 +46,14 @@ output[["trajectory_states_by_group_UI"]] <- renderUI({
             )
           )
         ),
-        uiOutput("states_by_group_table_UI")
+        tagList(
+          selectInput(
+            "states_by_group_select_other_group",
+            label = "Group to compare to:",
+            choices = c(getGroups(), getCellCycle())
+          ),
+          uiOutput("states_by_group_table_UI")
+        )
       )
     )
   )
@@ -80,7 +87,7 @@ output[["states_by_group_plot"]] <- plotly::renderPlotly({
   req(
     input[["trajectory_selected_method"]],
     input[["trajectory_selected_name"]],
-    input[["trajectory_point_color"]],
+    input[["states_by_group_select_other_group"]],
     input[["states_by_group_plot_type"]]
   )
 
@@ -93,14 +100,8 @@ output[["states_by_group_plot"]] <- plotly::renderPlotly({
   ## merge trajectory data with meta data
   cells_df <- cbind(trajectory_data[["meta"]], getMetaData())
 
-  ## if the selected variable to color cells by contains numeric values, show
-  ## cell counts by state, otherwise split the cell counts by the selected
-  ## (categorical) variable
-  if ( is.numeric(cells_df[[ input[["trajectory_point_color"]] ]]) ) {
-    grouping_variable <- "state"
-  } else {
-    grouping_variable <- input[["trajectory_point_color"]]
-  }
+  ##
+  grouping_variable <- input[["states_by_group_select_other_group"]]
 
   ## - remove cells without pseudotime (NA)
   ## - group table by state and selected variable

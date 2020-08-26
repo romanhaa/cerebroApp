@@ -67,20 +67,20 @@ extractMonocleTrajectory <- function(
   }
 
   ## check if provided Seurat object is of class "Seurat"
-  if ( class(object) != "Seurat" ) {
+  if ( class(seurat) != "Seurat" ) {
     stop(
       paste0(
-        "Provided object is of class `", class(object), "` but must be of class 'Seurat'."
+        "Provided object is of class `", class(seurat), "` but must be of class 'Seurat'."
       ),
       call. = FALSE
     )
   }
 
   ## check version of Seurat object and stop if it is lower than 3
-  if ( object@version < 3 ) {
+  if ( seurat@version < 3 ) {
     stop(
       paste0(
-        "Provided Seurat object has version `", object@version, "` but must be at least 3.0."
+        "Provided Seurat object has version `", seurat@version, "` but must be at least 3.0."
       ),
       call. = FALSE
     )

@@ -27,12 +27,12 @@ multiple grouping variables in the meta data of the provided Seurat object.
 Get most expressed genes for specified grouping variables in Seurat object.
 }
 \examples{
-pbmc <- readRDS(system.file("extdata/v1.3/seurat_pbmc.rds",
+pbmc <- readRDS(system.file("extdata/v1.3/pbmc_seurat.rds",
   package = "cerebroApp"))
 pbmc <- getMostExpressedGenes(
   object = pbmc,
   assay = 'RNA',
-  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main')
+  groups = c('sample','seurat_clusters')
 )
 }
 \keyword{Cerebro}

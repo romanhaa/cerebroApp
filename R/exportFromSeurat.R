@@ -31,17 +31,16 @@
 #' @importFrom rlang .data
 #' @import SingleCellExperiment
 #' @examples
-#' pbmc <- readRDS(system.file("extdata/v1.2/seurat_pbmc.rds",
+#' pbmc <- readRDS(system.file("extdata/v1.3/pbmc_seurat.rds",
 #'   package = "cerebroApp"))
 #' exportFromSeurat(
 #'   object = pbmc,
 #'   file = 'pbmc_Seurat.crb',
 #'   experiment_name = 'PBMC',
 #'   organism = 'hg',
-#'   columns_groups = c('sample','cluster'),
+#'   columns_groups = c('sample','seurat_clusters'),
 #'   column_nUMI = 'nCount_RNA',
-#'   column_nGene = 'nFeature_RNA',
-#'   columns_cell_cycle = c('Phase')
+#'   column_nGene = 'nFeature_RNA'
 #' )
 exportFromSeurat <- function(
   object,

@@ -17,12 +17,12 @@
 #' @importFrom rlang .data
 #' @importFrom tibble tibble
 #' @examples
-#' pbmc <- readRDS(system.file("extdata/v1.3/seurat_pbmc.rds",
+#' pbmc <- readRDS(system.file("extdata/v1.3/pbmc_seurat.rds",
 #'   package = "cerebroApp"))
 #' pbmc <- getMostExpressedGenes(
 #'   object = pbmc,
 #'   assay = 'RNA',
-#'   groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main')
+#'   groups = c('sample','seurat_clusters')
 #' )
 getMostExpressedGenes <- function(
   object,
@@ -166,16 +166,41 @@ getMostExpressedGenes <- function(
     ##     grouping variable
     if ( length(group_levels) == 1 ) {
 
-      ## issue warning because grouping variable will be skipped since only 1
-      ## group level was found
-      warning(
+      ## log message
+      message(
         paste0(
-          'Only 1 group levels was found (`', group_levels,
-          '`) for current grouping variable (`', current_group,
-          '`). Will proceed with next grouping variable.'
-        ),
-        call. = FALSE
+          '[', format(Sys.time(), '%H:%M:%S'), '] Group `', current_group,
+          '` contains only one subgroup. Will calculate most expressed genes ',
+          'across all cells of this group...'
+        )
       )
+
+      ## calculate sums for all genes
+      transcripts_counts_per_gene <- Matrix::rowSums(object@assays[[assay]]@counts)
+
+      ## calculate transcript count across all cells of current group level
+      total_transcript_count <- sum(transcripts_counts_per_gene)
+
+      ## transform transcript counts per gene to percentage of all transcripts
+      transcripts_percent_per_gene <- transcripts_counts_per_gene / total_transcript_count
+
+      ## sort percentage values decreasingly
+      transcripts_percent_per_gene <- sort(transcripts_percent_per_gene, decreasing = TRUE)
+
+      ## build data frame with results
+      table <- tibble::tibble(
+          group = group_levels,
+          gene = names(transcripts_percent_per_gene)[1:100],
+          pct = transcripts_percent_per_gene[1:100]
+        )
+
+      ## factorize group levels and rename first column
+      most_expressed_genes <- table %>%
+        dplyr::mutate(group = factor(group, levels = group_levels)) %>%
+        dplyr::rename(!!current_group := group)
+
+      ## add results to Seurat object
+      object@misc[["most_expressed_genes"]][[ current_group ]] <- most_expressed_genes
 
     ## ... if at least 2 group levels are present, perform analysis
     } else if ( length(group_levels) > 1 ) {
@@ -197,8 +222,20 @@ getMostExpressedGenes <- function(
         ## subset transcript count matrix for 
         transcript_count_matrix <- object@assays[[assay]]@counts[,cells_of_current_group_level]
 
-        ## calculate sums for all genes
-        transcripts_counts_per_gene <- Matrix::rowSums(transcript_count_matrix)
+        ## check how many cells are present in the matrix
+        ## ... only a single cell, which returns transcript counts as vector
+        ##     instead of a matrix
+        if ( is.vector(transcript_count_matrix) == TRUE ) {
+
+          ## take the transcript counts from that cell
+          transcripts_counts_per_gene <- transcript_count_matrix
+
+        ## ... at least 2 cells
+        } else {
+
+          ## calculate sums for all genes
+          transcripts_counts_per_gene <- Matrix::rowSums(transcript_count_matrix)
+        }
 
         ## calculate transcript count across all cells of current group level
         total_transcript_count <- sum(transcripts_counts_per_gene)
@@ -216,15 +253,15 @@ getMostExpressedGenes <- function(
             pct = transcripts_percent_per_gene[1:100]
           )
       })
+
+      ## merge tables with results and factorize group levels
+      most_expressed_genes <- do.call(rbind, results) %>%
+        dplyr::mutate(group = factor(group, levels = group_levels)) %>%
+        dplyr::rename(!!current_group := group)
+
+      ## add results to Seurat object
+      object@misc[["most_expressed_genes"]][[ current_group ]] <- most_expressed_genes
     }
-
-    ## merge tables with results and factorize group levels
-    most_expressed_genes <- do.call(rbind, results) %>%
-      dplyr::mutate(group = factor(group, levels = group_levels)) %>%
-      dplyr::rename(!!current_group := group)
-
-    ## add results to Seurat object
-    object@misc[["most_expressed_genes"]][[ current_group ]] <- most_expressed_genes
   }
 
   ##--------------------------------------------------------------------------##

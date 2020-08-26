@@ -28,16 +28,15 @@
 #' @importFrom biomaRt getBM useMart
 #' @import dplyr
 #' @importFrom rlang .data
-#' @importFrom Seurat FindAllMarkers Idents
 #' @importFrom tidyselect all_of any_of
 #' @examples
-#' pbmc <- readRDS(system.file("extdata/v1.3/seurat_pbmc.rds",
+#' pbmc <- readRDS(system.file("extdata/v1.3/pbmc_seurat.rds",
 #'   package = "cerebroApp"))
 #' pbmc <- getMarkerGenes(
 #'   object = pbmc,
 #'   assay = 'RNA',
 #'   organism = 'hg',
-#'   groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+#'   groups = c('sample','seurat_clusters'),
 #'   name = 'cerebro_seurat',
 #'   only_pos = TRUE,
 #'   min_pct = 0.7,

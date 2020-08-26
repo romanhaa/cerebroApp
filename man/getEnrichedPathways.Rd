@@ -49,7 +49,7 @@ in marker gene sets of all available grouping variables.
 Get enriched pathways based on marker genes from EnrichR.
 }
 \examples{
-pbmc <- readRDS(system.file("extdata/v1.2/seurat_pbmc.rds",
+pbmc <- readRDS(system.file("extdata/v1.3/pbmc_seurat.rds",
   package = "cerebroApp"))
 pbmc <- getEnrichedPathways(
   object = pbmc,

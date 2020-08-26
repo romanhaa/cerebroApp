@@ -16,9 +16,8 @@
 #' percentage of mitochondrial and ribosomal gene expression for each cell.
 #' @import dplyr
 #' @importFrom readr cols read_tsv
-#' @importFrom Seurat AddMetaData
 #' @examples
-#' pbmc <- readRDS(system.file("extdata/v1.2/seurat_pbmc.rds",
+#' pbmc <- readRDS(system.file("extdata/v1.3/pbmc_seurat.rds",
 #'   package = "cerebroApp"))
 #' pbmc <- addPercentMtRibo(
 #'   object = pbmc,

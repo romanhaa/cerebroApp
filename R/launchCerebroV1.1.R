@@ -7,12 +7,9 @@
 #' @return Shiny application.
 #' @import dplyr
 #' @importFrom DT datatable formatStyle
-#' @importFrom formattable proportion
 #' @import ggplot2
-#' @importFrom ggtree geom_tree geom_tiplab geom_tippoint theme_tree
 #' @importFrom msigdbr msigdbr
 #' @importFrom plotly layout plot_ly plotlyOutput renderPlotly toWebGL
-#' @importFrom reshape2 melt
 #' @importFrom tidyr spread
 #' @import scales
 #' @import shiny
@@ -26,6 +23,34 @@
 launchCerebroV1.1 <- function(
   maxFileSize = 800
 ){
+
+  ##--------------------------------------------------------------------------##
+  ## safety checks before starting to do anything
+  ##--------------------------------------------------------------------------##
+
+  ## check if ggtree package is installed
+  if ( !requireNamespace("ggtree", quietly = TRUE) ) {
+    stop(
+      "The 'ggtree' package is needed for this function to work. Please install it.",
+      call. = FALSE
+    )
+  }
+
+  ## check if formattable package is installed
+  if ( !requireNamespace("formattable", quietly = TRUE) ) {
+    stop(
+      "The 'formattable' package is needed for this function to work. Please install it.",
+      call. = FALSE
+    )
+  }
+
+  ## check if reshape2 package is installed
+  if ( !requireNamespace("reshape2", quietly = TRUE) ) {
+    stop(
+      "The 'reshape2' package is needed for this function to work. Please install it.",
+      call. = FALSE
+    )
+  }
 
   ##--------------------------------------------------------------------------##
   ## define path to export plots to

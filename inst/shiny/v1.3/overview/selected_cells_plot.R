@@ -15,7 +15,14 @@ output[["overview_selected_cells_plot_UI"]] <- renderUI({
         boxTitle("Plot of selected cells"),
         cerebroInfoButton("overview_details_selected_cells_plot_info")
       ),
-      plotly::plotlyOutput("overview_details_selected_cells_plot")
+      tagList(
+        selectInput(
+          "overview_selected_cells_plot_select_variable",
+          label = "Variable to compare:",
+          choices = colnames(getMetaData())[! colnames(getMetaData()) %in% c("cell_barcode")]
+        ),
+        plotly::plotlyOutput("overview_details_selected_cells_plot")
+      )
     )
   )
 })
@@ -30,7 +37,7 @@ output[["overview_selected_cells_plot_UI"]] <- renderUI({
 output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
   req(
     input[["overview_projection_to_display"]],
-    input[["overview_point_color"]]
+    input[["overview_selected_cells_plot_select_variable"]]
   )
 
   ## extract cells to plot
@@ -39,14 +46,24 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
       getMetaData()
     )
 
+  ##
+  ## ...
   if (
     is.null(plotly::event_data("plotly_selected", source = "overview_projection")) ||
     length(plotly::event_data("plotly_selected", source = "overview_projection")) == 0
   ) {
+
+    ###
     cells_df <- cells_df %>% dplyr::mutate(group = 'not selected')
+
+  ## ...
   } else {
+
+    ##
     selected_cells <- plotly::event_data("plotly_selected", source = "overview_projection") %>%
       dplyr::mutate(identifier = paste0(x, '-', y))
+
+    ##
     cells_df <- cells_df %>%
       dplyr::rename(X1 = 1, X2 = 2) %>%
       dplyr::mutate(
@@ -56,7 +73,7 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
       )
   }
 
-  color_variable <- input[["overview_point_color"]]
+  color_variable <- input[["overview_selected_cells_plot_select_variable"]]
 
   ## if the selected coloring variable is categorical, represent the selected
   ## cells in a bar chart
@@ -86,16 +103,16 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
       ## check whether the selected meta data column contains a registered
       ## grouping variable
       ## ... the column is a grouping variable
-      if ( input[["overview_point_color"]] %in% getGroups() ) {
+      if ( color_variable %in% getGroups() ) {
 
         ## get levels for the grouping variable
-        group_levels <- getGroupLevels(input[["overview_point_color"]])
+        group_levels <- getGroupLevels(color_variable)
 
       ## ... the column is not a known grouping variable
       } else {
 
         ## get unique values on the meta data column
-        group_levels <- unique(getMetaData()[[input[["overview_point_color"]]]])
+        group_levels <- unique(getMetaData()[[color_variable]])
       }
 
       ## create empty table to show
@@ -103,8 +120,7 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
           group = group_levels,
           n = 0
         ) %>%
-        dplyr::rename(!!input[["overview_point_color"]] := group)
-
+        dplyr::rename(!!color_variable := group)
     }
 
     ## convert factor to character to avoid empty bars when selecting cells of
@@ -112,7 +128,7 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
     cells_df[[1]] <- as.character(cells_df[[1]])
 
     ## get colors for groups
-    colors_for_groups <- assignColorsToGroups(cells_df, input[["overview_point_color"]])
+    colors_for_groups <- assignColorsToGroups(cells_df, color_variable)
 
     ## make bar chart
     plotly::plot_ly(
@@ -179,7 +195,7 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
         showline = TRUE
       ),
       yaxis = list(
-        title = colnames(t)[2],
+        title = colnames(cells_df)[2],
         hoverformat = ".0f",
         mirror = TRUE,
         showline = TRUE

@@ -8,8 +8,6 @@
 ## Layout of the UI elements.
 ##----------------------------------------------------------------------------##
 
-## TODO: add info button for input parameters
-
 output[["overview_projection_UI"]] <- renderUI({
   fluidRow(
     ## selections and parameters

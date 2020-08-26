@@ -109,13 +109,19 @@ output[["groups_tree_plot"]] <- renderPlot({
 
   ## only proceed if tree is present (this check is necessary because it can
   ## otherwise result in an error when switching between groups)
-  if ( !is.null(getTree( input[["groups_selected_group"]] )) ) {
+  if (
+    !is.null(getTree( input[["groups_selected_group"]] )) &&
+    class(getTree( input[["groups_selected_group"]] )) == 'phylo'
+  ) {
 
     ## retrieve tree from Cerebro object
     tree <- getTree( input[["groups_selected_group"]] )
 
-    ## get colors for tips
-    tip_colors <- reactive_colors()[[ input[["groups_selected_group"]] ]]
+    ## get color assignments for groups
+    group_colors <- reactive_colors()[[ input[["groups_selected_group"]] ]]
+
+    ## get put colors in correct order
+    tip_colors <- group_colors[match(tree$tip.label, names(group_colors))]
 
     ##
     if ( input[["groups_tree_plot_type"]] == "Unrooted" ) {
