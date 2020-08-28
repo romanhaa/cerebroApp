@@ -1,0 +1,291 @@
+---
+title: "Exporting a data set in SCE format"
+author: "Roman Hillje"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    toc: true
+    number_sections: true
+    self_contained: yes
+    mode: selfcontained
+vignette: >
+  %\VignetteIndexEntry{Exporting a data set in SCE format}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+Here, I explain how one can export a data set stored in the [`SingleCellExperiment`/`SCE`](https://bioconductor.org/packages/release/bioc/html/SingleCellExperiment.html) format to visualize it in Cerebro.
+
+The workflow used here is loosely put together from the [`scran`](https://bioconductor.org/packages/release/bioc/vignettes/scran/inst/doc/scran.html) and [`scater`](https://bioconductor.org/packages/3.11/bioc/vignettes/scater/inst/doc/overview.html) examples.
+Do not use this workflow as a reference for how to properly process your data.
+
+# Installation
+
+Before starting the workflow, we need to install `cerebroApp`, as well as the [`scran`](https://bioconductor.org/packages/release/bioc/html/scran.html), [`scater`](https://bioconductor.org/packages/3.11/bioc/html/scater.html) and [`SingleR`](https://www.bioconductor.org/packages/release/bioc/html/SingleR.html) packages, which are not installed as dependencies of cerebroApp because they are only necessary if you want/need to pre-process your scRNA-seq data.
+If you just want to launch the Cerebro user interface, e.g. because you already have the pre-processed data, you don't need those packages.
+
+```{r installation, message=FALSE, warning=FALSE}
+if ( 'BiocManager' %in% installed.packages() == FALSE ) install.packages('BiocManager')
+
+library(BiocManager)
+
+if ( 'cerebroApp' %in% installed.packages() == FALSE ) install('cerebroApp')
+if ( 'scran' %in% installed.packages() == FALSE ) install('scran')
+if ( 'scater' %in% installed.packages() == FALSE ) install('scater')
+if ( 'SingleR' %in% installed.packages() == FALSE ) install('SingleR')
+if ( 'monocle' %in% installed.packages() == FALSE ) install('monocle')
+```
+
+# Load packages
+
+Apart from the packages we just installed, we will also load the `dplyr` package and set a seed to make our analysis reproducible.
+
+```{r setup, message=FALSE, warning=FALSE}
+library(dplyr)
+library(scran)
+library(scater)
+library(SingleR)
+library(cerebroApp)
+
+options(width = 100)
+set.seed(1234567)
+```
+
+# Load count data
+
+In this example workflow, we will load a small transcript count table from the [`Seurat`](https://satijalab.org/seurat/) package containing 80 cells and 230 genes.
+If you want to try the workflow with a real data set, you can find some transcript count matrices on the [Cerebro GitHub repo](https://github.com/romanhaa/Cerebro/tree/master/examples).
+
+```{r load_data}
+pbmc_counts <- read.table(
+    file = system.file('extdata', 'pbmc_raw.txt', package = 'Seurat'),
+    as.is = TRUE
+  ) %>% as.matrix()
+```
+
+# Pre-processing with `scran` and `scater`
+
+Now, we create a `SingleCellExperiment` object and filter out cells with less than `50` transcripts or fewer than `10` expressed genes.
+Those cut-offs are only reasonable for this example data set and will likely need to be adjusted in a real data set.
+Then, we...
+
+* remove genes expressed in less than 5 cells,
+* log-normalize transcript counts,
+* identify highly variably genes,
+* perform principal component analysis (PCA).
+
+```{r pre_processing, warning=FALSE}
+sce <- SingleCellExperiment::SingleCellExperiment(
+  assays = list(counts = pbmc_counts)
+)
+
+qc_metrics <- perCellQCMetrics(sce)
+colData(sce) <- cbind(colData(sce), qc_metrics)
+
+cells_to_keep <- sce$sum >= 50 & sce$detected >= 10
+sce <- sce[,cells_to_keep]
+
+genes_to_keep <- nexprs(sce, byrow=TRUE) >= 5
+sce <- sce[genes_to_keep,]
+
+sce <- logNormCounts(sce)
+
+variable_genes <- modelGeneVar(sce)
+highly_variable_genes <- getTopHVGs(variable_genes, n = 50)
+
+sce <- runPCA(sce)
+```
+
+# Clustering
+
+Then, we identify clusters using a graph-based approach.
+
+```{r clustering}
+graph <- buildSNNGraph(sce, use.dimred = "PCA")
+cluster <- igraph::cluster_walktrap(graph)$membership
+sce$cluster <- factor(cluster)
+```
+
+# Dimensional reduction
+
+Next, we use the UMAP technique to generate two- and three-dimensional projections.
+
+```{r dimensional_reduction, warning=FALSE}
+sce <- runUMAP(
+  sce,
+  name = 'UMAP',
+  ncomponents = 2,
+)
+
+sce <- runUMAP(
+  sce,
+  name = 'UMAP_3D',
+  ncomponents = 3,
+)
+```
+
+# Curate meta data
+
+This example data set consists of a single sample so we just add that name to the meta data.
+Moreover, in order to be able to understand how we did the analysis later, we add some meta data to the `misc` slot of our `SCE` object, e.g. an experiment name and the species.
+The info we store there will later be collected for visualization in Cerebro.
+
+```{r prepare_meta_data}
+sce$sample <- factor('pbmc', levels = 'pbmc')
+
+sce@metadata$experiment <- list(
+  experiment_name = 'pbmc',
+  organism = 'hg',
+  date_of_analysis = Sys.Date()
+)
+
+sce@metadata$parameters <- list(
+  gene_nomenclature = 'gene_name',
+  discard_genes_expressed_in_fewer_cells_than = 10,
+  keep_mitochondrial_genes = TRUE,
+  variables_to_regress_out = 'nUMI'
+)
+
+sce@metadata$parameters$filtering <- list(
+  UMI_min = 50,
+  UMI_max = Inf,
+  genes_min = 10,
+  genes_max = Inf
+)
+
+sce@metadata$technical_info$cerebroApp_version <- utils::packageVersion('cerebroApp')
+sce@metadata$technical_info$scran <- utils::packageVersion('scran')
+sce@metadata$technical_info$scater <- utils::packageVersion('scater')
+sce@metadata$technical_info <- list(
+  'R' = capture.output(devtools::session_info())
+)
+```
+
+# Assign cell types
+
+Using the [`SingleR`](https://www.bioconductor.org/packages/release/bioc/html/SingleR.html) package, we can get a suggestion of cell type for each cell.
+Apart from the suggested cell type, we also extract the score that might help us to understand how confident the assignment was.
+
+```{r cell_type_assignment}
+singler_ref <- BlueprintEncodeData()
+
+singler_results_blueprintencode_main <- SingleR(
+  test = logcounts(sce),
+  ref = singler_ref,
+  labels = singler_ref@colData@listData$label.main
+)
+
+sce$cell_type_singler_blueprintencode_main <- singler_results_blueprintencode_main@listData$labels
+
+singler_scores <- singler_results_blueprintencode_main@listData$scores %>%
+  as_tibble() %>%
+  dplyr::mutate(assigned_score = NA)
+
+for ( i in seq_len(nrow(singler_scores)) ) {
+  singler_scores$assigned_score[i] <- singler_scores[[singler_results_blueprintencode_main@listData$labels[i]]][i]
+}
+
+sce$cell_type_singler_blueprintencode_main_score <- singler_scores$assigned_score
+```
+
+##Identify marker genes
+
+Marker genes are genes which are particularly strongly or weakly expressed in a given cell population, e.g. a cluster.
+This information can help to distinguish the role of different cell groups in the data set.
+Here, marker genes are identified for clusters and cell types using the `findMarkers()` function from the `scran` package.
+The results are separate tables for the respective subgroups, which we merge together in order to make them compatible with Cerebro.
+
+## Clusters
+
+```{r marker_genes_clusters}
+sce@metadata$marker_genes <- list()
+sce@metadata$marker_genes$scran <- list()
+
+marker_genes_cluster <- findMarkers(sce, sce$cluster)
+
+for ( i in seq_along(marker_genes_cluster) ) {
+  marker_genes_cluster[[i]] <- as.data.frame(marker_genes_cluster[[i]]) %>%
+    mutate(
+      cluster = names(marker_genes_cluster)[i],
+      gene = rownames(.)
+    )
+  marker_genes_cluster[[i]][[paste0('logFC.', names(marker_genes_cluster)[i])]] <- 0
+}
+
+marker_genes_cluster <- do.call(bind_rows, marker_genes_cluster) %>%
+  select(cluster, gene, Top, p.value, FDR, everything()) %>%
+  mutate(cluster = factor(cluster, levels = levels(colData(sce)$cluster)))
+
+sce@metadata$marker_genes$scran$cluster <- marker_genes_cluster %>%
+  filter(!is.na(Top), FDR <= 0.1)
+
+glimpse(marker_genes_cluster)
+
+marker_genes_cluster %>% head() %>% knitr::kable()
+```
+
+## Cell types
+
+```{r marker_genes_cell_types}
+marker_genes_cell_type <- findMarkers(sce, sce$cell_type_singler_blueprintencode_main)
+
+for ( i in seq_along(marker_genes_cell_type) ) {
+  marker_genes_cell_type[[i]] <- as.data.frame(marker_genes_cell_type[[i]]) %>%
+    mutate(
+      cell_type_singler_blueprintencode_main = names(marker_genes_cell_type)[i],
+      gene = rownames(.)
+    )
+  marker_genes_cell_type[[i]][[paste0('logFC.', gsub(names(marker_genes_cell_type)[i], pattern = ' |\\-|\\+', replacement = '.'))]] <- 0
+}
+
+marker_genes_cell_type <- do.call(bind_rows, marker_genes_cell_type) %>%
+  select(cell_type_singler_blueprintencode_main, gene, Top, p.value, FDR, everything()) %>%
+  mutate(cell_type_singler_blueprintencode_main = factor(
+      cell_type_singler_blueprintencode_main,
+      levels = unique(cell_type_singler_blueprintencode_main)
+    )
+  )
+
+sce@metadata$marker_genes$scran$cell_type_singler_blueprintencode_main <- marker_genes_cell_type %>%
+  filter(!is.na(Top), FDR <= 0.1)
+
+glimpse(marker_genes_cell_type)
+
+marker_genes_cell_type %>% select(1:6) %>% head() %>% knitr::kable(booktabs = T)
+```
+
+# Export to Cerebro format
+
+Finally, we use the `exportFromSeurat()` function of cerebroApp to export our Seurat object to a `.crb` file which can be loaded into Cerebro.
+
+```{r export_data}
+exportFromSCE(
+  sce,
+  assay = 'logcounts',
+  file = paste0('cerebro_pbmc_SCE_', Sys.Date(), '.crb'),
+  experiment_name = 'pbmc',
+  organism = 'hg',
+  columns_groups = c('sample','cluster','cell_type_singler_blueprintencode_main'),
+  column_nUMI = 'sum',
+  column_nGene = 'detected',
+  add_all_meta_data = TRUE,
+  verbose = FALSE
+)
+```
+
+The Cerebro use interface can be launched using the `launchCerebro()` function.
+
+# Session info
+
+```{r session_info}
+sessionInfo()
+```

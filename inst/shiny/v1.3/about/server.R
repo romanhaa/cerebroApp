@@ -57,7 +57,7 @@ observeEvent(input[["browser"]], {
 
 output[["logo_Cerebro"]] <- renderImage({
   list(
-    src = system.file('extdata/logo_Cerebro.png', package = 'cerebroApp'),
+    src = paste0(Cerebro.options$cerebro_root, '/extdata/logo_Cerebro.png'),
     contentType = 'image/png',
     width = 350,
     height = 405,

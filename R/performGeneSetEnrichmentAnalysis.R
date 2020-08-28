@@ -1,12 +1,14 @@
+#' @title
 #' Perform gene set enrichment analysis with GSVA.
-#' @title Perform gene set enrichment analysis with GSVA.
-#' @description This function calculates enrichment scores, p- and q-value
-#' statistics for provided gene sets for specified groups of cells in given
-#' Seurat object using gene set variation analysis (GSVA). Calculation of p- and
-#' q-values for gene sets is performed as done in "Evaluation of methods to
-#' assign cell type labels to cell clusters from single-cell RNA-sequencing
-#' data", Diaz-Mejia et al., F1000Research (2019).
-#' @keywords Cerebro scRNAseq Seurat GSVA
+#'
+#' @description
+#' This function calculates enrichment scores, p- and q-value statistics for
+#' provided gene sets for specified groups of cells in given Seurat object using
+#' gene set variation analysis (GSVA). Calculation of p- and q-values for gene
+#' sets is performed as done in "Evaluation of methods to assign cell type
+#' labels to cell clusters from single-cell RNA-sequencing data", Diaz-Mejia et
+#' al., F1000Research (2019).
+#'
 #' @param object Seurat object.
 #' @param assay Assay to pull counts from; defaults to 'RNA'. Only relevant in
 #' Seurat v3.0 or higher since the concept of assays wasn't implemented before.
@@ -20,15 +22,11 @@
 #' @param thresh_p_val Threshold for p-value, defaults to 0.05.
 #' @param thresh_q_val Threshold for q-value, defaults to 0.1.
 #' @param ... Further parameters can be passed to control GSVA::gsva().
-#' @export
-#' @return Seurat object with GSVA results for the specified grouping variables
+#'
+#' @return
+#' Seurat object with GSVA results for the specified grouping variables
 #' stored in object@misc$enriched_pathways$<name>
-#' @import dplyr
-#' @importFrom GSVA gsva
-#' @importFrom Matrix colMeans colSums rowSums t
-#' @importFrom qvalue qvalue
-#' @importFrom rlang .data
-#' @importFrom tibble tibble
+#'
 #' @examples
 #' pbmc <- readRDS(system.file("extdata/v1.3/pbmc_seurat.rds",
 #'   package = "cerebroApp"))
@@ -41,6 +39,16 @@
 #'   thresh_p_val = 0.05,
 #'   thresh_q_val = 0.1
 #' )
+#'
+#' @import dplyr
+#' @importFrom GSVA gsva
+#' @importFrom Matrix colMeans colSums rowSums t
+#' @importFrom qvalue qvalue
+#' @importFrom rlang .data
+#' @importFrom tibble tibble
+#'
+#' @export
+#'
 performGeneSetEnrichmentAnalysis <- function(
   object,
   assay = 'RNA',
@@ -252,6 +260,14 @@ performGeneSetEnrichmentAnalysis <- function(
       }
     }
 
+    ## log message
+    message(
+      glue::glue(
+        '[', format(Sys.time(), '%H:%M:%S'), '] Performing analysis for ',
+        '{length(group_levels)} subgroups of group `{current_group}`...'
+      )
+    )
+
     ## check number of group levels
     ## ... if only 1 group level is present, show warning and move to next
     ##     grouping variable
@@ -301,12 +317,12 @@ performGeneSetEnrichmentAnalysis <- function(
         )
 
       ## log message
-      message(
-        paste0(
-          '[', format(Sys.time(), '%H:%M:%S'), '] Filtering results based on ',
-          'specified thresholds...'
-        )
-      )
+      # message(
+      #   paste0(
+      #     '[', format(Sys.time(), '%H:%M:%S'), '] Filtering results based on ',
+      #     'specified thresholds...'
+      #   )
+      # )
 
       ## create empty tibble for results
       results <- tibble::tibble(
@@ -348,12 +364,12 @@ performGeneSetEnrichmentAnalysis <- function(
         } else if ( nrow(temp_results) >= 2 ) {
 
           ## log message
-          message(
-            paste0(
-              '[', format(Sys.time(), '%H:%M:%S'), '] Filtering results based ',
-              'on specified thresholds...'
-            )
-          )
+          # message(
+          #   paste0(
+          #     '[', format(Sys.time(), '%H:%M:%S'), '] Filtering results based ',
+          #     'on specified thresholds...'
+          #   )
+          # )
 
           ## calculate p- and q-values
           temp_p_values <- stats::pnorm(-abs(scale(temp_results$enrichment_score)[,1]))
@@ -390,9 +406,9 @@ performGeneSetEnrichmentAnalysis <- function(
 
       ## print number of enriched gene sets
       message(
-        paste0(
-          '[', format(Sys.time(), '%H:%M:%S'), '] ', nrow(results),
-          ' gene sets passed the thresholds across all samples.'
+        glue::glue(
+          '[', format(Sys.time(), '%H:%M:%S'), '] {nrow(results)} gene sets ',
+          'passed the thresholds across all subgroups of group `{current_group}`.'
         )
       )
 

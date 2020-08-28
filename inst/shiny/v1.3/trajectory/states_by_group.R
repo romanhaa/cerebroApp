@@ -9,6 +9,12 @@
 ##----------------------------------------------------------------------------##
 
 output[["trajectory_states_by_group_UI"]] <- renderUI({
+
+  req(
+    input[["trajectory_selected_method"]],
+    input[["trajectory_selected_name"]]
+  )
+
   fluidRow(
     cerebroBox(
       title = tagList(

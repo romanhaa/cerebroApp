@@ -2,11 +2,12 @@
 ## Tab: Gene (set) expression
 ##----------------------------------------------------------------------------##
 
-source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/gene_expression/projection.R"), local = TRUE)
-source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/gene_expression/table_of_selected_cells.R"), local = TRUE)
-source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/gene_expression/expression_in_selected_cells.R"), local = TRUE)
-source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/gene_expression/expression_by_group.R"), local = TRUE)
-source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/gene_expression/expression_by_gene.R"), local = TRUE)
+source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/gene_expression/projection.R"), local = TRUE)
+source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/gene_expression/table_of_selected_cells.R"), local = TRUE)
+source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/gene_expression/expression_in_selected_cells.R"), local = TRUE)
+source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/gene_expression/expression_by_group.R"), local = TRUE)
+source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/gene_expression/expression_by_gene.R"), local = TRUE)
+source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/gene_expression/expression_by_pseudotime.R"), local = TRUE)
 
 ##----------------------------------------------------------------------------##
 ## Reactive data that holds genes provided by user or in selected gene set.
@@ -80,11 +81,38 @@ gene_expression_plot_data <- reactive({
     genesToPlot()
   )
 
-  ## build data frame with data
-  cells_df <- cbind(
-      getProjection(input[["expression_projection_to_display"]]),
-      getMetaData()
+  ## check if projection or trajectory should be shown
+  ## ... projection
+  if ( input[["expression_projection_to_display"]] %in% availableProjections() ) {
+
+    ## build data frame with data
+    cells_df <- cbind(
+        getProjection(input[["expression_projection_to_display"]]),
+        getMetaData()
+      )
+
+  ## ... trajectory
+  } else {
+
+    ## split selection into method and name
+    selection <- strsplit(input[["expression_projection_to_display"]], split = ' // ')[[1]]
+
+    ## check if method and name exist and don't proceed if not
+    req(
+      selection[1] %in% getMethodsForTrajectories(),
+      selection[2] %in% getNamesOfTrajectories(selection[1])
     )
+
+    ## collect trajectory data
+    trajectory_data <- getTrajectory(
+      selection[1],
+      selection[2]
+    )
+
+    ## merge meta data and trajectory info and remove cells without pseudotime
+    cells_df <- cbind(trajectory_data[["meta"]], getMetaData()) %>%
+      dplyr::filter(!is.na(pseudotime))
+  }
 
   ## randomly remove cells (if necessary)
   cells_df <- randomlySubsetCells(cells_df, input[["expression_percentage_cells_to_show"]])

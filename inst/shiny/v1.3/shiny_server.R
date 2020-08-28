@@ -161,6 +161,7 @@ server <- function(input, output, session) {
     columns_indices <- c()
     for ( i in columns_to_test ) {
       if (
+        any(is.na(df[[i]])) == FALSE &&
         is.numeric(df[[i]]) &&
         all.equal(df[[i]], as.integer(df[[i]]), check.attributes = FALSE) == TRUE
       ) {
@@ -175,9 +176,10 @@ server <- function(input, output, session) {
     for ( i in 1:ncol(df) ) {
       if (
         grepl(colnames(df)[i], pattern = "pct|percent|%", ignore.case = TRUE) &&
+        any(is.na(df[[i]])) == FALSE &&
         is.numeric(df[[i]]) &&
-        min(df[[i]]) >= 0 &&
-        max(df[[i]])
+        min(df[[i]], na.rm = TRUE) >= 0 &&
+        max(df[[i]], na.rm = TRUE)
       ) {
         columns_indices <- c(columns_indices, i)
       }
@@ -191,9 +193,10 @@ server <- function(input, output, session) {
     for ( i in 1:ncol(df) ) {
       if (
         grepl(colnames(df)[i], pattern = pattern_columns_p_value, ignore.case = TRUE) &&
+        any(is.na(df[[i]])) == FALSE &&
         is.numeric(df[[i]]) &&
-        min(df[[i]]) >= 0 &&
-        max(df[[i]])
+        min(df[[i]], na.rm = TRUE) >= 0 &&
+        max(df[[i]], na.rm = TRUE)
       ) {
         columns_indices <- c(columns_indices, i)
       }
@@ -206,6 +209,7 @@ server <- function(input, output, session) {
     for ( i in 1:ncol(df) ) {
       if (
         grepl(colnames(df)[i], pattern = "logFC|log-FC|log_FC|log.FC", ignore.case = TRUE) &&
+        any(is.na(df[[i]])) == FALSE &&
         is.numeric(df[[i]])
       ) {
         columns_indices <- c(columns_indices, i)
@@ -377,7 +381,10 @@ server <- function(input, output, session) {
     if ( number_formatting == TRUE ) {
 
       ## integer values
-      if ( !is.null(columns_integer) && length(columns_integer) > 0 ) {
+      if (
+        !is.null(columns_integer) &&
+        length(columns_integer) > 0
+      ) {
         table <- table %>%
           DT::formatRound(
             columns = columns_integer,
@@ -388,7 +395,10 @@ server <- function(input, output, session) {
       }
 
       ## p-values
-      if ( !is.null(columns_p_value) && length(columns_p_value) > 0 ) {
+      if (
+        !is.null(columns_p_value) &&
+        length(columns_p_value) > 0
+      ) {
         table <- table %>%
           DT::formatSignif(
             columns = columns_p_value,
@@ -397,7 +407,10 @@ server <- function(input, output, session) {
       }
 
       ## logFC
-      if ( !is.null(columns_logFC) && length(columns_logFC) > 0 ) {
+      if (
+        !is.null(columns_logFC) &&
+        length(columns_logFC) > 0
+      ) {
         table <- table %>%
           DT::formatRound(
             columns = columns_logFC,
@@ -406,7 +419,10 @@ server <- function(input, output, session) {
       }
 
       ## percentage
-      if ( !is.null(columns_percent) && length(columns_percent) > 0 ) {
+      if (
+        !is.null(columns_percent) &&
+        length(columns_percent) > 0
+      ) {
         table <- table %>%
         DT::formatPercentage(
           columns = columns_percent,
@@ -415,7 +431,10 @@ server <- function(input, output, session) {
       }
 
       ## numeric but none of the above
-      if ( !is.null(columns_only_numeric) && length(columns_only_numeric) > 0 ) {
+      if (
+        !is.null(columns_only_numeric) &&
+        length(columns_only_numeric) > 0
+      ) {
         table <- table %>%
           DT::formatSignif(
             columns = columns_only_numeric,
@@ -536,7 +555,10 @@ server <- function(input, output, session) {
       }
 
       ## logicals
-      if ( !is.null(columns_logical) && length(columns_logical) > 0 ) {
+      if (
+        !is.null(columns_logical) &&
+        length(columns_logical) > 0
+      ) {
         table <- table %>%
           DT::formatStyle(
             columns_logical,
@@ -881,17 +903,17 @@ server <- function(input, output, session) {
   buildHoverInfoForProjections <- function(table) {
 
     ## put together cell ID, number of transcripts and number of expressed genes
-    hover_info <- paste0(
-      "<b>Cell</b>: ", table[[ "cell_barcode" ]], "<br>",
-      "<b>Transcripts</b>: ", formatC(table[[ "nUMI" ]], format = "f", big.mark = ",", digits = 0), "<br>",
-      "<b>Expressed genes</b>: ", formatC(table[[ "nGene" ]], format = "f", big.mark = ",", digits = 0), "<br>"
+    hover_info <- glue::glue(
+      "<b>Cell</b>: {table[[ 'cell_barcode' ]]}
+      <b>Transcripts</b>: {formatC(table[[ 'nUMI' ]], format = 'f', big.mark = ',', digits = 0)}
+      <b>Expressed genes</b>: {formatC(table[[ 'nGene' ]], format = 'f', big.mark = ',', digits = 0)}"
     )
 
     ## add info for known grouping variables
     for ( group in getGroups() ) {
-      hover_info <- paste0(
-        hover_info,
-        "<b>", group, "</b>: ", table[[ group ]], "<br>"
+      hover_info <- glue::glue(
+        "{hover_info}
+        <b>{group}</b>: {table[[ group ]]}"
       )
     }
 
@@ -933,17 +955,17 @@ server <- function(input, output, session) {
   ## Tabs.
   ##--------------------------------------------------------------------------##
 
-  source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/load_data/server.R"), local = TRUE)
-  source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/overview/server.R"), local = TRUE)
-  source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/groups/server.R"), local = TRUE)
-  source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/most_expressed_genes/server.R"), local = TRUE)
-  source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/marker_genes/server.R"), local = TRUE)
-  source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/enriched_pathways/server.R"), local = TRUE)
-  source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/gene_expression/server.R"), local = TRUE)
-  source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/gene_id_conversion/server.R"), local = TRUE)
-  source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/trajectory/server.R"), local = TRUE)
-  source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/analysis_info/server.R"), local = TRUE)
-  source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/color_management/server.R"), local = TRUE)
-  source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/about/server.R"), local = TRUE)
+  source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/load_data/server.R"), local = TRUE)
+  source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/overview/server.R"), local = TRUE)
+  source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/groups/server.R"), local = TRUE)
+  source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/most_expressed_genes/server.R"), local = TRUE)
+  source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/marker_genes/server.R"), local = TRUE)
+  source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/enriched_pathways/server.R"), local = TRUE)
+  source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/gene_expression/server.R"), local = TRUE)
+  source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/gene_id_conversion/server.R"), local = TRUE)
+  source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/trajectory/server.R"), local = TRUE)
+  source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/analysis_info/server.R"), local = TRUE)
+  source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/color_management/server.R"), local = TRUE)
+  source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/about/server.R"), local = TRUE)
 
 }

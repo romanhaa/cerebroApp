@@ -19,15 +19,12 @@ need to annotated as gene symbol, e.g. MKI67 (human) / Mki67 (mouse).}
 ENSEMBL ID ('ensembl') or GENCODE ID ('gencode_v27', 'gencode_vM16').}
 }
 \value{
-Seurat object with two new meta data columns containing the
-percentage of mitochondrial and ribosomal gene expression for each cell.
+Seurat object with two new meta data columns containing the percentage of
+mitochondrial and ribosomal gene expression for each cell.
 }
 \description{
-Get percentage of transcripts of gene list compared to all
-transcripts per cell.
-}
-\details{
-Add percentage of mitochondrial and ribosomal transcripts.
+Get percentage of transcripts of gene list compared to all transcripts per
+cell.
 }
 \examples{
 pbmc <- readRDS(system.file("extdata/v1.3/pbmc_seurat.rds",
@@ -38,9 +35,5 @@ pbmc <- addPercentMtRibo(
   organism = 'hg',
   gene_nomenclature = 'name'
 )
+
 }
-\keyword{Cerebro}
-\keyword{Seurat}
-\keyword{cerebro}
-\keyword{scRNAseq}
-\keyword{seurat}

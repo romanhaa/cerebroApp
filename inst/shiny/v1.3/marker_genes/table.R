@@ -80,7 +80,10 @@ output[["marker_genes_table_or_text_UI"]] <- renderUI({
           DT::dataTableOutput("marker_genes_table")
         )
       )
-    } else if ( results_type == "no_markers_found" ) {
+    } else if (
+      is.character(results_type) &&
+      results_type == "no_markers_found"
+    ) {
       textOutput("marker_genes_table_no_markers_found")
     }
   } else {
@@ -97,7 +100,8 @@ output[["marker_genes_filter_subgroups_UI"]] <- renderUI({
   ##
   req(
     input[["marker_genes_selected_method"]],
-    input[["marker_genes_selected_group"]]
+    input[["marker_genes_selected_group"]],
+    !is.null(input[["marker_genes_table_filter_switch"]])
   )
 
   ## fetch results
@@ -163,12 +167,15 @@ output[["marker_genes_table"]] <- DT::renderDataTable(server = FALSE, {
   ## subgroup did not work properly, skip the processing and show and empty
   ## table (otherwise the procedure would result in an error)
   if ( nrow(results_df) == 0 ) {
+
     results_df %>%
     as.data.frame() %>%
     dplyr::slice(0) %>%
     prepareEmptyTable()
+
   ## if there is at least 1 row, create proper table
   } else {
+
     prettifyTable(
       results_df,
       filter = list(position = "top", clear = TRUE),
@@ -235,8 +242,10 @@ marker_genes_info <- list(
     When active, the subgroup section element will disappear and instead the table will be shown for all subgroups. Subgroups can still be selected through the dedicated column filter, which also allows to select multiple subgroups at once. While using the column filter is more elegant, it can become laggy with very large tables, hence to option to filter the table beforehand.<br>
     <b>Automatically format numbers</b><br>
     When active, columns in the table that contain different types of numeric values will be formatted based on what they <u>seem</u> to be. The algorithm will look for integers (no decimal values), percentages, p-values, log-fold changes and apply different formatting schemes to each of them. Importantly, this process does that always work perfectly. If it fails and hinders working with the table, automatic formatting can be deactivated.<br>
+    <em>This feature does not work on columns that contain 'NA' values.</em><br>
     <b>Highlight values with colors</b><br>
     Similar to the automatic formatting option, when active, Cerebro will look for known columns in the table (those that contain grouping variables), try to interpret column content, and use colors and other stylistic elements to facilitate quick interpretation of the values. If you prefer the table without colors and/or the identification does not work properly, you can simply deactivate this feature.<br>
+    <em>This feature does not work on columns that contain 'NA' values.</em><br>
     <br>
     <em>Columns can be re-ordered by dragging their respective header.</em>"
   )

@@ -1,10 +1,22 @@
+#' @title
 #' Launch Cerebro v1.2
-#' @title Launch Cerebro v1.2
-#' @description Launch the Cerebro v1.2 Shiny application.
-#' @keywords Cerebro scRNAseq Seurat
-#' @param maxFileSize Maximum size of input file; defaults to 800 MB.
-#' @export
-#' @return Shiny application.
+#'
+#' @description
+#' Launch the Cerebro v1.2 Shiny application.
+#'
+#' @param maxFileSize Maximum size of input file; defaults to \code{800}
+#' (800 MB).
+#' @param ... Further parameters that are used by \code{shiny::runApp}, e.g.
+#' \code{host} an \code{port}.
+#'
+#' @return
+#' Shiny application.
+#'
+#' @examples
+#' if ( interactive() ) {
+#'   launchCerebroV1.2(maxFileSize = 800)
+#' }
+#'
 #' @importFrom colourpicker colourInput
 #' @import dplyr
 #' @importFrom DT datatable formatStyle
@@ -17,12 +29,12 @@
 #' @import shinydashboard
 #' @import shinyWidgets
 #' @importFrom viridis scale_fill_viridis
-#' @examples
-#' if ( interactive() ) {
-#'   launchCerebroV1.2(maxFileSize = 800)
-#' }
+#'
+#' @export
+#'
 launchCerebroV1.2 <- function(
-  maxFileSize = 800
+  maxFileSize = 800,
+  ...
 ){
 
   ##--------------------------------------------------------------------------##
@@ -100,6 +112,5 @@ launchCerebroV1.2 <- function(
       '##---------------------------------------------------------------------------##'
     )
   )
-  shiny::shinyApp(ui = ui, server = server)
-
+  shiny::shinyApp(ui = ui, server = server, ...)
 }

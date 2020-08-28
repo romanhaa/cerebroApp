@@ -1,8 +1,10 @@
+#' @title
 #' Get marker genes for specified grouping variables in Seurat object.
-#' @title Get marker genes for specified grouping variables in Seurat object.
-#' @description This function gets marker genes for one or multiple
-#' grouping variables in the meta data of the provided Seurat object.
-#' @keywords Cerebro scRNAseq Seurat
+#'
+#' @description
+#' This function gets marker genes for one or multiple grouping variables in
+#' the meta data of the provided Seurat object.
+#'
 #' @param object Seurat object.
 #' @param assay Assay to pull transcripts counts from; defaults to 'RNA'.
 #' @param organism Organism information for pulling info about presence of
@@ -11,7 +13,7 @@
 #' @param groups Grouping variables (columns) in object@meta.data for which
 #' marker genes should be calculated.
 #' @param name Name of list that should be used to store the results in
-#' object@misc$marker_genes$<name>; defaults to 'cerebro_seurat'.
+#' \code{object@misc$marker_genes$<name>}; defaults to 'cerebro_seurat'.
 #' @param only_pos Identify only over-expressed genes; defaults to TRUE.
 #' @param min_pct Only keep genes that are expressed in at least n\% of current
 #' group of cells, defaults to 0.70 (70\%).
@@ -22,13 +24,11 @@
 #' @param verbose Print progress bar; defaults to TRUE.
 #' @param ... Further parameters can be passed to control
 #' Seurat::FindAllMakers().
-#' @export
-#' @return Seurat object with marker gene results for the specified grouping
-#' variables stored in object@misc$marker_genes.
-#' @importFrom biomaRt getBM useMart
-#' @import dplyr
-#' @importFrom rlang .data
-#' @importFrom tidyselect all_of any_of
+#'
+#' @return
+#' Seurat object with marker gene results for the specified grouping variables
+#' stored in \code{object@misc$marker_genes}.
+#'
 #' @examples
 #' pbmc <- readRDS(system.file("extdata/v1.3/pbmc_seurat.rds",
 #'   package = "cerebroApp"))
@@ -45,6 +45,14 @@
 #'   test = 'wilcox',
 #'   verbose = TRUE
 #' )
+#'
+#' @importFrom biomaRt getBM useMart
+#' @import dplyr
+#' @importFrom rlang .data
+#' @importFrom tidyselect all_of any_of
+#'
+#' @export
+#'
 getMarkerGenes <- function(
   object,
   assay = 'RNA',

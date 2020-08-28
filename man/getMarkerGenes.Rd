@@ -32,7 +32,7 @@ object; defaults to NULL.}
 marker genes should be calculated.}
 
 \item{name}{Name of list that should be used to store the results in
-object@misc$marker_genes$<name>; defaults to 'cerebro_seurat'.}
+\code{object@misc$marker_genes$<name>}; defaults to 'cerebro_seurat'.}
 
 \item{only_pos}{Identify only over-expressed genes; defaults to TRUE.}
 
@@ -52,15 +52,12 @@ defaults to 0.25.}
 Seurat::FindAllMakers().}
 }
 \value{
-Seurat object with marker gene results for the specified grouping
-variables stored in object@misc$marker_genes.
+Seurat object with marker gene results for the specified grouping variables
+stored in \code{object@misc$marker_genes}.
 }
 \description{
-This function gets marker genes for one or multiple
-grouping variables in the meta data of the provided Seurat object.
-}
-\details{
-Get marker genes for specified grouping variables in Seurat object.
+This function gets marker genes for one or multiple grouping variables in
+the meta data of the provided Seurat object.
 }
 \examples{
 pbmc <- readRDS(system.file("extdata/v1.3/pbmc_seurat.rds",
@@ -78,7 +75,5 @@ pbmc <- getMarkerGenes(
   test = 'wilcox',
   verbose = TRUE
 )
+
 }
-\keyword{Cerebro}
-\keyword{Seurat}
-\keyword{scRNAseq}

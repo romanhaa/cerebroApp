@@ -1,21 +1,19 @@
+#' @title
 #' Get most expressed genes for specified grouping variables in Seurat object.
-#' @title Get most expressed genes for specified grouping variables in Seurat
-#' object.
-#' @description This function calculates the most expressed genes for one or
-#' multiple grouping variables in the meta data of the provided Seurat object.
-#' @keywords Cerebro scRNAseq Seurat
+#'
+#' @description
+#' This function calculates the most expressed genes for one or multiple
+#' grouping variables in the meta data of the provided Seurat object.
+#'
 #' @param object Seurat object.
 #' @param assay Assay to pull transcripts counts from; defaults to 'RNA'.
-#' @param groups Grouping variables (columns) in object@meta.data for which most
-#' expressed genes should be calculated; defaults to NULL.
-#' @export
-#' @return Seurat object with most expressed genes stored for every group level
-#' of the specified groups stored in object@misc$most_expressed_genes.
-#' @import dplyr
-#' @importFrom Matrix rowSums
-#' @importFrom pbapply pblapply
-#' @importFrom rlang .data
-#' @importFrom tibble tibble
+#' @param groups Grouping variables (columns) in \code{object@meta.data} for
+#' which most expressed genes should be calculated; defaults to NULL.
+#'
+#' @return
+#' Seurat object with most expressed genes stored for every group level of the
+#' specified groups stored in \code{object@misc$most_expressed_genes}.
+#'
 #' @examples
 #' pbmc <- readRDS(system.file("extdata/v1.3/pbmc_seurat.rds",
 #'   package = "cerebroApp"))
@@ -24,6 +22,15 @@
 #'   assay = 'RNA',
 #'   groups = c('sample','seurat_clusters')
 #' )
+#'
+#' @import dplyr
+#' @importFrom Matrix rowSums
+#' @importFrom pbapply pblapply
+#' @importFrom rlang .data
+#' @importFrom tibble tibble
+#'
+#' @export
+#'
 getMostExpressedGenes <- function(
   object,
   assay = 'RNA',

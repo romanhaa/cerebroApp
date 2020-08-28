@@ -9,6 +9,12 @@
 ##----------------------------------------------------------------------------##
 
 output[["trajectory_distribution_along_pseudotime_UI"]] <- renderUI({
+
+  req(
+    input[["trajectory_selected_method"]],
+    input[["trajectory_selected_name"]]
+  )
+
   fluidRow(
     cerebroBox(
       title = tagList(
@@ -109,40 +115,44 @@ output[["trajectory_distribution_along_pseudotime_plot"]] <- plotly::renderPlotl
       ## filter cells for those that are in current group
       temp_data <- cells_df[which(cells_df[[ color_variable ]] == current_group),]
 
-      ## calculate density over pseudotime
-      temp_density <- stats::density(temp_data[["pseudotime"]], kernel = "gaussian")
+      ## only proceed if at least 2 cells are in this subgroup
+      if ( nrow(temp_data) > 1) {
 
-      ## add alpha value to hex colors
-      temp_color <- grDevices::col2rgb(colors_for_groups[i])
-      temp_color <- grDevices::rgb(
-        red = temp_color[1],
-        green = temp_color[2],
-        blue = temp_color[3],
-        alpha = input[["trajectory_distribution_along_pseudotime_opacity"]]/1*255,
-        maxColorValue = 255
-      )
+        ## calculate density over pseudotime
+        temp_density <- stats::density(temp_data[["pseudotime"]], kernel = "gaussian")
 
-      ## add trace to plot
-      plot <- plot %>%
-        plotly::add_trace(
-          x = temp_density$x,
-          y = temp_density$y,
-          name = current_group,
-          type = 'scatter',
-          mode = 'lines',
-          fill = 'tozeroy',
-          fillcolor = temp_color,
-          line = list(
-            width = 0.5,
-            color = colors_for_groups[i]
-          ),
-          hoverinfo = 'text',
-          text = paste0(
-            "<b>", current_group, "</b><br>",
-            "<b>Pseudotime</b>: ", formatC(temp_density$x, format = "f", big.mark = ",", digits = 2), "<br>",
-            "<b>Density</b>: ", formatC(temp_density$y, format = "f", big.mark = ",", digits = 2), "<br>"
-          )
+        ## add alpha value to hex colors
+        temp_color <- grDevices::col2rgb(colors_for_groups[i])
+        temp_color <- grDevices::rgb(
+          red = temp_color[1],
+          green = temp_color[2],
+          blue = temp_color[3],
+          alpha = input[["trajectory_distribution_along_pseudotime_opacity"]]/1*255,
+          maxColorValue = 255
         )
+
+        ## add trace to plot
+        plot <- plot %>%
+          plotly::add_trace(
+            x = temp_density$x,
+            y = temp_density$y,
+            name = current_group,
+            type = 'scatter',
+            mode = 'lines',
+            fill = 'tozeroy',
+            fillcolor = temp_color,
+            line = list(
+              width = 0.5,
+              color = colors_for_groups[i]
+            ),
+            hoverinfo = 'text',
+            text = paste0(
+              "<b>", current_group, "</b><br>",
+              "<b>Pseudotime</b>: ", formatC(temp_density$x, format = "f", big.mark = ",", digits = 2), "<br>",
+              "<b>Density</b>: ", formatC(temp_density$y, format = "f", big.mark = ",", digits = 2), "<br>"
+            )
+          )
+      }
     }
 
     ## add layout to plot
@@ -249,5 +259,9 @@ observeEvent(input[["trajectory_distribution_along_pseudotime_info"]], {
 
 trajectory_distribution_along_pseudotime_info <- list(
   title = "Distribution along pseudotime",
-  text = p("This plot shows the distribution of the variable selected above to color cells by along pseudotime. If this is a categorical variable, e.g. 'sample' or 'cluster', you will see a density plot. In contrast, if you have selected a continuous variable, e.g. nUMI or nGene, cells will be colored by the state they belong to.")
+  text = HTML("
+    This plot shows the distribution of the variable selected above to color cells by along pseudotime.<br>
+    If this is a categorical variable, e.g. 'sample' or 'cluster', you will see a density plot. Subgroups of the selected categorical variable that contain only a single cell will not be shown as no density can be calculated for them.<br>
+    In contrast, if you have selected a continuous variable, e.g. nUMI or nGene, cells will be colored by the state they belong to."
+  )
 )

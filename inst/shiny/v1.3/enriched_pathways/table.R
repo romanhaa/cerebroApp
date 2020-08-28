@@ -283,8 +283,10 @@ enriched_pathways_info <- list(
     When active, the subgroup section element will disappear and instead the table will be shown for all subgroups. Subgroups can still be selected through the dedicated column filter, which also allows to select multiple subgroups at once. While using the column filter is more elegant, it can become laggy with very large tables, hence to option to filter the table beforehand.<br>
     <b>Automatically format numbers</b><br>
     When active, columns in the table that contain different types of numeric values will be formatted based on what they <u>seem</u> to be. The algorithm will look for integers (no decimal values), percentages, p-values, log-fold changes and apply different formatting schemes to each of them. Importantly, this process does that always work perfectly. If it fails and hinders working with the table, automatic formatting can be deactivated.<br>
+    <em>This feature does not work on columns that contain 'NA' values.</em><br>
     <b>Highlight values with colors</b><br>
     Similar to the automatic formatting option, when active, Cerebro will look for known columns in the table (those that contain grouping variables), try to interpret column content, and use colors and other stylistic elements to facilitate quick interpretation of the values. If you prefer the table without colors and/or the identification does not work properly, you can simply deactivate this feature.<br>
+    <em>This feature does not work on columns that contain 'NA' values.</em><br>
     <br>
     <em>Columns can be re-ordered by dragging their respective header.</em>"
   )

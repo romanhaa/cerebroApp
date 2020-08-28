@@ -315,7 +315,7 @@ exportFromSeurat(
   seurat,
   assay = 'RNA',
   slot = 'data',
-  file = 'example.crb',
+  file = 'inst/extdata/v1.3/example.crb',
   experiment_name = 'pbmc_10k_v3',
   organism = 'hg',
   columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),

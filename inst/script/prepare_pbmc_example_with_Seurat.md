@@ -37,8 +37,7 @@ pbmc <- RunUMAP(
 pbmc <- getMarkerGenes(
   pbmc,
   organism = 'hg',
-  column_sample = 'sample',
-  column_cluster = 'seurat_clusters'
+  groups = c('sample','seurat_clusters')
 )
 
 saveRDS(pbmc, 'inst/extdata/v1.3/pbmc_seurat.rds')

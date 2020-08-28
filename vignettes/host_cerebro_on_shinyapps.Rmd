@@ -1,0 +1,151 @@
+---
+title: "Host Cerebro on shinyapps.io"
+author: "Roman Hillje"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    toc: true
+    number_sections: true
+    self_contained: yes
+    mode: selfcontained
+vignette: >
+  %\VignetteIndexEntry{Host Cerebro on shinyapps.io}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Overview
+
+In this vignette, I explain how one can host Cerebro on [shinyapps.io](https://www.shinyapps.io).
+For a more detailed tutorial on how to host Shiny apps on shinyapps.io, take a look here: <https://shiny.rstudio.com/articles/shinyapps.html>
+
+[shinyapps.io](https://www.shinyapps.io) is a great place to host Shiny apps and make them accessible for other users.
+You will need an account on the website.
+The free account comes with a limit on (1) the number of applications that can be hosted in parallel and (2) the number of active hours, but it is enough to get some experience and figure out if this service fits your purpose.
+
+# Setup
+
+To upload Cerebro to shinyapps.io, we will use the [`rsconnect`](https://cran.r-project.org/web/packages/rsconnect/index.html) package, therefore it needs to be installed first.
+Of course, we also need the cerebroApp package.
+
+```{r eval=FALSE}
+if ( 'rsconnect' %in% installed.packages() == FALSE ) install.packages('rsconnect')
+if ( 'cerebroApp' %in% installed.packages() == FALSE ) install.packages('cerebroApp')
+
+library(rsconnect)
+```
+
+Then, you need to provide `rsconnect` with your shinyapps.io account info.
+On the shinyapps.io website, in the left navigation bar, go to "Account" and then "Tokens".
+A token should have already been generated for you.
+Take the token and secret, your account name, and run the command below.
+
+```{r eval=FALSE}
+rsconnect::setAccountInfo(name="<ACCOUNT>", token="<TOKEN>", secret="<SECRET>")
+```
+
+# Prepare Shiny files
+
+Next, we need to copy the Shiny files and some other data for Cerebro v1.3 to a dedicated directory, here `~/test_cerebro_shinyapps`.
+If you prefer to host a different version of Cerebro, adapt the code accordingly.
+
+```{r eval=FALSE}
+dir.create('~/test_cerebro_shinyapps')
+dir.create('~/test_cerebro_shinyapps/shiny')
+
+file.copy(
+  system.file('extdata', package = 'cerebroApp'),
+  '~/test_cerebro_shinyapps/',
+  recursive = TRUE
+)
+
+unlink(
+  c('~/test_cerebro_shinyapps/extdata/v1.0',
+    '~/test_cerebro_shinyapps/extdata/v1.1',
+    '~/test_cerebro_shinyapps/extdata/v1.2'),
+  recursive = TRUE
+)
+
+file.copy(
+  system.file('shiny', 'v1.3', package = 'cerebroApp'),
+  '~/test_cerebro_shinyapps/shiny',
+  recursive = TRUE
+)
+```
+
+# Prepare `app.R` file
+
+Since we are not using the usual `launchCerebro()` function to start Cerebro, we have to prepare a dedicated `app.R` file that will do the same for us.
+Use your favorite text editor to open a new file, paste the code below into it, and save it as `~/test_cerebro_shinyapps/app.R`.
+
+```{r eval=FALSE}
+## load packages -------------------------------------------------------------##
+library(dplyr)
+library(DT)
+library(plotly)
+library(shiny)
+library(shinydashboard)
+library(shinyWidgets)
+
+## set parameters ------------------------------------------------------------##
+Cerebro.options <- list(
+  "mode" = "open",
+  "crb_file_to_load" = "extdata/v1.3/example.crb",
+  "cerebro_root" = "."
+)
+
+shiny_options <- list(
+  maxRequestSize = 800 * 1024^2,
+  port = 1337
+)
+
+## load server and UI functions ----------------------------------------------##
+source(glue::glue("{Cerebro.options$cerebro_root}/shiny/v1.3/shiny_UI.R"))
+source(glue::glue("{Cerebro.options$cerebro_root}/shiny/v1.3/shiny_server.R"))
+
+## launch app ----------------------------------------------------------------##
+shiny::shinyApp(
+  ui = ui,
+  server = server,
+  options = shiny_options
+)
+```
+
+# Deploy app
+
+Now, it is time to upload the app the shinyapps.io.
+With `rsconnect`, that can be quickly done using the code below.
+
+Since we have a dependency from [Bioconductor](http://bioconductor.org), we have to add the current release (3.11) to the repositories using the `setRepositories()` command.
+When doing so, you will be asked which repositories should be used in this session.
+For what we are doing here, selecting `CRAN` and `BioC software` should be sufficient.
+
+When you run the `deployApp()` command, you might receive a warning about a hidden `browser()` call in the `shiny/v1.3/about/server.R` file, but you can ignore that and proceed.
+Alternatively, you can simply comment out the respective line.
+
+```{r eval=FALSE}
+setRepositories(addURLs = c(BioC = "https://bioconductor.org/packages/3.11/bioc"))
+
+rsconnect::deployApp('~/test_cerebro_shinyapps/', appName = 'Cerebro v1.3')
+```
+
+Uploading and preparing the app might take a few minutes, but once it finishes successfully, Cerebro should open in your browser.
+Using the shinyapps.io dashboard, you can manage the app, check usage metrics and logs, etc.
+An important parameter is the "Instance size", which controls the available memory and can be controled in the "Settings" tab of the dashboard.
+The larger the data set you want to upload to Cerebro, the more memory will be necessary.
+
+# See also
+
+* `vignette('launch_cerebro_with_pre-loaded_data_set')`
+* `vignette('protect_cerebro_with_login')`
+
+# Known issues
+
+* Exporting plots to PDF through the `export to PDF` buttons effectively does not work at the moment. That is because it will trigger a file selection dialog on the server side, not allowing the user to specify a location on their local machine.

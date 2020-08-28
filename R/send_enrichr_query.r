@@ -1,13 +1,22 @@
+#' @title
 #' Gene enrichment using Enrichr.
-#' @title Gene enrichment using Enrichr.
-#' @description Gene enrichment using Enrichr.
+#'
+#' @description
+#' Gene enrichment using Enrichr.
+#'
 #' @param genes Gene names or dataframe of gene names in first column and a
 #' score between 0 and 1 in the other.
 #' @param databases Databases to search.
 #' @param URL_API URL to send requests to (Enrichr API).
 #' See http://amp.pharm.mssm.edu/Enrichr/ for available databases.
-#' @return Returns a data frame of enrichment terms, p-values, ...
+#'
+#' @return
+#' Returns a data frame of enrichment terms, p-values, ...
+#'
+#' @importFrom httr GET POST
+#'
 #' @author Wajid Jawaid, modified by Roman Hillje
+#'
 .send_enrichr_query <- function(
   genes,
   databases = NULL,

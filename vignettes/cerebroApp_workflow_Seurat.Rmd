@@ -30,9 +30,9 @@ This vignette will give you an example of how scRNA-seq data can be processed us
 Ket features that can be accessed through Cerebro:
 
 * Interactive 2D and 3D dimensional reductions.
-* Sample and cluster overview panels.
-* Tables of most expressed genes and marker genes for samples and clusters.
-* Tables of enriched pathways for samples and clusters.
+* Overview panels for all grouping variables, e.g. samples and clusters.
+* Tables of most expressed genes and marker genes for subgroups of grouping variables.
+* Tables of enriched pathways for subgroups of grouping variables.
 * Query gene(s) and gene sets from MSigDB and show their expression in dimensional reductions.
 * Visualize trajectories calculated with Monocle v2.
 * All plots can be exported to PNG. In addition, 2D dimensional reductions can be exported to PDF.
@@ -40,7 +40,8 @@ Ket features that can be accessed through Cerebro:
 
 # Installation
 
-Before starting the workflow, we need to install cerebroApp, as well as the [Seurat](https://satijalab.org/seurat/) and [monocle](http://cole-trapnell-lab.github.io/monocle-release/) packages, which are not installed as dependencies of cerebroApp because they are only necessary if you want/need to pre-process your scRNA-seq data but not if you just want to launch the Cerebro user interface, e.g. because you already have the pre-processed data.
+Before starting the workflow, we need to install `cerebroApp`, as well as the [`Seurat`](https://satijalab.org/seurat/), [`monocle`](https://cole-trapnell-lab.github.io/monocle-release/) and [`SingleR`](https://www.bioconductor.org/packages/release/bioc/html/SingleR.html) packages, which are not installed as dependencies of cerebroApp because they are only necessary if you want/need to pre-process your scRNA-seq data.
+If you just want to launch the Cerebro user interface, e.g. because you already have the pre-processed data, you don't need those packages.
 
 ```{r installation, message=FALSE, warning=FALSE}
 if ( 'BiocManager' %in% installed.packages() == FALSE ) install.packages('BiocManager')
@@ -53,7 +54,7 @@ if ( 'SingleR' %in% installed.packages() == FALSE ) install('SingleR')
 if ( 'monocle' %in% installed.packages() == FALSE ) install('monocle')
 ```
 
-# Load packages
+# Setup
 
 Apart from the packages we just installed, we will also load the dplyr package and set a seed to make our analysis reproducible.
 
@@ -64,12 +65,14 @@ library(SingleR)
 library(monocle)
 library(cerebroApp)
 
+options(width = 100)
 set.seed(1234567)
 ```
 
 # Load count data
 
 In this example workflow, we will load a small transcript count table from the [Seurat](https://satijalab.org/seurat/) package containing 80 cells and 230 genes.
+If you want to try the workflow with a real data set, you can find some transcript count matrices on the [Cerebro GitHub repo](https://github.com/romanhaa/Cerebro/tree/master/examples).
 
 ```{r load_data}
 pbmc <- read.table(
@@ -80,7 +83,7 @@ pbmc <- read.table(
 
 # Pre-processing with Seurat
 
-Now, we create a Seurat object and filter out cells with less than `50` transcripts or fewer than `10` expressed genes.
+Now, we create a `Seurat` object and filter out cells with less than `50` transcripts or fewer than `10` expressed genes.
 Those cut-offs are only reasonable for this example data set and will likely need to be adjusted in a real data set.
 Then, we follow the [standard Seurat workflow](https://satijalab.org/seurat/essential_commands.html), including...
 
@@ -93,7 +96,7 @@ Then, we follow the [standard Seurat workflow](https://satijalab.org/seurat/esse
 seurat <- CreateSeuratObject(
   project = 'pbmc',
   counts = pbmc,
-  min.cells = 10
+  min.cells = 5
 )
 seurat <- subset(seurat, subset = nCount_RNA >= 50 & nFeature_RNA >= 10)
 seurat <- NormalizeData(seurat, verbose = FALSE)
@@ -104,7 +107,7 @@ seurat <- RunPCA(seurat, features = seurat@assays$RNA@var.features, verbose = FA
 
 # Clustering
 
-Then, we identify clusters and build a cluster tree that represents the similarity between clusters.
+Then, we identify clusters with a relatively low resolution, again, because of the small size of this data set.
 
 ```{r clustering}
 seurat <- FindNeighbors(seurat)
@@ -158,7 +161,8 @@ seurat <- RunUMAP(
 # Curate meta data
 
 This example data set consists of a single sample so we just add that name to the meta data.
-Moreover, in order to be able to understand how we did the analysis later, we add some meta data to the `misc` slot of our Seurat object.
+Moreover, in order to be able to understand how we did the analysis later, we add some meta data to the `misc` slot of our `Seurat` object, e.g. an experiment name and the species.
+The info we store there will later be collected for visualization in Cerebro.
 
 ```{r prepare_meta_data}
 seurat@meta.data$sample <- factor('pbmc', levels = 'pbmc')
@@ -194,7 +198,8 @@ seurat@misc$technical_info <- list(
 
 # Assign cell types
 
-Using the `SingleR` package, we can get a suggestion of cell type for each cell.
+Using the [`SingleR`](https://www.bioconductor.org/packages/release/bioc/html/SingleR.html) package, we can get a suggestion of cell type for each cell.
+Apart from the suggested cell type, we also extract the score that might help us to understand how confident the assignment was.
 
 ```{r cell_type_assignment}
 singler_ref <- BlueprintEncodeData()
@@ -218,9 +223,10 @@ for ( i in seq_len(nrow(singler_scores)) ) {
 seurat@meta.data$cell_type_singler_blueprintencode_main_score <- singler_scores$assigned_score
 ```
 
-# Calculate relationship trees (optional)
+# Calculate relationship trees
 
-Here, we calculate phylogenetic trees that represent the similarity between different subgroups, i.e. clusters and cell types.
+Here, we calculate phylogenetic trees that represent the similarity between different subgroups, in this case clusters and cell types.
+To do so, we need to set the identity in the Seurat object to the current grouping of interest, calculate the tree, and then copy the result to the `misc` slot in the Seurat object so it can be exported later.
 
 ## Clusters
 
@@ -248,9 +254,9 @@ seurat <- BuildClusterTree(
 seurat@misc$trees$cell_type_singler_blueprintencode_main <- seurat@tools$BuildClusterTree
 ```
 
-# cerebroApp functions (optional but recommended)
+# cerebroApp functions
 
-Now we use a set of cerebroApp function to get more information about the data set and the contained samples and clusters.
+Now we use a set of cerebroApp function to get more information about the data set and the contained clusters and cell types.
 
 ## Calculate percentage of mitochondrial and ribosomal transcripts
 
@@ -266,7 +272,7 @@ seurat <- addPercentMtRibo(
 
 ## Get most expressed genes
 
-Another interesting perspective is to look at the 100 most expressed genes in every cluster and cell type.
+Another interesting perspective is to look at the 100 most expressed genes across all cells and for every cluster and cell type.
 This can help in understanding the transcriptional activity of a given cell population.
 
 ```{r getMostExpressedGenes}
@@ -279,9 +285,9 @@ seurat <- getMostExpressedGenes(
 
 ## Identify marker genes
 
-Marker genes are genes which are particularly strongly or weakly expressed in a given cell population, e.g. cluster
+Marker genes are genes which are particularly strongly or weakly expressed in a given cell population, e.g. a cluster.
 This information can help to distinguish the role of different cell groups in the data set.
-We can identify marker genes using the `getMarkerGenes()` function which internally uses the `Seurat::FindAllMarkers()` function but also stores the results in the Seurat object under the `@misc` slot.
+We can identify marker genes using the `getMarkerGenes()` function which internally uses the `Seurat::FindAllMarkers()` function but also stores the results in the Seurat object under the `misc` slot.
 
 ```{r getMarkerGenes}
 seurat <- getMarkerGenes(
@@ -297,7 +303,8 @@ seurat <- getMarkerGenes(
 ## Perform pathway enrichment on marker genes
 
 Using the previously identified marker genes, we can perform a pathway enrichmeny analysis using the `getEnrichedPathways()` function.
-The function will internally use the [Enrichr](https://amp.pharm.mssm.edu/Enrichr/) API and store the results in the Seurat object under the `@misc` slot.
+The function will internally use the [Enrichr](https://amp.pharm.mssm.edu/Enrichr/) API and store the results in the Seurat object under the `misc` slot.
+All we have to do is provide the name that we specified in `getMarkerGenes()`.
 
 ```{r getEnrichedPathways}
 seurat <- getEnrichedPathways(
@@ -326,7 +333,7 @@ seurat <- performGeneSetEnrichmentAnalysis(
 
 # Trajectory analysis with Monocle (optional)
 
-Then, we perform trajectory analysis with [Monocle v2](http://cole-trapnell-lab.github.io/monocle-release/) using the previously identified highly variable genes.
+Then, we perform trajectory analysis with [Monocle v2](https://cole-trapnell-lab.github.io/monocle-release/) using the previously identified highly variable genes.
 We extract the trajectory from the generated Monocle object with the `extractMonocleTrajectory()` function of cerebroApp and attach it to our Seurat object.
 
 ```{r analysis_with_monocle}
@@ -356,7 +363,7 @@ exportFromSeurat(
   seurat,
   assay = 'RNA',
   slot = 'data',
-  file = paste0('cerebro_pbmc_', Sys.Date(), '.crb'),
+  file = paste0('cerebro_pbmc_seurat_', Sys.Date(), '.crb'),
   experiment_name = 'pbmc',
   organism = 'hg',
   columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),

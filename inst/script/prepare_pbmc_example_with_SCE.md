@@ -1,11 +1,9 @@
 # How to generate the SCE PBMC example data set used in the examples parts of cerebroApp function
 
 ```r
-library(SingleCellExperiment)
 library(scran)
 library(scater)
 library(cerebroApp)
-library(dplyr)
 
 ## load counts
 pbmc_counts <- read.table(
@@ -22,7 +20,7 @@ pbmc$nUMI <- colSums(counts(pbmc))
 pbmc$nGene <- colSums(counts(pbmc) != 0)
 
 ## add sample meta data
-colData(pbmc)$sample <- factor('A', levels = 'A')
+pbmc$sample <- factor('pbmc', levels = 'pbmc')
 
 ## log-normalize counts and perform PCA
 pbmc <- logNormCounts(pbmc)

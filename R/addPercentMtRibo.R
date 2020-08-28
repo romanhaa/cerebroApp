@@ -1,8 +1,10 @@
+#' @title
 #' Add percentage of mitochondrial and ribosomal transcripts.
-#' @title Add percentage of mitochondrial and ribosomal transcripts.
-#' @description Get percentage of transcripts of gene list compared to all
-#' transcripts per cell.
-#' @keywords Cerebro scRNAseq Seurat
+#'
+#' @description
+#' Get percentage of transcripts of gene list compared to all transcripts per
+#' cell.
+#'
 #' @param object Seurat object.
 #' @param assay Assay to pull counts from; defaults to 'RNA'. Only relevant in
 #' Seurat v3.0 or higher since the concept of assays wasn't implemented before.
@@ -10,12 +12,11 @@
 #' need to annotated as gene symbol, e.g. MKI67 (human) / Mki67 (mouse).
 #' @param gene_nomenclature Define if genes are saved by their name ('name'),
 #' ENSEMBL ID ('ensembl') or GENCODE ID ('gencode_v27', 'gencode_vM16').
-#' @keywords seurat cerebro
-#' @export
-#' @return Seurat object with two new meta data columns containing the
-#' percentage of mitochondrial and ribosomal gene expression for each cell.
-#' @import dplyr
-#' @importFrom readr cols read_tsv
+#'
+#' @return
+#' Seurat object with two new meta data columns containing the percentage of
+#' mitochondrial and ribosomal gene expression for each cell.
+#'
 #' @examples
 #' pbmc <- readRDS(system.file("extdata/v1.3/pbmc_seurat.rds",
 #'   package = "cerebroApp"))
@@ -25,6 +26,12 @@
 #'   organism = 'hg',
 #'   gene_nomenclature = 'name'
 #' )
+#'
+#' @import dplyr
+#' @importFrom readr cols read_tsv
+#'
+#' @export
+#'
 addPercentMtRibo <- function(
   object,
   assay = 'RNA',

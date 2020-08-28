@@ -2,8 +2,7 @@
 % Please edit documentation in R/getMostExpressedGenes.R
 \name{getMostExpressedGenes}
 \alias{getMostExpressedGenes}
-\title{Get most expressed genes for specified grouping variables in Seurat
-object.}
+\title{Get most expressed genes for specified grouping variables in Seurat object.}
 \usage{
 getMostExpressedGenes(object, assay = "RNA", groups = NULL)
 }
@@ -12,19 +11,16 @@ getMostExpressedGenes(object, assay = "RNA", groups = NULL)
 
 \item{assay}{Assay to pull transcripts counts from; defaults to 'RNA'.}
 
-\item{groups}{Grouping variables (columns) in object@meta.data for which most
-expressed genes should be calculated; defaults to NULL.}
+\item{groups}{Grouping variables (columns) in \code{object@meta.data} for
+which most expressed genes should be calculated; defaults to NULL.}
 }
 \value{
-Seurat object with most expressed genes stored for every group level
-of the specified groups stored in object@misc$most_expressed_genes.
+Seurat object with most expressed genes stored for every group level of the
+specified groups stored in \code{object@misc$most_expressed_genes}.
 }
 \description{
-This function calculates the most expressed genes for one or
-multiple grouping variables in the meta data of the provided Seurat object.
-}
-\details{
-Get most expressed genes for specified grouping variables in Seurat object.
+This function calculates the most expressed genes for one or multiple
+grouping variables in the meta data of the provided Seurat object.
 }
 \examples{
 pbmc <- readRDS(system.file("extdata/v1.3/pbmc_seurat.rds",
@@ -34,7 +30,5 @@ pbmc <- getMostExpressedGenes(
   assay = 'RNA',
   groups = c('sample','seurat_clusters')
 )
+
 }
-\keyword{Cerebro}
-\keyword{Seurat}
-\keyword{scRNAseq}

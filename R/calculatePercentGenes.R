@@ -1,17 +1,19 @@
+#' @title
 #' Calculate percentage of transcripts of gene list.
-#' @title Calculate percentage of transcripts of gene list.
-#' @description Get percentage of transcripts of gene list compared to all
-#' transcripts per cell.
-#' @keywords Cerebro scRNAseq Seurat
+#'
+#' @description
+#' Get percentage of transcripts of gene list compared to all transcripts per
+#' cell.
+#'
 #' @param object Seurat object.
 #' @param assay Assay to pull counts from; defaults to 'RNA'. Only relevant in
 #' Seurat v3.0 or higher since the concept of assays wasn't implemented before.
 #' @param genes List(s) of genes.
-#' @export
-#' @return List of lists containing the percentages of expression for each
-#' provided gene list.
-#' @importFrom Matrix colSums
-#' @importFrom pbapply pblapply
+#'
+#' @return
+#' List of lists containing the percentages of expression for each provided
+#' gene list.
+#'
 #' @examples
 #' pbmc <- readRDS(system.file("extdata/v1.3/pbmc_seurat.rds",
 #'   package = "cerebroApp"))
@@ -20,6 +22,12 @@
 #'   assay = 'RNA',
 #'   genes = list('example' = c('FCN1','CD3D'))
 #' )
+#'
+#' @importFrom Matrix colSums
+#' @importFrom pbapply pblapply
+#'
+#' @export
+#'
 calculatePercentGenes <- function(
   object,
   assay = 'RNA',

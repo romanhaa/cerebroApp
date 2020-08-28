@@ -21,9 +21,6 @@ Returns a data frame of enrichment terms, p-values, ...
 \description{
 Gene enrichment using Enrichr.
 }
-\details{
-Gene enrichment using Enrichr.
-}
 \author{
 Wajid Jawaid, modified by Roman Hillje
 }

@@ -42,15 +42,12 @@ Seurat object with GSVA results for the specified grouping variables
 stored in object@misc$enriched_pathways$<name>
 }
 \description{
-This function calculates enrichment scores, p- and q-value
-statistics for provided gene sets for specified groups of cells in given
-Seurat object using gene set variation analysis (GSVA). Calculation of p- and
-q-values for gene sets is performed as done in "Evaluation of methods to
-assign cell type labels to cell clusters from single-cell RNA-sequencing
-data", Diaz-Mejia et al., F1000Research (2019).
-}
-\details{
-Perform gene set enrichment analysis with GSVA.
+This function calculates enrichment scores, p- and q-value statistics for
+provided gene sets for specified groups of cells in given Seurat object using
+gene set variation analysis (GSVA). Calculation of p- and q-values for gene
+sets is performed as done in "Evaluation of methods to assign cell type
+labels to cell clusters from single-cell RNA-sequencing data", Diaz-Mejia et
+al., F1000Research (2019).
 }
 \examples{
 pbmc <- readRDS(system.file("extdata/v1.3/pbmc_seurat.rds",
@@ -64,8 +61,5 @@ pbmc <- performGeneSetEnrichmentAnalysis(
   thresh_p_val = 0.05,
   thresh_q_val = 0.1
 )
+
 }
-\keyword{Cerebro}
-\keyword{GSVA}
-\keyword{Seurat}
-\keyword{scRNAseq}

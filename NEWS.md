@@ -15,6 +15,14 @@
 
 - Hierarchical trees can be useful to show similarities between cell populations. Previously, a tree could only be visualized for clusters. By modifying the cell identities in a Seurat object, the Seurat function `BuildClusterTree()` can be used to calculate trees also for other cell groupings. To allow exporting multiple trees, they need to now be stored as a `list()` in the `@misc` or the `@metadata` slot of Seurat or SingleCellExperiment objects, respectively.
 
+# cerebroApp 1.2.2
+
+## Fixes
+
+- The title in the browser tab now correctly says "Cerebro" instead of containing some HTML code.
+- Cluster trees should now be displayed correctly.
+- `getEnrichedPathways()` no longer results in an error when marker genes are present but no database returns any enriched pathways, e.g. because there are too few marker genes. Thanks to @turkeyri for pointing it out and suggesting a solution!
+
 # cerebroApp 1.2.1
 
 ## New features

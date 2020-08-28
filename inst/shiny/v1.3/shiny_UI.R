@@ -29,18 +29,18 @@ boxTitle <- function(title) {
 ##----------------------------------------------------------------------------##
 ## Load UI content for each tab.
 ##----------------------------------------------------------------------------##
-source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/load_data/UI.R"), local = TRUE)
-source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/overview/UI.R"), local = TRUE)
-source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/groups/UI.R"), local = TRUE)
-source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/most_expressed_genes/UI.R"), local = TRUE)
-source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/marker_genes/UI.R"), local = TRUE)
-source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/enriched_pathways/UI.R"), local = TRUE)
-source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/gene_expression/UI.R"), local = TRUE)
-source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/trajectory/UI.R"), local = TRUE)
-source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/gene_id_conversion/UI.R"), local = TRUE)
-source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/analysis_info/UI.R"), local = TRUE)
-source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/color_management/UI.R"), local = TRUE)
-source(paste0(.GlobalEnv$Cerebro.options[["path_to_shiny_files"]], "/about/UI.R"), local = TRUE)
+source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/load_data/UI.R"), local = TRUE)
+source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/overview/UI.R"), local = TRUE)
+source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/groups/UI.R"), local = TRUE)
+source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/most_expressed_genes/UI.R"), local = TRUE)
+source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/marker_genes/UI.R"), local = TRUE)
+source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/enriched_pathways/UI.R"), local = TRUE)
+source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/gene_expression/UI.R"), local = TRUE)
+source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/trajectory/UI.R"), local = TRUE)
+source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/gene_id_conversion/UI.R"), local = TRUE)
+source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/analysis_info/UI.R"), local = TRUE)
+source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/color_management/UI.R"), local = TRUE)
+source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/about/UI.R"), local = TRUE)
 
 ##----------------------------------------------------------------------------##
 ## Create dashboard with different tabs.

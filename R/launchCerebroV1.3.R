@@ -1,16 +1,32 @@
+#' @title
 #' Launch Cerebro v1.3
-#' @title Launch Cerebro v1.3
-#' @description Launch the Cerebro v1.3 Shiny application.
-#' @keywords Cerebro scRNAseq Seurat
-#' @param mode Cerebro can be ran in "open" or "closed" mode, allowing the user
-#' to load their own data set ("open") or only show a pre-loaded data set
-#' ("closed", removes the "Load data" element); defaults to "open".
-#' @param maxFileSize Maximum size of input file; defaults to 800 MB.
-#' @param crb_file_to_load Path to .crb file to load on launch of Cerebro.
-#' Useful when using/hosting Cerebro in "closed" mode. Defaults to NULL.
-#' @param options ...
-#' @export
-#' @return Shiny application.
+#'
+#' @description
+#' Launch the Cerebro v1.3 Shiny application.
+#'
+#' @param mode Cerebro can be ran in \code{open} or \code{closed} mode, allowing
+#' the user to load their own data set (\code{open}) or only show a pre-loaded
+#' data set (\code{closed}, removes the "Load data" element); defaults to
+#' \code{open}.
+#' @param maxFileSize Maximum size of input file; defaults to \code{800}
+#' (800 MB).
+#' @param crb_file_to_load Path to \code{.crb} file to load on launch of
+#' Cerebro. Useful when using/hosting Cerebro in \code{closed} mode. Defaults to
+#' \code{NULL}.
+#' @param ... Further parameters that are used by \code{shiny::runApp}, e.g.
+#' \code{host} an \code{port}.
+#'
+#' @return
+#' Shiny application.
+#'
+#' @examples
+#' if ( interactive() ) {
+#'   launchCerebroV1.3(
+#'     mode = "open",
+#'     maxFileSize = 800
+#'   )
+#' }
+#'
 #' @importFrom ape plot.phylo
 #' @importFrom colourpicker colourInput
 #' @import dplyr
@@ -19,7 +35,7 @@
 #' @import ggplot2
 #' @importFrom grDevices col2rgb rgb
 #' @importFrom msigdbr msigdbr
-#' @importFrom plotly add_trace event_data layout plot_ly plotlyOutput
+#' @importFrom plotly add_lines add_trace event_data layout plot_ly plotlyOutput
 #' renderPlotly toWebGL
 #' @importFrom stringr str_length
 #' @importFrom tidyr pivot_longer pivot_wider
@@ -31,25 +47,17 @@
 #' @importFrom shinyjs inlineCSS
 #' @importFrom shinyWidgets awesomeCheckbox dropdownButton materialSwitch
 #' radioGroupButtons sendSweetAlert
-#' @import SingleCellExperiment
 #' @importFrom viridis scale_fill_viridis
-#' @examples
-#' if ( interactive() ) {
-#'   launchCerebroV1.3(
-#'     mode = "open",
-#'     maxFileSize = 800
-#'   )
-#' }
+#'
+#' @export
+#'
 launchCerebroV1.3 <- function(
   mode = "open",
   maxFileSize = 800,
   crb_file_to_load = NULL,
-  options = list()
+  welcome_message = NULL,
+  ...
 ){
-
-  ## TODO: figure out how to make this unnecessary; does the data set have to be
-  ##       exported again?
-  require("SingleCellExperiment")
 
   ##--------------------------------------------------------------------------##
   ## Check validity of 'mode' parameter.
@@ -68,7 +76,8 @@ launchCerebroV1.3 <- function(
   Cerebro.options <<- list(
     "mode" = mode,
     "crb_file_to_load" = crb_file_to_load,
-    "path_to_shiny_files" = system.file("shiny","v1.3", package = "cerebroApp")
+    "welcome_message" = welcome_message,
+    "cerebro_root" = system.file(package = "cerebroApp")
   )
 
   ##--------------------------------------------------------------------------##
@@ -107,7 +116,6 @@ launchCerebroV1.3 <- function(
   shiny::shinyApp(
     ui = ui,
     server = server,
-    options = options
+    ...
   )
-
 }

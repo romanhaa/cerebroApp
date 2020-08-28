@@ -4,9 +4,19 @@ navbar:
       text: Vignettes
       menu:
       - text: The cerebroApp workflow
-        href: articles/cerebroApp_workflow.html
+        href: articles/cerebroApp_workflow_Seurat.html
       - text: The Cerebro interface
-        href: articles/Cerebro_interface.html
+        menu:
+        - text: Cerebro v1.3
+          href: articles/Cerebro_interface_v1.3.html
+        - text: Cerebro v1.2 and older
+          href: articles/Cerebro_interface_v1.2.html
+      - text: Host Cerebro on shinyapps.io
+        href: articles/host_cerebro_on_shinyapps.html
+      - text: Launch Cerebro with pre-loaded data set
+        href: launch_cerebro_with_pre-loaded_data_set.html
+      - text: Protect Cerebro with login
+        href: protect_cerebro_with_login.html
 
 reference:
   - title: "Main functions"
@@ -14,6 +24,7 @@ reference:
       Main functions of cerebroApp
     contents:
       - exportFromSeurat
+      - exportFromSCE
       - launchCerebro
   - title: "Data pre-processing"
     desc: >
@@ -31,5 +42,14 @@ reference:
       These functions are either used inside other functions.
     contents:
       - calculatePercentGenes
-      - .send_enrichr_query
+      - launchCerebroV1.0
+      - launchCerebroV1.1
+      - launchCerebroV1.2
+      - launchCerebroV1.3
       - .read_GMT_file
+      - .send_enrichr_query
+  - title: "Classes"
+    desc: >
+      These classes are used by Cerebro to store data.
+    contents:
+      - Cerebro_v1.3

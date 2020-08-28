@@ -1,13 +1,16 @@
+#' @title
 #' Get enriched pathways based on marker genes from EnrichR.
-#' @title Get enriched pathways based on marker genes from EnrichR.
-#' @description This function uses the enrichR API to look for enriched pathways
-#' in marker gene sets of all available grouping variables.
-#' @keywords Cerebro scRNAseq Seurat Enrichr
-#' @param object Seurat object.
+#'
+#' @description
+#' This function uses the enrichR API to look for enriched pathways in marker
+#' gene sets of all available grouping variables.
+#'
+#' @param object Seurat object with marker genes calculated by
+#' \code{\link{getMarkerGenes}}.
 #' @param marker_genes_input Name of list of marker gene tables that will be
-#' used as input. This could be the "name" parameter used in "getMarkerGenes()".
-#' Enriched pathways will be calculated for every group level of every grouping
-#' variable. Defaults to "cerebro_seurat".
+#' used as input. This could be the "name" parameter used in
+#' \code{\link{getMarkerGenes()}}. Enriched pathways will be calculated for
+#' every group level of every grouping variable. Defaults to "cerebro_seurat".
 #' @param databases Which databases to query. Use enrichR::listEnrichrDbs() to
 #' check what databases are available.
 #' @param adj_p_cutoff Cut-off for adjusted p-value of enriched pathways;
@@ -17,14 +20,11 @@
 #' default URL with an alternative taken from the Enrichr website in case the
 #' original is out-of-service; defaults to
 #' 'http://amp.pharm.mssm.edu/Enrichr/enrich'.
-#' @export
-#' @return Seurat object with Enrichr results for all provided grouping
-#' variables, stored in
-#' object@misc$enriched_pathways$<marker_genes_input>_enrichr
-#' @import dplyr
-#' @importFrom future.apply future_sapply
-#' @importFrom rlang .data
-#' @importFrom tidyselect all_of
+#'
+#' @return
+#' Seurat object with Enrichr results for all provided grouping variables,
+#' stored in \code{object@misc$enriched_pathways$<marker_genes_input>_enrichr}
+#'
 #' @examples
 #' pbmc <- readRDS(system.file("extdata/v1.3/pbmc_seurat.rds",
 #'   package = "cerebroApp"))
@@ -36,6 +36,14 @@
 #'   max_terms = 100,
 #'   URL_API = 'http://amp.pharm.mssm.edu/Enrichr/enrich'
 #' )
+#'
+#' @import dplyr
+#' @importFrom future.apply future_sapply
+#' @importFrom rlang .data
+#' @importFrom tidyselect all_of
+#'
+#' @export
+#'
 getEnrichedPathways <- function(
   object,
   marker_genes_input = 'cerebro_seurat',

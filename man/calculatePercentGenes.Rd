@@ -15,15 +15,12 @@ Seurat v3.0 or higher since the concept of assays wasn't implemented before.}
 \item{genes}{List(s) of genes.}
 }
 \value{
-List of lists containing the percentages of expression for each
-provided gene list.
+List of lists containing the percentages of expression for each provided
+gene list.
 }
 \description{
-Get percentage of transcripts of gene list compared to all
-transcripts per cell.
-}
-\details{
-Calculate percentage of transcripts of gene list.
+Get percentage of transcripts of gene list compared to all transcripts per
+cell.
 }
 \examples{
 pbmc <- readRDS(system.file("extdata/v1.3/pbmc_seurat.rds",
@@ -33,7 +30,5 @@ pbmc <- calculatePercentGenes(
   assay = 'RNA',
   genes = list('example' = c('FCN1','CD3D'))
 )
+
 }
-\keyword{Cerebro}
-\keyword{Seurat}
-\keyword{scRNAseq}

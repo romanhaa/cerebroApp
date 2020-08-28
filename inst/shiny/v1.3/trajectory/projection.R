@@ -9,6 +9,12 @@
 ##----------------------------------------------------------------------------##
 
 output[["trajectory_projection_UI"]] <- renderUI({
+
+  req(
+    input[["trajectory_selected_method"]],
+    input[["trajectory_selected_name"]]
+  )
+
   tagList(
     fluidRow(
       column(width = 3, offset = 0, style = "padding: 0px;",
@@ -58,76 +64,6 @@ output[["trajectory_projection_UI"]] <- renderUI({
     )
   )
 })
-
-##----------------------------------------------------------------------------##
-##
-##----------------------------------------------------------------------------##
-
-# output[["trajectory_projection_coloring_type_UI"]] <- renderUI({
-#   shinyWidgets::radioGroupButtons(
-#    inputId = "trajectory_coloring_type",
-#    label = NULL,
-#    choices = c("Meta data", "Gene expression"),
-#    status = "primary",
-#    justified = TRUE,
-#    width = "100%"
-#   )
-# })
-
-##----------------------------------------------------------------------------##
-##
-##----------------------------------------------------------------------------##
-
-# output[["trajectory_projection_coloring_input_UI"]] <- renderUI({
-
-#   ##
-#   req(
-#     input[["trajectory_coloring_type"]]
-#   )
-
-#   ##
-#   if ( input[["trajectory_coloring_type"]] == "Meta data" ) {
-
-#   } else if ( input[["trajectory_coloring_type"]] == "Gene expression" ) {
-#     shinyWidgets::radioGroupButtons(
-#       inputId = "trajectory_expression_mode",
-#       label = NULL,
-#       choices = c("Gene(s)", "Gene set"),
-#       status = "primary",
-#       justified = TRUE,
-#       width = "100%"
-#     )
-#   }
-# })
-
-##----------------------------------------------------------------------------##
-##
-##----------------------------------------------------------------------------##
-
-# output[["trajectory_projection_expression_input_UI"]] <- renderUI({
-
-#   ##
-#   req(
-#     input[["trajectory_expression_mode"]]
-#   )
-
-#   ##
-#   if ( input[["trajectory_expression_mode"]] == "Gene(s)" ) {
-#     selectizeInput(
-#       'trajectory_point_color',
-#       label = 'Gene(s)',
-#       choices = data.table::as.data.table(data.frame("Genes" = getGeneNames())),
-#       multiple = TRUE
-#     )
-#   } else if ( input[["trajectory_expression_mode"]] == "Gene set" ) {
-#     selectizeInput(
-#       'trajectory_point_color',
-#       label = 'Gene set',
-#       choices = data.table::as.data.table(data.frame("Gene sets" = c("-", msigdbr:::msigdbr_genesets$gs_name))),
-#       multiple = FALSE
-#     )
-#   }
-# })
 
 ##----------------------------------------------------------------------------##
 ## UI elements for input parameters of projection plot.
@@ -346,7 +282,11 @@ output[["trajectory_number_of_selected_cells"]] <- renderText({
   ## don't proceed without these inputs
   req(
     input[["trajectory_selected_method"]],
-    input[["trajectory_selected_name"]]
+    input[["trajectory_selected_name"]],
+    input[["trajectory_percentage_cells_to_show"]],
+    input[["trajectory_point_color"]],
+    input[["trajectory_point_size"]],
+    input[["trajectory_point_opacity"]]
   )
 
   ## check selection

@@ -1,34 +1,37 @@
+#' @title
 #' Export SingleCellExperiment (SCE) object to Cerebro.
-#' @title Export SingleCellExperiment (SCE) object to Cerebro.
-#' @description This function allows to export a SingleCellExperiment (SCE)
+#'
+#' @description
+#' This function allows to export a \code{SingleCellExperiment} (\code{SCE})
 #' object to visualize in Cerebro.
-#' @keywords Cerebro scRNAseq SingleCellExperiment SCE
-#' @param object SingleCellExperiment (SCE) object.
-#' @param assay Assay to pull expression values from; defaults to 'logcounts'.
-#' It is recommended to use sparse data (such as log-transformed or raw counts)
-#' instead of dense data (such as the 'scaled' slot) to avoid performance
-#' bottlenecks in the Cerebro interface.
+#'
+#' @param object \code{SingleCellExperiment} (\code{SCE}) object.
+#' @param assay Assay to pull expression values from; defaults to
+#' \code{logcounts}. It is recommended to use sparse data (such as
+#' log-transformed or raw counts) instead of dense data (such as the 'scaled'
+#' slot) to avoid performance bottlenecks in the Cerebro interface.
 #' @param file Where to save the output.
 #' @param experiment_name Experiment name.
-#' @param organism Organism, e.g. hg (human), mm (mouse), etc.
+#' @param organism Organism, e.g. \code{hg} (human), \code{mm} (mouse), etc.
 #' @param columns_groups Names of grouping variables in meta data
-#' (colData(object)), e.g. c("sample","cluster"); at least one must be
-#' provided; defaults to NULL.
-#' @param column_nUMI Column in colData(object) that contains information about
-#' number of transcripts per cell; defaults to 'nUMI'.
-#' @param column_nGene Column in colData(object) that contains information about
-#' number of expressed genes per cell; defaults to 'nGene'.
-#' @param columns_cell_cycle Names of columns in meta data (object@meta.data)
-#' that contain cell cycle information.e.g. c("Phase"); defaults to NULL.
-#' @param add_all_meta_data If set to TRUE, all further meta data columns will
-#' be extracted as well.
-#' @param verbose Set this to TRUE if you want additional log messages; defaults
-#' to FALSE.
-#' @export
-#' @return No data returned.
-#' @import dplyr
-#' @importFrom rlang .data
-#' @import SingleCellExperiment
+#' (\code{colData(object)}), e.g. \code{c("sample","cluster")}; at least one
+#' must be provided; defaults to \code{NULL}.
+#' @param column_nUMI Column in \code{colData(object)} that contains information
+#' about number of transcripts per cell; defaults to \code{nUMI}.
+#' @param column_nGene Column in \code{colData(object)} that contains
+#' information about number of expressed genes per cell; defaults to
+#' \code{nGene}.
+#' @param columns_cell_cycle Names of columns in meta data
+#' (\code{colData(object)}) that contain cell cycle information, e.g.
+#' \code{c("Phase")}; defaults to \code{NULL}.
+#' @param add_all_meta_data If set to \code{TRUE}, all further meta data columns
+#' will be extracted as well.
+#' @param verbose Set this to \code{TRUE} if you want additional log messages;
+#' defaults to \code{FALSE}.
+#'
+#' @return
+#' No data returned.
+#'
 #' @examples
 #' pbmc <- readRDS(system.file("extdata/v1.3/pbmc_SCE.rds",
 #'   package = "cerebroApp"))
@@ -37,10 +40,17 @@
 #'   file = 'pbmc_SCE.crb',
 #'   experiment_name = 'PBMC',
 #'   organism = 'hg',
-#'   columns_groups = c('sample','seurat_clusters'),
-#'   column_nUMI = 'nCount_RNA',
-#'   column_nGene = 'nFeature_RNA'
+#'   columns_groups = c('sample','cluster'),
+#'   column_nUMI = 'nUMI',
+#'   column_nGene = 'nGene',
+#'   verbose = TRUE
 #' )
+#'
+#' @import dplyr
+#' @importFrom rlang .data
+#'
+#' @export
+#'
 exportFromSCE <- function(
   object,
   assay = 'logcounts',
@@ -54,49 +64,31 @@ exportFromSCE <- function(
   add_all_meta_data = TRUE,
   verbose = FALSE
 ) {
- 
+
   ##--------------------------------------------------------------------------##
   ## safety checks before starting to do anything
   ##--------------------------------------------------------------------------##
 
-  ## check if Seurat is installed
-  if ( !requireNamespace("Seurat", quietly = TRUE) ) {
-    stop(
-      "The 'Seurat' package is needed for this function to work. Please install it.",
-      call. = FALSE
-    )
-  }
-
-  ## check that Seurat package is at least v3.0
-  if ( utils::packageVersion('Seurat') < 3 ) {
+  ## check if provided object is of class "SingleCellExperiment"
+  if ( class(object) != "SingleCellExperiment" ) {
     stop(
       paste0(
-        "The installed Seurat package is of version `", utils::packageVersion('Seurat'),
-        "`, but at least v3.0 is required."
+        "Provided object is of class `", class(object), "` but must be of class 'SingleCellExperiment'."
       ),
       call. = FALSE
     )
   }
 
-  ## check if provided object is of class "Seurat"
-  if ( class(object) != "Seurat" ) {
+  ## check if SingleCellExperiment is installed
+  if ( !requireNamespace("SingleCellExperiment", quietly = TRUE) ) {
     stop(
-      paste0(
-        "Provided object is of class `", class(object), "` but must be of class 'Seurat'."
-      ),
+      "The 'SingleCellExperiment' package is needed for this function to work. Please install it.",
       call. = FALSE
     )
   }
 
-  ## check version of Seurat object and stop if it is lower than 3
-  if ( object@version < 3 ) {
-    stop(
-      paste0(
-        "Provided Seurat object has version `", object@version, "` but must be at least 3.0."
-      ),
-      call. = FALSE
-    )
-  }
+  ## make functions from SingleCellExperiment package available for next tests
+  require('SingleCellExperiment')
 
   ## `columns_groups`
   if ( any(columns_groups %in% names(colData(object)) == FALSE ) ) {
@@ -151,16 +143,15 @@ exportFromSCE <- function(
   ## check if provided assay exists
   if ( (assay %in% names(assays(object)) == FALSE ) ) {
     stop(
-      paste0(
-        'Specified assay `', assay, '` could not be found in provided SCE ',
-        'object.'
+      glue::glue(
+        'Specified assay `{assay}` could not be found in provided SCE object.'
       ),
       call. = FALSE
     )
   }
 
   ##--------------------------------------------------------------------------##
-  ## initialize export object with expression data
+  ## initialize Cerebro object
   ##--------------------------------------------------------------------------##
   if ( verbose ) {
     message(
@@ -176,11 +167,6 @@ exportFromSCE <- function(
     )
   }
 
-  ## convert expression data to "RleArray" if it is "dgCMatrix"
-  if ( class(expression_data) == 'dgCMatrix' ) {
-    expression_data <- as(expression_data, "RleArray")
-  }
-
   ## create new Cerebro object
   export <- Cerebro_v1.3$new()
 
@@ -193,17 +179,47 @@ exportFromSCE <- function(
   ## add cerebroApp version
   export$setVersion(utils::packageVersion('cerebroApp'))
 
-  ## add expression data
-  export$expression <- SingleCellExperiment::SingleCellExperiment(
-    assays = list(counts = assay(object, assay))
+  ##--------------------------------------------------------------------------##
+  ## add transcript counts
+  ##--------------------------------------------------------------------------##
+
+  ## get expression data
+  expression_data <- try(
+    assay(object, name = assay),
+    silent = TRUE
   )
+
+  ## check if provided slot exists in provided assay
+  if ( class(expression_data) == 'try-error' ) {
+    stop(
+      paste0(
+        'Assay `', assay, '` could not be found.'
+      ),
+      call. = FALSE
+    )
+  }
+
+  ## convert expression data to "RleArray" if it is "dgCMatrix" or "matrix"
+  if (
+    class(expression_data) %in% c('matrix','dgCMatrix') &&
+    requireNamespace("DelayedArray", quietly = TRUE)
+  ) {
+    require('DelayedArray')
+    expression_data <- as(expression_data, "RleArray")
+  }
+
+  ## add expression data
+  # export$expression <- SingleCellExperiment::SingleCellExperiment(
+  #   assays = list(counts = assay(object, assay))
+  # )
+  export$setExpression(assay(object, assay))
 
   ##--------------------------------------------------------------------------##
   ## collect some more data if present
   ##--------------------------------------------------------------------------##
 
   ## date of analysis
-  if ( !is.null(object@misc$experiment$date_of_analysis) ) {
+  if ( !is.null(object@metadata$experiment$date_of_analysis) ) {
     export$addExperiment('date_of_analysis', object@metadata$experiment$date_of_analysis)
   }
 
@@ -213,7 +229,7 @@ exportFromSCE <- function(
   ## `parameters`
   if ( !is.null(object@metadata$parameters) ) {
     for ( i in seq_along(object@metadata$parameters) ) {
-      name <- names(object@misc$parameters)[i]
+      name <- names(object@metadata$parameters)[i]
       export$addParameters(
         name,
         object@metadata$parameters[[name]]
@@ -253,22 +269,35 @@ exportFromSCE <- function(
   }
 
   ## cell barcodes
-  colData(export$expression)$cell_barcode <- colnames(object)
+  # colData(export$expression)$cell_barcode <- colnames(object)
+  temp_meta_data <- data.frame(
+    "cell_barcode" = colnames(object),
+    stringsAsFactors = FALSE
+  )
 
-  ## factorize group variables and add groups
+  ##--------------------------------------------------------------------------##
+  ## add grouping variables, factorize if necessary
+  ##--------------------------------------------------------------------------##
   for ( i in columns_groups ) {
-    if ( is.factor(colData(object)[[i]]) ) {
-      tmp_names <- levels(colData(object)[[i]])
+    if (
+      !is.factor(colData(object)[[i]]) &&
+      is.character(colData(object)[[i]])
+    ) {
+      temp_meta_data[[i]] <- factor(
+        colData(object)[[i]],
+        levels = unique(colData(object)[[i]])
+      )
     } else {
-      tmp_names <- unique(colData(object)[[i]])
+      temp_meta_data[[i]] <- colData(object)[[i]]
     }
-    colData(export$expression)[[i]] <- factor(colData(object)[[i]], levels = tmp_names)
-    export$addGroup(i, tmp_names)
+    # colData(export$expression)[[i]] <- factor(colData(object)[[i]], levels = tmp_names)
   }
 
   ## number of transcripts and expressed genes
-  colData(export$expression)$nUMI = colData(object)[[column_nUMI]]
-  colData(export$expression)$nGene = colData(object)[[column_nGene]]
+  # colData(export$expression)$nUMI = colData(object)[[column_nUMI]]
+  # colData(export$expression)$nGene = colData(object)[[column_nGene]]
+  temp_meta_data[["nUMI"]] = colData(object)[[column_nUMI]]
+  temp_meta_data[["nGene"]] = colData(object)[[column_nGene]]
 
   ## rest of meta data
   meta_data_columns <- names(colData(object))
@@ -279,16 +308,19 @@ exportFromSCE <- function(
   ##--------------------------------------------------------------------------##
   ## cell cycle
   ##--------------------------------------------------------------------------##
-  if ( !is.null(columns_cell_cycle) && length(columns_cell_cycle) > 0 ) {
+  if (
+    !is.null(columns_cell_cycle) &&
+    length(columns_cell_cycle) > 0
+  ) {
     for ( i in columns_cell_cycle ) {
       if ( is.factor(colData(object)[[i]]) ) {
         tmp_names <- levels(colData(object)[[i]])
       } else {
         tmp_names <- unique(colData(object)[[i]])
       }
-      colData(export$expression)[[i]] <- factor(colData(object)[[i]], levels = tmp_names)
+      # colData(export$expression)[[i]] <- factor(colData(object)[[i]], levels = tmp_names)
+      temp_meta_data[[i]] <- factor(colData(object)[[i]], levels = tmp_names)
     }
-    export$setCellCycle(columns_cell_cycle)
     meta_data_columns <- meta_data_columns[-which(meta_data_columns %in% columns_cell_cycle)]
   }
 
@@ -305,12 +337,33 @@ exportFromSCE <- function(
       )
     }
     for ( i in meta_data_columns ) {
-      colData(export$expression)[[i]] <- colData(object)[[i]]
+      # colData(export$expression)[[i]] <- colData(object)[[i]]
+      temp_meta_data[[i]] <- colData(object)[[i]]
     }
   }
 
   ## make column names in meta data unique (if necessary)
-  colnames(colData(export$expression)) <- make.unique(colnames(colData(export$expression)))
+  # colnames(colData(export$expression)) <- make.unique(colnames(colData(export$expression)))
+  colnames(temp_meta_data) <- make.unique(colnames(temp_meta_data))
+
+  ##--------------------------------------------------------------------------##
+  ## add meta data to Cerebro object
+  ##--------------------------------------------------------------------------##
+  export$setMetaData(temp_meta_data)
+
+  ##--------------------------------------------------------------------------##
+  ## add grouping variables and cell cycle columns
+  ##--------------------------------------------------------------------------##
+  for ( i in columns_groups ) {
+    export$addGroup(i, levels(temp_meta_data[[i]]))
+  }
+
+  if (
+    !is.null(columns_cell_cycle) &&
+    length(columns_cell_cycle) > 0
+  ) {
+    export$setCellCycle(columns_cell_cycle)
+  }
 
   ##--------------------------------------------------------------------------##
   ## projections
@@ -338,6 +391,10 @@ exportFromSCE <- function(
     length(projections_available_pca) == 1 )
   {
     SingleCellExperiment::reducedDims(export$expression)[[projections_available]] <- SingleCellExperiment::reducedDims(object)[[projections_available]]
+    export$addProjection(
+      projections_available,
+      SingleCellExperiment::reducedDims(object)[[projections_available]]
+    )
     warning(
       paste0(
         'Warning: Only PCA as dimensional reduction found, will export ',
@@ -355,8 +412,12 @@ exportFromSCE <- function(
         )
       )
     }
-    for ( i in projections_available_non_pca ) {
-      SingleCellExperiment::reducedDims(export$expression)[[i]] <- SingleCellExperiment::reducedDims(object)[[i]]
+    for ( projection in projections_available_non_pca ) {
+      # SingleCellExperiment::reducedDims(export$expression)[[projection]] <- SingleCellExperiment::reducedDims(object)[[projection]]
+      export$addProjection(
+        projection,
+        SingleCellExperiment::reducedDims(object)[[projection]]
+      )
     }
   }
 

@@ -1,17 +1,32 @@
+#' @title
 #' Launch Cerebro interface.
-#' @title Launch Cerebro interface.
-#' @description Launch Cerebro interface.
-#' @keywords Cerebro scRNAseq Seurat
+#'
+#' @description
+#' Launch Cerebro interface.
+#'
 #' @param version Which version of Cerebro to launch: "v1.0", "v1.1", "v1.2",
 #' "v1.3"; defaults to "v1.3".
-#' @param ... Further parameters that are used by the specific versions of
-#' Cerebro. See `launchCerebroV1.x()` for details.
-#' @export
-#' @return Shiny application.
+#' @param ... Further parameters that are used by \code{shiny::runApp}, e.g.
+#' \code{host} an \code{port}, and the specific versions of Cerebro. See
+#' \code{launchCerebroV1.x} for details.
+#'
+#' @return
+#' Shiny application.
+#'
+#' @seealso
+#' \code{\link{launchCerebroV1.0}}, \code{\link{launchCerebroV1.1}},
+#' \code{\link{launchCerebroV1.2}}, \code{\link{launchCerebroV1.3}}
+#'
 #' @examples
 #' if ( interactive() ) {
-#'   launchCerebro(version = "v1.3")
+#'   launchCerebro(
+#'     version = "v1.3",
+#'     options = list(port = 1337)
+#'   )
 #' }
+#'
+#' @export
+#'
 launchCerebro <- function(
   version = "v1.3",
   ...

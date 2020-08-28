@@ -1,13 +1,20 @@
+#' @title
 #' Read GMT file.
-#' @title Read GMT file.
-#' @description This functions reads a (tab-delimited) GMT file which contains
-#' the gene set name in the first column, the gene set description in the
-#' second column, and the gene names in the following columns.
+#'
+#' @description
+#' This functions reads a (tab-delimited) GMT file which contains the gene set
+#' name in the first column, the gene set description in the second column, and
+#' the gene names in the following columns.
+#'
 #' @param file Path to GMT file.
-#' @return Returns an object in the same format as from the GSA.read.gmt
-#' function (GSA package) with gene sets, gene set names, and gene set
-#' descriptions stored in lists.
+#'
+#' @return
+#' Returns an object in the same format as from the GSA.read.gmt function (GSA
+#' package) with gene sets, gene set names, and gene set descriptions stored in
+#' lists.
+#'
 #' @import dplyr
+#'
 .read_GMT_file <- function(
   file
 ) {

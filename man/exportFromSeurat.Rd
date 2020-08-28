@@ -22,47 +22,45 @@ exportFromSeurat(
 \arguments{
 \item{object}{Seurat object.}
 
-\item{assay}{Assay to pull expression values from; defaults to 'RNA'.}
+\item{assay}{Assay to pull expression values from; defaults to \code{RNA}.}
 
-\item{slot}{Slot to pull expression values from; defaults to 'data'. It is
-recommended to use sparse data (such as log-transformed or raw counts)
-instead of dense data (such as the 'scaled' slot) to avoid performance
+\item{slot}{Slot to pull expression values from; defaults to \code{data}. It
+is recommended to use sparse data (such as log-transformed or raw counts)
+instead of dense data (such as the \code{scaled} slot) to avoid performance
 bottlenecks in the Cerebro interface.}
 
 \item{file}{Where to save the output.}
 
 \item{experiment_name}{Experiment name.}
 
-\item{organism}{Organism, e.g. hg (human), mm (mouse), etc.}
+\item{organism}{Organism, e.g. \code{hg} (human), \code{mm} (mouse), etc.}
 
 \item{columns_groups}{Names of grouping variables in meta data
-(object@meta.data), e.g. c("sample","cluster"); at least one must be
-provided; defaults to NULL.}
+(\code{object@meta.data}), e.g. \code{c("sample","cluster")}; at least one
+must be provided; defaults to \code{NULL}.}
 
-\item{column_nUMI}{Column in object@meta.data that contains information about
-number of transcripts per cell; defaults to 'nUMI'.}
+\item{column_nUMI}{Column in \code{object@meta.data} that contains
+information about number of transcripts per cell; defaults to \code{nUMI}.}
 
-\item{column_nGene}{Column in object@meta.data that contains information
-about number of expressed genes per cell; defaults to 'nGene'.}
+\item{column_nGene}{Column in \code{object@meta.data} that contains
+information about number of expressed genes per cell; defaults to
+\code{nGene}.}
 
-\item{columns_cell_cycle}{Names of columns in meta data (object@meta.data)
-that contain cell cycle information.e.g. c("Phase"); defaults to NULL.}
+\item{columns_cell_cycle}{Names of columns in meta data
+(\code{object@meta.data}) that contain cell cycle information, e.g.
+\code{c("Phase")}; defaults to \code{NULL}.}
 
-\item{add_all_meta_data}{If set to TRUE, all further meta data columns will
-be extracted as well.}
+\item{add_all_meta_data}{If set to \code{TRUE}, all further meta data columns
+will be extracted as well.}
 
-\item{verbose}{Set this to TRUE if you want additional log messages; defaults
-to FALSE.}
+\item{verbose}{Set this to \code{TRUE} if you want additional log messages;
+defaults to \code{FALSE}.}
 }
 \value{
 No data returned.
 }
 \description{
-This function allows to export a Seurat object to visualize in
-Cerebro.
-}
-\details{
-Export Seurat object to Cerebro.
+This function allows to export a Seurat object to visualize in Cerebro.
 }
 \examples{
 pbmc <- readRDS(system.file("extdata/v1.3/pbmc_seurat.rds",
@@ -74,9 +72,8 @@ exportFromSeurat(
   organism = 'hg',
   columns_groups = c('sample','seurat_clusters'),
   column_nUMI = 'nCount_RNA',
-  column_nGene = 'nFeature_RNA'
+  column_nGene = 'nFeature_RNA',
+  verbose = TRUE
 )
+
 }
-\keyword{Cerebro}
-\keyword{Seurat}
-\keyword{scRNAseq}

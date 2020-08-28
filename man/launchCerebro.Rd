@@ -10,8 +10,9 @@ launchCerebro(version = "v1.3", ...)
 \item{version}{Which version of Cerebro to launch: "v1.0", "v1.1", "v1.2",
 "v1.3"; defaults to "v1.3".}
 
-\item{...}{Further parameters that are used by the specific versions of
-Cerebro. See `launchCerebroV1.x()` for details.}
+\item{...}{Further parameters that are used by \code{shiny::runApp}, e.g.
+\code{host} an \code{port}, and the specific versions of Cerebro. See
+\code{launchCerebroV1.x} for details.}
 }
 \value{
 Shiny application.
@@ -19,14 +20,16 @@ Shiny application.
 \description{
 Launch Cerebro interface.
 }
-\details{
-Launch Cerebro interface.
-}
 \examples{
 if ( interactive() ) {
-  launchCerebro(version = "v1.3")
+  launchCerebro(
+    version = "v1.3",
+    options = list(port = 1337)
+  )
 }
+
 }
-\keyword{Cerebro}
-\keyword{Seurat}
-\keyword{scRNAseq}
+\seealso{
+\code{\link{launchCerebroV1.0}}, \code{\link{launchCerebroV1.1}},
+\code{\link{launchCerebroV1.2}}, \code{\link{launchCerebroV1.3}}
+}

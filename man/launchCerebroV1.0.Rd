@@ -4,10 +4,14 @@
 \alias{launchCerebroV1.0}
 \title{Launch Cerebro v1.0}
 \usage{
-launchCerebroV1.0(maxFileSize = 800)
+launchCerebroV1.0(maxFileSize = 800, ...)
 }
 \arguments{
-\item{maxFileSize}{Maximum size of input file; defaults to 800 MB.}
+\item{maxFileSize}{Maximum size of input file; defaults to \code{800}
+(800 MB).}
+
+\item{...}{Further parameters that are used by \code{shiny::runApp}, e.g.
+\code{host} an \code{port}.}
 }
 \value{
 Shiny application.
@@ -15,14 +19,9 @@ Shiny application.
 \description{
 Launch the Cerebro v1.0 Shiny application.
 }
-\details{
-Launch Cerebro v1.0
-}
 \examples{
 if ( interactive() ) {
   launchCerebroV1.0(maxFileSize = 800)
 }
+
 }
-\keyword{Cerebro}
-\keyword{Seurat}
-\keyword{scRNAseq}

@@ -156,9 +156,9 @@ plotExpressionSinglePanel2D <- function(table, color_scale, hover_info) {
 
   ## prepare plot
   plot <- plotly::plot_ly(
-      gene_expression_plot_data(),
-      x = gene_expression_plot_data()[,1],
-      y = gene_expression_plot_data()[,2],
+      table,
+      x = table[,1],
+      y = table[,2],
       type = "scatter",
       mode = "markers",
       marker = list(
@@ -184,7 +184,7 @@ plotExpressionSinglePanel2D <- function(table, color_scale, hover_info) {
     ) %>%
     plotly::layout(
       xaxis = list(
-        title = colnames(gene_expression_plot_data())[1],
+        title = colnames(table)[1],
         mirror = TRUE,
         showline = TRUE,
         zeroline = FALSE,
@@ -194,7 +194,7 @@ plotExpressionSinglePanel2D <- function(table, color_scale, hover_info) {
         )
       ),
       yaxis = list(
-        title = colnames(gene_expression_plot_data())[2],
+        title = colnames(table)[2],
         mirror = TRUE,
         showline = TRUE,
         zeroline = FALSE,
@@ -211,6 +211,88 @@ plotExpressionSinglePanel2D <- function(table, color_scale, hover_info) {
         ),
         bgcolor = "lightgrey"
       )
+    )
+
+  ##
+  return(plot)
+}
+
+##----------------------------------------------------------------------------##
+## Function to plot expression in trajectory.
+##----------------------------------------------------------------------------##
+
+plotExpressionSinglePanel2DTrajectory <- function(
+  table,
+  trajectory_edges,
+  color_scale,
+  hover_info
+) {
+
+  ## convert edges of trajectory into list format to plot with plotly
+  trajectory_lines <- list()
+  for (i in 1:nrow(trajectory_edges) ) {
+    line = list(
+      type = "line",
+      line = list(color = "black"),
+      xref = "x",
+      yref = "y",
+      x0 = trajectory_edges$source_dim_1[i],
+      y0 = trajectory_edges$source_dim_2[i],
+      x1 = trajectory_edges$target_dim_1[i],
+      y1 = trajectory_edges$target_dim_2[i]
+    )
+    trajectory_lines <- c(trajectory_lines, list(line))
+  }
+
+  ##
+  plot <- plotly::plot_ly(
+      data = table,
+      x = ~DR_1,
+      y = ~DR_2,
+      type = "scatter",
+      mode = "markers",
+      marker = list(
+        colorbar = list(
+          title = "Expression"
+        ),
+        color = ~level,
+        opacity = input[["expression_projection_point_opacity"]],
+        colorscale = color_scale,
+        cauto = FALSE,
+        cmin = input[["expression_projection_color_scale_range"]][1],
+        cmax = input[["expression_projection_color_scale_range"]][2],
+        reversescale = TRUE,
+        line = list(
+          color = "rgb(196,196,196)",
+          width = 1
+        ),
+        size = input[["expression_projection_point_size"]]
+      ),
+      hoverinfo = "text",
+      text = ~hover_info,
+      source = "expression_projection"
+    ) %>%
+    plotly::layout(
+      shapes = trajectory_lines,
+      xaxis = list(
+        mirror = TRUE,
+        showline = TRUE,
+        zeroline = FALSE,
+        range = c(
+          input[["expression_projection_scale_x_manual_range"]][1],
+          input[["expression_projection_scale_x_manual_range"]][2]
+        )
+      ),
+      yaxis = list(
+        mirror = TRUE,
+        showline = TRUE,
+        zeroline = FALSE,
+        range = c(
+          input[["expression_projection_scale_y_manual_range"]][1],
+          input[["expression_projection_scale_y_manual_range"]][2]
+        )
+      ),
+      hoverlabel = list(font = list(size = 11))
     )
 
   ##
@@ -253,6 +335,76 @@ plotExpressionSinglePanel2DExport <- function(table) {
       alpha = input[["expression_projection_point_opacity"]]
     ) +
     lims(x = xlim, y = ylim) +
+    theme_bw()
+
+  ## check if selected color scale
+  ## ... selected color scale is "viridis"
+  if ( input[["expression_projection_color_scale"]] == 'viridis' ) {
+
+    ## add color scale to plot
+    plot <- plot +
+      viridis::scale_fill_viridis(
+        option = "viridis",
+        limits = input[["expression_projection_color_scale_range"]],
+        oob = scales::squish,
+        direction = -1,
+        name = "Log-normalised\nexpression",
+        guide = guide_colorbar(frame.colour = "black", ticks.colour = "black")
+      )
+
+  ## ... selected color scale is anything else than "viridis"
+  } else {
+
+    ## add color scale to plot
+    plot <- plot +
+      scale_fill_distiller(
+        palette = input[["expression_projection_color_scale"]],
+        limits = input[["expression_projection_color_scale_range"]],
+        oob = scales::squish,
+        direction = 1,
+        name = "Log-normalised\nexpression",
+        guide = guide_colorbar(frame.colour = "black", ticks.colour = "black")
+      )
+  }
+
+  ##
+  return(plot)
+}
+
+##----------------------------------------------------------------------------##
+## Function to plot expression in trajectory (for export).
+##----------------------------------------------------------------------------##
+
+plotExpressionSinglePanel2DTrajectoryExport <- function(
+  table,
+  trajectory_edges
+) {
+
+  ## start building the plot
+  plot <- ggplot() +
+    geom_point(
+      data = table,
+      aes_string(
+        x = colnames(table)[1],
+        y = colnames(table)[2],
+        fill = as.name("level")
+      ),
+      shape = 21,
+      size = input[["expression_projection_point_size"]]/3,
+      stroke = 0.2,
+      color = "#c4c4c4",
+      alpha = input[["expression_projection_point_opacity"]]
+    ) +
+    geom_segment(
+      data = trajectory_edges,
+      aes(
+        source_dim_1,
+        source_dim_2,
+        xend = target_dim_1,
+        yend = target_dim_2
+      ),
+      size = 0.75, linetype = "solid", na.rm = TRUE
+    ) +
     theme_bw()
 
   ## check if selected color scale
@@ -355,7 +507,7 @@ output[["expression_projection_UI"]] <- renderUI({
                 ),
                 style = "color: black !important;",
                 tagList(
-                  ## figure out how to vertically center box and label
+                  ## TODO: figure out how to vertically center box and label
                   shinyWidgets::awesomeCheckbox(
                     inputId = "expression_projection_show_genes_in_separate_panels",
                     label = HTML("Show genes in separate panels<br>(experimental)"),
@@ -423,11 +575,51 @@ output[["expression_projection_input_type_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 
 output[["expression_projection_parameters_UI"]] <- renderUI({
+
+  ## get available projections
+  available_projections <- availableProjections()
+
+  ## collect available trajectories across all methods and create selectable
+  ## options
+  available_trajectories <- c()
+  available_trajectory_method <- getMethodsForTrajectories()
+
+  ## check if at least 1 trajectory method exists
+  if ( length(available_trajectory_method) > 0 ) {
+
+    ## cycle through trajectory methods
+    for ( i in seq_along(available_trajectory_method) ) {
+
+      ## get current method and names of trajectories for this method
+      current_method <- available_trajectory_method[i]
+      available_trajectories_for_this_method <- getNamesOfTrajectories(current_method)
+
+      ## check if at least 1 trajectory is available for this method
+      if ( length(available_trajectories_for_this_method) > 0 ) {
+
+        ## cycle through trajectories for this method
+        for ( j in seq_along(available_trajectories_for_this_method) ) {
+
+          ## create selectable combination of method and trajectory name and add
+          ## it to the available trajectories
+          current_trajectory <- available_trajectories_for_this_method[j]
+          available_trajectories <- c(
+            available_trajectories,
+            glue::glue("{current_method} // {current_trajectory}")
+          )
+        }
+      }
+    }
+  }
+
   tagList(
     selectInput(
       "expression_projection_to_display",
       label = "Projection",
-      choices = availableProjections()
+      choices = list(
+        "Projections" = available_projections,
+        "Trajectories" = available_trajectories
+      )
     ),
     sliderInput(
       "expression_percentage_cells_to_show",
@@ -482,7 +674,10 @@ output[["expression_projection_color_scale_range_UI"]] <- renderUI({
 
   ## adjust expression range for color scale
   ## ... there is no range (from 0 to 0)
-  if ( expression_range[1] == 0 & expression_range[2] == 0 ) {
+  if (
+    expression_range[1] == 0 &&
+    expression_range[2] == 0
+  ) {
 
     ## set range to 0-1
     expression_range[2] = 1
@@ -516,12 +711,42 @@ output[["expression_projection_scales_UI"]] <- renderUI({
     input[["expression_projection_to_display"]]
   )
 
-  ##
-  projection_to_display <- input[["expression_projection_to_display"]]
-  range_x_min <- getProjection(projection_to_display)[,1] %>% min() %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round()
-  range_x_max <- getProjection(projection_to_display)[,1] %>% max() %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
-  range_y_min <- getProjection(projection_to_display)[,2] %>% min() %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round()
-  range_y_max <- getProjection(projection_to_display)[,2] %>% max() %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
+  ## check if projection or trajectory should be shown
+  ## ... projection
+  if ( input[["expression_projection_to_display"]] %in% availableProjections() ) {
+
+    ##
+    projection_to_display <- input[["expression_projection_to_display"]]
+    range_x_min <- getProjection(projection_to_display)[,1] %>% min() %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round()
+    range_x_max <- getProjection(projection_to_display)[,1] %>% max() %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
+    range_y_min <- getProjection(projection_to_display)[,2] %>% min() %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round()
+    range_y_max <- getProjection(projection_to_display)[,2] %>% max() %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
+
+  ## ... trajectory
+  } else {
+
+    ## split selection into method and name
+    selection <- strsplit(input[["expression_projection_to_display"]], split = ' // ')[[1]]
+
+    ## check if method and name exist and don't proceed if not
+    req(
+      selection[1] %in% getMethodsForTrajectories(),
+      selection[2] %in% getNamesOfTrajectories(selection[1])
+    )
+
+    ## collect trajectory data
+    trajectory_data <- getTrajectory(
+      selection[1],
+      selection[2]
+    )
+
+    ##
+    range_x_min <- trajectory_data[["meta"]][,1] %>% min(na.rm = TRUE) %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round()
+    range_x_max <- trajectory_data[["meta"]][,1] %>% max(na.rm = TRUE) %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
+    range_y_min <- trajectory_data[["meta"]][,2] %>% min(na.rm = TRUE) %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round()
+    range_y_max <- trajectory_data[["meta"]][,2] %>% max(na.rm = TRUE) %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
+  }
+
   tagList(
     hr(),
     sliderInput(
@@ -655,46 +880,84 @@ output[["expression_projection"]] <- plotly::renderPlotly({
     color_scale <- input[["expression_projection_color_scale"]]
   }
 
-  ## check if user requested to show expression in separate panels
-  ## ... separate panels requested, two-dimensional projection selected, and
-  ##     "gene" column present
-  if (
-    ncol(getProjection(input[["expression_projection_to_display"]])) == 2 &&
-    input[["expression_projection_show_genes_in_separate_panels"]] == TRUE &&
-    "gene" %in% colnames(gene_expression_plot_data()) == TRUE
-  ) {
+  ## check if projection or trajectory should be shown
+  ## ... projection
+  if ( input[["expression_projection_to_display"]] %in% availableProjections() ) {
 
-    ## prepare plot
-    plot <- plotExpressionMultiplePanels(gene_expression_plot_data())
+    ## check if user requested to show expression in separate panels
+    ## ... separate panels requested, two-dimensional projection selected, and
+    ##     "gene" column present
+    if (
+      ncol(getProjection(input[["expression_projection_to_display"]])) == 2 &&
+      input[["expression_projection_show_genes_in_separate_panels"]] == TRUE &&
+      "gene" %in% colnames(gene_expression_plot_data()) == TRUE
+    ) {
 
-    ## convert ggplot to plotly
-    plot <- plotly::ggplotly(plot)
+      ## prepare plot
+      plot <- plotExpressionMultiplePanels(gene_expression_plot_data())
 
-  ## ... if conditions for multiple panels are not met
+      ## convert ggplot to plotly
+      plot <- plotly::ggplotly(plot)
+
+    ## ... if conditions for multiple panels are not met
+    } else {
+
+      ## prepare hover info
+      hover_info <- buildHoverInfoForProjections(gene_expression_plot_data())
+
+      ## add expression levels to hover info
+      hover_info <- glue::glue(
+        "{hover_info}
+        <b>Expression level</b>: {formatC(gene_expression_plot_data()$level, format = 'f', big.mark = ',', digits = 3)}"
+      )
+
+      ## check if selection projection consists of 2 or 3 dimensions
+      ## ... selection projection consists of 3 dimensions
+      if ( ncol(getProjection(input[["expression_projection_to_display"]])) == 3 ) {
+
+        ## prepare plot
+        plot <- plotExpressionSinglePanel3D(gene_expression_plot_data(), color_scale, hover_info)
+
+      ## ... selection projection consists of 2 dimensions
+      } else if ( ncol(getProjection(input[["expression_projection_to_display"]])) == 2 ) {
+
+        ## prepare plot
+        plot <- plotExpressionSinglePanel2D(gene_expression_plot_data(), color_scale, hover_info)
+      }
+    }
+
+  ## ... trajectory
   } else {
+
+    ## split selection into method and name
+    selection <- strsplit(input[["expression_projection_to_display"]], split = ' // ')[[1]]
+
+    req(
+      selection[1] %in% getMethodsForTrajectories(),
+      selection[2] %in% getNamesOfTrajectories(selection[1])
+    )
+
+    ## collect trajectory data
+    trajectory_data <- getTrajectory(
+        selection[1],
+        selection[2]
+      )
 
     ## prepare hover info
     hover_info <- buildHoverInfoForProjections(gene_expression_plot_data())
 
     ## add expression levels to hover info
-    hover_info <- paste0(
-      hover_info,
-      "<b>Expression level</b>: ", formatC(gene_expression_plot_data()$level, format = "f", big.mark = ",", digits = 3)
+    hover_info <- glue::glue(
+      "{hover_info}
+      <b>Expression level</b>: {formatC(gene_expression_plot_data()$level, format = 'f', big.mark = ',', digits = 3)}"
     )
 
-    ## check if selection projection consists of 2 or 3 dimensions
-    ## ... selection projection consists of 3 dimensions
-    if ( ncol(getProjection(input[["expression_projection_to_display"]])) == 3 ) {
-
-      ## prepare plot
-      plot <- plotExpressionSinglePanel3D(gene_expression_plot_data(), color_scale, hover_info)
-
-    ## ... selection projection consists of 2 dimensions
-    } else if ( ncol(getProjection(input[["expression_projection_to_display"]])) == 2 ) {
-
-      ## prepare plot
-      plot <- plotExpressionSinglePanel2D(gene_expression_plot_data(), color_scale, hover_info)
-    }
+    plot <- plotExpressionSinglePanel2DTrajectory(
+        gene_expression_plot_data(),
+        trajectory_data[["edges"]],
+        color_scale,
+        hover_info
+      )
   }
 
   ## return plot either with WebGL or without, depending on setting
@@ -847,10 +1110,16 @@ observeEvent(input[["expression_projection_export"]], {
   save_file_input <- shinyFiles::parseSavePath(volumes, input[["expression_projection_export"]])
 
   ## only proceed if a path has been provided
-  if ( nrow(save_file_input) > 0 ) {
+  req(
+    nrow(save_file_input) > 0
+  )
 
-    ## extract specified file path
-    save_file_path <- as.character(save_file_input$datapath[1])
+  ## extract specified file path
+  save_file_path <- as.character(save_file_input$datapath[1])
+
+  ## check if projection or trajectory should be shown
+  ## ... projection
+  if ( input[["expression_projection_to_display"]] %in% availableProjections() ) {
 
     ## check if selection projection consists of 2 or 3 dimensions
     ## ... selection projection consists of 3 dimensions
@@ -881,36 +1150,63 @@ observeEvent(input[["expression_projection_export"]], {
 
         ## prepare plot
         plot <- plotExpressionSinglePanel2DExport(gene_expression_plot_data())
-
-      }
-
-      ## save plot
-      pdf(NULL)
-      ggsave(save_file_path, plot, height = 8, width = 11)
-
-      ## check if file was succesfully saved
-      ## ... successful
-      if ( file.exists(save_file_path) ) {
-
-        ## give positive message
-        shinyWidgets::sendSweetAlert(
-          session = session,
-          title = "Success!",
-          text = paste0("Plot saved successfully as: ", save_file_path),
-          type = "success"
-        )
-
-      ## ... failed
-      } else {
-
-        ## give negative message
-        shinyWidgets::sendSweetAlert(
-          session = session,
-          title = "Error!",
-          text = "Sorry, it seems something went wrong...",
-          type = "error"
-        )
       }
     }
+
+  ## ... trajectory
+  } else {
+
+    ## split selection into method and name
+    selection <- strsplit(input[["expression_projection_to_display"]], split = ' // ')[[1]]
+
+    req(
+      selection[1] %in% getMethodsForTrajectories(),
+      selection[2] %in% getNamesOfTrajectories(selection[1])
+    )
+
+    ## collect trajectory data
+    trajectory_data <- getTrajectory(
+      selection[1],
+      selection[2]
+    )
+
+    ## prepare plot
+    plot <- plotExpressionSinglePanel2DTrajectoryExport(
+      gene_expression_plot_data(),
+      trajectory_data[["edges"]]
+    )
+  }
+
+  ## plot must be a ggplot object, otherwise don't proceed
+  req(
+    is.ggplot(plot)
+  )
+
+  ## save plot
+  pdf(NULL)
+  ggsave(save_file_path, plot, height = 8, width = 11)
+
+  ## check if file was succesfully saved
+  ## ... successful
+  if ( file.exists(save_file_path) ) {
+
+    ## give positive message
+    shinyWidgets::sendSweetAlert(
+      session = session,
+      title = "Success!",
+      text = paste0("Plot saved successfully as: ", save_file_path),
+      type = "success"
+    )
+
+  ## ... failed
+  } else {
+
+    ## give negative message
+    shinyWidgets::sendSweetAlert(
+      session = session,
+      title = "Error!",
+      text = "Sorry, it seems something went wrong...",
+      type = "error"
+    )
   }
 })

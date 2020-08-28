@@ -16,12 +16,13 @@ getEnrichedPathways(
 )
 }
 \arguments{
-\item{object}{Seurat object.}
+\item{object}{Seurat object with marker genes calculated by
+\code{\link{getMarkerGenes}}.}
 
 \item{marker_genes_input}{Name of list of marker gene tables that will be
-used as input. This could be the "name" parameter used in "getMarkerGenes()".
-Enriched pathways will be calculated for every group level of every grouping
-variable. Defaults to "cerebro_seurat".}
+used as input. This could be the "name" parameter used in
+\code{\link{getMarkerGenes()}}. Enriched pathways will be calculated for
+every group level of every grouping variable. Defaults to "cerebro_seurat".}
 
 \item{databases}{Which databases to query. Use enrichR::listEnrichrDbs() to
 check what databases are available.}
@@ -37,16 +38,12 @@ original is out-of-service; defaults to
 'http://amp.pharm.mssm.edu/Enrichr/enrich'.}
 }
 \value{
-Seurat object with Enrichr results for all provided grouping
-variables, stored in
-object@misc$enriched_pathways$<marker_genes_input>_enrichr
+Seurat object with Enrichr results for all provided grouping variables,
+stored in \code{object@misc$enriched_pathways$<marker_genes_input>_enrichr}
 }
 \description{
-This function uses the enrichR API to look for enriched pathways
-in marker gene sets of all available grouping variables.
-}
-\details{
-Get enriched pathways based on marker genes from EnrichR.
+This function uses the enrichR API to look for enriched pathways in marker
+gene sets of all available grouping variables.
 }
 \examples{
 pbmc <- readRDS(system.file("extdata/v1.3/pbmc_seurat.rds",
@@ -59,8 +56,5 @@ pbmc <- getEnrichedPathways(
   max_terms = 100,
   URL_API = 'http://amp.pharm.mssm.edu/Enrichr/enrich'
 )
+
 }
-\keyword{Cerebro}
-\keyword{Enrichr}
-\keyword{Seurat}
-\keyword{scRNAseq}

@@ -28,30 +28,23 @@ pseudotime of a cell; defaults to 'Pseudotime'.}
 \value{
 Returns Seurat object with added trajectory. Trajectory info (state,
 pseudotime, projection and tree) will be stored in
-`object@misc$trajectories$monocle2` under the specified name.
+\code{object@misc$trajectories$monocle2}` under the specified name.
 }
 \description{
-This function takes a Monocle object, extracts a trajectory that
-was calculated, and stores it in the specified Seurat object. Trajectory info
+This function takes a Monocle object, extracts a trajectory that was
+calculated, and stores it in the specified Seurat object. Trajectory info
 (state, pseudotime, projection and tree) will be stored in
-seurat@misc$trajectories under the specified name.
-}
-\details{
-Extract trajectory from Monocle and add to Seurat object.
+\code{object@misc$trajectories$monocle2} under the specified name.
 }
 \examples{
 \dontrun{
-seurat <- extractMonocleTrajectory(
-  monocle = monocle,
-  seurat = seurat,
-  name = 'trajectory_1',
-  column_state = 'State',
-  column_pseudotime = 'Pseudotime'
-)
+  seurat <- extractMonocleTrajectory(
+    monocle = monocle,
+    seurat = seurat,
+    name = 'trajectory_1',
+    column_state = 'State',
+    column_pseudotime = 'Pseudotime'
+  )
 }
+
 }
-\keyword{Cerebro}
-\keyword{Monocle}
-\keyword{Seurat}
-\keyword{scRNAseq}
-\keyword{trajectory}

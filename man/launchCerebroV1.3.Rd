@@ -8,29 +8,30 @@ launchCerebroV1.3(
   mode = "open",
   maxFileSize = 800,
   crb_file_to_load = NULL,
-  options = list()
+  ...
 )
 }
 \arguments{
-\item{mode}{Cerebro can be ran in "open" or "closed" mode, allowing the user
-to load their own data set ("open") or only show a pre-loaded data set
-("closed", removes the "Load data" element); defaults to "open".}
+\item{mode}{Cerebro can be ran in \code{open} or \code{closed} mode, allowing
+the user to load their own data set (\code{open}) or only show a pre-loaded
+data set (\code{closed}, removes the "Load data" element); defaults to
+\code{open}.}
 
-\item{maxFileSize}{Maximum size of input file; defaults to 800 MB.}
+\item{maxFileSize}{Maximum size of input file; defaults to \code{800}
+(800 MB).}
 
-\item{crb_file_to_load}{Path to .crb file to load on launch of Cerebro.
-Useful when using/hosting Cerebro in "closed" mode. Defaults to NULL.}
+\item{crb_file_to_load}{Path to \code{.crb} file to load on launch of
+Cerebro. Useful when using/hosting Cerebro in \code{closed} mode. Defaults to
+\code{NULL}.}
 
-\item{options}{...}
+\item{...}{Further parameters that are used by \code{shiny::runApp}, e.g.
+\code{host} an \code{port}.}
 }
 \value{
 Shiny application.
 }
 \description{
 Launch the Cerebro v1.3 Shiny application.
-}
-\details{
-Launch Cerebro v1.3
 }
 \examples{
 if ( interactive() ) {
@@ -39,7 +40,5 @@ if ( interactive() ) {
     maxFileSize = 800
   )
 }
+
 }
-\keyword{Cerebro}
-\keyword{Seurat}
-\keyword{scRNAseq}

@@ -11,8 +11,8 @@
 output[["load_data_select_file_UI"]] <- renderUI({
   if (
     exists('Cerebro.options') &&
-    !is.null(.GlobalEnv$Cerebro.options[['mode']]) &&
-    .GlobalEnv$Cerebro.options[["mode"]] != "closed"
+    !is.null(Cerebro.options[['mode']]) &&
+    Cerebro.options[["mode"]] != "closed"
   ) {
     tagList(
       fluidRow(
@@ -45,10 +45,17 @@ output[["load_data_select_file_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 
 output[["load_data_mode_open"]] <- renderText({
-  paste0(
-    "<h3 style='text-align: center; margin-top: 0'><strong>Welcome to Cerebro!</strong></h2>",
-    "<p style='text-align: center'>Please load your data set or take a look at the pre-loaded data.</p>"
-  )
+  if (
+    exists('Cerebro.options') &&
+    !is.null(Cerebro.options[["welcome_message"]])
+  ) {
+    HTML(Cerebro.options[["welcome_message"]])
+  } else {
+    HTML(
+      "<h3 style='text-align: center; margin-top: 0px'><strong>Welcome to Cerebro!</strong></h3>
+      <p style='text-align: center'>Please load your data set or take a look at the pre-loaded data.</p>"
+    )
+  }
 })
 
 ##----------------------------------------------------------------------------##
@@ -56,9 +63,16 @@ output[["load_data_mode_open"]] <- renderText({
 ##----------------------------------------------------------------------------##
 
 output[["load_data_mode_closed"]] <- renderText({
-  paste0(
-    "<h3 style='text-align: center; margin-top: 0'><strong>Welcome to Cerebro!</strong></h2>",
-    "<p style='text-align: center'>Cerebro was launched in 'closed' mode, which means you cannot load your own data set. Instead, take a look at the pre-loaded data.</p>",
-    "<br>"
-  )
+  if (
+    exists('Cerebro.options') &&
+    !is.null(Cerebro.options[["welcome_message"]])
+  ) {
+    HTML(Cerebro.options[["welcome_message"]])
+  } else {
+    HTML(
+      "<h3 style='text-align: center; margin-top: 0px'><strong>Welcome to Cerebro!</strong></h3>
+      <p style='text-align: center'>Cerebro was launched in 'closed' mode, which means you cannot load your own data set. Instead, take a look at the pre-loaded data.</p>
+      <br>"
+    )
+  }
 })
