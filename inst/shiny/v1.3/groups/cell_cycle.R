@@ -102,148 +102,51 @@ output[["groups_by_cell_cycle_plot"]] <- plotly::renderPlotly({
     input[["groups_by_cell_cycle_plot_type"]]
   )
 
-  ## calculate table (must be merged later if user chooses to display as percent)
-  table_wide <- calculateTableAB(
-    getMetaData(),
-    input[[ "groups_selected_group" ]],
-    input[[ "groups_by_cell_cycle_column" ]]
-  )
-
-  ## process table
-  table_long <- table_wide %>%
-    dplyr::select(-total_cell_count) %>%
-    tidyr::pivot_longer(
-      cols = 2:ncol(.),
-      names_to = input[[ "groups_by_cell_cycle_column" ]],
-      values_to = "cells"
-    )
-
-  ## factorize second group
-  table_long[[ input[[ "groups_by_cell_cycle_column" ]] ]] <- factor(
-    table_long[[ input[[ "groups_by_cell_cycle_column" ]] ]],
-    levels = unique(table_long[[ input[[ "groups_by_cell_cycle_column" ]] ]])
-  )
-
   ##
   if ( input[["groups_by_cell_cycle_plot_type"]] == "Bar chart" ) {
 
-    ##
-    if ( input[["groups_by_cell_cycle_show_as_percent"]] != TRUE ) {
-      table_long %>%
-      plotly::plot_ly(
-        x = ~.[[ input[[ "groups_selected_group" ]] ]],
-        y = ~cells,
-        type = "bar",
-        color = ~.[[ input[[ "groups_by_cell_cycle_column" ]] ]],
-        colors = reactive_colors()[[ input[[ "groups_by_cell_cycle_column" ]] ]],
-        hoverinfo = "text",
-        text = ~paste0("<b>", .[[ input[[ "groups_by_cell_cycle_column" ]] ]], ": </b>", formatC(.$cells, big.mark = ','))
-      ) %>%
-      plotly::layout(
-        xaxis = list(
-          title ="",
-          mirror = TRUE,
-          showline = TRUE
-        ),
-        yaxis = list(
-          title = "Number of cells",
-          hoverformat = ".2f",
-          mirror = TRUE,
-          zeroline = FALSE,
-          showline = TRUE
-        ),
-        barmode = "stack",
-        hovermode = "compare"
-      )
-    } else {
-      table_long %>%
-      dplyr::left_join(
-        .data,
-        table_wide[ , c(input[[ "groups_selected_group" ]], "total_cell_count") ],
-        by = input[[ "groups_selected_group" ]]
-      ) %>%
-      dplyr::mutate(pct = cells / total_cell_count * 100) %>%
-      plotly::plot_ly(
-        x = ~.[[ input[[ "groups_selected_group" ]] ]],
-        y = ~pct,
-        type = "bar",
-        color = ~.[[ input[[ "groups_by_cell_cycle_column" ]] ]],
-        colors = reactive_colors()[[ input[[ "groups_by_cell_cycle_column" ]] ]],
-        hoverinfo = "text",
-        text = ~paste0("<b>", .[[ input[[ "groups_by_cell_cycle_column" ]] ]], ": </b>", format(round(.$pct, 1), nsmall = 1), "%")
-      ) %>%
-      plotly::layout(
-        xaxis = list(
-          title ="",
-          mirror = TRUE,
-          showline = TRUE
-        ),
-        yaxis = list(
-          title = "Percent of cells [%]",
-          range = c(0,100),
-          hoverformat = ".2f",
-          mirror = TRUE,
-          zeroline = FALSE,
-          showline = TRUE
-        ),
-        barmode = "stack",
-        hovermode = "compare"
-      )
-    }
+    ## calculate table
+    composition_df <- calculateTableAB(
+      getMetaData(),
+      input[[ "groups_selected_group" ]],
+      input[[ "groups_by_cell_cycle_column" ]],
+      mode = "long",
+      percent = input[["groups_by_cell_cycle_show_as_percent"]]
+    )
+
+    ## generate plot
+    plotlyBarChart(
+      table = composition_df,
+      first_grouping_variable = input[[ "groups_selected_group" ]],
+      second_grouping_variable = input[[ "groups_by_cell_cycle_column" ]],
+      colors = reactive_colors()[[ input[[ "groups_by_cell_cycle_column" ]] ]],
+      percent = input[["groups_by_cell_cycle_show_as_percent"]]
+    )
 
   ##
   } else if ( input[["groups_by_cell_cycle_plot_type"]] == "Sankey plot" ) {
 
-    ## transform factor levels to integers (necessary for plotly)
-    table_long[["source"]] <- as.numeric(table_long[[1]]) - 1
-    table_long[["target"]] <- as.numeric(table_long[[2]]) - 1 + length(unique(table_long[[1]]))
-
-    ## combine all factor levels in a single vector
-    all_groups <- c(levels(table_long[[1]]), levels(table_long[[2]]))
+    ## calculate table
+    composition_df <- calculateTableAB(
+      getMetaData(),
+      input[[ "groups_selected_group" ]],
+      input[[ "groups_by_cell_cycle_column" ]],
+      mode = "long",
+      percent = FALSE
+    )
 
     ## get color code for all group levels (from both groups)
     colors_for_groups <- c(
-        reactive_colors()[[ input[[ "groups_selected_group" ]] ]][ levels(table_long[[1]]) ],
-        reactive_colors()[[ input[[ "groups_by_cell_cycle_column" ]] ]][ levels(table_long[[2]]) ]
-      )
+      assignColorsToGroups(composition_df, input[[ "groups_selected_group" ]]),
+      assignColorsToGroups(composition_df, input[[ "groups_by_cell_cycle_column" ]])
+    )
 
-    ## match color codes to group levels (from both groups)
-    colors_for_groups_all <- colors_for_groups[names(colors_for_groups) %in% all_groups]
-
-    ## prepare plot
-    plotly::plot_ly(
-      type = "sankey",
-      orientation = "v",
-      valueformat = ".0f",
-      node = list(
-        label = all_groups,
-        hovertemplate = paste0(
-          "<b>%{label}</b><br>",
-          "%{value:,.0f} cells",
-          "<extra></extra>",
-          collapse = ""
-        ),
-        color = colors_for_groups_all,
-        pad = 15,
-        thickness = 20,
-        line = list(
-          color = "black",
-          width = 0.5
-        )
-      ),
-      link = list(
-        source = table_long[["source"]],
-        target = table_long[["target"]],
-        value =  table_long[[3]],
-        hoverinfo = "all",
-        hovertemplate = paste0(
-          "<b>", input[["groups_selected_group"]], ":</b> %{source.label}<br>",
-          "<b>", input[["groups_by_other_group_second_group"]], ":</b> %{target.label}<br>",
-          "<b>Number of cells:</b> %{value:,.0f}",
-          "<extra></extra>",
-          collapse = ""
-        )
-      )
+    ## generate plot
+    plotlySankeyPlot(
+      table = composition_df,
+      first_grouping_variable = input[[ "groups_selected_group" ]],
+      second_grouping_variable = input[[ "groups_by_cell_cycle_column" ]],
+      colors_for_groups = colors_for_groups
     )
   }
 })
@@ -264,14 +167,13 @@ output[["groups_by_cell_cycle_table"]] <- DT::renderDataTable({
   composition_df <- calculateTableAB(
     getMetaData(),
     input[["groups_selected_group"]],
-    input[["groups_by_cell_cycle_column"]]
+    input[["groups_by_cell_cycle_column"]],
+    mode = "wide",
+    percent = input[["groups_by_cell_cycle_show_as_percent"]]
   )
 
-  ##
+  ## get indices of columns that should be formatted as percent
   if ( input[["groups_by_cell_cycle_show_as_percent"]] == TRUE ) {
-    for ( i in 3:ncol(composition_df) ) {
-      composition_df[,i] <- composition_df[,i] / composition_df$total_cell_count
-    }
     columns_percentage <- c(3:ncol(composition_df))
   } else {
     columns_percentage <- NULL

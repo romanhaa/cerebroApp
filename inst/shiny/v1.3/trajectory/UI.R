@@ -18,6 +18,5 @@ tab_trajectory <- tabItem(
   uiOutput("trajectory_selected_cells_table_UI"),
   uiOutput("trajectory_distribution_along_pseudotime_UI"),
   uiOutput("trajectory_states_by_group_UI"),
-  uiOutput("trajectory_nUMI_by_state_UI"),
-  uiOutput("trajectory_nGene_by_state_UI")
+  uiOutput("trajectory_expression_metrics_UI")
 )

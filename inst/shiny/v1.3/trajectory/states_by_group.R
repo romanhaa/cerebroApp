@@ -109,157 +109,60 @@ output[["states_by_group_plot"]] <- plotly::renderPlotly({
   ##
   grouping_variable <- input[["states_by_group_select_other_group"]]
 
-  ## - remove cells without pseudotime (NA)
-  ## - group table by state and selected variable
-  ## - count number of cells for each combination of groups
-  ## - add total cell count per state to each combination of groups
-  cells_df <- cells_df %>%
-    dplyr::filter(!is.na(pseudotime)) %>%
-    dplyr::group_by_at(c("state", grouping_variable)) %>%
-    dplyr::summarise(count = n(), .groups = "drop") %>%
-    dplyr::ungroup() %>%
-    dplyr::group_by(state) %>%
-    dplyr::mutate(total = sum(count)) %>%
-    dplyr::ungroup()
-
-  ## get colors for groups
-  colors_for_groups <- assignColorsToGroups(cells_df, grouping_variable)
-
   ## check which plot type is chosen
   ## ... bar chart
   if (
-    input[["states_by_group_plot_type"]] == "Bar chart" ||
-    grouping_variable == "state"
+    input[["states_by_group_plot_type"]] == "Bar chart"
   ) {
 
-    ## check whether cell counts or percentages should be shown
-    ## ... cell counts
-    if ( input[["states_by_group_show_as_percent"]] != TRUE ) {
-
-      ## prepare plot
-      cells_df %>%
-      plotly::plot_ly(
-        x = ~state,
-        y = ~count,
-        type = "bar",
-        color = cells_df[[ grouping_variable ]],
-        colors = colors_for_groups,
-        hoverinfo = "text",
-        text = ~paste0("<b>", .[[2]], ":</b> ", formatC(.$count, big.mark = ','))
-      ) %>%
-      plotly::layout(
-        xaxis = list(
-          title = "",
-          mirror = TRUE,
-          showline = TRUE
-        ),
-        yaxis = list(
-          title = "Number of cells",
-          hoverformat = ".2f",
-          mirror = TRUE,
-          zeroline = FALSE,
-          showline = TRUE
-        ),
-        barmode = "stack",
-        hovermode = "compare"
+    ##
+    composition_df <- cells_df %>%
+      dplyr::filter(!is.na(pseudotime)) %>%
+      calculateTableAB(
+        "state",
+        grouping_variable,
+        mode = "long",
+        percent = input[["states_by_group_show_as_percent"]]
       )
 
-    ## ... percentages
-    } else {
+    ## get colors for groups
+    colors_for_groups <- assignColorsToGroups(composition_df, grouping_variable)
 
-      ## - convert count to percentages
-      ## - prepare plot
-      cells_df %>%
-      dplyr::mutate(pct = count / total * 100) %>%
-      plotly::plot_ly(
-        x = ~state,
-        y = ~pct,
-        type = "bar",
-        color = cells_df[[ grouping_variable ]],
-        colors = colors_for_groups,
-        hoverinfo = "text",
-        text = ~paste0("<b>", .[[2]], ":</b> ", format(round(.$pct, 1), nsmall = 1), "%")
-      ) %>%
-      plotly::layout(
-        xaxis = list(
-          title = "",
-          mirror = TRUE,
-          showline = TRUE
-        ),
-        yaxis = list(
-          title = "Percentage (%)",
-          range = c(0,100),
-          hoverformat = ".2f",
-          mirror = TRUE,
-          zeroline = FALSE,
-          showline = TRUE
-        ),
-        barmode = "stack",
-        hovermode = "compare"
-      )
-    }
+    ## generate plot
+    plotlyBarChart(
+      table = composition_df,
+      first_grouping_variable = "state",
+      second_grouping_variable = grouping_variable,
+      colors = colors_for_groups,
+      percent = input[["states_by_group_show_as_percent"]]
+    )
 
   ## ... Sankey plot
   } else if ( input[["states_by_group_plot_type"]] == "Sankey plot" ) {
 
-    ## transform factor levels to integers (necessary for plotly)
-    cells_df[["source"]] <- as.numeric(cells_df[[1]]) - 1
-    cells_df[["target"]] <- as.numeric(cells_df[[2]]) - 1 + length(unique(cells_df[[1]]))
-
-    ## combine all factor levels in a single vector
-    all_groups <- c(levels(cells_df[[1]]), levels(cells_df[[2]]))
-
     ##
-    colors_states <- setNames(
-      default_colorset[seq_along(levels(trajectory_data[["meta"]]$state))],
-      levels(trajectory_data[["meta"]]$state)
-    )
+    composition_df <- cells_df %>%
+      dplyr::filter(!is.na(pseudotime)) %>%
+      calculateTableAB(
+        "state",
+        grouping_variable,
+        mode = "long",
+        percent = FALSE
+      )
 
     ## get color code for all group levels (from both groups)
     colors_for_groups <- c(
-        colors_states,
-        colors_for_groups
-      )
-
-    ## match color codes to group levels (from both groups)
-    colors_for_groups_all <- colors_for_groups[names(colors_for_groups) %in% all_groups]
-
-    ## prepare plot
-    plotly::plot_ly(
-      type = "sankey",
-      orientation = "v",
-      valueformat = ".0f",
-      node = list(
-        label = all_groups,
-        hovertemplate = paste0(
-          "<b>%{label}</b><br>",
-          "%{value:,.0f} cells",
-          "<extra></extra>",
-          collapse = ""
-        ),
-        color = colors_for_groups_all,
-        pad = 15,
-        thickness = 20,
-        line = list(
-          color = "black",
-          width = 0.5
-        )
-      ),
-      link = list(
-        source = cells_df[["source"]],
-        target = cells_df[["target"]],
-        value =  cells_df[[3]],
-        hoverinfo = "all",
-        hovertemplate = paste0(
-          "<b>State:</b> %{source.label}<br>",
-          "<b>", grouping_variable, ":</b> %{target.label}<br>",
-          "<b>Number of cells:</b> %{value:,.0f}",
-          "<extra></extra>",
-          collapse = ""
-        )
-      )
+      assignColorsToGroups(composition_df, "state"),
+      assignColorsToGroups(composition_df, grouping_variable)
     )
 
+    ## generate plot
+    plotlySankeyPlot(
+      table = composition_df,
+      first_grouping_variable = "state",
+      second_grouping_variable = grouping_variable,
+      colors_for_groups = colors_for_groups
+    )
   }
 })
 
@@ -273,7 +176,7 @@ output[["states_by_group_table"]] <- DT::renderDataTable({
   req(
     input[["trajectory_selected_method"]],
     input[["trajectory_selected_name"]],
-    input[["trajectory_point_color"]]
+    input[["states_by_group_select_other_group"]]
   )
 
   ## collect trajectory data
@@ -285,73 +188,28 @@ output[["states_by_group_table"]] <- DT::renderDataTable({
   ## merge trajectory data with meta data
   cells_df <- cbind(trajectory_data[["meta"]], getMetaData())
 
-  ## if the selected variable to color cells by contains numeric values, show
-  ## cell counts by state, otherwise split the cell counts by the selected
-  ## (categorical) variable
-  if ( is.numeric(cells_df[[ input[["trajectory_point_color"]] ]]) ) {
-    grouping_variable <- "state"
-  } else {
-    grouping_variable <- input[["trajectory_point_color"]]
-  }
+  ##
+  grouping_variable <- input[["states_by_group_select_other_group"]]
 
-  ## - remove cells without pseudotime (NA)
-  ## - group table by state and selected variable
-  ## - count number of cells for each combination of groups
-  ## - add total cell count per state to each combination of groups
-  cells_df <- cells_df %>%
+  ## generate table
+  composition_df <- cells_df %>%
     dplyr::filter(!is.na(pseudotime)) %>%
-    dplyr::group_by_at(c("state", grouping_variable)) %>%
-    dplyr::summarise(count = n(), .groups = "drop") %>%
-    dplyr::ungroup() %>%
-    dplyr::group_by(state) %>%
-    dplyr::mutate(total = sum(count)) %>%
-    dplyr::ungroup()
+    calculateTableAB(
+      "state",
+      grouping_variable,
+      mode = "wide",
+      percent = input[["states_by_group_show_as_percent"]]
+    )
 
-  ## if percentages should be shown, normalize counts (to 100%)
+  ## get indices of columns that should be formatted as percent
   if ( input[["states_by_group_show_as_percent"]] == TRUE ) {
-    cells_df <- dplyr::mutate(cells_df, count = count / total)
-  }
-
-  ## if grouping variable is not "state", spread the table by grouping variable
-  if ( grouping_variable != "state" ) {
-    cells_df <- cells_df %>%
-      tidyr::pivot_wider(
-        id_cols = c("state", "total"),
-        names_from = 2,
-        values_from = count,
-        values_fill = 0
-      )
-
-  ## if grouping variable is "state"
-  } else {
-
-    ## if percentages should be shown, reorder and rename columns
-    if ( input[["states_by_group_show_as_percent"]] == TRUE ) {
-      cells_df <- cells_df %>%
-        dplyr::select(state, total, dplyr::everything()) %>%
-        dplyr::rename("Percent" = count)
-
-    ## if cell counts should be shown, remove "count" column
-    } else {
-      cells_df <- cells_df %>%
-        dplyr::select(-count)
-    }
-  }
-
-  ## if percentages should be shown, set which columns contain percentage values,
-  ## otherwise create empty vector
-  if ( input[["states_by_group_show_as_percent"]] == TRUE ) {
-    columns_percentage <- c(3:ncol(cells_df))
+    columns_percentage <- c(3:ncol(composition_df))
   } else {
     columns_percentage <- NULL
   }
 
-  ## rename columns and create table
-  cells_df %>%
-  dplyr::rename(
-    State = state,
-    "# of cells" = total
-  ) %>%
+  composition_df %>%
+  dplyr::rename("# of cells" = total_cell_count) %>%
   prettifyTable(
     filter = "none",
     dom = "Brtlip",

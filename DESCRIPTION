@@ -55,11 +55,12 @@ Imports:
   utils,
   viridis (>= 0.5.1)
 Suggests:
-  formattable (>= 0.2.0.1),
-  ggtree (>= 1.14.6),
-  knitr,
-  monocle (>= 2.10),
-  reshape2 (>= 1.4.3),
-  rmarkdown,
-  Seurat (>= 3.0.0)
+    formattable (>= 0.2.0.1),
+    ggtree (>= 1.14.6),
+    knitr,
+    monocle (>= 2.10),
+    reshape2 (>= 1.4.3),
+    rmarkdown,
+    Seurat (>= 3.0.0),
+    testthat
 VignetteBuilder: knitr

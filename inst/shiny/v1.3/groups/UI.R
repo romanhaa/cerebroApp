@@ -16,9 +16,6 @@ tab_groups <- tabItem(
   uiOutput("groups_select_group_UI"),
   uiOutput("groups_tree_UI"),
   uiOutput("groups_composition_UI"),
-  uiOutput("groups_number_of_transcripts_UI"),
-  uiOutput("groups_number_of_expressed_genes_UI"),
-  uiOutput("groups_mitochondrial_expression_UI"),
-  uiOutput("groups_ribosomal_expression_UI"),
+  uiOutput("groups_expression_metrics_UI"),
   uiOutput("groups_cell_cycle_UI")
 )

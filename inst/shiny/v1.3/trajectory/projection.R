@@ -159,6 +159,13 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
   ## prepare hover info
   hover_info <- buildHoverInfoForProjections(cells_df)
 
+  ## add expression levels to hover info
+  hover_info <- glue::glue(
+    "{hover_info}
+    <b>State</b>: {cells_df$state}
+    <b>Pseudotime</b>: {formatC(cells_df$pseudotime, format = 'f', big.mark = ',', digits = 3)}"
+  )
+
   ##
   if (
     is.factor(cells_df[[ input[["trajectory_point_color"]] ]]) ||
@@ -331,13 +338,13 @@ observeEvent(input[["trajectory_projection_export"]], {
   shinyFiles::shinyFileSave(
     input,
     id = "trajectory_projection_export",
-    roots = volumes,
+    roots = available_storage_volumes,
     session = session,
     restrictions = system.file(package = "base")
   )
 
   ## retrieve info from dialog
-  save_file_input <- shinyFiles::parseSavePath(volumes, input[["trajectory_projection_export"]])
+  save_file_input <- shinyFiles::parseSavePath(available_storage_volumes, input[["trajectory_projection_export"]])
 
   ## only proceed if a path has been provided
   if ( nrow(save_file_input) > 0 ) {

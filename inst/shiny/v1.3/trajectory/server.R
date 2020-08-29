@@ -7,5 +7,4 @@ source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/trajectory/project
 source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/trajectory/selected_cells_table.R"), local = TRUE)
 source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/trajectory/distribution_along_pseudotime.R"), local = TRUE)
 source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/trajectory/states_by_group.R"), local = TRUE)
-source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/trajectory/number_of_transcripts_by_state.R"), local = TRUE)
-source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/trajectory/number_of_expressed_genes_by_state.R"), local = TRUE)
+source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/trajectory/expression_metrics.R"), local = TRUE)

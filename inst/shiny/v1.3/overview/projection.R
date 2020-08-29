@@ -126,25 +126,23 @@ output[["overview_projection_scales_UI"]] <- renderUI({
     input[["overview_projection_to_display"]]
   }
 
-  range_x_min <- getProjection(projection_to_display)[,1] %>% min() %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round()
-  range_x_max <- getProjection(projection_to_display)[,1] %>% max() %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
-  range_y_min <- getProjection(projection_to_display)[,2] %>% min() %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round()
-  range_y_max <- getProjection(projection_to_display)[,2] %>% max() %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
+  XYranges <- getXYranges(getProjection(projection_to_display))
+
   tagList(
     hr(),
     sliderInput(
       "overview_scale_x_manual_range",
       label = "Range of X axis",
-      min = range_x_min,
-      max = range_x_max,
-      value = c(range_x_min, range_x_max)
+      min = XYranges$x$min,
+      max = XYranges$x$max,
+      value = c(XYranges$x$min, XYranges$x$max)
     ),
     sliderInput(
       "overview_scale_y_manual_range",
       label = "Range of Y axis",
-      min = range_y_min,
-      max = range_y_max,
-      value = c(range_y_min, range_y_max)
+      min = XYranges$y$min,
+      max = XYranges$y$max,
+      value = c(XYranges$y$min, XYranges$y$max)
     )
   )
 })
@@ -466,13 +464,13 @@ observeEvent(input[["overview_projection_export"]], {
   shinyFiles::shinyFileSave(
     input,
     id = "overview_projection_export",
-    roots = volumes,
+    roots = available_storage_volumes,
     session = session,
     restrictions = system.file(package = "base")
   )
 
   ## retrieve info from dialog
-  save_file_input <- shinyFiles::parseSavePath(volumes, input[["overview_projection_export"]])
+  save_file_input <- shinyFiles::parseSavePath(available_storage_volumes, input[["overview_projection_export"]])
 
   ## only proceed if a path has been provided
   if ( nrow(save_file_input) > 0 ) {

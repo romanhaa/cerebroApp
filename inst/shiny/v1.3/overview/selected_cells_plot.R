@@ -131,33 +131,19 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
     colors_for_groups <- assignColorsToGroups(cells_df, color_variable)
 
     ## make bar chart
-    plotly::plot_ly(
-      cells_df,
-      x = ~cells_df[[1]],
-      y = ~cells_df[[2]],
-      type = "bar",
-      color = ~cells_df[[1]],
-      colors = colors_for_groups,
-      source = "subset",
-      showlegend = FALSE,
-      hoverinfo = "y"
-    ) %>%
-    plotly::layout(
-      title = "",
-      xaxis = list(
-        title = "",
-        mirror = TRUE,
-        showline = TRUE
-      ),
-      yaxis = list(
-        title = "Number of cells",
-        hoverformat = ".0f",
-        mirror = TRUE,
-        showline = TRUE
-      ),
-      dragmode = "select",
-      hovermode = "compare"
-    )
+    plot <- plotly::plot_ly(
+        cells_df,
+        x = ~cells_df[[1]],
+        y = ~cells_df[[2]],
+        type = "bar",
+        color = ~cells_df[[1]],
+        colors = colors_for_groups,
+        source = "subset",
+        showlegend = FALSE,
+        hoverinfo = "y"
+      )
+
+    y_axis_title <- "Number of cells"
 
   ## if the selected coloring variable is numeric/continuous
   } else if ( is.numeric(cells_df[[ color_variable ]]) ) {
@@ -167,43 +153,47 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
       dplyr::select(group, !!! rlang::syms(color_variable))
 
     ## create violin/box plot
-    plotly::plot_ly(
-      cells_df,
-      x = ~cells_df[[1]],
-      y = ~cells_df[[2]],
-      type = "violin",
-      box = list(
-        visible = TRUE
-      ),
-      meanline = list(
-        visible = TRUE
-      ),
-      color = ~cells_df[[1]],
-      colors = setNames(c('#e74c3c','#7f8c8d'), c('selected', 'not selected')),
-      source = "subset",
-      showlegend = FALSE,
-      hoverinfo = "y",
-      marker = list(
-        size = 5
+    plot <- plotly::plot_ly(
+        cells_df,
+        x = ~cells_df[[1]],
+        y = ~cells_df[[2]],
+        type = "violin",
+        box = list(
+          visible = TRUE
+        ),
+        meanline = list(
+          visible = TRUE
+        ),
+        color = ~cells_df[[1]],
+        colors = setNames(c('#e74c3c','#7f8c8d'), c('selected', 'not selected')),
+        source = "subset",
+        showlegend = FALSE,
+        hoverinfo = "y",
+        marker = list(
+          size = 5
+        )
       )
-    ) %>%
-    plotly::layout(
-      title = "",
-      xaxis = list(
-        title = "",
-        mirror = TRUE,
-        showline = TRUE
-      ),
-      yaxis = list(
-        title = colnames(cells_df)[2],
-        hoverformat = ".0f",
-        mirror = TRUE,
-        showline = TRUE
-      ),
-      dragmode = "select",
-      hovermode = "compare"
-    )
+
+    y_axis_title <- colnames(cells_df)[2]
   }
+
+  plot %>%
+  plotly::layout(
+    title = "",
+    xaxis = list(
+      title = "",
+      mirror = TRUE,
+      showline = TRUE
+    ),
+    yaxis = list(
+      title = y_axis_title,
+      hoverformat = ".0f",
+      mirror = TRUE,
+      showline = TRUE
+    ),
+    dragmode = "select",
+    hovermode = "compare"
+  )
 })
 
 ##----------------------------------------------------------------------------##
