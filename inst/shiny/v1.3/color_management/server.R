@@ -23,8 +23,7 @@ output[["color_assignments_UI"]] <- renderUI({
           collapsible = TRUE,
           tagList({
             color_list <- list()
-            for ( group_level in getGroupLevels(group_name) )
-            {
+            for ( group_level in getGroupLevels(group_name) ) {
               color_list[[ group_level ]] <- colourpicker::colourInput(
                 inputId = paste0('color_', group_name, '_', gsub(group_level, pattern = '[^[:alnum:]]', replacement = '_')),
                 label = group_level,
@@ -51,8 +50,7 @@ output[["color_assignments_UI"]] <- renderUI({
             collapsible = TRUE,
             tagList({
               color_list <- list()
-              for ( state in unique(as.character(getMetaData()[[ column ]])) )
-              {
+              for ( state in unique(as.character(getMetaData()[[ column ]])) ) {
                 color_list[[ state ]] <- colourpicker::colourInput(
                   inputId = paste0('color_', column, '_', gsub(state, pattern = '[^[:alnum:]]', replacement = '_')),
                   label = state,

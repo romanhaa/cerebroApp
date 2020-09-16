@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Introduction
+# Overview
 
 The `cerebroApp` package has two main purposes: (1) Give access to the Cerebro user interface, and (2) provide a set of functions to pre-process and export scRNA-seq data for visualization in Cerebro.
 The Cerebro user interface was built using the Shiny framework and designed to provide numerous perspectives on a given data set that should facilitate data interpretation.

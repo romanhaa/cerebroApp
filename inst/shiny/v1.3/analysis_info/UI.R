@@ -3,7 +3,7 @@
 ##----------------------------------------------------------------------------##
 
 tab_analysis_info <- tabItem(
-  tabName = "info",
+  tabName = "analysis_info",
   fluidRow(
     column(12,
       titlePanel("Information about the data set and analysis"),

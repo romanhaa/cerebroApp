@@ -64,6 +64,10 @@ specified during the call to \code{\link{getEnrichedPathways}} or
 method that was used to calculate trajectories, and, depending on the
 method, a \code{data.frame} or \code{list} for each specific trajectory,
 e.g. those extracted with \code{\link{extractMonocleTrajectory}}.}
+
+\item{\code{extra_material}}{\code{list} that can contain additional material
+related to the data set; tables should be stored in \code{data.frame}
+format in a named \code{list} called `tables`}
 }
 \if{html}{\out{</div>}}
 }
@@ -89,7 +93,11 @@ e.g. those extracted with \code{\link{extractMonocleTrajectory}}.}
 \item \href{#method-addGeneList}{\code{Cerebro_v1.3$addGeneList()}}
 \item \href{#method-getGeneLists}{\code{Cerebro_v1.3$getGeneLists()}}
 \item \href{#method-setExpression}{\code{Cerebro_v1.3$setExpression()}}
-\item \href{#method-getExpression}{\code{Cerebro_v1.3$getExpression()}}
+\item \href{#method-getCellNames}{\code{Cerebro_v1.3$getCellNames()}}
+\item \href{#method-getGeneNames}{\code{Cerebro_v1.3$getGeneNames()}}
+\item \href{#method-getMeanExpressionForGenes}{\code{Cerebro_v1.3$getMeanExpressionForGenes()}}
+\item \href{#method-getMeanExpressionForCells}{\code{Cerebro_v1.3$getMeanExpressionForCells()}}
+\item \href{#method-getExpressionMatrix}{\code{Cerebro_v1.3$getExpressionMatrix()}}
 \item \href{#method-setCellCycle}{\code{Cerebro_v1.3$setCellCycle()}}
 \item \href{#method-getCellCycle}{\code{Cerebro_v1.3$getCellCycle()}}
 \item \href{#method-addProjection}{\code{Cerebro_v1.3$addProjection()}}
@@ -112,6 +120,12 @@ e.g. those extracted with \code{\link{extractMonocleTrajectory}}.}
 \item \href{#method-getMethodsForTrajectories}{\code{Cerebro_v1.3$getMethodsForTrajectories()}}
 \item \href{#method-getNamesOfTrajectories}{\code{Cerebro_v1.3$getNamesOfTrajectories()}}
 \item \href{#method-getTrajectory}{\code{Cerebro_v1.3$getTrajectory()}}
+\item \href{#method-addExtraMaterial}{\code{Cerebro_v1.3$addExtraMaterial()}}
+\item \href{#method-addExtraTable}{\code{Cerebro_v1.3$addExtraTable()}}
+\item \href{#method-getExtraMaterialCategories}{\code{Cerebro_v1.3$getExtraMaterialCategories()}}
+\item \href{#method-checkForExtraTables}{\code{Cerebro_v1.3$checkForExtraTables()}}
+\item \href{#method-getNamesOfExtraTables}{\code{Cerebro_v1.3$getNamesOfExtraTables()}}
+\item \href{#method-getExtraTable}{\code{Cerebro_v1.3$getExtraTable()}}
 \item \href{#method-print}{\code{Cerebro_v1.3$print()}}
 \item \href{#method-clone}{\code{Cerebro_v1.3$clone()}}
 }
@@ -429,17 +443,101 @@ of rows in the \code{meta_data} field.}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-getExpression"></a>}}
-\if{latex}{\out{\hypertarget{method-getExpression}{}}}
-\subsection{Method \code{getExpression()}}{
-Retrieve transcript count matrix.
+\if{html}{\out{<a id="method-getCellNames"></a>}}
+\if{latex}{\out{\hypertarget{method-getCellNames}{}}}
+\subsection{Method \code{getCellNames()}}{
+Get names of all cells.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cerebro_v1.3$getExpression()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Cerebro_v1.3$getCellNames()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-Transcript count matrix, possibly but not necessarily in
-\code{RleArray} format.
+\code{vector} containing all cell names/barcodes.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-getGeneNames"></a>}}
+\if{latex}{\out{\hypertarget{method-getGeneNames}{}}}
+\subsection{Method \code{getGeneNames()}}{
+Get names of all genes in transcript count matrix.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cerebro_v1.3$getGeneNames()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+\code{vector} containing all gene names in transcript count matrix.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-getMeanExpressionForGenes"></a>}}
+\if{latex}{\out{\hypertarget{method-getMeanExpressionForGenes}{}}}
+\subsection{Method \code{getMeanExpressionForGenes()}}{
+Retrieve mean expression across all cells in the data set for a set of
+genes.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cerebro_v1.3$getMeanExpressionForGenes(genes)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{genes}}{Names of genes to extract; no default.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+\code{data.frame} containing specified gene names and their respective
+mean expression across all cells in the data set.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-getMeanExpressionForCells"></a>}}
+\if{latex}{\out{\hypertarget{method-getMeanExpressionForCells}{}}}
+\subsection{Method \code{getMeanExpressionForCells()}}{
+Retrieve (mean) expression for a single gene or a set of genes for a
+given set of cells.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cerebro_v1.3$getMeanExpressionForCells(cells = NULL, genes = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{cells}}{Names/barcodes of cells to extract; defaults to \code{NULL},
+which will return all cells.}
+
+\item{\code{genes}}{Names of genes to extract; defaults to \code{NULL}, which
+will return all genes.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+\code{vector} containing (mean) expression across all specified genes in
+each specified cell.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-getExpressionMatrix"></a>}}
+\if{latex}{\out{\hypertarget{method-getExpressionMatrix}{}}}
+\subsection{Method \code{getExpressionMatrix()}}{
+Retrieve transcript count matrix.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cerebro_v1.3$getExpressionMatrix(cells = NULL, genes = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{cells}}{Names/barcodes of cells to extract; defaults to \code{NULL},
+which will return all cells.}
+
+\item{\code{genes}}{Names of genes to extract; defaults to \code{NULL}, which
+will return all genes.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Dense transcript count matrix for specified cells and genes.
 }
 }
 \if{html}{\out{<hr>}}
@@ -629,7 +727,7 @@ the specified grouping variable.
 \subsection{Method \code{addMarkerGenes()}}{
 Add table of marker genes.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cerebro_v1.3$addMarkerGenes(method, group_name, table)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Cerebro_v1.3$addMarkerGenes(method, name, table)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -637,8 +735,9 @@ Add table of marker genes.
 \describe{
 \item{\code{method}}{Name of method that was used to generate the marker genes.}
 
-\item{\code{group_name}}{Name of grouping variable that the marker genes belong
-to. Must be registered in the \code{groups} field.}
+\item{\code{name}}{Name of table. This name will be used to select the table in
+Cerebro. It is recommended to use the grouping variable, e.g.
+\code{sample}.}
 
 \item{\code{table}}{\code{data.frame} that contains the marker genes.}
 }
@@ -687,7 +786,7 @@ calculated using the specified method.
 \subsection{Method \code{getMarkerGenes()}}{
 Retrieve table of marker genes for specific method and grouping variable.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cerebro_v1.3$getMarkerGenes(method, group_name)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Cerebro_v1.3$getMarkerGenes(method, name)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -695,7 +794,7 @@ Retrieve table of marker genes for specific method and grouping variable.
 \describe{
 \item{\code{method}}{Name of method.}
 
-\item{\code{group_name}}{Grouping variable.}
+\item{\code{name}}{Name of table.}
 }
 \if{html}{\out{</div>}}
 }
@@ -710,7 +809,7 @@ combination of method and grouping variable.
 \subsection{Method \code{addEnrichedPathways()}}{
 Add table of enriched pathways.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cerebro_v1.3$addEnrichedPathways(method, group_name, table)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Cerebro_v1.3$addEnrichedPathways(method, name, table)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -719,8 +818,9 @@ Add table of enriched pathways.
 \item{\code{method}}{Name of method that was used to generate the enriched
 pathways.}
 
-\item{\code{group_name}}{Name of grouping variable that the enriched pathways
-belong to. Must be registered in the \code{groups} field.}
+\item{\code{name}}{Name of table. This name will be used to select the table in
+Cerebro. It is recommended to use the grouping variable, e.g.
+\code{sample}.}
 
 \item{\code{table}}{\code{data.frame} that contains the enriched pathways.}
 }
@@ -770,7 +870,7 @@ calculated using the specified method.
 Retrieve table of enriched pathways for specific method and grouping
 variable.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Cerebro_v1.3$getEnrichedPathways(method, group_name)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Cerebro_v1.3$getEnrichedPathways(method, name)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -778,7 +878,7 @@ variable.
 \describe{
 \item{\code{method}}{Name of method.}
 
-\item{\code{group_name}}{Grouping variable.}
+\item{\code{name}}{Grouping variable.}
 }
 \if{html}{\out{</div>}}
 }
@@ -869,15 +969,117 @@ trajectory.
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-addExtraMaterial"></a>}}
+\if{latex}{\out{\hypertarget{method-addExtraMaterial}{}}}
+\subsection{Method \code{addExtraMaterial()}}{
+Add content to extra material field.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cerebro_v1.3$addExtraMaterial(category, name, content)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{category}}{Name of category. At the moment, only \code{tables} is a
+valid category.}
+
+\item{\code{name}}{Name of material, will be used to select it in Cerebro.}
+
+\item{\code{content}}{Data that should be added.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-addExtraTable"></a>}}
+\if{latex}{\out{\hypertarget{method-addExtraTable}{}}}
+\subsection{Method \code{addExtraTable()}}{
+Add table to `extra_material` slot.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cerebro_v1.3$addExtraTable(name, table)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{name}}{Name of material, will be used to select it in Cerebro.}
+
+\item{\code{table}}{Table that should be added, must be \code{data.frame}.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-getExtraMaterialCategories"></a>}}
+\if{latex}{\out{\hypertarget{method-getExtraMaterialCategories}{}}}
+\subsection{Method \code{getExtraMaterialCategories()}}{
+Get names of categories for which extra material is available.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cerebro_v1.3$getExtraMaterialCategories()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+\code{vector} with names of available categories.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-checkForExtraTables"></a>}}
+\if{latex}{\out{\hypertarget{method-checkForExtraTables}{}}}
+\subsection{Method \code{checkForExtraTables()}}{
+Check whether there are tables in the extra materials.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cerebro_v1.3$checkForExtraTables()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+\code{logical} indicating whether there are tables in the extra
+materials.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-getNamesOfExtraTables"></a>}}
+\if{latex}{\out{\hypertarget{method-getNamesOfExtraTables}{}}}
+\subsection{Method \code{getNamesOfExtraTables()}}{
+Get names of tables in extra materials.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cerebro_v1.3$getNamesOfExtraTables()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+\code{vector} containing names of tables in extra materials.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-getExtraTable"></a>}}
+\if{latex}{\out{\hypertarget{method-getExtraTable}{}}}
+\subsection{Method \code{getExtraTable()}}{
+Get table from extra materials.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cerebro_v1.3$getExtraTable(name)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{name}}{Name of table.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Requested table in \code{data.frame} format.
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-print"></a>}}
 \if{latex}{\out{\hypertarget{method-print}{}}}
 \subsection{Method \code{print()}}{
 Show overview of object and the data it contains.
-Print overview of available marker gene results for \code{self$print}
+Print overview of available marker gene results for \code{self$print()}
 function.
 Print overview of available enriched pathway results for
-\code{self$print} function.
-Print overview of available trajectories for \code{self$print} function.
+\code{self$print()} function.
+Print overview of available trajectories for \code{self$print()} function.
+Print overview of extra material for \code{self$print()} function.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Cerebro_v1.3$print()}\if{html}{\out{</div>}}
 }

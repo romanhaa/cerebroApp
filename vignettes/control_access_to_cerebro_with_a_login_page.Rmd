@@ -1,5 +1,5 @@
 ---
-title: "Protect Cerebro with login"
+title: "Control access to Cerebro with a login page"
 author: "Roman Hillje"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
@@ -9,11 +9,9 @@ output:
     self_contained: yes
     mode: selfcontained
 vignette: >
-  %\VignetteIndexEntry{Protect Cerebro with login}
+  %\VignetteIndexEntry{Control access to Cerebro with a login page}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-resource_files:
-  - protect_cerebro_with_login_files/login_screen.png
 ---
 
 ```{r, include = FALSE}
@@ -92,7 +90,7 @@ ui <- shinymanager::secure_app(ui)
 
 # Usage
 
-<a target="_blank" href="protect_cerebro_with_login_files/login_screen.png"><img src="protect_cerebro_with_login_files/login_screen.png" alt="Load data" width="100%" height="auto" /></a>
+<a target="_blank" href="control_access_to_cerebro_with_a_login_page_files/login_screen.png"><img src="control_access_to_cerebro_with_a_login_page_files/login_screen.png" alt="Login screen" width="100%" height="auto" /></a>
 
 Now, when opening the Cerebro user interface, user have to authenticate themselves as one of the users in the `user_credentials` data frame.
 Of course, the use credentials can also be loaded from a file, which might be easier to manage.
@@ -101,5 +99,5 @@ Thanks to Michael Heming from the University of Münster for pointing this possi
 
 # See also
 
-* `vignette('host_cerebro_on_shinyapps')`
-* `vignette('launch_cerebro_with_pre-loaded_data_set')`
+* [Launch Cerebro with pre-loaded data set](launch_cerebro_with_pre-loaded_data_set.html)
+* [Host Cerebro on shinyapps.io](host_cerebro_on_shinyapps.html)

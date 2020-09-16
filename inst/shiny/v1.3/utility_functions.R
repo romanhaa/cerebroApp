@@ -304,19 +304,25 @@ prettifyTable <- function(
   ##   are not the same, therefore a few tests are necessary to prevent errors
   if ( color_highlighting == TRUE ) {
 
-    ## percentage
+    ## integer
     if (
-      !is.null(columns_percent) &&
-      length(columns_percent) > 0
+      !is.null(columns_integer) &&
+      length(columns_integer) > 0 &&
+      nrow(table_original) > 1
     ) {
-      table <- table %>%
-        DT::formatStyle(
-          columns = columns_percent,
-          background = DT::styleColorBar(c(0,1), 'pink'),
-          backgroundSize = '98% 88%',
-          backgroundRepeat = 'no-repeat',
-          backgroundPosition = 'center'
-        )
+      for ( i in columns_integer ) {
+        range <- range(table_original[[i]])
+        if ( range[1] != range[2] ) {
+          table <- table %>%
+            DT::formatStyle(
+              columns = i,
+              backgroundColor = DT::styleInterval(
+                seq(range[1], range[2], (range[2]-range[1])/100),
+                colorRampPalette(colors = c('white', '#e67e22'))(102)
+              )
+            )
+        }
+      }
     }
 
     ## p-values
@@ -355,25 +361,19 @@ prettifyTable <- function(
       }
     }
 
-    ## integer
+    ## percentage
     if (
-      !is.null(columns_integer) &&
-      length(columns_integer) > 0 &&
-      nrow(table_original) > 1
+      !is.null(columns_percent) &&
+      length(columns_percent) > 0
     ) {
-      for ( i in columns_integer ) {
-        range <- range(table_original[[i]])
-        if ( range[1] != range[2] ) {
-          table <- table %>%
-            DT::formatStyle(
-              columns = i,
-              backgroundColor = DT::styleInterval(
-                seq(range[1], range[2], (range[2]-range[1])/100),
-                colorRampPalette(colors = c('white', '#e67e22'))(102)
-              )
-            )
-        }
-      }
+      table <- table %>%
+        DT::formatStyle(
+          columns = columns_percent,
+          background = DT::styleColorBar(c(0,1), 'pink'),
+          backgroundSize = '98% 88%',
+          backgroundRepeat = 'no-repeat',
+          backgroundPosition = 'center'
+        )
     }
 
     ## numeric values that are non of the above
@@ -517,7 +517,7 @@ calculateTableAB <- function(
   ## factorize group columns A if not already a factor
   if ( is.character(table[[groupA]]) ) {
     levels_groupA <- table[[groupA]] %>% unique() %>% sort()
-    table[,groupA] <- factor(table[[groupA]], levels = levels_groupA)
+    table[,groupA] <- factor(table[[groupA]], levels = levels_groupA, exclude = NULL)
   } else {
     levels_groupA <- levels(table[,groupA])
   }
@@ -525,7 +525,7 @@ calculateTableAB <- function(
   ## factorize group columns B if not already a factor
   if ( is.character(table[[groupB]]) ) {
     levels_groupB <- table[[groupB]] %>% unique() %>% sort()
-    table[,groupB] <- factor(table[[groupB]], levels = levels_groupB)
+    table[,groupB] <- factor(table[[groupB]], levels = levels_groupB, exclude = NULL)
   } else {
     levels_groupB <- levels(table[,groupB])
   }
@@ -639,11 +639,26 @@ assignColorsToGroups <- function(table, grouping_variable) {
 ##----------------------------------------------------------------------------##
 buildHoverInfoForProjections <- function(table) {
 
+  # ## put together cell ID, number of transcripts and number of expressed genes
+  # hover_info <- glue::glue(
+  #   "<b>Cell</b>: {table[[ 'cell_barcode' ]]}
+  #   <b>Transcripts</b>: {formatC(table[[ 'nUMI' ]], format = 'f', big.mark = ',', digits = 0)}
+  #   <b>Expressed genes</b>: {formatC(table[[ 'nGene' ]], format = 'f', big.mark = ',', digits = 0)}"
+  # )
+
+  # ## add info for known grouping variables
+  # for ( group in getGroups() ) {
+  #   hover_info <- glue::glue(
+  #     "{hover_info}
+  #     <b>{group}</b>: {table[[ group ]]}"
+  #   )
+  # }
+
   ## put together cell ID, number of transcripts and number of expressed genes
   hover_info <- glue::glue(
     "<b>Cell</b>: {table[[ 'cell_barcode' ]]}
-    <b>Transcripts</b>: {formatC(table[[ 'nUMI' ]], format = 'f', big.mark = ',', digits = 0)}
-    <b>Expressed genes</b>: {formatC(table[[ 'nGene' ]], format = 'f', big.mark = ',', digits = 0)}"
+    <b>Transcripts</b>: {table[[ 'nUMI' ]]}
+    <b>Expressed genes</b>: {table[[ 'nGene' ]]}"
   )
 
   ## add info for known grouping variables
@@ -706,82 +721,207 @@ getXYranges <- function(table) {
 }
 
 ##----------------------------------------------------------------------------##
+## Function to get genes for selected gene set.
+##----------------------------------------------------------------------------##
+getGenesForGeneSet <- function(gene_set) {
+
+  if (
+    !is.null(getExperiment()$organism) &&
+    getExperiment()$organism == "mm"
+  ) {
+    species <- "Mus musculus"
+  } else if (
+    !is.null(getExperiment()$organism) &&
+    getExperiment()$organism == "hg"
+  ) {
+    species <- "Homo sapiens"
+  } else {
+    species <- "Mus musculus"
+  }
+
+  ## - get list of gene set names
+  ## - filter for selected gene set
+  ## - extract genes that belong to the gene set
+  ## - get orthologs for the genes
+  ## - convert gene symbols to vector
+  ## - only keep unique gene symbols
+  ## - sort genes
+  msigdbr:::msigdbr_genesets[,1:2] %>%
+  dplyr::filter(.data$gs_name == gene_set) %>%
+  dplyr::inner_join(
+    .,
+    msigdbr:::msigdbr_genes,
+    by = "gs_id"
+  ) %>%
+  dplyr::inner_join(
+    .,
+    msigdbr:::msigdbr_orthologs %>%
+      dplyr::filter(.data$species_name == species) %>%
+      dplyr::select(human_entrez_gene, gene_symbol),
+    by = "human_entrez_gene"
+  ) %>%
+  dplyr::pull(gene_symbol) %>%
+  unique() %>%
+  sort()
+}
+
+##----------------------------------------------------------------------------##
 ## Functions to interact with data set.
 ##
 ## Never directly interact with data set: data_set()
 ##----------------------------------------------------------------------------##
 getExperiment <- function() {
-  return(data_set()$getExperiment())
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getExperiment())
+  }
 }
 getParameters <- function() {
-  return(data_set()$getParameters())
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getParameters())
+  }
 }
 getTechnicalInfo <- function() {
-  return(data_set()$getTechnicalInfo())
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getTechnicalInfo())
+  }
 }
 getGeneLists <- function() {
-  return(data_set()$getGeneLists())
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getGeneLists())
+  }
 }
-getExpression <- function() {
-  return(data_set()$getExpression())
+getMeanExpressionForGenes <- function(genes) {
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getMeanExpressionForGenes(genes))
+  }
 }
-getCellIDs <- function() {
-  return(colnames(data_set()$getExpression()))
+getMeanExpressionForCells <- function(cells, genes) {
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getMeanExpressionForCells(cells, genes))
+  }
+}
+getExpressionMatrix <- function(...) {
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getExpressionMatrix(...))
+  }
+}
+getCellNames <- function() {
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getCellNames())
+  }
 }
 getGeneNames <- function() {
-  return(rownames(data_set()$getExpression()))
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getGeneNames())
+  }
 }
 getGroups <- function() {
-  return(data_set()$getGroups())
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getGroups())
+  }
 }
 getGroupLevels <- function(group) {
-  return(data_set()$getGroupLevels(group))
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getGroupLevels(group))
+  }
 }
 getCellCycle <- function() {
-  return(data_set()$getCellCycle())
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getCellCycle())
+  }
 }
 getMetaData <- function() {
-  return(data_set()$getMetaData())
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getMetaData())
+  }
 }
 availableProjections <- function() {
-  return(data_set()$availableProjections())
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$availableProjections())
+  }
 }
 getProjection <- function(name) {
-  return(data_set()$getProjection(name))
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getProjection(name))
+  }
 }
 getTree <- function(group) {
-  return(data_set()$getTree(group))
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getTree(group))
+  }
 }
 getGroupsWithMostExpressedGenes <- function() {
-  return(data_set()$getGroupsWithMostExpressedGenes())
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getGroupsWithMostExpressedGenes())
+  }
 }
 getMostExpressedGenes <- function(group) {
-  return(data_set()$getMostExpressedGenes(group))
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getMostExpressedGenes(group))
+  }
 }
 getMethodsForMarkerGenes <- function() {
-  return(data_set()$getMethodsForMarkerGenes())
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getMethodsForMarkerGenes())
+  }
 }
 getGroupsWithMarkerGenes <- function(method) {
-  return(data_set()$getGroupsWithMarkerGenes(method))
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getGroupsWithMarkerGenes(method))
+  }
 }
 getMarkerGenes <- function(method, group) {
-  return(data_set()$getMarkerGenes(method, group))
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getMarkerGenes(method, group))
+  }
 }
 getMethodsForEnrichedPathways <- function() {
-  return(data_set()$getMethodsForEnrichedPathways())
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getMethodsForEnrichedPathways())
+  }
 }
 getGroupsWithEnrichedPathways <- function(method) {
-  return(data_set()$getGroupsWithEnrichedPathways(method))
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getGroupsWithEnrichedPathways(method))
+  }
 }
 getEnrichedPathways <- function(method, group) {
-  return(data_set()$getEnrichedPathways(method, group))
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getEnrichedPathways(method, group))
+  }
 }
 getMethodsForTrajectories <- function() {
-  return(data_set()$getMethodsForTrajectories())
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getMethodsForTrajectories())
+  }
 }
 getNamesOfTrajectories <- function(method) {
-  return(data_set()$getNamesOfTrajectories(method))
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getNamesOfTrajectories(method))
+  }
 }
 getTrajectory <- function(method, name) {
-  return(data_set()$getTrajectory(method, name))
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getTrajectory(method, name))
+  }
+}
+getExtraMaterialCategories <- function() {
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+   return(data_set()$getExtraMaterialCategories())
+  }
+}
+checkForExtraTables <- function() {
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$checkForExtraTables())
+  }
+}
+getNamesOfExtraTables <- function() {
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getNamesOfExtraTables())
+  }
+}
+getExtraTable <- function(name) {
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getExtraTable(name))
+  }
 }

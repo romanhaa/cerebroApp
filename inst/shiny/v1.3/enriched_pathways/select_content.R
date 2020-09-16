@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------##
 ## Tab: Enriched pathways
 ##
-## Select method and group.
+## Select method and table (group).
 ##----------------------------------------------------------------------------##
 
 ##----------------------------------------------------------------------------##
@@ -9,7 +9,7 @@
 ## because the group depends on which method is selected.
 ##----------------------------------------------------------------------------##
 
-output[["enriched_pathways_select_method_and_group_UI"]] <- renderUI({
+output[["enriched_pathways_select_method_and_table_UI"]] <- renderUI({
 
   ## ...
   if (
@@ -24,7 +24,7 @@ output[["enriched_pathways_select_method_and_group_UI"]] <- renderUI({
         ),
         column(
           6,
-          uiOutput("enriched_pathways_selected_group_UI")
+          uiOutput("enriched_pathways_selected_table_UI")
         )
       )
     )
@@ -68,19 +68,23 @@ output[["enriched_pathways_selected_method_UI"]] <- renderUI({
 ## UI element to select which group should be shown.
 ##----------------------------------------------------------------------------##
 
-output[["enriched_pathways_selected_group_UI"]] <- renderUI({
+output[["enriched_pathways_selected_table_UI"]] <- renderUI({
+
+  ##
   req(
     input[["enriched_pathways_selected_method"]]
   )
+
+  ##
   tagList(
     div(
-      HTML('<h3 style="text-align: center; margin-top: 0"><strong>Choose a grouping variable:</strong></h2>')
+      HTML('<h3 style="text-align: center; margin-top: 0"><strong>Choose a table:</strong></h2>')
     ),
     fluidRow(
       column(2),
       column(8,
         selectInput(
-          "enriched_pathways_selected_group",
+          "enriched_pathways_selected_table",
           label = NULL,
           choices = getGroupsWithEnrichedPathways(input[["enriched_pathways_selected_method"]]),
           width = "100%"

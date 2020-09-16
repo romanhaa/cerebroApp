@@ -1,0 +1,36 @@
+---
+title: "Update cerebroApp website"
+author: "Roman Hillje"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    toc: true
+    number_sections: true
+    self_contained: yes
+    mode: selfcontained
+vignette: >
+  %\VignetteIndexEntry{Update cerebroApp website}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Procedure
+
+Prepare website with `pkgdown`.
+
+```{r eval=FALSE}
+pkgdown::build_site(
+  pkg = ".",
+  examples = TRUE,
+  run_dont_run = FALSE,
+  seed = 1014,
+  lazy = FALSE,
+  override = list(),
+  preview = NA,
+  devel = FALSE,
+  new_process = !devel,
+  install = !devel
+)
+```
+
+Copy results to other branch (dedicated directory) and commit.

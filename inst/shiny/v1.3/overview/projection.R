@@ -7,7 +7,6 @@
 ##----------------------------------------------------------------------------##
 ## Layout of the UI elements.
 ##----------------------------------------------------------------------------##
-
 output[["overview_projection_UI"]] <- renderUI({
   fluidRow(
     ## selections and parameters
@@ -25,10 +24,7 @@ output[["overview_projection_UI"]] <- renderUI({
             style = "margin-right: 5px"
           )
         ),
-        tagList(
-          uiOutput("overview_projection_parameters_UI"),
-          uiOutput("overview_projection_scales_UI")
-        )
+        uiOutput("overview_projection_parameters_UI")
       )
     ),
     ## plot
@@ -51,6 +47,18 @@ output[["overview_projection_UI"]] <- renderUI({
             filetype = "pdf",
             viewtype = "icon",
             class = "btn-xs"
+          ),
+          shinyWidgets::dropdownButton(
+            tags$div(
+              style = "color: black !important;",
+              tagList(
+                uiOutput("overview_projection_scales_UI")
+              )
+            ),
+            circle = FALSE,
+            icon = icon("cog"),
+            inline = TRUE,
+            size = "xs"
           )
         ),
         tagList(
@@ -129,7 +137,6 @@ output[["overview_projection_scales_UI"]] <- renderUI({
   XYranges <- getXYranges(getProjection(projection_to_display))
 
   tagList(
-    hr(),
     sliderInput(
       "overview_scale_x_manual_range",
       label = "Range of X axis",
@@ -146,6 +153,12 @@ output[["overview_projection_scales_UI"]] <- renderUI({
     )
   )
 })
+
+outputOptions(
+  output,
+  "overview_projection_scales_UI",
+  suspendWhenHidden = FALSE
+)
 
 ##----------------------------------------------------------------------------##
 ## Text in info box.

@@ -27,11 +27,33 @@ output[["trajectory_distribution_along_pseudotime_UI"]] <- renderUI({
             tagList(
               sliderInput(
                 "trajectory_distribution_along_pseudotime_opacity",
-                label = "Opacity of curve:",
+                label = "Opacity of density curve",
                 min = 0,
                 max = 1,
                 step = 0.1,
                 value = 0.6
+              ),
+              hr(),
+              shinyWidgets::awesomeCheckbox(
+                inputId = "trajectory_distribution_along_pseudotime_show_trend_line",
+                label = "Show trend line",
+                value = TRUE
+              ),
+              sliderInput(
+                "trajectory_distribution_along_pseudotime_trend_line_bandwidth",
+                label = "Bandwidth for trend line",
+                min = 1,
+                max = 50,
+                step = 1,
+                value = 7
+              ),
+              sliderInput(
+                "trajectory_distribution_along_pseudotime_trend_line_width",
+                label = "Width of line",
+                min = 1,
+                max = 10,
+                step = 1,
+                value = 2
               )
             )
           ),
@@ -46,7 +68,7 @@ output[["trajectory_distribution_along_pseudotime_UI"]] <- renderUI({
           "trajectory_distribution_along_pseudotime_select_variable",
           label = "Variable to show along pseudotime:",
           choices = c(
-            "state", "pseudotime",
+            "state",
             colnames(getMetaData())[! colnames(getMetaData()) %in% c("cell_barcode")]
           )
         ),
@@ -67,7 +89,10 @@ output[["trajectory_distribution_along_pseudotime_plot"]] <- plotly::renderPlotl
     input[["trajectory_selected_method"]],
     input[["trajectory_selected_name"]],
     input[["trajectory_distribution_along_pseudotime_select_variable"]],
-    input[["trajectory_distribution_along_pseudotime_opacity"]]
+    input[["trajectory_distribution_along_pseudotime_opacity"]],
+    input[["trajectory_distribution_along_pseudotime_show_trend_line"]],
+    input[["trajectory_distribution_along_pseudotime_trend_line_bandwidth"]],
+    input[["trajectory_distribution_along_pseudotime_trend_line_width"]]
   )
 
   ## collect trajectory data
@@ -79,9 +104,6 @@ output[["trajectory_distribution_along_pseudotime_plot"]] <- plotly::renderPlotl
   ## extract cells to plot
   cells_df <- cbind(trajectory_data[["meta"]], getMetaData()) %>%
     dplyr::filter(!is.na(pseudotime))
-
-  ## put rows in random order
-  cells_df <- cells_df[ sample(1:nrow(cells_df)) , ]
 
   ## grab column name for cell coloring
   color_variable <- input[["trajectory_distribution_along_pseudotime_select_variable"]]
@@ -147,7 +169,7 @@ output[["trajectory_distribution_along_pseudotime_plot"]] <- plotly::renderPlotl
             ),
             hoverinfo = 'text',
             text = paste0(
-              "<b>", current_group, "</b><br>",
+              "<b>State ", current_group, "</b><br>",
               "<b>Pseudotime</b>: ", formatC(temp_density$x, format = "f", big.mark = ",", digits = 2), "<br>",
               "<b>Density</b>: ", formatC(temp_density$y, format = "f", big.mark = ",", digits = 2), "<br>"
             )
@@ -156,23 +178,26 @@ output[["trajectory_distribution_along_pseudotime_plot"]] <- plotly::renderPlotl
     }
 
     ## add layout to plot
-    plot %>%
-    plotly::layout(
-      xaxis = list(
-        title = "Pseudotime",
-        mirror = TRUE,
-        showline = TRUE,
-        zeroline = FALSE,
-        range = range(cells_df[["pseudotime"]])
-      ),
-      yaxis = list(
-        title = "Density",
-        mirror = TRUE,
-        showline = TRUE,
-        zeroline = FALSE
-      ),
-      hovermode = "compare"
-    )
+    plot <- plot %>%
+      plotly::layout(
+        xaxis = list(
+          title = "Pseudotime",
+          mirror = TRUE,
+          showline = TRUE,
+          zeroline = FALSE,
+          range = range(cells_df[["pseudotime"]])
+        ),
+        yaxis = list(
+          title = "Density",
+          mirror = TRUE,
+          showline = TRUE,
+          zeroline = FALSE
+        ),
+        hovermode = "compare",
+        hoverlabel = list(
+          align = 'left'
+        )
+      )
 
   ## ... cells should be colored by a numeric variable; instead of showing the
   ##     density by pseudotime, the numeric variable will be shown directly on
@@ -187,53 +212,95 @@ output[["trajectory_distribution_along_pseudotime_plot"]] <- plotly::renderPlotl
 
     ## add expression levels to hover info
     hover_info <- paste0(
-      hover_info,
+      hover_info, "<br>",
       "<b>Pseudotime</b>: ", formatC(cells_df[[ "pseudotime" ]], format = "f", big.mark = ",", digits = 2), "<br>",
       "<b>State</b>: ", cells_df[[ "state" ]], "<br>"
     )
 
     ## prepare plot
-    plot <- plotly::plot_ly(
-      data = cells_df,
-      x = ~pseudotime,
-      y = ~cells_df[[ color_variable ]],
-      type = "scatter",
-      mode = "markers",
-      color = ~state,
-      colors = colors_for_groups,
-      marker = list(
-        opacity = input[["trajectory_point_opacity"]],
-        line = list(
-          color = "rgb(196,196,196)",
-          width = 1
+    plot <- plotly::plot_ly() %>%
+      plotly::add_trace(
+        data = cells_df,
+        x = ~pseudotime,
+        y = ~cells_df[[ color_variable ]],
+        type = "scatter",
+        mode = "markers",
+        color = ~state,
+        colors = colors_for_groups,
+        marker = list(
+          opacity = input[["trajectory_point_opacity"]],
+          line = list(
+            color = "rgb(196,196,196)",
+            width = 1
+          ),
+          size = input[["trajectory_point_size"]]
         ),
-        size = input[["trajectory_point_size"]]
-      ),
-      hoverinfo = "text",
-      text = ~hover_info
-    ) %>%
-    plotly::layout(
-      xaxis = list(
-        title = "Pseudotime",
-        mirror = TRUE,
-        showline = TRUE,
-        zeroline = FALSE
-      ),
-      yaxis = list(
-        title = color_variable,
-        mirror = TRUE,
-        showline = TRUE,
-        zeroline = FALSE
-      ),
-      hoverlabel = list(font = list(size = 11))
-    )
+        hoverinfo = "text",
+        text = ~hover_info
+      ) %>%
+      plotly::layout(
+        xaxis = list(
+          title = "Pseudotime",
+          mirror = TRUE,
+          showline = TRUE,
+          zeroline = FALSE
+        ),
+        yaxis = list(
+          title = color_variable,
+          mirror = TRUE,
+          showline = TRUE,
+          zeroline = FALSE
+        ),
+        hoverlabel = list(
+          font = list(
+            size = 11,
+            color = "black"
+          ),
+          align = 'left'
+        )
+      )
 
-    ## if set in options, return plot with WebGL
-    if ( preferences$use_webgl == TRUE ) {
-      plotly::toWebGL(plot)
-    } else {
-      plot
+    ## add trend line if activated
+    if ( input[["trajectory_distribution_along_pseudotime_show_trend_line"]] == TRUE ) {
+
+      ## calculate smoothened trend line
+      trend_line = stats::ksmooth(
+        cells_df[[ "pseudotime" ]],
+        cells_df[[ color_variable ]],
+        "normal",
+        input[["trajectory_distribution_along_pseudotime_trend_line_bandwidth"]],
+        x.points = cells_df[[ "pseudotime" ]]
+      )
+
+      ## add trend line to plot
+      plot <- plotly::add_trace(
+        plot,
+        x = trend_line$x,
+        y = trend_line$y,
+        type = "scatter",
+        mode = "lines",
+        line = list(
+          dash = "solid",
+          width = input[["trajectory_distribution_along_pseudotime_trend_line_width"]],
+          color = "#e74c3c"
+        ),
+        name = "Trend line",
+        hoverinfo = "text",
+        text = ~glue::glue(
+          "<b>Trend line</b>
+          <b>Pseudotime:</b> {formatC(trend_line$x, format = 'f', big.mark = ',', digits = 3)}
+          <b>{color_variable}:</b> {formatC(trend_line$y, format = 'f', big.mark = ',', digits = 3)}"
+        ),
+        showlegend = FALSE
+      )
     }
+  }
+
+  ## if set in options, return plot with WebGL
+  if ( preferences$use_webgl == TRUE ) {
+    plotly::toWebGL(plot)
+  } else {
+    plot
   }
 })
 

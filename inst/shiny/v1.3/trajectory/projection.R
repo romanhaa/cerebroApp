@@ -163,7 +163,7 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
   hover_info <- glue::glue(
     "{hover_info}
     <b>State</b>: {cells_df$state}
-    <b>Pseudotime</b>: {formatC(cells_df$pseudotime, format = 'f', big.mark = ',', digits = 3)}"
+    <b>Pseudotime</b>: {formatC(cells_df$pseudotime, format = 'f', digits = 2)}"
   )
 
   ##
@@ -243,7 +243,12 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
         zeroline = FALSE,
         range = range(cells_df$DR_2) * 1.1
       ),
-      hoverlabel = list(font = list(size = 11))
+      hoverlabel = list(
+        font = list(
+          size = 11
+        ),
+        align = 'left'
+      )
     )
 
   ## return plot either with WebGL or without, depending on setting

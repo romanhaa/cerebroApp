@@ -18,7 +18,7 @@ source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/gene_expression/ex
 genesToPlot <- reactive({
 
   ## prepare empty list for data
-  genesToPlot <- list(
+  gene_sets <- list(
     "genes_to_display" = character(),
     "genes_to_display_present" = character(),
     "genes_to_display_missing" = character()
@@ -36,7 +36,7 @@ genesToPlot <- reactive({
       ## - remove spaces
       ## - remove duplicated strings
       ## - remove empty strings
-      genesToPlot[["genes_to_display"]] <- input[["expression_genes_input"]] %>%
+      gene_sets[["genes_to_display"]] <- input[["expression_genes_input"]] %>%
         strsplit(",| |;|\n") %>%
         unlist() %>%
         gsub(pattern = " ", replacement = "", fixed = TRUE) %>%
@@ -51,19 +51,19 @@ genesToPlot <- reactive({
       input[["expression_select_gene_set"]]
     )
 
-    genesToPlot[["genes_to_display"]] <- getGenesForGeneSet(input[["expression_select_gene_set"]])
+    gene_sets[["genes_to_display"]] <- getGenesForGeneSet(input[["expression_select_gene_set"]])
   }
 
   ## check which are available in the data set
-  genes_to_display_here <- getGeneNames()[ match(tolower(genesToPlot[["genes_to_display"]]), tolower(getGeneNames())) ]
+  genes_to_display_here <- getGeneNames()[ match(tolower(gene_sets[["genes_to_display"]]), tolower(getGeneNames())) ]
 
   ## get which genes are available in the data set
-  genesToPlot[["genes_to_display_present"]] <- na.omit(genes_to_display_here)
+  gene_sets[["genes_to_display_present"]] <- na.omit(genes_to_display_here)
 
   ## get names of provided genes that are not in the data set
-  genesToPlot[["genes_to_display_missing"]] <- genesToPlot[["genes_to_display"]][ which(is.na(genes_to_display_here)) ]
+  gene_sets[["genes_to_display_missing"]] <- gene_sets[["genes_to_display"]][ which(is.na(genes_to_display_here)) ]
 
-  return(genesToPlot)
+  return(gene_sets)
 })
 
 ##----------------------------------------------------------------------------##
@@ -125,16 +125,7 @@ gene_expression_plot_data <- reactive({
     ## set expression level to 0
     cells_df$level <- 0
 
-  ## ... 1 gene is available
-  } else if ( length(genesToPlot()$genes_to_display_present) == 1 ) {
-
-    ## retrieve expression values for that gene
-    cells_df$level <- getExpression()[
-        genesToPlot()$genes_to_display_present ,
-        rownames(cells_df)
-      ]
-
-  ## ... at least 2 genes are available
+  ## ... at least 1 gene is available
   } else {
 
     ## check if user requested to show expression in separate panels
@@ -142,12 +133,13 @@ gene_expression_plot_data <- reactive({
     ##     genes selected
     if (
       input[["expression_projection_show_genes_in_separate_panels"]] == TRUE &&
+      input[["expression_projection_to_display"]] %in% availableProjections() &&
       length(genesToPlot()$genes_to_display_present) >= 2 &&
       length(genesToPlot()$genes_to_display_present) <= 8
     ) {
 
-      ## - get expression values
-      ## - transform matrix
+      ## - get expression matrix
+      ## - transpose matrix
       ## - convert to data frame with genes as columns and cells as rows
       ## - add projection coordinates (only first two columns because 3D is not
       ##   supported anyway)
@@ -155,10 +147,10 @@ gene_expression_plot_data <- reactive({
       ## NOTE: I don't merge the expression value with cell meta data because
       ##       hover info doesn't work properly anyway so like this the data
       ##       frame stays smaller, especially with large data sets
-      cells_df <- getExpression()[
-          genesToPlot()$genes_to_display_present ,
-          rownames(cells_df)
-        ] %>%
+      cells_df <- getExpressionMatrix(
+          cells = cells_df$cell_barcode,
+          genes = genesToPlot()$genes_to_display_present
+        ) %>%
         Matrix::t() %>%
         as.data.frame() %>%
         cbind(cells_df[,1:2], .) %>%
@@ -172,11 +164,10 @@ gene_expression_plot_data <- reactive({
     } else {
 
       ## calculate mean across all genes for each cell
-      cells_df$level <- getExpression()[
-          genesToPlot()$genes_to_display_present ,
-          rownames(cells_df)
-        ] %>%
-        Matrix::colMeans()
+      cells_df$level <- getMeanExpressionForCells(
+        cells = cells_df$cell_barcode,
+        genes = genesToPlot()$genes_to_display_present
+      )
     }
   }
 

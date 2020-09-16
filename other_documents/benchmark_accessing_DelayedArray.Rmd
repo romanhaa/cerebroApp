@@ -1,0 +1,322 @@
+---
+title: "Benchmark of subsetting a `DelayedArray`"
+author: "Roman Hillje"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    toc: true
+    number_sections: true
+    self_contained: yes
+    mode: selfcontained
+vignette: >
+  %\VignetteIndexEntry{Benchmark of subsetting a `DelayedArray`}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Preparation
+
+Load packages.
+
+```{r message=FALSE}
+library(tidyverse)
+library(patchwork)
+library(DelayedArray)
+```
+
+Load transcript counts in `DelayedArray` format.
+
+```{r}
+t <- readRDS('~/Dropbox/Cerebro_development/pbmc_Seurat_RleMatrix.crb')
+
+expr <- t$expression
+```
+
+It contains `r format(nrow(expr), big.mark = ',')` genes (rows) and `r format(ncol(expr), big.mark = ',')` cells (columns).
+
+To test whether either rows or columns are faster to access, we also prepare a transposed version of the array.
+
+```{r}
+expr_t <- Matrix::t(expr)
+```
+
+Define functions to subset array.
+
+```{r}
+get_col_means_direct <- function(matrix, gene_names) {
+  return(Matrix::colMeans(matrix[ gene_names , ]))
+}
+
+get_col_means_direct_transposed <- function(matrix, gene_names) {
+  return(Matrix::rowMeans(matrix[ , gene_names ]))
+}
+
+get_col_means_function <- function(matrix, gene_names) {
+  indexes_of_genes_to_extract <- which(rownames(matrix) %in% gene_names)
+  Matrix::colMeans(
+    extract_array(
+      matrix,
+      list(
+        indexes_of_genes_to_extract,
+        NULL
+      )
+    )
+  )
+}
+
+get_col_means_function_transposed <- function(matrix, gene_names) {
+  indexes_of_genes_to_extract <- which(colnames(matrix) %in% gene_names)
+  Matrix::rowMeans(
+    extract_array(
+      matrix,
+      list(
+        NULL,
+        indexes_of_genes_to_extract
+      )
+    )
+  )
+}
+```
+
+# Perform benchmark
+
+Measure the time it takes to calculate the mean expression across different numbers of randomly chosen genes (from 5 to 1000) using the four functions/methods defined above.
+For each combination of the number of genes and function/method, 10 runs will be done.
+
+```{r}
+n_genes_to_test <- c(5,10,50,100,500,1000)
+number_of_runs <- 10
+
+results_extensive <- tibble(
+  n_genes = numeric(),
+  run = numeric(),
+  method = character(),
+  run_time = numeric()
+)
+
+for ( n_genes in n_genes_to_test ) {
+  for ( run in seq(number_of_runs) ) {
+    genes_to_extract <- rownames(expr)[sample(1:nrow(expr), size = n_genes)]
+    results_extensive <- rbind(
+      results_extensive,
+      tribble(
+        ~n_genes, ~run,               ~method,                                                                   ~run_time,
+         n_genes,  run,              'direct',                system.time(get_col_means_direct(expr, genes_to_extract))[3],
+         n_genes,  run,   'direct_transposed',   system.time(get_col_means_direct_transposed(expr_t, genes_to_extract))[3],
+         n_genes,  run,            'function',              system.time(get_col_means_function(expr, genes_to_extract))[3],
+         n_genes,  run, 'function_transposed', system.time(get_col_means_function_transposed(expr_t, genes_to_extract))[3]
+      )
+    )
+  }
+}
+```
+
+# Plot results
+
+Plot access times.
+
+```{r fig.height = 8, fig.width = 12, fig.align = "center"}
+p1 <- results_extensive %>%
+  group_by(n_genes, method) %>%
+  summarise(
+    mean = mean(run_time),
+    sd = sd(run_time),
+    se = sd/sqrt(number_of_runs),
+    ci = qnorm(0.975)*sd/sqrt(number_of_runs)
+  ) %>%
+  ggplot(aes(n_genes, mean, group = method, color = method)) +
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), color = 'black', width = .2, position = position_dodge(width = 0.25)) +
+  geom_point(position = position_dodge(width = 0.25)) +
+  scale_x_log10(name = 'Number of genes', breaks = n_genes_to_test, labels = scales::comma) +
+  scale_y_continuous(name = 'Run time [seconds]') +
+  annotation_logticks(sides = 'b') +
+  theme_bw() +
+  theme(
+    legend.position = "none",
+    panel.grid.minor = element_blank()
+  )
+
+p2 <- results_extensive %>%
+  group_by(n_genes, method) %>%
+  summarise(
+    mean = mean(run_time),
+    sd = sd(run_time),
+    se = sd/sqrt(10),
+    ci = qnorm(0.975)*sd/sqrt(10)
+  ) %>%
+  ggplot(aes(n_genes, mean, group = method, color = method)) +
+  geom_smooth(method = lm, formula = y~x, se = FALSE) +
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), color = 'black', width = .2, position = position_dodge(width = 0.25)) +
+  geom_point(position = position_dodge(width = 0.25)) +
+  scale_x_log10(name = 'Number of genes', breaks = n_genes_to_test, labels = scales::comma) +
+  scale_y_log10(name = 'Run time [seconds]') +
+  annotation_logticks(sides = 'bl') +
+  theme_bw() +
+  theme(
+    panel.grid.minor = element_blank()
+  )
+
+p3 <- results_extensive %>%
+  mutate(method_n_genes = paste0(method, '_', n_genes)) %>%
+  ggplot(aes(n_genes, run_time, group = method_n_genes, color = method)) +
+  geom_boxplot(position = position_dodge(width = 0.25)) +
+  scale_x_log10(name = 'Number of genes', breaks = n_genes_to_test, labels = scales::comma) +
+  scale_y_continuous(name = 'Run time [seconds]') +
+  annotation_logticks(sides = 'b') +
+  theme_bw() +
+  theme(
+    legend.position = 'none',
+    panel.grid.minor = element_blank()
+  )
+
+p4 <- results_extensive %>%
+  mutate(method_n_genes = paste0(method, '_', n_genes)) %>%
+  ggplot(aes(n_genes, run_time, group = method_n_genes, color = method)) +
+  geom_boxplot(position = position_dodge(width = 0.25)) +
+  scale_x_log10(name = 'Number of genes', breaks = n_genes_to_test, labels = scales::comma) +
+  scale_y_log10(name = 'Run time [seconds]') +
+  annotation_logticks(sides = 'bl') +
+  theme_bw() +
+  theme(
+    legend.position = 'none',
+    panel.grid.minor = element_blank()
+  )
+
+p1 + p2 + p3 + p4 + plot_layout(ncol = 2)
+```
+
+# Add the stuff below
+
+# Alternative array formats for expression data
+
+## `HDF5Array`
+
+Additional dependencies?
+
+Create expression arrays in different formats.
+
+```{r eval=FALSE}
+#library('HDF5Array')
+
+expression_dgCMatrix <- cerebro_seurat$expression@assays@data@listData$expression
+
+expression_HDF5Array <- as(expression_dgCMatrix, "HDF5Array")
+rownames(expression_HDF5Array) <- rownames(expression_dgCMatrix)
+colnames(expression_HDF5Array) <- colnames(expression_dgCMatrix)
+
+expression_RleArray <- as(expression_dgCMatrix, "RleArray")
+rownames(expression_RleArray) <- rownames(expression_dgCMatrix)
+colnames(expression_RleArray) <- colnames(expression_dgCMatrix)
+```
+
+Create `SCE` object with expression data in different formats.
+
+```{r eval=FALSE}
+test_sce_dgCMatrix <- SingleCellExperiment(list(counts = expression_dgCMatrix))
+test_sce_HDF5Array <- SingleCellExperiment(list(counts = expression_HDF5Array))
+test_sce_RleArray <- SingleCellExperiment(list(counts = expression_RleArray))
+```
+
+### Object size
+
+```{r eval=FALSE}
+print(object.size(expression_dgCMatrix), units = "auto", standard = "SI")
+# 61.5 MB
+
+print(object.size(expression_HDF5Array), units = "auto", standard = "SI")
+# 1.5 MB
+
+print(object.size(expression_RleArray), units = "auto", standard = "SI")
+# 1.5 MB
+
+print(object.size(test_sce_dgCMatrix), units = "auto", standard = "SI")
+# 63.1 MB
+
+print(object.size(test_sce_HDF5Array), units = "auto", standard = "SI")
+# 3.2 MB
+
+print(object.size(test_sce_RleArray), units = "auto", standard = "SI")
+# 3.2 MB
+```
+
+The memory savings are impressive.
+
+### Access speed
+
+#### Single genes
+
+```{r eval=FALSE}
+genes <- 'A1BG'
+
+system.time(as.vector(assay(test_sce_dgCMatrix[genes,], 'counts')))
+#  user  system elapsed 
+# 0.061   0.001   0.064
+
+system.time(as.vector(counts(test_sce_dgCMatrix[genes,])))
+#  user  system elapsed 
+# 0.062   0.000   0.063
+
+system.time(as.vector(assay(test_sce_HDF5Array[genes,], 'counts')))
+#  user  system elapsed 
+# 0.191   0.045   0.251
+
+system.time(as.vector(counts(test_sce_HDF5Array[genes,])))
+#  user  system elapsed 
+# 0.184   0.043   0.232
+
+system.time(as.vector(assay(test_sce_RleArray[genes,], 'counts')))
+#  user  system elapsed 
+# 0.067   0.027   0.104
+
+system.time(as.vector(counts(test_sce_RleArray[genes,])))
+#  user  system elapsed 
+# 0.056   0.003   0.065
+```
+
+Quite a bit slower.
+
+#### 1,000 genes
+
+```{r eval=FALSE}
+genes <- sample(rownames(test_sce_dgCMatrix), 1000)
+
+system.time(as.vector(assay(test_sce_dgCMatrix[genes,], 'counts')))
+#  user  system elapsed 
+# 0.110   0.036   0.149
+
+system.time(as.vector(counts(test_sce_dgCMatrix[genes,])))
+#  user  system elapsed 
+# 0.107   0.005   0.116
+
+system.time(as.vector(assay(test_sce_HDF5Array[genes,], 'counts')))
+#  user  system elapsed
+# 1.790   0.481   2.334
+
+system.time(as.vector(counts(test_sce_HDF5Array[genes,])))
+#  user  system elapsed
+# 1.733   0.438   2.197
+
+system.time(as.vector(assay(test_sce_RleArray[genes,], 'counts')))
+#  user  system elapsed
+# 1.481   0.357   2.165
+
+system.time(as.vector(counts(test_sce_RleArray[genes,])))
+#  user  system elapsed
+# 1.397   0.215   1.640
+```
+
+Also here there is a big difference.
+
+### Store file
+
+```{r eval=FALSE}
+saveRDS(test_sce_dgCMatrix, 'test_sce_dgCMatrix.rds')
+saveRDS(test_sce_HDF5Array, 'test_sce_HDF5Array.rds')
+saveRDS(test_sce_RleArray, 'test_sce_RleArray.rds')
+
+system("ls -alh | grep 'test_sce_'")
+-rw-r--r--   1 romanhaa  staff    11M Aug 14 12:47 test_sce_dgCMatrix.rds
+-rw-r--r--   1 romanhaa  staff   173K Aug 14 09:56 test_sce_HDF5Array.rds
+-rw-r--r--   1 romanhaa  staff   8.9M Aug 14 09:56 test_sce_RleArray.rds
+```
+

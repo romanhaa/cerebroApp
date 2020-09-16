@@ -47,13 +47,13 @@ output[["expression_by_pseudotime_UI"]] <- renderUI({
                 min = 1,
                 max = 50,
                 step = 1,
-                value = 5
+                value = 7
               ),
               sliderInput(
                 "expression_by_pseudotime_trend_line_width",
                 label = "Width of line",
                 min = 1,
-                max = 5,
+                max = 10,
                 step = 1,
                 value = 2
               )
@@ -101,7 +101,7 @@ output[["expression_by_pseudotime"]] <- plotly::renderPlotly({
   ## add expression levels to hover info
   hover_info <- glue::glue(
     "{hover_info}
-    <b>Pseudotime</b>: {formatC(cells_df[[ 'pseudotime' ]], format = 'f', big.mark = ',', digits = 2)}
+    <b>Pseudotime</b>: {formatC(cells_df[[ 'pseudotime' ]], format = 'f', digits = 2)}
     <b>State</b>: {cells_df[[ 'state' ]]}"
   )
 
@@ -166,6 +166,7 @@ output[["expression_by_pseudotime"]] <- plotly::renderPlotly({
       )
     )
 
+  ## add trend line if activated
   if ( input[["expression_by_pseudotime_show_trend_line"]] == TRUE ) {
 
     ## calculate smoothened trend line
@@ -176,7 +177,8 @@ output[["expression_by_pseudotime"]] <- plotly::renderPlotly({
       input[["expression_by_pseudotime_trend_line_bandwidth"]],
       x.points = cells_df$pseudotime
     )
-    
+
+    ## add trend line to plot
     plot <- plotly::add_trace(
       plot,
       x = trend_line$x,
@@ -192,8 +194,8 @@ output[["expression_by_pseudotime"]] <- plotly::renderPlotly({
       hoverinfo = "text",
       text = ~glue::glue(
         "<b>Trend line</b>
-        <b>Pseudotime:</b> {formatC(trend_line$x, format = 'f', big.mark = ',', digits = 3)}
-        <b>Expression:</b> {formatC(trend_line$y, format = 'f', big.mark = ',', digits = 3)}"
+        <b>Pseudotime:</b> {formatC(trend_line$x, format = 'f', digits = 2)}
+        <b>Expression:</b> {formatC(trend_line$y, format = 'f', digits = 3)}"
       ),
       showlegend = FALSE
     )

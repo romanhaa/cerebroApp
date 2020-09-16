@@ -1,0 +1,93 @@
+---
+title: "Overview of the Cerebro v1.3 class"
+author: "Roman Hillje"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    toc: true
+    number_sections: true
+    self_contained: yes
+    mode: selfcontained
+vignette: >
+  %\VignetteIndexEntry{Overview of the Cerebro v1.3 class}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+The introduction of the `Cerebro_v1.3` class is an attempt to formalize the data structure and thereby provide stability in future releases, ultimately aiming to improve backwards compatibility between Cerebro version.
+
+While the data is organized similar to how it was done before, now they live in their own class with setter and getter methods for the different slots. Also, unnecessary prefixes and suffixes have been removed, allowing direct connection between results, e.g. tables of marker genes, and the grouping variable they belong to / were derived from. Moreover, additional layers have been added to allow storing results derived from different methods.
+
+Let's look at some details. Overall, the object is organized as such:
+
+```
+<Cerebro_object>
+├── version (package_version)
+├── experiment (named list)
+│   ├── experiment_name (string)
+│   ├── organism (string)
+│   ├── date_of_analysis (string)
+│   └── date_of_export (string)
+├── technical_info (named list)
+├── parameters (named list)
+├── groups (named list)
+│   └── <grouping_variable> (vector of group levels)
+├── cell_cycle (vector)
+├── gene_lists (named list)
+│   └── <gene_list_name> (vector of genes)
+├── expression (matrix-like)
+├── meta_data (data.frame)
+├── projections (named list)
+│   └── <projection_name> (data.frame)
+├── trees (named list)
+│   └── <grouping_variable> (phylo)
+├── most_expressed_genes (named list)
+│   └── <grouping_variable> (data.frame)
+├── marker_genes (named list)
+│   └── <method> (named list)
+│       └── <table_name> (data.frame)
+├── enriched_pathways (named list)
+│   └── <method> (named list)
+│       └── <table_name> (data.frame)
+├── trajectories (named list)
+│   └── <method> (named list)
+│       └── <trajectory_name> (depends on method, most likely a list or data frame)
+└── extra_material (named list)
+    └── tables (named list)
+        └── <name> (data.frame)
+```
+
+Interaction with the Cerebro object will be done through internal methods, providing additional control for the correct format of the object.
+
+As long as you follow the described scheme, you can export and visualize any data frame that is stored in the `marker_genes` or `enriched_pathways` slots. I have prepared a vignette with some more details that you can find [here](export_and_visualize_custom_tables.html).
+
+Please make sure to use names for items in lists, otherwise it will likely result in an error.
+
+Information stored in the `technical_info` and `parameters` slots will be presented in the "Analysis info" tab. Here you can add strings, numbers, and lists that with you think are relevant to share.
+
+Calling the Cerebro object will give an overview of the information it currently contains:
+
+```
+class: Cerebro_v1.3
+cerebroApp version: 1.3.0
+experiment name: pbmc_Seurat
+organism: hg
+date of analysis: 2020-02-19
+date of export: 2020-09-08
+number of cells: 5,697
+number of genes: 15,907
+grouping variables (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main
+cell cycle variables (1): cell_cycle_seurat
+projections (2): UMAP, UMAP_3D
+trees (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main
+most expressed genes: sample, seurat_clusters, cell_type_singler_blueprintencode_main
+marker genes:
+  - cerebro_seurat (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main
+enriched pathways:
+  - cerebro_seurat_enrichr (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main, 
+  - cerebro_GSVA (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main
+trajectories:
+  - monocle2 (1): highly_variable_genes
+```
+
+For more details, please check the `Cerebro_v1.3` reference page.

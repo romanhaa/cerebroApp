@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------##
 ## Tab: Marker genes
 ##
-## Select method and group.
+## Select method and table (group).
 ##----------------------------------------------------------------------------##
 
 ##----------------------------------------------------------------------------##
@@ -9,7 +9,7 @@
 ## because the group depends on which method is selected.
 ##----------------------------------------------------------------------------##
 
-output[["marker_genes_select_method_and_group_UI"]] <- renderUI({
+output[["marker_genes_select_method_and_table_UI"]] <- renderUI({
 
   ## ...
    if (
@@ -24,7 +24,7 @@ output[["marker_genes_select_method_and_group_UI"]] <- renderUI({
         ),
         column(
           6,
-          uiOutput("marker_genes_selected_group_UI")
+          uiOutput("marker_genes_selected_table_UI")
         )
       )
     )
@@ -68,7 +68,7 @@ output[["marker_genes_selected_method_UI"]] <- renderUI({
 ## UI element to select which group should be shown.
 ##----------------------------------------------------------------------------##
 
-output[["marker_genes_selected_group_UI"]] <- renderUI({
+output[["marker_genes_selected_table_UI"]] <- renderUI({
 
   ##
   req(
@@ -78,13 +78,13 @@ output[["marker_genes_selected_group_UI"]] <- renderUI({
   ##
   tagList(
     div(
-      HTML('<h3 style="text-align: center; margin-top: 0"><strong>Choose a grouping variable:</strong></h2>')
+      HTML('<h3 style="text-align: center; margin-top: 0"><strong>Choose a table:</strong></h2>')
     ),
     fluidRow(
       column(2),
       column(8,
         selectInput(
-          "marker_genes_selected_group",
+          "marker_genes_selected_table",
           label = NULL,
           choices = getGroupsWithMarkerGenes(input[["marker_genes_selected_method"]]),
           width = "100%"

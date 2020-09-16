@@ -1,22 +1,37 @@
 navbar:
+  structure:
+    left:  [home, reference, articles, release_notes, news]
+    right: [github, twitter]
   components:
     articles:
-      text: Vignettes
+      text: "Articles"
       menu:
-      - text: The cerebroApp workflow
+      - text: "The cerebroApp workflow (Seurat)"
         href: articles/cerebroApp_workflow_Seurat.html
-      - text: The Cerebro interface
+      - text: "The Cerebro interface"
         menu:
-        - text: Cerebro v1.3
-          href: articles/Cerebro_interface_v1.3.html
-        - text: Cerebro v1.2 and older
+        - text: "Cerebro v1.2 and older"
           href: articles/Cerebro_interface_v1.2.html
-      - text: Host Cerebro on shinyapps.io
+      - text: "Export an SCE/SingleCellExperiment object"
+        href: articles/export_a_data_set_in_SCE_format.html
+      - text: "Export and visualize custom tables"
+        href: articles/export_and_visualize_custom_tables.html
+      - text: "Launch Cerebro with pre-loaded data set"
+        href: articles/launch_cerebro_with_pre-loaded_data_set.html
+      - text: "Host Cerebro on shinyapps.io"
         href: articles/host_cerebro_on_shinyapps.html
-      - text: Launch Cerebro with pre-loaded data set
-        href: launch_cerebro_with_pre-loaded_data_set.html
-      - text: Protect Cerebro with login
-        href: protect_cerebro_with_login.html
+      - text: "Control access to Cerebro with a login page"
+        href: articles/control_access_to_cerebro_with_a_login_page.html
+      - text: "Overview of the Cerebro v1.3 class"
+        href: articles/overview_of_cerebro_v1.3_class.html
+    release_notes:
+      text: "Release notes"
+      menu:
+      - text: "v1.3"
+        href: articles/release_notes_v1.3.html
+    twitter:
+      icon: "fab fa-twitter fa-lg"
+      href: https://twitter.com/fakechek1
 
 reference:
   - title: "Main functions"

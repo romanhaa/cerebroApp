@@ -57,6 +57,9 @@ server <- function(input, output, session) {
       ## load specified file
       data <- readRDS(input[["input_file"]]$datapath)
 
+      ## print log message
+      print(glue::glue("[{Sys.time()}] Loaded data set: {input[['input_file']]$datapath}"))
+
     ## ... a .crb file was specified to be loaded into Cerebro on launch, the
     ##     file exists, and no selection has been made through the "Load data"
     ##     UI element
@@ -69,6 +72,9 @@ server <- function(input, output, session) {
       ## load the specified file
       data <- readRDS(.GlobalEnv$Cerebro.options[["crb_file_to_load"]])
 
+      ## print log message
+      print(glue::glue("[{Sys.time()}] Loaded data set: {.GlobalEnv$Cerebro.options[['crb_file_to_load']]}"))
+
     ## ... no file was specified to be loaded and no file has been selected in
     ##     the "Load data" UI element
     } else {
@@ -77,6 +83,18 @@ server <- function(input, output, session) {
       data <- readRDS(
         system.file("extdata/v1.3/example.crb", package = "cerebroApp")
       )
+
+      ## print log message
+      print(glue::glue("[{Sys.time()}] Loaded example data set..."))
+
+    }
+
+    message(data$print())
+
+    ## check if 'expression' slot exists and print log message with its format
+    ## if it does
+    if ( !is.null(data$expression) ) {
+      print(glue::glue("[{Sys.time()}] Format of expression data: {class(data$expression)}"))
     }
 
     ## return loaded data
@@ -84,23 +102,35 @@ server <- function(input, output, session) {
   })
 
   ##--------------------------------------------------------------------------##
-  ## Sidebar menu.
+  ## Show "Trajectory" tab if there are trajectories in the data set.
   ##--------------------------------------------------------------------------##
-  output[["sidebar_menu"]] <- renderMenu({
-    sidebarMenu(id = "sidebar",
-      menuItem("Load data", tabName = "loadData", icon = icon("spinner"), selected = TRUE),
-      menuItem("Overview", tabName = "overview", icon = icon("binoculars")),
-      menuItem("Groups", tabName = "groups", icon = icon("star")),
-      menuItem("Most expressed genes", tabName = "mostExpressedGenes", icon = icon("bullhorn")),
-      menuItem("Marker genes", tabName = "markerGenes", icon = icon("magnet")),
-      menuItem("Enriched pathways", tabName = "enrichedPathways", icon = icon("sitemap")),
-      menuItem("Gene (set) expression", tabName = "geneExpression", icon = icon("signal")),
-      menuItem("Trajectory", tabName = "trajectory", icon = icon("random")),
-      menuItem("Gene ID conversion", tabName = "geneIdConversion", icon = icon("barcode")),
-      menuItem("Analysis info", tabName = "info", icon = icon("info")),
-      menuItem("Color management", tabName = "color_management", icon = icon("palette")),
-      menuItem("About", tabName = "about", icon = icon("at"))
-    )
+  output[["sidebar_item_trajectory"]] <- renderMenu({
+    if ( length(getMethodsForTrajectories()) > 0 ) {
+      menuItem("Trajectory", tabName = "trajectory", icon = icon("random"))
+    } else {
+      NULL
+    }
+  })
+
+  ##--------------------------------------------------------------------------##
+  ## Show "Extra material" tab if there is some extra material in the data set.
+  ##--------------------------------------------------------------------------##
+  output[["sidebar_item_extra_material"]] <- renderMenu({
+    if (
+      !is.null(getExtraMaterialCategories()) &&
+      length(getExtraMaterialCategories()) > 0
+    ) {
+      menuItem("Extra material", tabName = "extra_material", icon = icon("gift"))
+    } else {
+      NULL
+    }
+  })
+
+  ##--------------------------------------------------------------------------##
+  ## Print log message when switching tab (for debugging).
+  ##--------------------------------------------------------------------------##
+  observe({
+    print(glue::glue("[{Sys.time()}] Active tab: {input[['sidebar']]}"))
   })
 
   ##--------------------------------------------------------------------------##
@@ -113,8 +143,9 @@ server <- function(input, output, session) {
   source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/marker_genes/server.R"), local = TRUE)
   source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/enriched_pathways/server.R"), local = TRUE)
   source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/gene_expression/server.R"), local = TRUE)
-  source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/gene_id_conversion/server.R"), local = TRUE)
   source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/trajectory/server.R"), local = TRUE)
+  source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/extra_material/server.R"), local = TRUE)
+  source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/gene_id_conversion/server.R"), local = TRUE)
   source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/analysis_info/server.R"), local = TRUE)
   source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/color_management/server.R"), local = TRUE)
   source(paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/about/server.R"), local = TRUE)

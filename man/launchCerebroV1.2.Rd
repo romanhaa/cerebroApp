@@ -11,7 +11,7 @@ launchCerebroV1.2(maxFileSize = 800, ...)
 (800 MB).}
 
 \item{...}{Further parameters that are used by \code{shiny::runApp}, e.g.
-\code{host} an \code{port}.}
+\code{host} or \code{port}.}
 }
 \value{
 Shiny application.

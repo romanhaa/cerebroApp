@@ -8,6 +8,7 @@ launchCerebroV1.3(
   mode = "open",
   maxFileSize = 800,
   crb_file_to_load = NULL,
+  welcome_message = NULL,
   ...
 )
 }
@@ -24,8 +25,12 @@ data set (\code{closed}, removes the "Load data" element); defaults to
 Cerebro. Useful when using/hosting Cerebro in \code{closed} mode. Defaults to
 \code{NULL}.}
 
+\item{welcome_message}{\code{string} with custom welcome message to display
+in the "Load data" tab. Can contain HTML formatting, e.g.
+\code{'<h3>Hi!</h3>'}. Defaults to \code{NULL}.}
+
 \item{...}{Further parameters that are used by \code{shiny::runApp}, e.g.
-\code{host} an \code{port}.}
+\code{host} or \code{port}.}
 }
 \value{
 Shiny application.

@@ -1,0 +1,458 @@
+---
+title: "Testing procedure for v1.3"
+author: "Roman Hillje"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    toc: true
+    number_sections: true
+    self_contained: yes
+    mode: selfcontained
+vignette: >
+  %\VignetteIndexEntry{Testing procedure for v1.3}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Prepararation
+
+## Load packages
+
+```{r eval=FALSE}
+library(dplyr)
+library(shiny)
+library(shinydashboard)
+```
+
+```{r eval=FALSE}
+library(Seurat)
+library(cerebroApp)
+```
+
+## Classes
+
+### `Group`
+
+```{r eval=FALSE}
+source('R/class-Group.R')
+```
+
+```{r eval=FALSE}
+Group$new(
+  name = 'sample',
+  levels = levels(cerebro_seurat$meta_data$sample),
+  description = 'experimental samples',
+  colors = c('black','red','green')
+)
+```
+
+```{r eval=FALSE}
+Group$new(
+  name = 'sample',
+  levels = levels(cerebro_seurat$meta_data$sample),
+  description = 'experimental samples',
+  colors = c('black','red')
+)
+```
+
+### `GeneList`
+
+```{r eval=FALSE}
+source('R/class-GeneList.R')
+```
+
+```{r eval=FALSE}
+GeneList$new(
+  name = 'test',
+  genes = c('a','b','c'),
+  description = 'genes to assign cell cycle'
+)
+```
+
+```{r eval=FALSE}
+GeneList$new(
+  name = 'test',
+  genes = 1,
+  description = 'genes to assign cell cycle'
+)
+```
+
+```{r eval=FALSE}
+GeneList$new(
+  name = 'test',
+  genes = c('a','b')
+)
+```
+
+### `MetaData`
+
+```{r eval=FALSE}
+source('R/class-MetaData.R')
+```
+
+```{r eval=FALSE}
+table <- Table$new(
+  name = 'test',
+  table = cerebro_seurat$marker_genes$cerebro_seurat$sample,
+  description = 'this is a description'
+)
+table
+```
+
+### `Table`
+
+```{r eval=FALSE}
+source('R/class-Table.R')
+```
+
+```{r eval=FALSE}
+table <- Table$new(
+  name = 'test',
+  table = cerebro_seurat$marker_genes$cerebro_seurat$sample,
+  description = 'this is a description'
+)
+table
+```
+
+### `Projection`
+
+```{r eval=FALSE}
+source('R/class-Projection.R')
+```
+
+```{r eval=FALSE}
+projection <- Projection$new(
+  name = 'test',
+  dimensions = 2,
+  coordinates = cerebro_seurat$projections$UMAP,
+  description = 'this is a description'
+)
+projection
+```
+
+### `Tree`
+
+```{r eval=FALSE}
+source('R/class-Tree.R')
+```
+
+```{r eval=FALSE}
+tree <- Tree$new(
+  group = 'sample',
+  tree = cerebro_seurat$trees$sample,
+  description = 'this tree shows the relationship between samples'
+)
+tree
+```
+
+### `Monocle_v2`
+
+## Load data
+
+```{r eval=FALSE}
+pbmc_Seurat <- readRDS('~/Dropbox/GSE_stuff/data/seurat.rds')
+```
+
+# Process data
+
+## Dimensional reduction
+
+```{r eval=FALSE}
+pbmc_Seurat <- RunUMAP(
+  pbmc_Seurat,
+  reduction.name = 'UMAP_3D',
+  reduction.key = 'UMAP3D_',
+  dims = 1:30,
+  n.components = 3,
+  seed.use = 100,
+  verbose = FALSE
+)
+```
+
+## Trees
+
+```{r eval=FALSE}
+Idents(pbmc_Seurat) <- "sample"
+pbmc_Seurat <- BuildClusterTree(
+  pbmc_Seurat,
+  dims = 1:30,
+  reorder = FALSE,
+  reorder.numeric = FALSE,
+  verbose = FALSE
+)
+pbmc_Seurat@misc$trees$sample <- pbmc_Seurat@tools$BuildClusterTree
+
+Idents(pbmc_Seurat) <- "seurat_clusters"
+pbmc_Seurat <- BuildClusterTree(
+  pbmc_Seurat,
+  dims = 1:30,
+  reorder = FALSE,
+  reorder.numeric = FALSE,
+  verbose = FALSE
+)
+pbmc_Seurat@misc$trees$seurat_clusters <- pbmc_Seurat@tools$BuildClusterTree
+
+Idents(pbmc_Seurat) <- "cell_type_singler_blueprintencode_main"
+pbmc_Seurat <- BuildClusterTree(
+  pbmc_Seurat,
+  dims = 1:30,
+  reorder = FALSE,
+  reorder.numeric = FALSE,
+  verbose = FALSE
+)
+pbmc_Seurat@misc$trees$cell_type_singler_blueprintencode_main <- pbmc_Seurat@tools$BuildClusterTree
+```
+
+## Most expressed genes
+
+```{r eval=FALSE}
+source('~/Research/GitHub/cerebroApp_v1.3/R/getMostExpressedGenes.R')
+```
+
+```{r eval=FALSE}
+# names(pbmc_Seurat@misc$most_expressed_genes) <- c('sample','seurat_clusters')
+pbmc_Seurat@misc$most_expressed_genes$by_sample <- NULL
+pbmc_Seurat@misc$most_expressed_genes$by_cluster <- NULL
+
+pbmc_Seurat <- getMostExpressedGenes(
+  pbmc_Seurat,
+  assay = 'RNA',
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main')
+)
+```
+
+## Marker genes
+
+```{r eval=FALSE}
+source('~/Research/GitHub/cerebroApp_v1.3/R/getMarkerGenes.R')
+```
+
+```{r eval=FALSE}
+pbmc_Seurat@misc$marker_genes$by_sample <- NULL
+pbmc_Seurat@misc$marker_genes$by_cluster <- NULL
+pbmc_Seurat@misc$marker_genes$parameters <- NULL
+
+pbmc_Seurat <- getMarkerGenes(
+  pbmc_Seurat,
+  assay = 'RNA',
+  organism = 'hg',
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  name = 'cerebro_seurat',
+  only_pos = TRUE,
+  min_pct = 0.7,
+  thresh_logFC = 0.25,
+  thresh_p_val = 0.01,
+  test = 'wilcox',
+  verbose = TRUE
+)
+```
+
+## Enriched pathways
+
+```{r eval=FALSE}
+source('~/Research/GitHub/cerebroApp_v1.3/R/send_enrichr_query.r')
+source('~/Research/GitHub/cerebroApp_v1.3/R/getEnrichedPathways.R')
+```
+
+```{r eval=FALSE}
+pbmc_Seurat@misc$enriched_pathways$enrichr <- NULL
+
+pbmc_Seurat <- getEnrichedPathways(
+  pbmc_Seurat,
+  marker_genes_input = 'cerebro_seurat',
+  adj_p_cutoff = 0.01,
+  max_terms = 100
+)
+```
+
+## Gene set enrichment
+
+```{r eval=FALSE}
+source('~/Research/GitHub/cerebroApp_v1.3/R/read_GMT_file.R')
+source('~/Research/GitHub/cerebroApp_v1.3/R/performGeneSetEnrichmentAnalysis.R')
+```
+
+```{r eval=FALSE}
+pbmc_Seurat@misc$enriched_pathways$GSVA <- NULL
+
+example_gene_set <- system.file("extdata/example_gene_set.gmt", package = "cerebroApp")
+
+pbmc_Seurat <- performGeneSetEnrichmentAnalysis(
+  pbmc_Seurat,
+  assay = 'RNA',
+  GMT_file = example_gene_set,
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main')
+)
+```
+
+## Meta data
+
+```{r eval=FALSE}
+pbmc_Seurat@misc$technical_info$cerebroApp_version <- utils::packageVersion('cerebroApp')
+pbmc_Seurat@misc$technical_info$Seurat <- utils::packageVersion('Seurat')
+```
+
+## Trajectory
+
+```{r eval=FALSE}
+source('~/Research/GitHub/cerebroApp_v1.3/R/extractMonocleTrajectory.R')
+```
+
+```{r eval=FALSE}
+monocle <- readRDS('~/Dropbox/GSE_stuff/data/monocle.rds')
+pbmc_Seurat <- extractMonocleTrajectory(monocle, pbmc_Seurat, 'highly_variable_genes')
+```
+
+# Export data
+
+```{r eval=FALSE}
+source('~/Research/GitHub/cerebroApp_v1.3/R/Cerebro_v1.3-class.R')
+
+source('~/Research/GitHub/cerebroApp_v1.3/R/exportFromSeurat.R')
+source('~/Research/GitHub/cerebroApp_v1.3/R/exportFromSCE.R')
+```
+
+## `dgCMatrix`
+
+```{r eval=FALSE}
+exportFromSeurat(
+  pbmc_Seurat,
+  assay = 'SCT',
+  slot = 'data',
+  file = '~/Dropbox/Cerebro_development/pbmc_Seurat_dgCMatrix.crb',
+  experiment_name = 'pbmc_Seurat',
+  organism = 'hg',
+  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  column_nUMI = 'nCount_RNA',
+  column_nGene = 'nFeature_RNA',
+  columns_cell_cycle = c('cell_cycle_seurat'),
+  add_all_meta_data = TRUE,
+  use_delayed_array = FALSE,
+  verbose = TRUE
+)
+```
+
+## `RleMatrix`
+
+```{r eval=FALSE}
+exportFromSeurat(
+  pbmc_Seurat,
+  assay = 'SCT',
+  slot = 'data',
+  file = '~/Dropbox/Cerebro_development/pbmc_Seurat_RleMatrix.crb',
+  experiment_name = 'pbmc_Seurat',
+  organism = 'hg',
+  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  column_nUMI = 'nCount_RNA',
+  column_nGene = 'nFeature_RNA',
+  columns_cell_cycle = c('cell_cycle_seurat'),
+  add_all_meta_data = TRUE,
+  use_delayed_array = TRUE,
+  verbose = TRUE
+)
+```
+
+# Load data to check
+
+```{r eval=FALSE}
+cerebro_seurat <- readRDS('~/Dropbox/Cerebro_development/pbmc_Seurat_dgCMatrix.crb')
+cerebro_seurat
+# class: Cerebro_v1.3
+# cerebroApp version: 1.3.0
+# experiment name: pbmc_Seurat
+# organism: hg
+# date of analysis: 2020-02-19
+# date of export: 2020-08-20
+# number of cells: 5,697
+# number of genes: 15,907
+# grouping variables (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main
+# cell cycle variables (1): cell_cycle_seurat
+# projections (2): UMAP, UMAP_3D
+# trees (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main
+# most expressed genes: sample, seurat_clusters, cell_type_singler_blueprintencode_main
+# marker genes:
+#   - cerebro_seurat (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main, 
+#   - test (1): sample
+# enriched pathways:
+#   - cerebro_seurat_enrichr (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main, 
+#   - cerebro_GSVA (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main
+# trajectories:
+#   - monocle2 (1): highly_variable_genes
+```
+
+# Launch Cerebro
+
+## Set options
+
+### Pre-load with `dgCMatrix`
+
+```{r eval=FALSE}
+Cerebro.options <- list(
+  "mode" = "open",
+  "crb_file_to_load" = "~/Dropbox/Cerebro_development/pbmc_Seurat_dgCMatrix.crb",
+  "cerebro_root" = "~/Research/GitHub/cerebroApp_v1.3/inst/"
+)
+```
+
+### Pre-load with `RleMatrix`
+
+```{r eval=FALSE}
+Cerebro.options <- list(
+  "mode" = "open",
+  "crb_file_to_load" = "~/Dropbox/Cerebro_development/pbmc_Seurat_RleMatrix.crb",
+  "cerebro_root" = "~/Research/GitHub/cerebroApp_v1.3/inst/"
+)
+```
+
+### No pre-loading
+
+```{r eval=FALSE}
+Cerebro.options <- list(
+  "mode" = "open",
+  "crb_file_to_load" = NULL,
+  "cerebro_root" = "~/Research/GitHub/cerebroApp_v1.3/inst"
+)
+```
+
+## Start Cerebro
+
+### Without profvis
+
+```{r eval=FALSE}
+options(shiny.maxRequestSize = 800 * 1024^2)
+
+source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/shiny_UI.R")
+source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/shiny_server.R")
+
+shiny::shinyApp(ui = ui, server = server)
+```
+
+### With provfis
+
+```{r eval=FALSE}
+options(shiny.maxRequestSize = 800 * 1024^2)
+
+source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/shiny_UI.R")
+source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/shiny_server.R")
+
+profvis::profvis(shiny::runApp(shiny::shinyApp(ui = ui, server = server)))
+```
+
+# Install `cerebroApp`
+
+```{r eval=FALSE}
+devtools::document()
+devtools::document()
+
+devtools::install_local(
+  '.',
+  force = TRUE,
+  upgrade = FALSE,
+  build_vignettes = FALSE
+)
+
+cerebroApp::launchCerebro(
+  version = "v1.3",
+  crb_file_to_load = "~/Dropbox/Cerebro_development/pbmc_Seurat_dgCMatrix.crb"
+)
+```

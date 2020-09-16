@@ -1,5 +1,5 @@
 ---
-title: "Exporting a data set in SCE format"
+title: "Export a data set in SCE format"
 author: "Roman Hillje"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
@@ -9,7 +9,7 @@ output:
     self_contained: yes
     mode: selfcontained
 vignette: >
-  %\VignetteIndexEntry{Exporting a data set in SCE format}
+  %\VignetteIndexEntry{Export a data set in SCE format}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Introduction
+# Overview
 
 Here, I explain how one can export a data set stored in the [`SingleCellExperiment`/`SCE`](https://bioconductor.org/packages/release/bioc/html/SingleCellExperiment.html) format to visualize it in Cerebro.
 

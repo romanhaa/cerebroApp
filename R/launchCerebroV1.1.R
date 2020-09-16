@@ -7,7 +7,7 @@
 #' @param maxFileSize Maximum size of input file; defaults to \code{800}
 #' (800 MB).
 #' @param ... Further parameters that are used by \code{shiny::runApp}, e.g.
-#' \code{host} an \code{port}.
+#' \code{host} or \code{port}.
 #'
 #' @return
 #' Shiny application.

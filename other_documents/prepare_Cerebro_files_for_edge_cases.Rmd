@@ -1,0 +1,410 @@
+---
+title: "Prepare Cerebro files for edge cases"
+author: "Roman Hillje"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    toc: true
+    number_sections: true
+    self_contained: yes
+    mode: selfcontained
+vignette: >
+  %\VignetteIndexEntry{Prepare Cerebro files for edge cases}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Scenarios to test
+
+* Cerebro modes: `open` and `closed`
+* Absence of most expressed genes.
+* Absence of marker genes.
+* Absence of enriched pathways.
+* Absence of trajectories.
+* Expression data is present in "normal" sparse matrix.
+
+# Test several cases of custom, missing or incomplete data
+
+## `NA` values in grouping variables
+
+```{r eval=FALSE}
+pbmc_Seurat_copy <- pbmc_Seurat
+pbmc_Seurat_copy@meta.data$sample[sample(seq(nrow(pbmc_Seurat_copy@meta.data)), 1000, replace = FALSE)] <- NA
+exportFromSeurat(
+  pbmc_Seurat_copy,
+  assay = 'SCT',
+  slot = 'data',
+  file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
+  experiment_name = 'pbmc_Seurat',
+  organism = 'hg',
+  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  column_nUMI = 'nCount_RNA',
+  column_nGene = 'nFeature_RNA',
+  add_all_meta_data = TRUE,
+  verbose = TRUE
+)
+```
+
+## No experiment info
+
+```{r eval=FALSE}
+pbmc_Seurat_copy <- pbmc_Seurat
+pbmc_Seurat_copy@misc$experiment <- list()
+exportFromSeurat(
+  pbmc_Seurat_copy,
+  assay = 'SCT',
+  slot = 'data',
+  file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
+  experiment_name = 'pbmc_Seurat',
+  organism = 'hg',
+  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  column_nUMI = 'nCount_RNA',
+  column_nGene = 'nFeature_RNA',
+  add_all_meta_data = TRUE,
+  verbose = FALSE
+)
+```
+
+## No cell cycle assignments
+
+```{r eval=FALSE}
+exportFromSeurat(
+  pbmc_Seurat,
+  assay = 'SCT',
+  slot = 'data',
+  file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
+  experiment_name = 'pbmc_Seurat',
+  organism = 'hg',
+  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  column_nUMI = 'nCount_RNA',
+  column_nGene = 'nFeature_RNA',
+  add_all_meta_data = TRUE,
+  verbose = FALSE
+)
+```
+
+## No phylogenetic trees
+
+```{r eval=FALSE}
+pbmc_Seurat_copy <- pbmc_Seurat
+pbmc_Seurat_copy@misc$trees <- list()
+exportFromSeurat(
+  pbmc_Seurat_copy,
+  assay = 'SCT',
+  slot = 'data',
+  file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
+  experiment_name = 'pbmc_Seurat',
+  organism = 'hg',
+  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  column_nUMI = 'nCount_RNA',
+  column_nGene = 'nFeature_RNA',
+  add_all_meta_data = TRUE,
+  verbose = FALSE
+)
+```
+
+## Most expressed genes
+
+### Data is missing
+
+```{r eval=FALSE}
+pbmc_Seurat_copy <- pbmc_Seurat
+pbmc_Seurat_copy@misc$most_expressed_genes <- NULL
+exportFromSeurat(
+  pbmc_Seurat_copy,
+  assay = 'SCT',
+  slot = 'data',
+  file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
+  experiment_name = 'pbmc_Seurat',
+  organism = 'hg',
+  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  columns_cell_cycle = c('cell_cycle_seurat'),
+  column_nUMI = 'nCount_RNA',
+  column_nGene = 'nFeature_RNA',
+  add_all_meta_data = TRUE,
+  verbose = FALSE
+)
+```
+
+## Marker genes
+
+### Data is missing
+
+```{r eval=FALSE}
+pbmc_Seurat_copy <- pbmc_Seurat
+pbmc_Seurat_copy@misc$marker_genes <- NULL
+exportFromSeurat(
+  pbmc_Seurat_copy,
+  assay = 'SCT',
+  slot = 'data',
+  file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
+  experiment_name = 'pbmc_Seurat',
+  organism = 'hg',
+  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  columns_cell_cycle = c('cell_cycle_seurat'),
+  column_nUMI = 'nCount_RNA',
+  column_nGene = 'nFeature_RNA',
+  add_all_meta_data = TRUE,
+  verbose = FALSE
+)
+```
+
+### No marker genes found
+
+```{r eval=FALSE}
+pbmc_Seurat_copy <- pbmc_Seurat
+pbmc_Seurat_copy@misc$marker_genes$cerebro_seurat$sample <- "no_markers_found"
+exportFromSeurat(
+  pbmc_Seurat_copy,
+  assay = 'SCT',
+  slot = 'data',
+  file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
+  experiment_name = 'pbmc_Seurat',
+  organism = 'hg',
+  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  columns_cell_cycle = c('cell_cycle_seurat'),
+  column_nUMI = 'nCount_RNA',
+  column_nGene = 'nFeature_RNA',
+  add_all_meta_data = TRUE,
+  verbose = FALSE
+)
+```
+
+### Custom table
+
+```{r eval=FALSE}
+pbmc_Seurat_copy <- pbmc_Seurat
+pbmc_Seurat_copy@misc$marker_genes$test <- list(
+  "test1" = tibble(
+    a = "this",
+    b = "is",
+    c = "a",
+    d = "test"
+  )
+)
+
+exportFromSeurat(
+  pbmc_Seurat_copy,
+  assay = 'SCT',
+  slot = 'data',
+  file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
+  experiment_name = 'pbmc_Seurat',
+  organism = 'hg',
+  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  columns_cell_cycle = c('cell_cycle_seurat'),
+  column_nUMI = 'nCount_RNA',
+  column_nGene = 'nFeature_RNA',
+  add_all_meta_data = TRUE,
+  verbose = FALSE
+)
+# class: Cerebro_v1.3
+# cerebroApp version: 1.3.0
+# experiment name: pbmc_Seurat
+# organism: hg
+# date of analysis: 2020-02-19
+# date of export: 2020-08-30
+# number of cells: 5,697
+# number of genes: 15,907
+# grouping variables (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main
+# cell cycle variables (1): cell_cycle_seurat
+# projections (2): UMAP, UMAP_3D
+# trees (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main
+# most expressed genes: sample, seurat_clusters, cell_type_singler_blueprintencode_main
+# marker genes:
+#   - cerebro_seurat (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main,
+#   - test (1): test1
+# enriched pathways:
+#   - cerebro_seurat_enrichr (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main,
+#   - cerebro_GSVA (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main,
+# trajectories:
+#   - monocle2 (1): highly_variable_genes
+```
+
+## Enriched pathways
+
+### Data is missing
+
+```{r eval=FALSE}
+pbmc_Seurat_copy <- pbmc_Seurat
+pbmc_Seurat_copy@misc$enriched_pathways <- NULL
+exportFromSeurat(
+  pbmc_Seurat_copy,
+  assay = 'SCT',
+  slot = 'data',
+  file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
+  experiment_name = 'pbmc_Seurat',
+  organism = 'hg',
+  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  columns_cell_cycle = c('cell_cycle_seurat'),
+  column_nUMI = 'nCount_RNA',
+  column_nGene = 'nFeature_RNA',
+  add_all_meta_data = TRUE,
+  verbose = FALSE
+)
+```
+
+### Enrichr: No marker genes found or no pathways enriched
+
+```{r eval=FALSE}
+pbmc_Seurat_copy <- pbmc_Seurat
+pbmc_Seurat_copy@misc$enriched_pathways$cerebro_seurat_enrichr$sample <- "no_markers_found"
+pbmc_Seurat_copy@misc$enriched_pathways$cerebro_seurat_enrichr_2 <- list(
+  sample = "no_pathways_found"
+)
+exportFromSeurat(
+  pbmc_Seurat_copy,
+  assay = 'SCT',
+  slot = 'data',
+  file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
+  experiment_name = 'pbmc_Seurat',
+  organism = 'hg',
+  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  columns_cell_cycle = c('cell_cycle_seurat'),
+  column_nUMI = 'nCount_RNA',
+  column_nGene = 'nFeature_RNA',
+  add_all_meta_data = TRUE,
+  verbose = FALSE
+)
+```
+
+### GSVA: No gene sets enriched
+
+```{r eval=FALSE}
+pbmc_Seurat_copy <- pbmc_Seurat
+pbmc_Seurat_copy@misc$enriched_pathways$cerebro_GSVA$sample <- "no_gene_sets_enriched"
+exportFromSeurat(
+  pbmc_Seurat_copy,
+  assay = 'SCT',
+  slot = 'data',
+  file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
+  experiment_name = 'pbmc_Seurat',
+  organism = 'hg',
+  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  columns_cell_cycle = c('cell_cycle_seurat'),
+  column_nUMI = 'nCount_RNA',
+  column_nGene = 'nFeature_RNA',
+  add_all_meta_data = TRUE,
+  verbose = FALSE
+)
+```
+
+### Custom table
+
+```{r eval=FALSE}
+pbmc_Seurat_copy <- pbmc_Seurat
+
+pbmc_Seurat_copy@misc$enriched_pathways$test <- list(
+  "test2" = tibble(
+    a = "this",
+    b = "is",
+    c = "a",
+    d = "test"
+  )
+)
+
+exportFromSeurat(
+  pbmc_Seurat_copy,
+  assay = 'SCT',
+  slot = 'data',
+  file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
+  experiment_name = 'pbmc_Seurat',
+  organism = 'hg',
+  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  columns_cell_cycle = c('cell_cycle_seurat'),
+  column_nUMI = 'nCount_RNA',
+  column_nGene = 'nFeature_RNA',
+  add_all_meta_data = TRUE,
+  verbose = FALSE
+)
+# class: Cerebro_v1.3
+# cerebroApp version: 1.3.0
+# experiment name: pbmc_Seurat
+# organism: hg
+# date of analysis: 2020-02-19
+# date of export: 2020-08-30
+# number of cells: 5,697
+# number of genes: 15,907
+# grouping variables (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main
+# cell cycle variables (1): cell_cycle_seurat
+# projections (2): UMAP, UMAP_3D
+# trees (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main
+# most expressed genes: sample, seurat_clusters, cell_type_singler_blueprintencode_main
+# marker genes:
+#   - cerebro_seurat (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main,
+# enriched pathways:
+#   - cerebro_seurat_enrichr (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main,
+#   - cerebro_GSVA (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main,
+#   - test (1): test2
+# trajectories:
+#   - monocle2 (1): highly_variable_genes
+```
+
+## No trajectories
+
+```{r eval=FALSE}
+pbmc_Seurat_copy <- pbmc_Seurat
+
+pbmc_Seurat_copy@misc$trajectories <- NULL
+
+exportFromSeurat(
+  pbmc_Seurat_copy,
+  assay = 'SCT',
+  slot = 'data',
+  file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
+  experiment_name = 'pbmc_Seurat',
+  organism = 'hg',
+  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  columns_cell_cycle = c('cell_cycle_seurat'),
+  column_nUMI = 'nCount_RNA',
+  column_nGene = 'nFeature_RNA',
+  add_all_meta_data = TRUE,
+  verbose = FALSE
+)
+```
+
+## Export custom table in extra material
+
+```{r eval=FALSE}
+pbmc_Seurat_copy <- pbmc_Seurat
+
+pbmc_Seurat_copy@misc$extra_material$tables <- list(
+  "test" = tibble(
+    a = "this",
+    b = "is",
+    c = "a",
+    d = "test"
+  )
+)
+
+exportFromSeurat(
+  pbmc_Seurat_copy,
+  assay = 'SCT',
+  slot = 'data',
+  file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
+  experiment_name = 'pbmc_Seurat',
+  organism = 'hg',
+  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  columns_cell_cycle = c('cell_cycle_seurat'),
+  column_nUMI = 'nCount_RNA',
+  column_nGene = 'nFeature_RNA',
+  add_all_meta_data = TRUE,
+  verbose = FALSE
+)
+```
+
+## Format of expression data
+
+### `dgCMatrix`
+
+```{r eval=FALSE}
+cerebro_seurat <- readRDS('~/Dropbox/Cerebro_development/pbmc_Seurat.crb')
+str(cerebro_seurat$expression)
+cell_names <- colnames(cerebro_seurat$expression)
+gene_names <- rownames(cerebro_seurat$expression)
+cerebro_seurat$expression <- as(cerebro_seurat$expression, 'dgCMatrix')
+str(cerebro_seurat$expression)
+colnames(cerebro_seurat$expression) <- cell_names
+rownames(cerebro_seurat$expression) <- gene_names
+str(cerebro_seurat$expression)
+saveRDS(cerebro_seurat, '~/Dropbox/Cerebro_development/pbmc_Seurat.crb')
+```

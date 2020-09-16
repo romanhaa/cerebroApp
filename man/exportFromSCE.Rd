@@ -15,6 +15,7 @@ exportFromSCE(
   column_nGene = "nGene",
   columns_cell_cycle = NULL,
   add_all_meta_data = TRUE,
+  use_delayed_array = FALSE,
   verbose = FALSE
 )
 }
@@ -50,6 +51,15 @@ information about number of expressed genes per cell; defaults to
 \item{add_all_meta_data}{If set to \code{TRUE}, all further meta data columns
 will be extracted as well.}
 
+\item{use_delayed_array}{When set to \code{TRUE}, the expression matrix will
+be stored as an \code{RleMatrix} (see \code{DelayedArray} package). This can
+be useful for very large data sets, as the matrix won't be loaded into memory
+and instead values will be read from the disk directly, at the cost of
+performance. Note that it is necessary to install the \code{DelayedArray}
+package. If set to \code{FALSE} (default), the expression matrix will be
+copied from the input object as is. It is recommended to use a sparse format,
+such as \code{dgCMatrix} from the \code{Matrix} package.}
+
 \item{verbose}{Set this to \code{TRUE} if you want additional log messages;
 defaults to \code{FALSE}.}
 }
@@ -71,6 +81,7 @@ exportFromSCE(
   columns_groups = c('sample','cluster'),
   column_nUMI = 'nUMI',
   column_nGene = 'nGene',
+  use_delayed_array = FALSE,
   verbose = TRUE
 )
 

@@ -12,8 +12,6 @@ vignette: >
   %\VignetteIndexEntry{Launch Cerebro with pre-loaded data set}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-resource_files:
-  - protect_cerebro_with_login_files/login_screen.png
 ---
 
 ```{r, include = FALSE}
@@ -69,5 +67,5 @@ launchCerebro(
 
 # See also
 
-* `vignette('host_cerebro_on_shinyapps')`
-* `vignette('protect_cerebro_with_login')`
+* [Host Cerebro on shinyapps.io](host_cerebro_on_shinyapps.html)
+* [Control access to Cerebro with a login page](control_access_to_cerebro_with_a_login_page.html)

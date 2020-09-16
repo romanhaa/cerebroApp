@@ -95,7 +95,10 @@ plotExpressionSinglePanel3D <- function(table, color_scale, hover_info) {
       mode = "markers",
       marker = list(
         colorbar = list(
-          title = "Expression"
+          title = "Expression",
+          ticks = 'outside',
+          outlinewidth = 1,
+          outlinecolor = 'black'
         ),
         color = ~level,
         opacity = input[["expression_projection_point_opacity"]],
@@ -140,7 +143,8 @@ plotExpressionSinglePanel3D <- function(table, color_scale, hover_info) {
           size = 11,
           color = "black"
         ),
-        bgcolor = "lightgrey"
+        bgcolor = "lightgrey",
+        align = 'left'
       )
     )
 
@@ -163,7 +167,10 @@ plotExpressionSinglePanel2D <- function(table, color_scale, hover_info) {
       mode = "markers",
       marker = list(
         colorbar = list(
-          title = "Expression"
+          title = "Expression",
+          ticks = 'outside',
+          outlinewidth = 1,
+          outlinecolor = 'black'
         ),
         color = ~level,
         opacity = input[["expression_projection_point_opacity"]],
@@ -209,7 +216,8 @@ plotExpressionSinglePanel2D <- function(table, color_scale, hover_info) {
           size = 11,
           color = "black"
         ),
-        bgcolor = "lightgrey"
+        bgcolor = "lightgrey",
+        align = 'left'
       )
     )
 
@@ -253,7 +261,10 @@ plotExpressionSinglePanel2DTrajectory <- function(
       mode = "markers",
       marker = list(
         colorbar = list(
-          title = "Expression"
+          title = "Expression",
+          ticks = 'outside',
+          outlinewidth = 1,
+          outlinecolor = 'black'
         ),
         color = ~level,
         opacity = input[["expression_projection_point_opacity"]],
@@ -292,7 +303,14 @@ plotExpressionSinglePanel2DTrajectory <- function(
           input[["expression_projection_scale_y_manual_range"]][2]
         )
       ),
-      hoverlabel = list(font = list(size = 11))
+      hoverlabel = list(
+        font = list(
+          size = 11,
+          color = "black"
+        ),
+        bgcolor = "lightgrey",
+        align = 'left'
+      )
     )
 
   ##
@@ -472,8 +490,7 @@ output[["expression_projection_UI"]] <- renderUI({
           ),
           uiOutput("expression_projection_input_type_UI"),
           uiOutput("expression_projection_parameters_UI"),
-          uiOutput("expression_projection_color_scale_range_UI"),
-          uiOutput("expression_projection_scales_UI")
+          uiOutput("expression_projection_color_scale_range_UI")
         )
       )
     ),
@@ -512,7 +529,9 @@ output[["expression_projection_UI"]] <- renderUI({
                     inputId = "expression_projection_show_genes_in_separate_panels",
                     label = HTML("Show genes in separate panels<br>(experimental)"),
                     value = FALSE
-                  )
+                  ),
+                  hr(),
+                  uiOutput("expression_projection_scales_UI")
                 )
               ),
               circle = FALSE,
@@ -564,7 +583,9 @@ output[["expression_projection_input_type_UI"]] <- renderUI({
     selectizeInput(
       'expression_select_gene_set',
       label = 'Gene set',
-      choices = data.table::as.data.table(data.frame("Gene sets" = c("-", msigdbr:::msigdbr_genesets$gs_name))),
+      choices = data.table::as.data.table(
+        data.frame("Gene sets" = c("-", msigdbr:::msigdbr_genesets$gs_name))
+      ),
       multiple = FALSE
     )
   }
@@ -617,8 +638,8 @@ output[["expression_projection_parameters_UI"]] <- renderUI({
       "expression_projection_to_display",
       label = "Projection",
       choices = list(
-        "Projections" = available_projections,
-        "Trajectories" = available_trajectories
+        "Projections" = as.list(available_projections),
+        "Trajectories" = as.list(available_trajectories)
       )
     ),
     sliderInput(
@@ -741,7 +762,6 @@ output[["expression_projection_scales_UI"]] <- renderUI({
   }
 
   tagList(
-    hr(),
     sliderInput(
       "expression_projection_scale_x_manual_range",
       label = "Range of X axis",
@@ -758,6 +778,12 @@ output[["expression_projection_scales_UI"]] <- renderUI({
     )
   )
 })
+
+outputOptions(
+  output,
+  "expression_projection_scales_UI",
+  suspendWhenHidden = FALSE
+)
 
 ##----------------------------------------------------------------------------##
 ## Info box that gets shown when pressing the "info" button.
@@ -797,53 +823,6 @@ expression_projection_parameters_info <- list(
     "
   )
 )
-
-##----------------------------------------------------------------------------##
-## Function to get genes for selected gene set.
-##----------------------------------------------------------------------------##
-
-## get genes for gene set
-getGenesForGeneSet <- function(gene_set) {
-
-  if (
-    !is.null(getExperiment()$organism) &&
-    getExperiment()$organism == "mm"
-  ) {
-    species <- "Mus musculus"
-  } else if (
-    !is.null(getExperiment()$organism) &&
-    getExperiment()$organism == "hg"
-  ) {
-    species <- "Homo sapiens"
-  } else {
-    species <- "Mus musculus"
-  }
-
-  ## - get list of gene set names
-  ## - filter for selected gene set
-  ## - extract genes that belong to the gene set
-  ## - get orthologs for the genes
-  ## - convert gene symbols to vector
-  ## - only keep unique gene symbols
-  ## - sort genes
-  msigdbr:::msigdbr_genesets %>%
-  dplyr::filter(.data$gs_name == gene_set) %>%
-  dplyr::inner_join(
-    .,
-    msigdbr:::msigdbr_genes,
-    by = "gs_id"
-  ) %>%
-  dplyr::inner_join(
-    .,
-    msigdbr:::msigdbr_orthologs %>%
-      dplyr::filter(., .data$species_name == species),
-    by = "human_entrez_gene"
-  ) %>%
-  dplyr::pull(gene_symbol) %>%
-  unique() %>%
-  sort()
-
-}
 
 ##----------------------------------------------------------------------------##
 ## Plot of projection.
@@ -901,7 +880,7 @@ output[["expression_projection"]] <- plotly::renderPlotly({
       ## add expression levels to hover info
       hover_info <- glue::glue(
         "{hover_info}
-        <b>Expression level</b>: {formatC(gene_expression_plot_data()$level, format = 'f', big.mark = ',', digits = 3)}"
+        <b>Expression level</b>: {formatC(gene_expression_plot_data()$level, format = 'f', digits = 3)}"
       )
 
       ## check if selection projection consists of 2 or 3 dimensions
@@ -942,7 +921,9 @@ output[["expression_projection"]] <- plotly::renderPlotly({
     ## add expression levels to hover info
     hover_info <- glue::glue(
       "{hover_info}
-      <b>Expression level</b>: {formatC(gene_expression_plot_data()$level, format = 'f', big.mark = ',', digits = 3)}"
+      <b>State</b>: {gene_expression_plot_data()$state}
+      <b>Pseudotime</b>: {formatC(gene_expression_plot_data()$pseudotime, format = 'f', digits = 2)}
+      <b>Expression level</b>: {formatC(gene_expression_plot_data()$level, format = 'f', digits = 3)}"
     )
 
     plot <- plotExpressionSinglePanel2DTrajectory(

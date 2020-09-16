@@ -13,6 +13,6 @@ tab_enriched_pathways <- tabItem(
     }
     "
   ),
-  uiOutput("enriched_pathways_select_method_and_group_UI"),
+  uiOutput("enriched_pathways_select_method_and_table_UI"),
   uiOutput("enriched_pathways_table_UI")
 )

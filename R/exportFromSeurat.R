@@ -26,6 +26,14 @@
 #' \code{c("Phase")}; defaults to \code{NULL}.
 #' @param add_all_meta_data If set to \code{TRUE}, all further meta data columns
 #' will be extracted as well.
+#' @param use_delayed_array When set to \code{TRUE}, the expression matrix will
+#' be stored as an \code{RleMatrix} (see \code{DelayedArray} package). This can
+#' be useful for very large data sets, as the matrix won't be loaded into memory
+#' and instead values will be read from the disk directly, at the cost of
+#' performance. Note that it is necessary to install the \code{DelayedArray}
+#' package. If set to \code{FALSE} (default), the expression matrix will be
+#' copied from the input object as is. It is recommended to use a sparse format,
+#' such as \code{dgCMatrix} from the \code{Matrix} package.
 #' @param verbose Set this to \code{TRUE} if you want additional log messages;
 #' defaults to \code{FALSE}.
 #'
@@ -43,6 +51,7 @@
 #'   columns_groups = c('sample','seurat_clusters'),
 #'   column_nUMI = 'nCount_RNA',
 #'   column_nGene = 'nFeature_RNA',
+#'   use_delayed_array = FALSE,
 #'   verbose = TRUE
 #' )
 #'
@@ -63,6 +72,7 @@ exportFromSeurat <- function(
   column_nGene = 'nGene',
   columns_cell_cycle = NULL,
   add_all_meta_data = TRUE,
+  use_delayed_array = FALSE,
   verbose = FALSE
 ) {
 
@@ -219,19 +229,26 @@ exportFromSeurat <- function(
     )
   }
 
-  ## convert expression data to "RleArray" if it is "dgCMatrix" or "matrix"
+  ## convert expression data to "RleArray" if requested, if it is "dgCMatrix" or
+  ## "matrix" format, and if the "DelayedArray" package is available
   if (
+    use_delayed_array == TRUE &&
     class(expression_data) %in% c('matrix','dgCMatrix') &&
     requireNamespace("DelayedArray", quietly = TRUE)
   ) {
+    if ( verbose ) {
+      message(
+        paste0(
+          '[', format(Sys.time(), '%H:%M:%S'), '] Storing expression data as ',
+          'DelayedArray...'
+        )
+      )
+    }
     require('DelayedArray')
     expression_data <- as(expression_data, "RleArray")
   }
 
   ## add expression data
-  # export$expression <- SingleCellExperiment::SingleCellExperiment(
-  #   assays = list(counts = expression_data)
-  # )
   export$setExpression(expression_data)
 
   ##--------------------------------------------------------------------------##
@@ -289,7 +306,6 @@ exportFromSeurat <- function(
   }
 
   ## cell barcodes
-  # colData(export$expression)$cell_barcode <- Cells(object)
   temp_meta_data <- data.frame(
     "cell_barcode" = Seurat::Cells(object),
     stringsAsFactors = FALSE
@@ -298,24 +314,65 @@ exportFromSeurat <- function(
   ##--------------------------------------------------------------------------##
   ## add grouping variables, factorize if necessary
   ##--------------------------------------------------------------------------##
+
+  ## go through grouping variables
   for ( i in columns_groups ) {
+
+    ## check content of column in meta data
+    ## ... content not factorized
     if (
       !is.factor(object@meta.data[[i]]) &&
       is.character(object@meta.data[[i]])
     ) {
-      temp_meta_data[[i]] <- factor(
-        object@meta.data[[i]],
-        levels = unique(object@meta.data[[i]])
-      )
+
+      ## get all values and unique values (sorted, which removes NA)
+      values <- object@meta.data[[i]]
+      levels <- sort(unique(values), na.last = NA)
+
+      ## check if there are NA values; if so, change NA values to 'N/A' and add
+      ## 'N/A' to levels
+      if ( any(is.na(values)) ) {
+        values[is.na(values)] <- 'N/A'
+        levels <- c(levels, 'N/A')
+      }
+
+      ## factorize values
+      temp_meta_data[[i]] <- factor(values, levels = levels)
+
+    ## ... content is factorized but there are NA values and NA is not among the
+    ##     factor levels
+    } else if (
+      is.factor(object@meta.data[[i]]) &&
+      any(is.na(object@meta.data[[i]])) &&
+      'NA' %in% levels(object@meta.data[[i]]) == FALSE
+    ) {
+
+      ## print log message
+      if ( verbose ) {
+        message(
+          glue::glue(
+            '[{format(Sys.time(), "%H:%M:%S")}] Adding `NA` to factor levels ',
+            'of group `{i}`...'
+          )
+        )
+      }
+
+      ## add 'N/A' to factor levels for NA values
+      levels <- levels(object@meta.data[[i]])
+      values <- as.character(object@meta.data[[i]])
+      values[is.na(values)] <- 'N/A'
+      values <- factor(values, levels = c(levels, 'N/A'))
+      temp_meta_data[[i]] <- values
+
+    ## ... none of the above
     } else {
+
+      ## copy content to meta data
       temp_meta_data[[i]] <- object@meta.data[[i]]
     }
-    # colData(export$expression)[[i]] <- factor(object@meta.data[[i]], levels = tmp_names)
   }
 
   ## number of transcripts and expressed genes
-  # colData(export$expression)$nUMI = object@meta.data[[column_nUMI]]
-  # colData(export$expression)$nGene = object@meta.data[[column_nGene]]
   temp_meta_data[["nUMI"]] = object@meta.data[[column_nUMI]]
   temp_meta_data[["nGene"]] = object@meta.data[[column_nGene]]
 
@@ -617,6 +674,51 @@ exportFromSeurat <- function(
   }
 
   ##--------------------------------------------------------------------------##
+  ## extra material
+  ##
+  ## currently, only tables can be exported
+  ##--------------------------------------------------------------------------##
+
+  ## define valid categories
+  valid_categories <- c('tables')
+
+  ## check of extra material exists, that it is in list format, and that the
+  ## list is not empty
+  if (
+    !is.null(object@misc$extra_material) &&
+    is.list(object@misc$extra_material) &&
+    length(object@misc$extra_material) > 0
+  ) {
+
+    if ( verbose ) {
+      message(
+        glue::glue(
+          '[{format(Sys.time(), "%H:%M:%S")}] Found extra material to export...'
+        )
+      )
+    }
+
+    ## go through categories in `extra_material` slot
+    for ( category in names(object@misc$extra_material) ) {
+
+      ## do this if category is `tables`
+      if ( category == 'tables' ) {
+
+        ## go through tables
+        for ( i in seq_along(object@misc$extra_material$tables) ) {
+
+          ## export table
+          export$addExtraMaterial(
+            category = 'tables',
+            name = names(object@misc$extra_material$tables)[i],
+            content = object@misc$extra_material$tables[[i]]
+          )
+        }
+      }
+    }
+  }
+
+  ##--------------------------------------------------------------------------##
   ## show overview of Cerebro object
   ##--------------------------------------------------------------------------##
   message(
@@ -662,11 +764,12 @@ exportFromSeurat <- function(
     )
   ## ... target file doesn't exist
   } else {
-    message(
+    stop(
       paste0(
         '[', format(Sys.time(), '%H:%M:%S'), '] Something went wrong while ',
         'saving the file.'
-      )
+      ),
+      .call = FALSE
     )
   }
 }

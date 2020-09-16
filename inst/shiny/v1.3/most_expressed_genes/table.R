@@ -40,7 +40,7 @@ output[["most_expressed_genes_table_or_text_UI"]] <- renderUI({
     column(12,
       shinyWidgets::materialSwitch(
         inputId = "most_expressed_genes_table_filter_switch",
-        label = "Show results for all subgroups (no filtering):",
+        label = "Show results for all subgroups (no pre-filtering):",
         value = FALSE,
         status = "primary",
         inline = TRUE
@@ -60,15 +60,48 @@ output[["most_expressed_genes_table_or_text_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 
 output[["most_expressed_genes_filter_subgroups_UI"]] <- renderUI({
-  if ( input[["most_expressed_genes_table_filter_switch"]] == TRUE ) {
+
+  ##
+  req(
+    input[["most_expressed_genes_selected_group"]],
+    !is.null(input[["most_expressed_genes_table_filter_switch"]])
+  )
+
+  ## fetch results
+  results_df <- getMostExpressedGenes(
+    input[["most_expressed_genes_selected_group"]]
+  )
+
+  ## don't proceed if input is not a data frame
+  req(is.data.frame(results_df))
+
+  ## check if pre-filtering is activated and name of first column in table is
+  ## one of the registered groups
+  ## ... it's not
+  if (
+    input[["most_expressed_genes_table_filter_switch"]] == TRUE ||
+    colnames(results_df)[1] %in% getGroups() == FALSE
+  ) {
+
+    ## return nothing (empty row)
     fluidRow()
+
+  ## ... it is
   } else {
+
+    ## check for which groups results exist
+    if ( is.character(results_df[[1]]) ) {
+      available_groups <- unique(results_df[[1]])
+    } else if ( is.factor(results_df[[1]]) ) {
+      available_groups <- levels(results_df[[1]])
+    }
+
     fluidRow(
       column(12,
         selectInput(
           "most_expressed_genes_table_select_group_level",
           label = "Filter results for subgroup:",
-          choices = getGroupLevels(input[["most_expressed_genes_selected_group"]])
+          choices = available_groups
         )
       )
     )
@@ -83,14 +116,28 @@ output[["most_expressed_genes_table"]] <- DT::renderDataTable(server = FALSE, {
 
   ##
   req(
-    input[["most_expressed_genes_selected_group"]],
-    input[["most_expressed_genes_table_select_group_level"]]
+    input[["most_expressed_genes_selected_group"]]
   )
+
+  ## fetch results
+  results_df <- getMostExpressedGenes(
+    input[["most_expressed_genes_selected_group"]]
+  )
+
+  ## don't proceed if input is not a data frame
+  req(is.data.frame(results_df))
 
   ## filter the table for a specific subgroup only if specified by the user,
   ## otherwise show all results
-  results_df <- getMostExpressedGenes(input[["most_expressed_genes_selected_group"]])
-  if ( input[["most_expressed_genes_table_filter_switch"]] != TRUE ) {
+  if (
+    input[["most_expressed_genes_table_filter_switch"]] == FALSE &&
+    colnames(results_df)[1] %in% getGroups() == TRUE
+  ) {
+
+    ## don't proceed if selection of subgroup is not available
+    req(input[["most_expressed_genes_table_select_group_level"]])
+
+    ## filter table
     results_df <- results_df %>%
       dplyr::filter_at(1, dplyr::all_vars(. == input[["most_expressed_genes_table_select_group_level"]]))
   }
@@ -151,7 +198,10 @@ observeEvent(input[["most_expressed_genes_info"]], {
 most_expressed_genes_info <- list(
   title = "Most expressed genes",
   text = HTML("
-    Table of top 100 most expressed genes in each group. For example, if gene XY contributes with 5% to the total expression, that means 5% of all transcripts found in all cells of this sample come from that respective gene. These lists can help to identify/verify the dominant cell types.<br>
+    Table of top 100 most expressed genes in each group. For example, if gene XY contributes with 5% to the total expression, that means 5% of all transcripts found in all cells of this sample come from that respective gene. These lists can help to identify/verify the dominant cell types.
+    <h4>Options</h4>
+    <b>Show results for all subgroups (no pre-filtering)</b><br>
+    When active, the subgroup section element will disappear and instead the table will be shown for all subgroups. Subgroups can still be selected through the dedicated column filter, which also allows to select multiple subgroups at once. While using the column filter is more elegant, it can become laggy with very large tables, hence to option to filter the table beforehand. Please note that this feature only works if the first column was recognized as holding assignments to one of the grouping variables, e.g. 'sample' or 'clusters', otherwise your choice here will be ignored and the whole table shown without pre-filtering.<br>
     <br>
     <em>Columns can be re-ordered by dragging their respective header.</em>"
   )

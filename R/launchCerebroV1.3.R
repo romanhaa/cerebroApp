@@ -13,8 +13,11 @@
 #' @param crb_file_to_load Path to \code{.crb} file to load on launch of
 #' Cerebro. Useful when using/hosting Cerebro in \code{closed} mode. Defaults to
 #' \code{NULL}.
+#' @param welcome_message \code{string} with custom welcome message to display
+#' in the "Load data" tab. Can contain HTML formatting, e.g.
+#' \code{'<h3>Hi!</h3>'}. Defaults to \code{NULL}.
 #' @param ... Further parameters that are used by \code{shiny::runApp}, e.g.
-#' \code{host} an \code{port}.
+#' \code{host} or \code{port}.
 #'
 #' @return
 #' Shiny application.

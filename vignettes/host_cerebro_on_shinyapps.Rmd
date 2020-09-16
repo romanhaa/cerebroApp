@@ -143,8 +143,8 @@ The larger the data set you want to upload to Cerebro, the more memory will be n
 
 # See also
 
-* `vignette('launch_cerebro_with_pre-loaded_data_set')`
-* `vignette('protect_cerebro_with_login')`
+* [Launch Cerebro with pre-loaded data set](launch_cerebro_with_pre-loaded_data_set.html)
+* [Control access to Cerebro with a login page](control_access_to_cerebro_with_a_login_page.html)
 
 # Known issues
 

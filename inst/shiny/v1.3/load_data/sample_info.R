@@ -49,7 +49,7 @@ output[["load_data_experiment_name"]] <- renderValueBox({
 ## number of cells
 output[["load_data_number_of_cells"]] <- renderValueBox({
   valueBox(
-    value = formatC(ncol(getExpression()), format = "f", big.mark = ",", digits = 0),
+    value = formatC(length(getCellNames()), format = "f", big.mark = ",", digits = 0),
     subtitle = "Cells",
     color = "light-blue"
   )
