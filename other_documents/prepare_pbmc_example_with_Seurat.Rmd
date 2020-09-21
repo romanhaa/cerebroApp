@@ -1,6 +1,22 @@
-# How to generate the Seurat PBMC example data set used in the examples parts of cerebroApp function
+---
+title: "How to generate the Seurat PBMC example data set used in the examples parts of cerebroApp function"
+author: "Roman Hillje"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    toc: true
+    number_sections: true
+    self_contained: yes
+    mode: selfcontained
+vignette: >
+  %\VignetteIndexEntry{How to generate the Seurat PBMC example data set used in the examples parts of cerebroApp function}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
 
-```r
+Run this.
+
+```{r}
 library(Seurat)
 library(cerebroApp)
 
@@ -40,5 +56,5 @@ pbmc <- getMarkerGenes(
   groups = c('sample','seurat_clusters')
 )
 
-saveRDS(pbmc, 'inst/extdata/v1.3/pbmc_seurat.rds')
+saveRDS(pbmc, '~/Research/GitHub/cerebroApp_v1.3/inst/extdata/v1.3/pbmc_seurat.rds')
 ```

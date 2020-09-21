@@ -1,6 +1,23 @@
-# How to generate the SCE PBMC example data set used in the examples parts of cerebroApp function
+---
+title: "How to generate the SCE PBMC example data set used in the examples parts of cerebroApp function"
+author: "Roman Hillje"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    toc: true
+    number_sections: true
+    self_contained: yes
+    mode: selfcontained
+vignette: >
+  %\VignetteIndexEntry{How to generate the SCE PBMC example data set used in the examples parts of cerebroApp function}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
 
-```r
+Run this.
+
+```{r}
+library(dplyr)
 library(scran)
 library(scater)
 library(cerebroApp)
@@ -34,5 +51,5 @@ pbmc$cluster <- factor(cluster)
 ## calculate UMAP
 pbmc <- runUMAP(pbmc)
 
-saveRDS(pbmc, 'inst/extdata/v1.3/pbmc_SCE.rds')
+saveRDS(pbmc, '~/Research/GitHub/cerebroApp_v1.3/inst/extdata/v1.3/pbmc_SCE.rds')
 ```
