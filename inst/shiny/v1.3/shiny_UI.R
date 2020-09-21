@@ -12,13 +12,14 @@ cerebroBox <- function(title, content) {
   )
 }
 
-cerebroInfoButton <- function(id) {
+cerebroInfoButton <- function(id, ...) {
   actionButton(
     inputId = id,
     label = "info",
     icon = NULL,
     class = "btn-xs",
-    title = "Show additional information for this panel."
+    title = "Show additional information for this panel.",
+    ...
   )
 }
 

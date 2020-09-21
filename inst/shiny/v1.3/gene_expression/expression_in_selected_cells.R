@@ -114,7 +114,7 @@ output[["expression_in_selected_cells"]] <- plotly::renderPlotly({
       ),
       yaxis = list(
         title = "Expression level",
-        range = c(0, max(cells_df$level) * 1.2),
+        range = c(0, max(cells_df$level, na.rm = TRUE) * 1.2),
         hoverformat = ".2f",
         mirror = TRUE,
         showline = TRUE

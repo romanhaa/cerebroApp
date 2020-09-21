@@ -475,8 +475,7 @@ output[["expression_projection_UI"]] <- renderUI({
             label = "info",
             icon = NULL,
             class = "btn-xs",
-            title = "Show additional information for this panel.",
-            style = "margin-right: 5px"
+            title = "Show additional information for this panel."
           )
         ),
         tagList(
@@ -506,7 +505,7 @@ output[["expression_projection_UI"]] <- renderUI({
               icon = NULL,
               class = "btn-xs",
               title = "Show additional information for this panel.",
-              style = "margin-right: 5px"
+              style = "margin-right: 3px"
             ),
             shinyFiles::shinySaveButton(
               "expression_projection_export",
@@ -515,7 +514,7 @@ output[["expression_projection_UI"]] <- renderUI({
               filetype = "pdf",
               viewtype = "icon",
               class = "btn-xs",
-              style = "margin-right: 5px"
+              style = "margin-right: 3px"
             ),
             shinyWidgets::dropdownButton(
               tags$div(
@@ -818,7 +817,7 @@ expression_projection_parameters_info <- list(
       <li><b>Point opacity:</b> Controls the transparency of the cells.</li>
       <li><b>Color scale:</b> Choose your prefered color scale.</li>
       <li><b>Range of color scale:</b> Using the sliders, you can set the limits for the color scale. Values outside the scale will be shown in the color corresponding to the min/max value, respectively.</li>
-      <li><b>Range of X/Y axis:</b> Set the X/Y axis limits. This is useful when you want to change the aspect ratio of the plot.</li>
+      <li><b>Range of X/Y axis (located in dropdown menu above the projection):</b> Set the X/Y axis limits. This is useful when you want to change the aspect ratio of the plot.</li>
     </ul>
     "
   )

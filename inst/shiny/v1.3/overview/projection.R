@@ -20,8 +20,7 @@ output[["overview_projection_UI"]] <- renderUI({
             label = "info",
             icon = NULL,
             class = "btn-xs",
-            title = "Show additional information for this panel.",
-            style = "margin-right: 5px"
+            title = "Show additional information for this panel."
           )
         ),
         uiOutput("overview_projection_parameters_UI")
@@ -35,10 +34,10 @@ output[["overview_projection_UI"]] <- renderUI({
           actionButton(
             inputId = "overview_projection_info",
             label = "info",
+            title = "Show additional information for this panel.",
             icon = NULL,
             class = "btn-xs",
-            title = "Show additional information for this panel.",
-            style = "margin-right: 5px"
+            style = "margin-right: 3px"
           ),
           shinyFiles::shinySaveButton(
             "overview_projection_export",
@@ -46,7 +45,8 @@ output[["overview_projection_UI"]] <- renderUI({
             title = "Export dimensional reduction to PDF file.",
             filetype = "pdf",
             viewtype = "icon",
-            class = "btn-xs"
+            class = "btn-xs",
+            style = "margin-right: 3px"
           ),
           shinyWidgets::dropdownButton(
             tags$div(
@@ -161,6 +161,22 @@ outputOptions(
 )
 
 ##----------------------------------------------------------------------------##
+## Info box that gets shown when pressing the "info" button.
+##----------------------------------------------------------------------------##
+
+observeEvent(input[["overview_projection_parameters_info"]], {
+  showModal(
+    modalDialog(
+      overview_projection_parameters_info[["text"]],
+      title = overview_projection_parameters_info[["title"]],
+      easyClose = TRUE,
+      footer = NULL,
+      size = "l"
+    )
+  )
+})
+
+##----------------------------------------------------------------------------##
 ## Text in info box.
 ##----------------------------------------------------------------------------##
 
@@ -174,8 +190,7 @@ overview_projection_parameters_info <- list(
       <li><b>Show % of cells:</b> Using the slider, you can randomly remove a fraction of cells from the plot. This can be useful for large data sets and/or computers with limited resources.</li>
       <li><b>Point size:</b> Controls how large the cells should be.</li>
       <li><b>Point opacity:</b> Controls the transparency of the cells.</li>
-      <li><b>Range of color scale:</b> Using the sliders, you can set the limits for the color scale. Values outside the scale will be shown in the color corresponding to the min/max value, respectively.</li>
-      <li><b>Range of X/Y axis:</b> Set the X/Y axis limits. This is useful when you want to change the aspect ratio of the plot.</li>
+      <li><b>Range of X/Y axis (located in dropdown menu above the projection):</b> Set the X/Y axis limits. This is useful when you want to change the aspect ratio of the plot.</li>
     </ul>
     "
   )

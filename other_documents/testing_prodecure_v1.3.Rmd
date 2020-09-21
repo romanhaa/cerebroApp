@@ -404,12 +404,21 @@ Cerebro.options <- list(
 )
 ```
 
+### Pre-load with example data set
+
+```{r eval=FALSE}
+Cerebro.options <- list(
+  "mode" = "open",
+  "crb_file_to_load" = "~/Research/GitHub/cerebroApp_v1.3/inst/extdata/v1.3/example.crb",
+  "cerebro_root" = "~/Research/GitHub/cerebroApp_v1.3/inst"
+)
+```
+
 ### No pre-loading
 
 ```{r eval=FALSE}
 Cerebro.options <- list(
   "mode" = "open",
-  "crb_file_to_load" = NULL,
   "cerebro_root" = "~/Research/GitHub/cerebroApp_v1.3/inst"
 )
 ```

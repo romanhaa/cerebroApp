@@ -19,7 +19,16 @@ output[["trajectory_projection_UI"]] <- renderUI({
     fluidRow(
       column(width = 3, offset = 0, style = "padding: 0px;",
         cerebroBox(
-          title = "Input parameters",
+          title = tagList(
+            "Input parameters",
+            actionButton(
+              inputId = "trajectory_projection_parameters_info",
+              label = "info",
+              icon = NULL,
+              class = "btn-xs",
+              title = "Show additional information for this panel."
+            )
+          ),
           tagList(
             uiOutput("trajectory_projection_input")
           )
@@ -35,7 +44,7 @@ output[["trajectory_projection_UI"]] <- renderUI({
               icon = NULL,
               class = "btn-xs",
               title = "Show additional information for this panel.",
-              style = "margin-right: 5px"
+              style = "margin-right: 3px"
             ),
             shinyFiles::shinySaveButton(
               "trajectory_projection_export",
@@ -106,6 +115,40 @@ output[["trajectory_projection_input"]] <- renderUI({
     )
   )
 })
+
+##----------------------------------------------------------------------------##
+## Info box that gets shown when pressing the "info" button.
+##----------------------------------------------------------------------------##
+
+observeEvent(input[["trajectory_projection_parameters_info"]], {
+  showModal(
+    modalDialog(
+      trajectory_projection_parameters_info$text,
+      title = trajectory_projection_parameters_info$title,
+      easyClose = TRUE,
+      footer = NULL,
+      size = "l"
+    )
+  )
+})
+
+##----------------------------------------------------------------------------##
+## Text in info box.
+##----------------------------------------------------------------------------##
+
+trajectory_projection_parameters_info <- list(
+  title = "Parameters for projection of trajectory",
+  text = HTML("
+    The elements in this panel allow you to control what and how results are displayed across the whole tab.
+    <ul>
+      <li><b>Color cells by:</b> Select which variable, categorical or continuous, from the meta data should be used to color the cells.</li>
+      <li><b>Show % of cells:</b> Using the slider, you can randomly remove a fraction of cells from the plot. This can be useful for large data sets and/or computers with limited resources.</li>
+      <li><b>Point size:</b> Controls how large the cells should be.</li>
+      <li><b>Point opacity:</b> Controls the transparency of the cells.</li>
+    </ul>
+    "
+  )
+)
 
 ##----------------------------------------------------------------------------##
 ## Plot of projection.

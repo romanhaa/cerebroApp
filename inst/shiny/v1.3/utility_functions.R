@@ -109,9 +109,12 @@ prettifyTable <- function(
   ## find columns with very long (character) content so that they can be
   ## hidden
   columns_with_long_content <- c()
-  if ( hide_long_columns == TRUE ) {
+  if (
+    hide_long_columns == TRUE &&
+    length(columns_character) >= 1
+  ) {
     for ( i in columns_character ) {
-      if ( max(stringr::str_length(table[[i]])) > 200 ) {
+      if ( max(stringr::str_length(table[[i]]), na.rm = TRUE) > 200 ) {
         columns_with_long_content <- c(columns_with_long_content, i)
       }
     }

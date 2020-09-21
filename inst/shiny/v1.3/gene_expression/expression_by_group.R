@@ -85,7 +85,7 @@ output[["expression_by_group"]] <- plotly::renderPlotly({
       ),
       yaxis = list(
         title = "Expression level",
-        range = c(0, max(gene_expression_plot_data()$level) * 1.2),
+        range = c(0, max(gene_expression_plot_data()$level, na.rm = TRUE) * 1.2),
         hoverformat = ".2f",
         mirror = TRUE,
         showline = TRUE

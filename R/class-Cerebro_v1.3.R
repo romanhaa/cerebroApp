@@ -858,15 +858,20 @@ Cerebro_v1.3 <- R6::R6Class(
 
       ## stop if table is not a data frame
       if ( !is.data.frame(table) ) {
-        stop(
-          glue::glue(
-            'Cannot add table `{table}` because it is not a data frame.'
-          ),
-          call. = FALSE
-        )
+        if ( 'DFrame' %in% class(table) ) {
+          table <- as.data.frame(table)
+        } else {
+          stop(
+            glue::glue(
+              'Cannot add table `{name}` because it is not a data frame.'
+            ),
+            call. = FALSE
+          )
+        }
+      }
 
       ## stop if `name` is already used
-      } else if (
+      if (
         !is.null(self$extra_material) &&
         !is.null(self$extra_material$tables) &&
         is.list(self$extra_material$tables) &&

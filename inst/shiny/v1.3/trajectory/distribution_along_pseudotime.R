@@ -19,7 +19,10 @@ output[["trajectory_distribution_along_pseudotime_UI"]] <- renderUI({
     cerebroBox(
       title = tagList(
         boxTitle("Distribution along pseudotime"),
-        cerebroInfoButton("trajectory_distribution_along_pseudotime_info"),
+        cerebroInfoButton(
+          "trajectory_distribution_along_pseudotime_info",
+          style = "margin-right: 3px"
+        ),
         shinyWidgets::dropdownButton(
           tags$div(
             style = "color: black !important;",

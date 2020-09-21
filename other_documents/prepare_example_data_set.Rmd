@@ -1,12 +1,28 @@
-# How to generate the pre-loaded example data set for the Cerebro user interface
+---
+title: "How to generate the pre-loaded example data set for the Cerebro user interface"
+author: "Roman Hillje"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    toc: true
+    number_sections: true
+    self_contained: yes
+    mode: selfcontained
+vignette: >
+  %\VignetteIndexEntry{How to generate the pre-loaded example data set for the Cerebro user interface}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Preparation
 
 ## Download raw data
 
 Download raw data from Cerebro GitHub repository: <https://github.com/romanhaa/Cerebro/blob/master/examples/pbmc_10k_v3/raw_data/filtered_feature_bc_matrix.h5>
 
-## Preparation
+## Load packages
 
-```r
+```{r load_packages, message=FALSE}
 library(dplyr)
 library(Seurat)
 library(SingleR)
@@ -19,14 +35,16 @@ set.seed(1234567)
 
 ## Load and randomly downsample data to 501 cells
 
-```r
+```{r load_raw_data}
 feature_matrix <- Read10X_h5('~/Downloads/filtered_feature_bc_matrix.h5')
 feature_matrix <- feature_matrix[ , sample(1:ncol(feature_matrix), 501) ]
 ```
 
-## Basic Seurat workflow
+# Seurat workflow
 
-```r
+## Pre-processing
+
+```{r pre-processing}
 seurat <- CreateSeuratObject(
   project = 'pbmc_10k_v3',
   counts = feature_matrix,
@@ -41,7 +59,7 @@ seurat <- RunPCA(seurat, npcs = 30, features = seurat@assays$RNA@var.features)
 
 ## Clustering
 
-```r
+```{r clustering}
 seurat <- FindNeighbors(seurat)
 seurat <- FindClusters(seurat, resolution = 0.5)
 seurat@meta.data$RNA_snn_res.0.5 <- NULL
@@ -49,7 +67,7 @@ seurat@meta.data$RNA_snn_res.0.5 <- NULL
 
 ## Randomly assign cells to samples
 
-```r
+```{r assign_sample_info}
 sample_info <- rep(NA, 501)
 sample_info[1:166] <- 'pbmc_10k_v3_rep1'
 sample_info[167:334] <- 'pbmc_10k_v3_rep2'
@@ -60,7 +78,7 @@ seurat@meta.data$sample <- sample_info
 
 ## Cell cycle analysis
 
-```r
+```{r cell_cycle_analysis}
 seurat <- CellCycleScoring(
 seurat,
   g2m.features = cc.genes$g2m.genes,
@@ -73,7 +91,7 @@ seurat@misc$gene_lists$S_phase_genes <- cc.genes$s.genes
 
 ## Dimensional reduction
 
-```r
+```{r dimensional_reduction}
 seurat <- RunTSNE(
   seurat,
   reduction.name = 'tSNE',
@@ -113,9 +131,9 @@ seurat <- RunUMAP(
 )
 ```
 
-## Curate meta data
+# Curate meta data
 
-```r
+```{r add_meta_data}
 seurat@misc$experiment <- list(
   experiment_name = 'pbmc_10k_v3',
   organism = 'hg',
@@ -146,9 +164,9 @@ seurat@misc$technical_info <- list(
 )
 ```
 
-## Assign cell types
+# Cell type annotation
 
-```r
+```{r cell_type_annotation}
 singler_ref <- BlueprintEncodeData()
 
 singler_results_blueprintencode_main <- SingleR(
@@ -170,11 +188,11 @@ for ( i in seq_len(nrow(singler_scores)) ) {
 seurat@meta.data$cell_type_singler_blueprintencode_main_score <- singler_scores$assigned_score
 ```
 
-## Calculate relationship trees
+# Relationship trees
 
-### Samples
+## Samples
 
-```r
+```{r tree_of_samples}
 Idents(seurat) <- "sample"
 seurat <- BuildClusterTree(
   seurat,
@@ -186,9 +204,9 @@ seurat <- BuildClusterTree(
 seurat@misc$trees$sample <- seurat@tools$BuildClusterTree
 ```
 
-### Clusters
+## Clusters
 
-```r
+```{r tree_of_clusters}
 Idents(seurat) <- "seurat_clusters"
 seurat <- BuildClusterTree(
   seurat,
@@ -200,9 +218,9 @@ seurat <- BuildClusterTree(
 seurat@misc$trees$seurat_clusters <- seurat@tools$BuildClusterTree
 ```
 
-### Cell types
+## Cell types
 
-```r
+```{r tree_of_cell_types}
 Idents(seurat) <- "cell_type_singler_blueprintencode_main"
 seurat <- BuildClusterTree(
   seurat,
@@ -215,9 +233,9 @@ seurat <- BuildClusterTree(
 seurat@misc$trees$cell_type_singler_blueprintencode_main <- seurat@tools$BuildClusterTree
 ```
 
-## cerebroApp functions
+# cerebroApp functions
 
-```r
+```{r cerebroApp_steps}
 seurat <- addPercentMtRibo(
   seurat,
   organism = 'hg',
@@ -256,11 +274,11 @@ seurat <- performGeneSetEnrichmentAnalysis(
 )
 ```
 
-## Trajectory analysis with Monocle
+# Trajectory analysis with Monocle
 
-### All cells
+## All cells
 
-```r
+```{r trajectory_all_cells}
 monocle_all_cells <- newCellDataSet(
   seurat@assays$RNA@counts,
   phenoData = new('AnnotatedDataFrame', data = seurat@meta.data),
@@ -279,9 +297,9 @@ monocle_all_cells <- orderCells(monocle_all_cells)
 seurat <- extractMonocleTrajectory(monocle_all_cells, seurat, 'all_cells')
 ```
 
-### Cells in G1 phase
+## Cells in G1 phase
 
-```r
+```{r trajectory_G1_cells}
 G1_cells <- which(seurat@meta.data$Phase == 'G1')
 
 monocle_subset_of_cells <- newCellDataSet(
@@ -302,20 +320,28 @@ monocle_subset_of_cells <- orderCells(monocle_subset_of_cells)
 seurat <- extractMonocleTrajectory(monocle_subset_of_cells, seurat, 'subset_of_cells')
 ```
 
-## Randomly downsample genes to 1000
+# Add table as extra material
 
-```r
+```{r extra_material_table}
+seurat@misc$extra_material$tables <- list(
+  "SingleR_results" = singler_results_blueprintencode_main
+)
+```
+
+# Randomly downsample genes to 1000
+
+```{r down-sampling_of_genes}
 seurat@assays$RNA@data <- seurat@assays$RNA@data[ sample(1:nrow(seurat@assays$RNA@data), 1000) , ]
 ```
 
-## Export to Cerebro format
+# Export to Cerebro format
 
-```r
+```{r export}
 exportFromSeurat(
   seurat,
   assay = 'RNA',
   slot = 'data',
-  file = 'inst/extdata/v1.3/example.crb',
+  file = '~/Research/GitHub/cerebroApp_v1.3/inst/extdata/v1.3/example.crb',
   experiment_name = 'pbmc_10k_v3',
   organism = 'hg',
   columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),

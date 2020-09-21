@@ -13,7 +13,10 @@ output[["groups_tree_UI"]] <- renderUI({
     cerebroBox(
       title = tagList(
         boxTitle("Relationship tree"),
-        cerebroInfoButton("groups_tree_info"),
+        cerebroInfoButton(
+          "groups_tree_info",
+          style = "margin-right: 3px"
+        ),
         shinyWidgets::dropdownButton(
           tags$div(
             style = "color: black !important;",
