@@ -92,8 +92,7 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
 
       ## count the number of cells by selected meta data column
       cells_df <- cells_df %>%
-        dplyr::select(!!! rlang::syms(color_variable)) %>%
-        dplyr::group_by_at(1) %>%
+        dplyr::group_by(dplyr::across(c(color_variable))) %>%
         dplyr::tally() %>%
         dplyr::ungroup()
 
@@ -150,13 +149,13 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
 
     ## remove unnecessary columns
     cells_df <- cells_df %>%
-      dplyr::select(group, !!! rlang::syms(color_variable))
+      dplyr::select(group, tidyselect::all_of(color_variable))
 
     ## create violin/box plot
     plot <- plotly::plot_ly(
         cells_df,
-        x = ~cells_df[[1]],
-        y = ~cells_df[[2]],
+        x = ~cells_df[[ 'group' ]],
+        y = ~cells_df[[ color_variable ]],
         type = "violin",
         box = list(
           visible = TRUE
