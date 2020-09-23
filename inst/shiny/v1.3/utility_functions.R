@@ -535,10 +535,10 @@ calculateTableAB <- function(
 
   ## prepare table in long format
   table <- table %>%
-    dplyr::arrange_at(c(groupA, groupB)) %>%
-    dplyr::group_by_at(c(groupA, groupB)) %>%
+    dplyr::arrange(dplyr::across(c(groupA, groupB))) %>%
+    dplyr::group_by(dplyr::across(c(groupA, groupB))) %>%
     dplyr::summarise(count = dplyr::n(), .groups = 'drop') %>%
-    dplyr::group_by_at(groupA) %>%
+    dplyr::group_by(dplyr::across(c(groupA))) %>%
     dplyr::mutate(total_cell_count = sum(count)) %>%
     dplyr::ungroup()
 
