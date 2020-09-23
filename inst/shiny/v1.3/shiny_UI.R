@@ -72,6 +72,7 @@ ui <- dashboardPage(
     )
   ),
   dashboardBody(
+    shinyjs::useShinyjs(),
     tags$script(HTML('$("body").addClass("fixed");')),
     tabItems(
       tab_load_data,

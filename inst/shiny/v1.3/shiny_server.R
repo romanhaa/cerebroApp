@@ -104,26 +104,76 @@ server <- function(input, output, session) {
   ##--------------------------------------------------------------------------##
   ## Show "Trajectory" tab if there are trajectories in the data set.
   ##--------------------------------------------------------------------------##
+
+  ## the tab item needs to be in the `output`
   output[["sidebar_item_trajectory"]] <- renderMenu({
-    if ( length(getMethodsForTrajectories()) > 0 ) {
-      menuItem("Trajectory", tabName = "trajectory", icon = icon("random"))
+    menuItem("Trajectory", tabName = "trajectory", icon = icon("random"))
+  })
+
+  ## this reactive value checks whether the tab should be shown or not
+  show_trajectory_tab <- reactive({
+
+    ## require a data set to be loaded
+    req(
+      !is.null(data_set())
+    )
+
+    ## if at least one trajectory is present, return TRUE, otherwise FALSE
+    if (
+      !is.null(getMethodsForTrajectories()) &&
+      length(getMethodsForTrajectories()) > 0
+    ) {
+      return(TRUE)
     } else {
-      NULL
+      return(FALSE)
     }
+  })
+
+  ## listen to reactive value defined above and toggle visibility of trajectory
+  ## tab accordingly
+  observe({
+    shinyjs::toggleElement(
+      id = "sidebar_item_trajectory",
+      condition = show_trajectory_tab()
+    )
   })
 
   ##--------------------------------------------------------------------------##
   ## Show "Extra material" tab if there is some extra material in the data set.
   ##--------------------------------------------------------------------------##
+
+  ## the tab item needs to be in the `output`
   output[["sidebar_item_extra_material"]] <- renderMenu({
+    menuItem("Extra material", tabName = "extra_material", icon = icon("gift"))
+  })
+
+  ## this reactive value checks whether the tab should be shown or not
+  show_extra_material_tab <- reactive({
+
+    ## require a data set to be loaded
+    req(
+      !is.null(data_set())
+    )
+
+    ## if at least one piece of extra material is present, return TRUE,
+    ## otherwise FALSE
     if (
       !is.null(getExtraMaterialCategories()) &&
       length(getExtraMaterialCategories()) > 0
     ) {
-      menuItem("Extra material", tabName = "extra_material", icon = icon("gift"))
+      return(TRUE)
     } else {
-      NULL
+      return(FALSE)
     }
+  })
+
+  ## listen to reactive value defined above and toggle visibility of extra
+  ## material tab accordingly
+  observe({
+    shinyjs::toggleElement(
+      id = "sidebar_item_extra_material",
+      condition = show_extra_material_tab()
+    )
   })
 
   ##--------------------------------------------------------------------------##
