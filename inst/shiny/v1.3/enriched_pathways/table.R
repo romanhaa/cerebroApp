@@ -192,11 +192,12 @@ output[["enriched_pathways_table"]] <- DT::renderDataTable(server = FALSE, {
   ) {
 
     ## don't proceed if selection of subgroup is not available
-    req(input[["enriched_pathways_table_select_group_level"]])
+    req(
+      input[["enriched_pathways_table_select_group_level"]]
+    )
 
     ## filter table
-    results_df <- results_df %>%
-      dplyr::filter_at(1, dplyr::all_vars(. == input[["enriched_pathways_table_select_group_level"]]))
+    results_df <- results_df[ which(results_df[[1]] == input[["enriched_pathways_table_select_group_level"]]) , ]
   }
 
   ## if the table is empty, e.g. because the filtering of results for a specific

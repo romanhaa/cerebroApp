@@ -125,7 +125,9 @@ output[["most_expressed_genes_table"]] <- DT::renderDataTable(server = FALSE, {
   )
 
   ## don't proceed if input is not a data frame
-  req(is.data.frame(results_df))
+  req(
+    is.data.frame(results_df)
+  )
 
   ## filter the table for a specific subgroup only if specified by the user,
   ## otherwise show all results
@@ -138,8 +140,7 @@ output[["most_expressed_genes_table"]] <- DT::renderDataTable(server = FALSE, {
     req(input[["most_expressed_genes_table_select_group_level"]])
 
     ## filter table
-    results_df <- results_df %>%
-      dplyr::filter_at(1, dplyr::all_vars(. == input[["most_expressed_genes_table_select_group_level"]]))
+    results_df <- results_df[ which(results_df[[1]] == input[["most_expressed_genes_table_select_group_level"]]) , ]
   }
 
   ## if the table is empty, e.g. because the filtering of results for a specific
