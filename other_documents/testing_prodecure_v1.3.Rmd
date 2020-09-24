@@ -446,6 +446,25 @@ source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/shiny_server.R")
 profvis::profvis(shiny::runApp(shiny::shinyApp(ui = ui, server = server)))
 ```
 
+### With reactlog
+
+```{r eval=FALSE}
+library(reactlog)
+
+reactlog_enable()
+
+options(shiny.maxRequestSize = 800 * 1024^2)
+
+source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/shiny_UI.R")
+source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/shiny_server.R")
+
+shiny::shinyApp(ui = ui, server = server)
+```
+
+```{r eval=FALSE}
+shiny::reactlogShow()
+```
+
 # Install `cerebroApp`
 
 ```{r eval=FALSE}
