@@ -714,6 +714,20 @@ exportFromSeurat <- function(
             content = object@misc$extra_material$tables[[i]]
           )
         }
+
+      ## do this if category is `plots`
+      } else if ( category == 'plots' ) {
+
+        ## go through tables
+        for ( i in seq_along(object@misc$extra_material$plots) ) {
+
+          ## export table
+          export$addExtraMaterial(
+            category = 'plots',
+            name = names(object@misc$extra_material$plots)[i],
+            content = object@misc$extra_material$plots[[i]]
+          )
+        }
       }
     }
   }

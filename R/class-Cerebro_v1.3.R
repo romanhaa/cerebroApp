@@ -823,14 +823,15 @@ Cerebro_v1.3 <- R6::R6Class(
     #' @description
     #' Add content to extra material field.
     #'
-    #' @param category Name of category. At the moment, only \code{tables} is a
-    #' valid category.
+    #' @param category Name of category. At the moment, only \code{tables} and
+    #' \code{plots} are valid categories. Tables must be in \code{data.frame}
+    #' format and plots must be created with \code{ggplot2}.
     #' @param name Name of material, will be used to select it in Cerebro.
     #' @param content Data that should be added.
     addExtraMaterial = function(category, name, content) {
 
       ## valid categories
-      valid_categories <- c('tables')
+      valid_categories <- c('tables','plots')
 
       ## proceed only if specified category is valid
       if ( category %in% valid_categories == FALSE ) {
@@ -846,6 +847,11 @@ Cerebro_v1.3 <- R6::R6Class(
       ## call function to add table
       if ( category == 'tables' ) {
         self$addExtraTable(name, content)
+      }
+
+      ## call function to add table
+      if ( category == 'plots' ) {
+        self$addExtraPlot(name, content)
       }
     },
 
@@ -879,7 +885,7 @@ Cerebro_v1.3 <- R6::R6Class(
       ) {
         stop(
           glue::glue(
-            'A table with name `{name}` already exists in the extra material. '
+            'A table with name `{name}` already exists in the extra material.'
           ),
           call. = FALSE
         )
@@ -887,6 +893,44 @@ Cerebro_v1.3 <- R6::R6Class(
       ## add table
       } else {
         self$extra_material$tables[[ name ]] <- table
+      }
+    },
+
+    #' @description
+    #' Add plot to `extra_material` slot.
+    #' 
+    #' @param name Name of material, will be used to select it in Cerebro.
+    #' @param plot Plot that should be added, must be created with
+    #' \code{ggplot2} (class: \code{ggplot}).
+    addExtraPlot = function(name, plot) {
+
+      ## stop if table is not a data frame
+      if ( "ggplot" %in% class(plot) == FALSE ) {
+        stop(
+          glue::glue(
+            'Cannot add plot `{name}` because it is not of class "ggplot".'
+          ),
+          call. = FALSE
+        )
+      }
+
+      ## stop if `name` is already used
+      if (
+        !is.null(self$extra_material) &&
+        !is.null(self$extra_material$plots) &&
+        is.list(self$extra_material$plots) &&
+        name %in% names(self$extra_material$plots)
+      ) {
+        stop(
+          glue::glue(
+            'A plot with name `{name}` already exists in the extra material.'
+          ),
+          call. = FALSE
+        )
+
+      ## add table
+      } else {
+        self$extra_material$plots[[ name ]] <- plot
       }
     },
 
@@ -927,6 +971,36 @@ Cerebro_v1.3 <- R6::R6Class(
     #' Requested table in \code{data.frame} format.
     getExtraTable = function(name) {
       return(self$extra_material$table[[ name ]])
+    },
+
+    #' @description
+    #' Check whether there are plots in the extra materials.
+    #'
+    #' @return
+    #' \code{logical} indicating whether there are plots in the extra
+    #' materials.
+    checkForExtraPlots = function() {
+      return(!is.null(self$extra_material$plots))
+    },
+
+    #' @description
+    #' Get names of plots in extra materials.
+    #'
+    #' @return
+    #' \code{vector} containing names of plots in extra materials.
+    getNamesOfExtraPlots = function() {
+      return(names(self$extra_material$plots))
+    },
+
+    #' @description
+    #' Get plot from extra materials.
+    #'
+    #' @param name Name of plot.
+    #'
+    #' @return
+    #' Requested plot made with \code{ggplot2}.
+    getExtraPlot = function(name) {
+      return(self$extra_material$plots[[ name ]])
     },
 
     #' @description

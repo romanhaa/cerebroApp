@@ -59,7 +59,7 @@ output[["extra_material_selected_content_UI"]] <- renderUI({
     input[["extra_material_selected_category"]]
   )
 
-  ##
+  ## if selected category is `tables`
   if (
     input[["extra_material_selected_category"]] == 'tables' &&
     checkForExtraTables() == TRUE
@@ -77,6 +77,31 @@ output[["extra_material_selected_content_UI"]] <- renderUI({
             "extra_material_selected_content",
             label = NULL,
             choices = getNamesOfExtraTables(),
+            width = "100%"
+          )
+        ),
+        column(2)
+      )
+    )
+
+  ## if selected category is `plots`
+  } else if (
+    input[["extra_material_selected_category"]] == 'plots' &&
+    checkForExtraPlots() == TRUE
+  ) {
+
+    ##
+    tagList(
+      div(
+        HTML('<h3 style="text-align: center; margin-top: 0"><strong>Choose a plot:</strong></h2>')
+      ),
+      fluidRow(
+        column(2),
+        column(8,
+          selectInput(
+            "extra_material_selected_content",
+            label = NULL,
+            choices = getNamesOfExtraPlots(),
             width = "100%"
           )
         ),

@@ -928,3 +928,18 @@ getExtraTable <- function(name) {
     return(data_set()$getExtraTable(name))
   }
 }
+checkForExtraPlots <- function() {
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$checkForExtraPlots())
+  }
+}
+getNamesOfExtraPlots <- function() {
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getNamesOfExtraPlots())
+  }
+}
+getExtraPlot <- function(name) {
+  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
+    return(data_set()$getExtraPlot(name))
+  }
+}

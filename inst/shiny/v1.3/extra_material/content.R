@@ -15,7 +15,7 @@ output[["extra_material_content_UI"]] <- renderUI({
     input[["extra_material_selected_category"]]
   )
 
-  ##
+  ## if selected category is `tables`
   if ( input[["extra_material_selected_category"]] == 'tables' ) {
 
     ##
@@ -48,11 +48,29 @@ output[["extra_material_content_UI"]] <- renderUI({
         )
       )
     )
+
+  ## if selected category is `plots`
+  } else if ( input[["extra_material_selected_category"]] == 'plots' ) {
+
+    ##
+    fluidRow(
+      cerebroBox(
+        title = tagList(
+          boxTitle("Extra material"),
+          cerebroInfoButton("extra_material_info")
+        ),
+        plotly::plotlyOutput(
+          "extra_material_plot",
+          width = "auto",
+          height = "50vh"
+        )
+      )
+    )
   }
 })
 
 ##----------------------------------------------------------------------------##
-## Table with results.
+## Table.
 ##----------------------------------------------------------------------------##
 
 output[["extra_material_table"]] <- DT::renderDataTable(server = FALSE, {
@@ -103,6 +121,37 @@ output[["extra_material_table"]] <- DT::renderDataTable(server = FALSE, {
 })
 
 ##----------------------------------------------------------------------------##
+## Plot.
+##----------------------------------------------------------------------------##
+
+output[["extra_material_plot"]] <- plotly::renderPlotly({
+
+  ##
+  req(
+    input[["extra_material_selected_category"]],
+    input[["extra_material_selected_content"]]
+  )
+
+  ## fetch results
+  plot <- getExtraPlot(input[["extra_material_selected_content"]])
+
+  ## don't proceed if input is not of class "ggplot"
+  req(
+    "ggplot" %in% class(plot)
+  )
+
+  ## convert to plotly
+  plot <- plotly::ggplotly(plot)
+
+  ## return plot either with WebGL or without, depending on setting
+  if ( preferences$use_webgl == TRUE ) {
+    plot %>% plotly::toWebGL()
+  } else {
+    plot
+  }
+})
+
+##----------------------------------------------------------------------------##
 ## Info box that gets shown when pressing the "info" button.
 ##----------------------------------------------------------------------------##
 
@@ -125,7 +174,7 @@ observeEvent(input[["extra_material_info"]], {
 extra_material_info <- list(
   title = "Extra material",
   text = HTML("
-    Here, additional material related to the data set can be stored. At the moment, only tables are supported, but depending on user requests, support for others types of content can be added in the future.<br>
+    Here, additional material related to the data set can be stored. At the moment, only tables and plots made with ggplot2 are supported, but depending on user requests, support for others types of content can be added in the future.<br>
     <br>
     For an explanation of the specific content, please refer to the person who exported this data set."
   )

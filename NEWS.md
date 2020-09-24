@@ -9,7 +9,7 @@ Because this is a relatively big release, I have prepared a dedicated article wi
 - Due to the changes in data structure, files exported with cerebroApp v1.3 can only be visualized in Cerebro v1.3. Moreover, files exported with cerebroApp v1.2 and earlier cannot be loaded into Cerebro v1.3. I apologize for any inconvenience but I believe these changes will lead to more stability coming releases.
 - Removed support for Seurat objects before v3.0. Users who need to continue working with older version of Seurat have two options: (1) use the `Seurat::UpdateSeuratObject()` function to update their Seurat object before exporting it for visualization in Cerebro; (2) use older Cerebro version. I apologize for the any trouble this may cause.
 - The "Gene expression" and "Gene set expression" tabs have been merged into the new "Gene (set) expression)" which gives you access to both.
-- The new "Extra material" tab allows you to export additional material related to the data set that you want to share with others. At the moment, only tables are supported, but support for other types of content can be added upon user request in the future.
+- The new "Extra material" tab allows you to export additional material related to the data set that you want to share with others. At the moment, only tables and plots (from ggplot2) are supported, but support for other types of content can be added upon user request in the future.
 
 ## New features
 
