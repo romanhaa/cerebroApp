@@ -1,13 +1,19 @@
 ##----------------------------------------------------------------------------##
 ## Custom functions.
 ##----------------------------------------------------------------------------##
-cerebroBox <- function(title, content) {
+cerebroBox <- function(
+  title,
+  content,
+  collapsible = TRUE,
+  collapsed = FALSE
+) {
   box(
     title = title,
     status = "primary",
     solidHeader = TRUE,
     width = 12,
-    collapsible = TRUE,
+    collapsible = collapsible,
+    collapsed = collapsed,
     content
   )
 }
