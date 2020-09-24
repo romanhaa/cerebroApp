@@ -112,6 +112,7 @@ output[["overview_projection_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 
 output[["overview_projection_main_parameters_UI"]] <- renderUI({
+
   tagList(
     selectInput(
       "overview_projection_to_display",
