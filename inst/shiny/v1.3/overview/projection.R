@@ -12,18 +12,48 @@ output[["overview_projection_UI"]] <- renderUI({
     ## selections and parameters
     column(width = 3, offset = 0, style = "padding: 0px;",
       cerebroBox(
-        title = 
-          tagList(
-            "Input parameters",
+        title = tagList(
+          "Main parameters",
           actionButton(
-            inputId = "overview_projection_parameters_info",
+            inputId = "overview_projection_main_parameters_info",
             label = "info",
             icon = NULL,
             class = "btn-xs",
-            title = "Show additional information for this panel."
+            title = "Show additional information for this panel.",
+            style = "margin-left: 5px"
           )
         ),
-        uiOutput("overview_projection_parameters_UI")
+        uiOutput("overview_projection_main_parameters_UI")
+      ),
+      cerebroBox(
+        title = tagList(
+          "Additional parameters",
+          actionButton(
+            inputId = "overview_projection_additional_parameters_info",
+            label = "info",
+            icon = NULL,
+            class = "btn-xs",
+            title = "Show additional information for this panel.",
+            style = "margin-left: 5px"
+          )
+        ),
+        uiOutput("overview_projection_additional_parameters_UI"),
+        collapsed = TRUE
+      ),
+      cerebroBox(
+        title = tagList(
+          "Group filters",
+          actionButton(
+            inputId = "overview_projection_group_filters_info",
+            label = "info",
+            icon = NULL,
+            class = "btn-xs",
+            title = "Show additional information for this panel.",
+            style = "margin-left: 5px"
+          )
+        ),
+        uiOutput("overview_projection_group_filters_UI"),
+        collapsed = TRUE
       )
     ),
     ## plot
@@ -51,9 +81,7 @@ output[["overview_projection_UI"]] <- renderUI({
           shinyWidgets::dropdownButton(
             tags$div(
               style = "color: black !important;",
-              tagList(
-                uiOutput("overview_projection_scales_UI")
-              )
+              uiOutput("overview_projection_scales_UI")
             ),
             circle = FALSE,
             icon = icon("cog"),
@@ -80,9 +108,10 @@ output[["overview_projection_UI"]] <- renderUI({
 })
 
 ##----------------------------------------------------------------------------##
-## UI elements to set parameters for the projection.
+## UI elements to set main parameters for the projection.
 ##----------------------------------------------------------------------------##
-output[["overview_projection_parameters_UI"]] <- renderUI({
+
+output[["overview_projection_main_parameters_UI"]] <- renderUI({
   tagList(
     selectInput(
       "overview_projection_to_display",
@@ -93,15 +122,48 @@ output[["overview_projection_parameters_UI"]] <- renderUI({
       "overview_point_color",
       label = "Color cells by",
       choices = colnames(getMetaData())[! colnames(getMetaData()) %in% c("cell_barcode")]
-    ),
-    sliderInput(
-      "overview_percentage_cells_to_show",
-      label = "Show % of cells",
-      min = scatter_plot_percentage_cells_to_show[["min"]],
-      max = scatter_plot_percentage_cells_to_show[["max"]],
-      step = scatter_plot_percentage_cells_to_show[["step"]],
-      value = scatter_plot_percentage_cells_to_show[["default"]]
-    ),
+    )
+  )
+})
+
+##----------------------------------------------------------------------------##
+## Info box that gets shown when pressing the "info" button.
+##----------------------------------------------------------------------------##
+
+observeEvent(input[["overview_projection_main_parameters_info"]], {
+  showModal(
+    modalDialog(
+      overview_projection_main_parameters_info[["text"]],
+      title = overview_projection_main_parameters_info[["title"]],
+      easyClose = TRUE,
+      footer = NULL,
+      size = "l"
+    )
+  )
+})
+
+##----------------------------------------------------------------------------##
+## Text in info box.
+##----------------------------------------------------------------------------##
+
+overview_projection_main_parameters_info <- list(
+  title = "Main parameters for projection",
+  text = HTML("
+    The elements in this panel allow you to control what and how results are displayed across the whole tab.
+    <ul>
+      <li><b>Projection:</b> Select here which projection you want to see in the scatter plot on the right.</li>
+      <li><b>Color cells by:</b> Select which variable, categorical or continuous, from the meta data should be used to color the cells.</li>
+    </ul>
+    "
+  )
+)
+
+##----------------------------------------------------------------------------##
+## UI elements to set additional parameters for the projection.
+##----------------------------------------------------------------------------##
+
+output[["overview_projection_additional_parameters_UI"]] <- renderUI({
+  tagList(
     sliderInput(
       "overview_point_size",
       label = "Point size",
@@ -117,13 +179,117 @@ output[["overview_projection_parameters_UI"]] <- renderUI({
       max = scatter_plot_point_opacity[["max"]],
       step = scatter_plot_point_opacity[["step"]],
       value = scatter_plot_point_opacity[["default"]]
+    ),
+    sliderInput(
+      "overview_percentage_cells_to_show",
+      label = "Show % of cells",
+      min = scatter_plot_percentage_cells_to_show[["min"]],
+      max = scatter_plot_percentage_cells_to_show[["max"]],
+      step = scatter_plot_percentage_cells_to_show[["step"]],
+      value = scatter_plot_percentage_cells_to_show[["default"]]
+    )
+  )
+})
+
+## make sure elements are loaded even though the box is collapsed
+outputOptions(
+  output,
+  "overview_projection_additional_parameters_UI",
+  suspendWhenHidden = FALSE
+)
+
+##----------------------------------------------------------------------------##
+## Info box that gets shown when pressing the "info" button.
+##----------------------------------------------------------------------------##
+
+observeEvent(input[["overview_projection_additional_parameters_info"]], {
+  showModal(
+    modalDialog(
+      overview_projection_additional_parameters_info[["text"]],
+      title = overview_projection_additional_parameters_info[["title"]],
+      easyClose = TRUE,
+      footer = NULL,
+      size = "l"
     )
   )
 })
 
 ##----------------------------------------------------------------------------##
+## Text in info box.
+##----------------------------------------------------------------------------##
+# <li><b>Range of X/Y axis (located in dropdown menu above the projection):</b> Set the X/Y axis limits. This is useful when you want to change the aspect ratio of the plot.</li>
+
+overview_projection_additional_parameters_info <- list(
+  title = "Additional parameters for projection",
+  text = HTML("
+    The elements in this panel allow you to control what and how results are displayed across the whole tab.
+    <ul>
+      <li><b>Point size:</b> Controls how large the cells should be.</li>
+      <li><b>Point opacity:</b> Controls the transparency of the cells.</li>
+      <li><b>Show % of cells:</b> Using the slider, you can randomly remove a fraction of cells from the plot. This can be useful for large data sets and/or computers with limited resources.</li>
+    </ul>
+    "
+  )
+)
+
+##----------------------------------------------------------------------------##
+## UI elements to set group filters for the projection.
+##----------------------------------------------------------------------------##
+
+output[["overview_projection_group_filters_UI"]] <- renderUI({
+  group_filters <- list()
+  for ( i in getGroups() ) {
+    group_filters[[i]] <- shinyWidgets::pickerInput(
+      paste0("overview_projection_group_filter_", i),
+      label = i,
+      choices = getGroupLevels(i),
+      selected = getGroupLevels(i),
+      options = list("actions-box" = TRUE),
+      multiple = TRUE
+    )
+  }
+  group_filters
+})
+
+##----------------------------------------------------------------------------##
+## Info box that gets shown when pressing the "info" button.
+##----------------------------------------------------------------------------##
+
+observeEvent(input[["overview_projection_group_filters_info"]], {
+  showModal(
+    modalDialog(
+      overview_projection_group_filters_info[["text"]],
+      title = overview_projection_group_filters_info[["title"]],
+      easyClose = TRUE,
+      footer = NULL,
+      size = "l"
+    )
+  )
+})
+
+##----------------------------------------------------------------------------##
+## Text in info box.
+##----------------------------------------------------------------------------##
+
+overview_projection_group_filters_info <- list(
+  title = "Group filters for projection",
+  text = HTML("
+    The elements in this panel allow you to select which cells should be plotted based on the group(s) they belong to. For each grouping variable, you can activate or deactivate group levels. Only cells that are pass all filters (for each grouping variable) are shown in the projection.
+    "
+  )
+)
+
+## make sure elements are loaded even though the box is collapsed
+outputOptions(
+  output,
+  "overview_projection_group_filters_UI",
+  suspendWhenHidden = FALSE
+)
+
+##----------------------------------------------------------------------------##
 ## UI elements to select X and Y limits in projection.
 ##----------------------------------------------------------------------------##
+
 output[["overview_projection_scales_UI"]] <- renderUI({
   projection_to_display <- if (
     is.null(input[["overview_projection_to_display"]]) ||
@@ -154,46 +320,11 @@ output[["overview_projection_scales_UI"]] <- renderUI({
   )
 })
 
+## make sure elements are loaded even though the box is collapsed
 outputOptions(
   output,
   "overview_projection_scales_UI",
   suspendWhenHidden = FALSE
-)
-
-##----------------------------------------------------------------------------##
-## Info box that gets shown when pressing the "info" button.
-##----------------------------------------------------------------------------##
-
-observeEvent(input[["overview_projection_parameters_info"]], {
-  showModal(
-    modalDialog(
-      overview_projection_parameters_info[["text"]],
-      title = overview_projection_parameters_info[["title"]],
-      easyClose = TRUE,
-      footer = NULL,
-      size = "l"
-    )
-  )
-})
-
-##----------------------------------------------------------------------------##
-## Text in info box.
-##----------------------------------------------------------------------------##
-
-overview_projection_parameters_info <- list(
-  title = "Parameters for projection",
-  text = HTML("
-    The elements in this panel allow you to control what and how results are displayed across the whole tab.
-    <ul>
-      <li><b>Projection:</b> Select here which projection you want to see in the scatter plot on the right.</li>
-      <li><b>Color cells by:</b> Select which variable, categorical or continuous, from the meta data should be used to color the cells.</li>
-      <li><b>Show % of cells:</b> Using the slider, you can randomly remove a fraction of cells from the plot. This can be useful for large data sets and/or computers with limited resources.</li>
-      <li><b>Point size:</b> Controls how large the cells should be.</li>
-      <li><b>Point opacity:</b> Controls the transparency of the cells.</li>
-      <li><b>Range of X/Y axis (located in dropdown menu above the projection):</b> Set the X/Y axis limits. This is useful when you want to change the aspect ratio of the plot.</li>
-    </ul>
-    "
-  )
 )
 
 ##----------------------------------------------------------------------------##
@@ -217,6 +348,17 @@ output[["overview_projection"]] <- plotly::renderPlotly({
 
   ## build data frame with data
   cells_df <- cbind(getProjection(projection_to_display), getMetaData())
+
+  ## available group filters
+  group_filters <- names(input)[grepl(names(input), pattern = 'overview_projection_group_filter_')]
+
+  ## remove cells based on group filters
+  for ( i in group_filters ) {
+    group <- strsplit(i, split = 'overview_projection_group_filter_')[[1]][2]
+    if ( group %in% colnames(cells_df) ) {
+      cells_df <- cells_df[which(cells_df[[group]] %in% input[[i]] ),]
+    }
+  }
 
   ## randomly remove cells (if necessary)
   cells_df <- randomlySubsetCells(cells_df, input[["overview_percentage_cells_to_show"]])

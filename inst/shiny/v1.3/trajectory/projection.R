@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------##
 ## Tab: Trajectory
 ##
-## Projection with trajectory.
+## Projection.
 ##----------------------------------------------------------------------------##
 
 ##----------------------------------------------------------------------------##
@@ -20,18 +20,47 @@ output[["trajectory_projection_UI"]] <- renderUI({
       column(width = 3, offset = 0, style = "padding: 0px;",
         cerebroBox(
           title = tagList(
-            "Input parameters",
+            "Main parameters",
             actionButton(
-              inputId = "trajectory_projection_parameters_info",
+              inputId = "trajectory_projection_main_parameters_info",
               label = "info",
               icon = NULL,
               class = "btn-xs",
-              title = "Show additional information for this panel."
+              title = "Show additional information for this panel.",
+              style = "margin-left: 5px"
             )
           ),
-          tagList(
-            uiOutput("trajectory_projection_input")
-          )
+          uiOutput("trajectory_projection_main_parameters_UI")
+        ),
+        cerebroBox(
+          title = tagList(
+            "Additional parameters",
+            actionButton(
+              inputId = "trajectory_projection_additional_parameters_info",
+              label = "info",
+              icon = NULL,
+              class = "btn-xs",
+              title = "Show additional information for this panel.",
+              style = "margin-left: 5px"
+            )
+          ),
+          uiOutput("trajectory_projection_additional_parameters_UI"),
+          collapsed = TRUE
+        ),
+        cerebroBox(
+          title = tagList(
+            "Group filters",
+            actionButton(
+              inputId = "trajectory_projection_group_filters_info",
+              label = "info",
+              icon = NULL,
+              class = "btn-xs",
+              title = "Show additional information for this panel.",
+              style = "margin-left: 5px"
+            )
+          ),
+          uiOutput("trajectory_projection_group_filters_UI"),
+          collapsed = TRUE
         )
       ),
       column(width = 9, offset = 0, style = "padding: 0px;",
@@ -75,28 +104,58 @@ output[["trajectory_projection_UI"]] <- renderUI({
 })
 
 ##----------------------------------------------------------------------------##
-## UI elements for input parameters of projection plot.
+## UI elements for main parameters of projection plot.
 ##----------------------------------------------------------------------------##
 
-output[["trajectory_projection_input"]] <- renderUI({
+output[["trajectory_projection_main_parameters_UI"]] <- renderUI({
+  selectInput(
+    "trajectory_point_color",
+    label = "Color cells by",
+    choices = c(
+      "state", "pseudotime",
+      colnames(getMetaData())[! colnames(getMetaData()) %in% c("cell_barcode")]
+    )
+  )
+})
+
+##----------------------------------------------------------------------------##
+## Info box that gets shown when pressing the "info" button.
+##----------------------------------------------------------------------------##
+
+observeEvent(input[["trajectory_projection_main_parameters_info"]], {
+  showModal(
+    modalDialog(
+      trajectory_projection_main_parameters_info$text,
+      title = trajectory_projection_main_parameters_info$title,
+      easyClose = TRUE,
+      footer = NULL,
+      size = "l"
+    )
+  )
+})
+
+##----------------------------------------------------------------------------##
+## Text in info box.
+##----------------------------------------------------------------------------##
+
+trajectory_projection_main_parameters_info <- list(
+  title = "Main parameters for projection of trajectory",
+  text = HTML("
+    The elements in this panel allow you to control what and how results are displayed across the whole tab.
+    <ul>
+      <li><b>Color cells by:</b> Select which variable, categorical or continuous, from the meta data should be used to color the cells.</li>
+    </ul>
+    "
+  )
+)
+
+##----------------------------------------------------------------------------##
+## UI elements for additional parameters of projection plot.
+##----------------------------------------------------------------------------##
+
+output[["trajectory_projection_additional_parameters_UI"]] <- renderUI({
 
   tagList(
-    selectInput(
-      "trajectory_point_color",
-      label = "Color cells by",
-      choices = c(
-        "state", "pseudotime",
-        colnames(getMetaData())[! colnames(getMetaData()) %in% c("cell_barcode")]
-      )
-    ),
-    sliderInput(
-      "trajectory_percentage_cells_to_show",
-      label = "Show % of cells",
-      min = scatter_plot_percentage_cells_to_show[["min"]],
-      max = scatter_plot_percentage_cells_to_show[["max"]],
-      step = scatter_plot_percentage_cells_to_show[["step"]],
-      value = scatter_plot_percentage_cells_to_show[["default"]]
-    ),
     sliderInput(
       "trajectory_point_size",
       label = "Point size",
@@ -112,19 +171,34 @@ output[["trajectory_projection_input"]] <- renderUI({
       max = scatter_plot_point_opacity[["max"]],
       step = scatter_plot_point_opacity[["step"]],
       value = scatter_plot_point_opacity[["default"]]
+    ),
+    sliderInput(
+      "trajectory_percentage_cells_to_show",
+      label = "Show % of cells",
+      min = scatter_plot_percentage_cells_to_show[["min"]],
+      max = scatter_plot_percentage_cells_to_show[["max"]],
+      step = scatter_plot_percentage_cells_to_show[["step"]],
+      value = scatter_plot_percentage_cells_to_show[["default"]]
     )
   )
 })
+
+## make sure elements are loaded even though the box is collapsed
+outputOptions(
+  output,
+  "trajectory_projection_additional_parameters_UI",
+  suspendWhenHidden = FALSE
+)
 
 ##----------------------------------------------------------------------------##
 ## Info box that gets shown when pressing the "info" button.
 ##----------------------------------------------------------------------------##
 
-observeEvent(input[["trajectory_projection_parameters_info"]], {
+observeEvent(input[["trajectory_projection_additional_parameters_info"]], {
   showModal(
     modalDialog(
-      trajectory_projection_parameters_info$text,
-      title = trajectory_projection_parameters_info$title,
+      trajectory_projection_additional_parameters_info$text,
+      title = trajectory_projection_additional_parameters_info$title,
       easyClose = TRUE,
       footer = NULL,
       size = "l"
@@ -136,16 +210,69 @@ observeEvent(input[["trajectory_projection_parameters_info"]], {
 ## Text in info box.
 ##----------------------------------------------------------------------------##
 
-trajectory_projection_parameters_info <- list(
-  title = "Parameters for projection of trajectory",
+trajectory_projection_additional_parameters_info <- list(
+  title = "Additional parameters for projection of trajectory",
   text = HTML("
     The elements in this panel allow you to control what and how results are displayed across the whole tab.
     <ul>
-      <li><b>Color cells by:</b> Select which variable, categorical or continuous, from the meta data should be used to color the cells.</li>
-      <li><b>Show % of cells:</b> Using the slider, you can randomly remove a fraction of cells from the plot. This can be useful for large data sets and/or computers with limited resources.</li>
       <li><b>Point size:</b> Controls how large the cells should be.</li>
       <li><b>Point opacity:</b> Controls the transparency of the cells.</li>
+      <li><b>Show % of cells:</b> Using the slider, you can randomly remove a fraction of cells from the plot. This can be useful for large data sets and/or computers with limited resources.</li>
     </ul>
+    "
+  )
+)
+
+##----------------------------------------------------------------------------##
+## UI elements for group filters of projection plot.
+##----------------------------------------------------------------------------##
+
+output[["trajectory_projection_group_filters_UI"]] <- renderUI({
+  group_filters <- list()
+  for ( i in getGroups() ) {
+    group_filters[[i]] <- shinyWidgets::pickerInput(
+      paste0("trajectory_projection_group_filter_", i),
+      label = i,
+      choices = getGroupLevels(i),
+      selected = getGroupLevels(i),
+      options = list("actions-box" = TRUE),
+      multiple = TRUE
+    )
+  }
+  group_filters
+})
+
+## make sure elements are loaded even though the box is collapsed
+outputOptions(
+  output,
+  "trajectory_projection_group_filters_UI",
+  suspendWhenHidden = FALSE
+)
+
+##----------------------------------------------------------------------------##
+## Info box that gets shown when pressing the "info" button.
+##----------------------------------------------------------------------------##
+
+observeEvent(input[["trajectory_projection_group_filters_info"]], {
+  showModal(
+    modalDialog(
+      trajectory_projection_group_filters_info$text,
+      title = trajectory_projection_group_filters_info$title,
+      easyClose = TRUE,
+      footer = NULL,
+      size = "l"
+    )
+  )
+})
+
+##----------------------------------------------------------------------------##
+## Text in info box.
+##----------------------------------------------------------------------------##
+
+trajectory_projection_group_filters_info <- list(
+  title = "Group filters for projection of trajectory",
+  text = HTML("
+    The elements in this panel allow you to select which cells should be plotted based on the group(s) they belong to. For each grouping variable, you can activate or deactivate group levels. Only cells that are pass all filters (for each grouping variable) are shown in the projection.
     "
   )
 )
@@ -175,6 +302,17 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
   ## build data frame with data
   cells_df <- cbind(trajectory_data[["meta"]], getMetaData()) %>%
     dplyr::filter(!is.na(pseudotime))
+
+  ## available group filters
+  group_filters <- names(input)[grepl(names(input), pattern = 'trajectory_projection_group_filter_')]
+
+  ## remove cells based on group filters
+  for ( i in group_filters ) {
+    group <- strsplit(i, split = 'trajectory_projection_group_filter_')[[1]][2]
+    if ( group %in% colnames(cells_df) ) {
+      cells_df <- cells_df[which(cells_df[[group]] %in% input[[i]] ),]
+    }
+  }
 
   ## randomly remove cells (if necessary)
   cells_df <- randomlySubsetCells(cells_df, input[["trajectory_percentage_cells_to_show"]])

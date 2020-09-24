@@ -87,9 +87,9 @@ gene_expression_plot_data <- reactive({
 
     ## build data frame with data
     cells_df <- cbind(
-        getProjection(input[["expression_projection_to_display"]]),
-        getMetaData()
-      )
+      getProjection(input[["expression_projection_to_display"]]),
+      getMetaData()
+    )
 
   ## ... trajectory
   } else {
@@ -112,6 +112,17 @@ gene_expression_plot_data <- reactive({
     ## merge meta data and trajectory info and remove cells without pseudotime
     cells_df <- cbind(trajectory_data[["meta"]], getMetaData()) %>%
       dplyr::filter(!is.na(pseudotime))
+  }
+
+  ## available group filters
+  group_filters <- names(input)[grepl(names(input), pattern = 'expression_projection_group_filter_')]
+
+  ## remove cells based on group filters
+  for ( i in group_filters ) {
+    group <- strsplit(i, split = 'expression_projection_group_filter_')[[1]][2]
+    if ( group %in% colnames(cells_df) ) {
+      cells_df <- cells_df[which(cells_df[[group]] %in% input[[i]] ),]
+    }
   }
 
   ## randomly remove cells (if necessary)

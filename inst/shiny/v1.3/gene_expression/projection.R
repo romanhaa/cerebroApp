@@ -467,29 +467,79 @@ output[["expression_projection_UI"]] <- renderUI({
   fluidRow(
     column(
       width = 3, offset = 0, style = "padding: 0px;",
-      cerebroBox(
-        title = tagList(
-          "Input parameters",
-          actionButton(
-            inputId = "expression_projection_parameters_info",
-            label = "info",
-            icon = NULL,
-            class = "btn-xs",
-            title = "Show additional information for this panel."
+      tagList(
+        cerebroBox(
+          title = tagList(
+            "Main parameters",
+            actionButton(
+              inputId = "expression_projection_main_parameters_info",
+              label = "info",
+              icon = NULL,
+              class = "btn-xs",
+              title = "Show additional information for this panel.",
+              style = "margin-left: 5px"
+            )
+          ),
+          tagList(
+            shinyWidgets::radioGroupButtons(
+               inputId = "expression_analysis_mode",
+               label = NULL,
+               choices = c("Gene(s)", "Gene set"),
+               status = "primary",
+               justified = TRUE,
+               width = "100%"
+            ),
+            uiOutput("expression_projection_input_type_UI"),
+            uiOutput("expression_projection_select_projection_UI")
           )
         ),
-        tagList(
-          shinyWidgets::radioGroupButtons(
-             inputId = "expression_analysis_mode",
-             label = NULL,
-             choices = c("Gene(s)", "Gene set"),
-             status = "primary",
-             justified = TRUE,
-             width = "100%"
+        cerebroBox(
+          title = tagList(
+            "Additional parameters",
+            actionButton(
+              inputId = "expression_projection_additional_parameters_info",
+              label = "info",
+              icon = NULL,
+              class = "btn-xs",
+              title = "Show additional information for this panel.",
+              style = "margin-left: 5px"
+            )
           ),
-          uiOutput("expression_projection_input_type_UI"),
-          uiOutput("expression_projection_parameters_UI"),
-          uiOutput("expression_projection_color_scale_range_UI")
+          uiOutput("expression_projection_select_additional_parameters_UI"),
+          collapsed = TRUE
+        ),
+        cerebroBox(
+          title = tagList(
+            "Group filters",
+            actionButton(
+              inputId = "expression_projection_group_filters_info",
+              label = "info",
+              icon = NULL,
+              class = "btn-xs",
+              title = "Show additional information for this panel.",
+              style = "margin-left: 5px"
+            )
+          ),
+          uiOutput("expression_projection_group_filters_UI"),
+          collapsed = TRUE
+        ),
+        cerebroBox(
+          title = tagList(
+            "Color scale",
+            actionButton(
+              inputId = "expression_projection_color_scale_info",
+              label = "info",
+              icon = NULL,
+              class = "btn-xs",
+              title = "Show additional information for this panel.",
+              style = "margin-left: 5px"
+            )
+          ),
+          tagList(
+            uiOutput("expression_projection_color_scale_UI"),
+            uiOutput("expression_projection_color_scale_range_UI"),
+          ),
+          collapsed = TRUE
         )
       )
     ),
@@ -591,10 +641,10 @@ output[["expression_projection_input_type_UI"]] <- renderUI({
 })
 
 ##----------------------------------------------------------------------------##
-## UI elements to collect parameters for plot from user.
+## UI elements to choose which projection/trajectory to show.
 ##----------------------------------------------------------------------------##
 
-output[["expression_projection_parameters_UI"]] <- renderUI({
+output[["expression_projection_select_projection_UI"]] <- renderUI({
 
   ## get available projections
   available_projections <- availableProjections()
@@ -632,23 +682,54 @@ output[["expression_projection_parameters_UI"]] <- renderUI({
     }
   }
 
+  selectInput(
+    "expression_projection_to_display",
+    label = "Projection",
+    choices = list(
+      "Projections" = as.list(available_projections),
+      "Trajectories" = as.list(available_trajectories)
+    )
+  )
+})
+
+##----------------------------------------------------------------------------##
+## Info box that gets shown when pressing the "info" button.
+##----------------------------------------------------------------------------##
+
+observeEvent(input[["expression_projection_main_parameters_info"]], {
+  showModal(
+    modalDialog(
+      expression_projection_main_parameters_info$text,
+      title = expression_projection_main_parameters_info$title,
+      easyClose = TRUE,
+      footer = NULL,
+      size = "l"
+    )
+  )
+})
+
+##----------------------------------------------------------------------------##
+## Text in info box.
+##----------------------------------------------------------------------------##
+
+expression_projection_main_parameters_info <- list(
+  title = "Main parameters for gene (set) expression",
+  text = HTML("
+    The elements in this panel allow you to control what and how results are displayed across the whole tab.
+    <ul>
+      <li><b>Gene(s) / Gene set:</b> Select whether you would like to select individual genes or gene sets. In the case of 'Gene(s)', you can select one or multiple genes from the input field below. If you select multiple genes, the mean expression across the selected genes will be calculated for each cell. If you select 'Gene set', you can select a gene set from the MSigDB. Species-specific gene names will be tried to retrieve, otherwise gene name matching is attempted. A list of which genes are present or missing in the data set can be found below the projection.</li>
+      <li><b>Projection:</b> Select here which projection you want to see in the scatter plot on the right.</li>
+    </ul>
+    "
+  )
+)
+
+##----------------------------------------------------------------------------##
+## UI elements to set additional plotting parameters.
+##----------------------------------------------------------------------------##
+
+output[["expression_projection_select_additional_parameters_UI"]] <- renderUI({
   tagList(
-    selectInput(
-      "expression_projection_to_display",
-      label = "Projection",
-      choices = list(
-        "Projections" = as.list(available_projections),
-        "Trajectories" = as.list(available_trajectories)
-      )
-    ),
-    sliderInput(
-      "expression_percentage_cells_to_show",
-      label = "Show % of cells",
-      min = scatter_plot_percentage_cells_to_show[["min"]],
-      max = scatter_plot_percentage_cells_to_show[["max"]],
-      step = scatter_plot_percentage_cells_to_show[["step"]],
-      value = scatter_plot_percentage_cells_to_show[["default"]]
-    ),
     selectInput(
       "expression_projection_plotting_order",
       label = "Plotting order",
@@ -671,20 +752,135 @@ output[["expression_projection_parameters_UI"]] <- renderUI({
       step = scatter_plot_point_opacity[["step"]],
       value = scatter_plot_point_opacity[["default"]]
     ),
-    hr(),
-    selectInput(
-      "expression_projection_color_scale",
-      label = "Color scale",
-      choices = c("YlGnBu", "YlOrRd","Blues","Greens","Reds","RdBu","viridis"),
-      selected = "YlGnBu"
+    sliderInput(
+      "expression_percentage_cells_to_show",
+      label = "Show % of cells",
+      min = scatter_plot_percentage_cells_to_show[["min"]],
+      max = scatter_plot_percentage_cells_to_show[["max"]],
+      step = scatter_plot_percentage_cells_to_show[["step"]],
+      value = scatter_plot_percentage_cells_to_show[["default"]]
+    )
+  )
+})
+
+## make sure elements are loaded even though the box is collapsed
+outputOptions(
+  output,
+  "expression_projection_select_additional_parameters_UI",
+  suspendWhenHidden = FALSE
+)
+
+##----------------------------------------------------------------------------##
+## Info box that gets shown when pressing the "info" button.
+##----------------------------------------------------------------------------##
+
+observeEvent(input[["expression_projection_additional_parameters_info"]], {
+  showModal(
+    modalDialog(
+      expression_projection_additional_parameters_info$text,
+      title = expression_projection_additional_parameters_info$title,
+      easyClose = TRUE,
+      footer = NULL,
+      size = "l"
     )
   )
 })
 
 ##----------------------------------------------------------------------------##
-## UI element for color scale range in projection. This is a separate element
-## because it requires generation of "gene_expression_plot_data()", which needs
-## user input from other UI elements.
+## Text in info box.
+##----------------------------------------------------------------------------##
+
+expression_projection_additional_parameters_info <- list(
+  title = "Additional parameters for gene (set) expression",
+  text = HTML("
+    The elements in this panel allow you to control what and how results are displayed across the whole tab.
+    <ul>
+      <li><b>Plotting order:</b> Cells can be plotted in random order or so that cells with highest expression are on top.</li>
+      <li><b>Point size:</b> Controls how large the cells should be.</li>
+      <li><b>Point opacity:</b> Controls the transparency of the cells.</li>
+      <li><b>Show % of cells:</b> Using the slider, you can randomly remove a fraction of cells from the plot. This can be useful for large data sets and/or computers with limited resources.</li>
+    </ul>
+    "
+  )
+)
+
+##----------------------------------------------------------------------------##
+## UI elements to set group filters.
+##----------------------------------------------------------------------------##
+
+output[["expression_projection_group_filters_UI"]] <- renderUI({
+  group_filters <- list()
+  for ( i in getGroups() ) {
+    group_filters[[i]] <- shinyWidgets::pickerInput(
+      paste0("expression_projection_group_filter_", i),
+      label = i,
+      choices = getGroupLevels(i),
+      selected = getGroupLevels(i),
+      options = list("actions-box" = TRUE),
+      multiple = TRUE
+    )
+  }
+  group_filters
+})
+
+## make sure elements are loaded even though the box is collapsed
+outputOptions(
+  output,
+  "expression_projection_group_filters_UI",
+  suspendWhenHidden = FALSE
+)
+
+##----------------------------------------------------------------------------##
+## Info box that gets shown when pressing the "info" button.
+##----------------------------------------------------------------------------##
+
+observeEvent(input[["expression_projection_group_filters_info"]], {
+  showModal(
+    modalDialog(
+      expression_projection_group_filters_info$text,
+      title = expression_projection_group_filters_info$title,
+      easyClose = TRUE,
+      footer = NULL,
+      size = "l"
+    )
+  )
+})
+
+##----------------------------------------------------------------------------##
+## Text in info box.
+##----------------------------------------------------------------------------##
+# <li><b>Range of X/Y axis (located in dropdown menu above the projection):</b> Set the X/Y axis limits. This is useful when you want to change the aspect ratio of the plot.</li>
+
+expression_projection_group_filters_info <- list(
+  title = "Group filters for gene (set) expression",
+  text = HTML("
+    The elements in this panel allow you to select which cells should be plotted based on the group(s) they belong to. For each grouping variable, you can activate or deactivate group levels. Only cells that are pass all filters (for each grouping variable) are shown in the projection, the expression by group, and expression by pseudotime (if applicable).
+    "
+  )
+)
+
+##----------------------------------------------------------------------------##
+## UI elements to set color scale.
+##----------------------------------------------------------------------------##
+
+output[["expression_projection_color_scale_UI"]] <- renderUI({
+  selectInput(
+    "expression_projection_color_scale",
+    label = "Color scale",
+    choices = c("YlGnBu", "YlOrRd","Blues","Greens","Reds","RdBu","viridis"),
+    selected = "YlGnBu"
+  )
+})
+
+## make sure elements are loaded even though the box is collapsed
+outputOptions(
+  output,
+  "expression_projection_color_scale_UI",
+  suspendWhenHidden = FALSE
+)
+
+##----------------------------------------------------------------------------##
+## UI elements to set color scale range.
 ##----------------------------------------------------------------------------##
 
 output[["expression_projection_color_scale_range_UI"]] <- renderUI({
@@ -709,16 +905,53 @@ output[["expression_projection_color_scale_range_UI"]] <- renderUI({
     expression_range <- round(expression_range, digits = 2)
   }
 
-  tagList(
-    sliderInput(
-      "expression_projection_color_scale_range",
-      label = "Range of color scale",
-      min = expression_range[1],
-      max = expression_range[2],
-      value = expression_range
+  sliderInput(
+    "expression_projection_color_scale_range",
+    label = "Range of color scale",
+    min = expression_range[1],
+    max = expression_range[2],
+    value = expression_range
+  )
+})
+
+## make sure elements are loaded even though the box is collapsed
+outputOptions(
+  output,
+  "expression_projection_color_scale_range_UI",
+  suspendWhenHidden = FALSE
+)
+
+##----------------------------------------------------------------------------##
+## Info box that gets shown when pressing the "info" button.
+##----------------------------------------------------------------------------##
+
+observeEvent(input[["expression_projection_color_scale_info"]], {
+  showModal(
+    modalDialog(
+      expression_projection_color_scale_info$text,
+      title = expression_projection_color_scale_info$title,
+      easyClose = TRUE,
+      footer = NULL,
+      size = "l"
     )
   )
 })
+
+##----------------------------------------------------------------------------##
+## Text in info box.
+##----------------------------------------------------------------------------##
+
+expression_projection_color_scale_info <- list(
+  title = "Color scale for gene (set) expression",
+  text = HTML("
+    The elements in this panel allow you to control what and how results are displayed across the whole tab.
+    <ul>
+      <li><b>Color scale:</b> Choose your prefered color scale.</li>
+      <li><b>Range of color scale:</b> Using the sliders, you can set the limits for the color scale. Values outside the scale will be shown in the color corresponding to the min/max value, respectively.</li>
+    </ul>
+    "
+  )
+)
 
 ##----------------------------------------------------------------------------##
 ## UI elements to set X and Y scales in plot. Separate element because it
@@ -778,49 +1011,11 @@ output[["expression_projection_scales_UI"]] <- renderUI({
   )
 })
 
+## make sure elements are loaded even though the box is collapsed
 outputOptions(
   output,
   "expression_projection_scales_UI",
   suspendWhenHidden = FALSE
-)
-
-##----------------------------------------------------------------------------##
-## Info box that gets shown when pressing the "info" button.
-##----------------------------------------------------------------------------##
-
-observeEvent(input[["expression_projection_parameters_info"]], {
-  showModal(
-    modalDialog(
-      expression_projection_parameters_info$text,
-      title = expression_projection_parameters_info$title,
-      easyClose = TRUE,
-      footer = NULL,
-      size = "l"
-    )
-  )
-})
-
-##----------------------------------------------------------------------------##
-## Text in info box.
-##----------------------------------------------------------------------------##
-
-expression_projection_parameters_info <- list(
-  title = "Parameters for gene (set) expression",
-  text = HTML("
-    The elements in this panel allow you to control what and how results are displayed across the whole tab.
-    <ul>
-      <li><b>Gene(s) / Gene set:</b> Select whether you would like to select individual genes or gene sets. In the case of 'Gene(s)', you can select one or multiple genes from the input field below. If you select multiple genes, the mean expression across the selected genes will be calculated for each cell. If you select 'Gene set', you can select a gene set from the MSigDB. Species-specific gene names will be tried to retrieve, otherwise gene name matching is attempted. A list of which genes are present or missing in the data set can be found below the projection.</li>
-      <li><b>Projection:</b> Select here which projection you want to see in the scatter plot on the right.</li>
-      <li><b>Show % of cells:</b> Using the slider, you can randomly remove a fraction of cells from the plot. This can be useful for large data sets and/or computers with limited resources.</li>
-      <li><b>Plotting order:</b> Cells can be plotted in random order or so that cells with highest expression are on top.</li>
-      <li><b>Point size:</b> Controls how large the cells should be.</li>
-      <li><b>Point opacity:</b> Controls the transparency of the cells.</li>
-      <li><b>Color scale:</b> Choose your prefered color scale.</li>
-      <li><b>Range of color scale:</b> Using the sliders, you can set the limits for the color scale. Values outside the scale will be shown in the color corresponding to the min/max value, respectively.</li>
-      <li><b>Range of X/Y axis (located in dropdown menu above the projection):</b> Set the X/Y axis limits. This is useful when you want to change the aspect ratio of the plot.</li>
-    </ul>
-    "
-  )
 )
 
 ##----------------------------------------------------------------------------##
