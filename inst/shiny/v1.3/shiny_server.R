@@ -34,8 +34,11 @@ server <- function(input, output, session) {
     default = 100
   )
 
-  preferences <- reactiveValues(use_webgl = TRUE)
+  preferences <- reactiveValues(
+    use_webgl = TRUE
+  )
 
+  ## paths for storing plots
   available_storage_volumes <- c(
     Home = "~",
     shinyFiles::getVolumes()()
@@ -44,51 +47,48 @@ server <- function(input, output, session) {
   ##--------------------------------------------------------------------------##
   ## Load data set.
   ##--------------------------------------------------------------------------##
-  data_set <- reactive({
 
-    ## check what data to load
-    ## ... file was selected in the "Load data" UI element and it also
+  ## reactive value holding path to file of data set to load
+  data_to_load <- reactiveValues()
+
+  ## listen to selected 'input_file', initialize before UI element is loaded
+  observeEvent(input[['input_file']], ignoreNULL = FALSE, {
+
+    ## grab path from 'input_file' if one is specified
     if (
       !is.null(input[["input_file"]]) &&
       !is.na(input[["input_file"]]) &&
       file.exists(input[["input_file"]]$datapath)
     ) {
+      new_path <- input[["input_file"]]$datapath
 
-      ## load specified file
-      data <- readRDS(input[["input_file"]]$datapath)
-
-      ## print log message
-      print(glue::glue("[{Sys.time()}] Loaded data set: {input[['input_file']]$datapath}"))
-
-    ## ... a .crb file was specified to be loaded into Cerebro on launch, the
-    ##     file exists, and no selection has been made through the "Load data"
-    ##     UI element
+    ## take path from 'Cerebro.options' if it is set
     } else if (
       exists('Cerebro.options') &&
-      !is.null(.GlobalEnv$Cerebro.options[["crb_file_to_load"]]) &&
-      file.exists(.GlobalEnv$Cerebro.options[["crb_file_to_load"]])
+      !is.null(Cerebro.options[["crb_file_to_load"]]) &&
+      file.exists(Cerebro.options[["crb_file_to_load"]])
     ) {
+      new_path <- .GlobalEnv$Cerebro.options$crb_file_to_load
 
-      ## load the specified file
-      data <- readRDS(.GlobalEnv$Cerebro.options[["crb_file_to_load"]])
-
-      ## print log message
-      print(glue::glue("[{Sys.time()}] Loaded data set: {.GlobalEnv$Cerebro.options[['crb_file_to_load']]}"))
-
-    ## ... no file was specified to be loaded and no file has been selected in
-    ##     the "Load data" UI element
+    ## if none of the above apply, get path of example data set
     } else {
-
-      ## load small example data set
-      data <- readRDS(
-        system.file("extdata/v1.3/example.crb", package = "cerebroApp")
-      )
-
-      ## print log message
-      print(glue::glue("[{Sys.time()}] Loaded example data set..."))
-
+      new_path <- system.file("extdata/v1.3/example.crb", package = "cerebroApp")
     }
 
+    ## set reactive value to new file path
+    data_to_load$path <- new_path
+  })
+
+  ## create reactive value holding the current data set
+  data_set <- reactive({
+
+    ## log message
+    print(glue::glue("[{Sys.time()}] File to load: {data_to_load$path}"))
+
+    ## read the file
+    data <- readRDS(data_to_load$path)
+
+    ## log message
     message(data$print())
 
     ## check if 'expression' slot exists and print log message with its format
@@ -107,6 +107,12 @@ server <- function(input, output, session) {
 
   ## the tab item needs to be in the `output`
   output[["sidebar_item_trajectory"]] <- renderMenu({
+
+    ## require a data set to be loaded
+    req(
+      !is.null(data_set())
+    )
+
     menuItem("Trajectory", tabName = "trajectory", icon = icon("random"))
   })
 
@@ -144,6 +150,12 @@ server <- function(input, output, session) {
 
   ## the tab item needs to be in the `output`
   output[["sidebar_item_extra_material"]] <- renderMenu({
+
+    ## require a data set to be loaded
+    req(
+      !is.null(data_set())
+    )
+
     menuItem("Extra material", tabName = "extra_material", icon = icon("gift"))
   })
 
