@@ -1,5 +1,5 @@
 ---
-title: "Export and visualize custom table"
+title: "Export and visualize custom tables and plots"
 author: "Roman Hillje"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
@@ -9,7 +9,7 @@ output:
     self_contained: yes
     mode: selfcontained
 vignette: >
-  %\VignetteIndexEntry{Export and visualize custom table}
+  %\VignetteIndexEntry{Export and visualize custom tables and plots}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -23,11 +23,13 @@ knitr::opts_chunk$set(
 
 # Overview
 
+cerebroApp v1.3 provides new possibilities to export and visualize custom data that you would like to share alongside with your scRNA-seq data. At the time of writing, you can attach tables and plots (made with ggplot2) to your data set. In this article, I will show you to do it.
+
+# Tables
+
 In previous cerebroApp versions, a very specific format for tables containing marker genes and enriched pathways was expected, resulting in a severe limitation of which methods you can use to generate the results, or alternatively requiring manual modification of the table to fit the format. Since cerebroApp v1.3, it is possible to export and visualize tables of any format in Cerebro, as long as they are a `data.frame`. Due to dynamic column formatting and color highlighting, the table content can be visually enhanced anyway.
 
-Here, I will give you an example how you can export tables that were not produced by cerebroApp and visualize them in Cerebro anyway.
-
-# Marker genes and enriched pathways
+## Marker genes and enriched pathways
 
 Let's assume you have a `Seurat` object but generated tables of differentially expressed genes and enriched pathways using other tools/methods than those built into cerebroApp. To export those tables, you just need to put it in the right place, following a "method" and "name" scheme. In this example, we assume you have a table of marker genes called `custom_table` that looks like this:
 
@@ -101,22 +103,24 @@ You can see that among the marker gene results is the `custom_method` and `custo
 
 Then, after loading the data into Cerebro, we will see this:
 
-<a target="_blank" href="export_and_visualize_custom_tables_files/marker_genes.png"><img src="export_and_visualize_custom_tables_files/marker_genes.png" alt="Custom marker gene table in Cerebro" width="100%" height="auto" /></a>
+<a target="_blank" href="export_and_visualize_custom_tables_and_plots_files/table_marker_genes.png"><img src="export_and_visualize_custom_tables_and_plots_files/table_marker_genes.png" alt="Custom marker gene table in Cerebro" width="100%" height="auto" /></a>
 
 Granted, this isn't a very pretty table, but you get the idea.
 
-# Extra material
+## Extra material
 
 When you have tables that might be useful to interpret the data set but don't contain marker genes, differentially expressed genes, or enriched pathways, then you can add them as extra material. Again, just make sure you follow the general structure. In the case of a `Seurat` object, store the tables with an interpretable name in a list at `@misc$extra_material$tables`. You can see an example below, where we store the same example table as before:
 
 ```{r eval=FALSE}
+custom_table <- tibble(
+  a = "this",
+  b = "is",
+  c = "a",
+  d = "test"
+)
+
 pbmc_Seurat@misc$extra_material$tables <- list(
-  "test" = tibble(
-    a = "this",
-    b = "is",
-    c = "a",
-    d = "test"
-  )
+  "test" = custom_table
 )
 
 exportFromSeurat(
@@ -169,6 +173,75 @@ extra material:
 
 This time, you see that our table with the name "test" was exported as part of the extra material. In Cerebro, when a data set contains extra material, a tab will appear in the side bar which will give you access to the table, as shown in the screenshot:
 
-<a target="_blank" href="export_and_visualize_custom_tables_files/extra_material.png"><img src="export_and_visualize_custom_tables_files/extra_material.png" alt="Custom table as extra material in Cerebro" width="100%" height="auto" /></a>
+<a target="_blank" href="export_and_visualize_custom_tables_and_plots_files/table_extra_material.png"><img src="export_and_visualize_custom_tables_and_plots_files/table_extra_material.png" alt="Custom table as extra material in Cerebro" width="100%" height="auto" /></a>
 
 Again, this table isn't particularly informative, but hopefully you got an idea of the procedure.
+
+# Plots
+
+Custom plots can be exported and visualized in the "Extra material" tab as well. The only requirement is that they were produced with ggplot2.
+
+Let's look at an example in which we create a simple plot with ggplot2, call it `iris`, and add it to the Seurat object:
+
+```{r eval=FALSE}
+library(ggplot2)
+
+custom_plot <- ggplot(iris, aes(Sepal.Length, Sepal.Width, color = Species)) +
+  geom_point()
+
+pbmc_Seurat@misc$extra_material$plots <- list(
+  "iris" = custom_plot
+)
+
+exportFromSeurat(
+  pbmc_Seurat,
+  assay = 'SCT',
+  slot = 'data',
+  file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
+  experiment_name = 'pbmc_Seurat',
+  organism = 'hg',
+  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  columns_cell_cycle = c('cell_cycle_seurat'),
+  column_nUMI = 'nCount_RNA',
+  column_nGene = 'nFeature_RNA',
+  add_all_meta_data = TRUE,
+  verbose = FALSE
+)
+```
+
+```
+[11:54:33] Start collecting data...
+[11:54:33] Overview of Cerebro object:
+
+class: Cerebro_v1.3
+cerebroApp version: 1.3.0
+experiment name: pbmc_Seurat
+organism: hg
+date of analysis: 2020-02-19
+date of export: 2020-09-24
+number of cells: 5,697
+number of genes: 15,907
+grouping variables (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main
+cell cycle variables (1): cell_cycle_seurat
+projections (2): UMAP, UMAP_3D
+trees (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main
+most expressed genes: sample, seurat_clusters, cell_type_singler_blueprintencode_main
+marker genes:
+  - cerebro_seurat (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main
+enriched pathways:
+  - cerebro_seurat_enrichr (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main, 
+  - cerebro_GSVA (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main
+trajectories:
+  - monocle2 (1): highly_variable_genes
+extra material:
+  - plots (1): iris
+
+[11:54:33] Saving Cerebro object to: ~/Dropbox/Cerebro_development/pbmc_Seurat_dgCMatrix.crb
+[11:54:37] Done!
+```
+
+In the log messages of the export process, we see that the plot was correctly extracted and is listed in the "extra material".
+
+In Cerebro, we can now access this table in the "Extra material" tab through the "plots" category.
+
+<a target="_blank" href="export_and_visualize_custom_tables_and_plots_files/plot_extra_material.png"><img src="export_and_visualize_custom_tables_and_plots_files/plot_extra_material.png" alt="Custom plot as extra material in Cerebro" width="100%" height="auto" /></a>

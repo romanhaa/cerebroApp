@@ -53,13 +53,15 @@ Let's look at some details. Overall, the object is organized as such:
 │   └── <method> (named list)
 │       └── <trajectory_name> (depends on method, most likely a list or data frame)
 └── extra_material (named list)
-    └── tables (named list)
-        └── <name> (data.frame)
+    ├── tables (named list)
+    │   └── <name> (data.frame)    
+    └── plots (named list)
+        └── <name> (ggplot-object)
 ```
 
 Interaction with the Cerebro object will be done through internal methods, providing additional control for the correct format of the object.
 
-As long as you follow the described scheme, you can export and visualize any data frame that is stored in the `marker_genes` or `enriched_pathways` slots. I have prepared a vignette with some more details that you can find [here](export_and_visualize_custom_tables.html).
+As long as you follow the described scheme, you can export and visualize any data frame that is stored in the `marker_genes` or `enriched_pathways` slots. I have prepared a vignette with some more details that you can find [here](export_and_visualize_custom_tables_and_plots.html).
 
 Please make sure to use names for items in lists, otherwise it will likely result in an error.
 

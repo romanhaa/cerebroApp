@@ -210,7 +210,6 @@ source('~/Research/GitHub/cerebroApp_v1.3/R/getMostExpressedGenes.R')
 ```
 
 ```{r eval=FALSE}
-# names(pbmc_Seurat@misc$most_expressed_genes) <- c('sample','seurat_clusters')
 pbmc_Seurat@misc$most_expressed_genes$by_sample <- NULL
 pbmc_Seurat@misc$most_expressed_genes$by_cluster <- NULL
 
@@ -306,7 +305,7 @@ pbmc_Seurat <- extractMonocleTrajectory(monocle, pbmc_Seurat, 'highly_variable_g
 # Export data
 
 ```{r eval=FALSE}
-source('~/Research/GitHub/cerebroApp_v1.3/R/Cerebro_v1.3-class.R')
+source('~/Research/GitHub/cerebroApp_v1.3/R/class-Cerebro_v1.3.R')
 
 source('~/Research/GitHub/cerebroApp_v1.3/R/exportFromSeurat.R')
 source('~/Research/GitHub/cerebroApp_v1.3/R/exportFromSCE.R')

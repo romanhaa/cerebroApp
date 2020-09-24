@@ -122,10 +122,14 @@ format in a named \code{list} called `tables`}
 \item \href{#method-getTrajectory}{\code{Cerebro_v1.3$getTrajectory()}}
 \item \href{#method-addExtraMaterial}{\code{Cerebro_v1.3$addExtraMaterial()}}
 \item \href{#method-addExtraTable}{\code{Cerebro_v1.3$addExtraTable()}}
+\item \href{#method-addExtraPlot}{\code{Cerebro_v1.3$addExtraPlot()}}
 \item \href{#method-getExtraMaterialCategories}{\code{Cerebro_v1.3$getExtraMaterialCategories()}}
 \item \href{#method-checkForExtraTables}{\code{Cerebro_v1.3$checkForExtraTables()}}
 \item \href{#method-getNamesOfExtraTables}{\code{Cerebro_v1.3$getNamesOfExtraTables()}}
 \item \href{#method-getExtraTable}{\code{Cerebro_v1.3$getExtraTable()}}
+\item \href{#method-checkForExtraPlots}{\code{Cerebro_v1.3$checkForExtraPlots()}}
+\item \href{#method-getNamesOfExtraPlots}{\code{Cerebro_v1.3$getNamesOfExtraPlots()}}
+\item \href{#method-getExtraPlot}{\code{Cerebro_v1.3$getExtraPlot()}}
 \item \href{#method-print}{\code{Cerebro_v1.3$print()}}
 \item \href{#method-clone}{\code{Cerebro_v1.3$clone()}}
 }
@@ -980,8 +984,9 @@ Add content to extra material field.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{category}}{Name of category. At the moment, only \code{tables} is a
-valid category.}
+\item{\code{category}}{Name of category. At the moment, only \code{tables} and
+\code{plots} are valid categories. Tables must be in \code{data.frame}
+format and plots must be created with \code{ggplot2}.}
 
 \item{\code{name}}{Name of material, will be used to select it in Cerebro.}
 
@@ -1005,6 +1010,26 @@ Add table to `extra_material` slot.
 \item{\code{name}}{Name of material, will be used to select it in Cerebro.}
 
 \item{\code{table}}{Table that should be added, must be \code{data.frame}.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-addExtraPlot"></a>}}
+\if{latex}{\out{\hypertarget{method-addExtraPlot}{}}}
+\subsection{Method \code{addExtraPlot()}}{
+Add plot to `extra_material` slot.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cerebro_v1.3$addExtraPlot(name, plot)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{name}}{Name of material, will be used to select it in Cerebro.}
+
+\item{\code{plot}}{Plot that should be added, must be created with
+\code{ggplot2} (class: \code{ggplot}).}
 }
 \if{html}{\out{</div>}}
 }
@@ -1067,6 +1092,53 @@ Get table from extra materials.
 }
 \subsection{Returns}{
 Requested table in \code{data.frame} format.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-checkForExtraPlots"></a>}}
+\if{latex}{\out{\hypertarget{method-checkForExtraPlots}{}}}
+\subsection{Method \code{checkForExtraPlots()}}{
+Check whether there are plots in the extra materials.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cerebro_v1.3$checkForExtraPlots()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+\code{logical} indicating whether there are plots in the extra
+materials.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-getNamesOfExtraPlots"></a>}}
+\if{latex}{\out{\hypertarget{method-getNamesOfExtraPlots}{}}}
+\subsection{Method \code{getNamesOfExtraPlots()}}{
+Get names of plots in extra materials.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cerebro_v1.3$getNamesOfExtraPlots()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+\code{vector} containing names of plots in extra materials.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-getExtraPlot"></a>}}
+\if{latex}{\out{\hypertarget{method-getExtraPlot}{}}}
+\subsection{Method \code{getExtraPlot()}}{
+Get plot from extra materials.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Cerebro_v1.3$getExtraPlot(name)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{name}}{Name of plot.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Requested plot made with \code{ggplot2}.
 }
 }
 \if{html}{\out{<hr>}}

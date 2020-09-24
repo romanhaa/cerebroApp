@@ -362,18 +362,22 @@ exportFromSeurat(
 )
 ```
 
-## Export custom table in extra material
+## Extra material
+
+### Table
 
 ```{r eval=FALSE}
 pbmc_Seurat_copy <- pbmc_Seurat
 
+custom_table <- tibble(
+  a = "this",
+  b = "is",
+  c = "a",
+  d = "test"
+)
+
 pbmc_Seurat_copy@misc$extra_material$tables <- list(
-  "test" = tibble(
-    a = "this",
-    b = "is",
-    c = "a",
-    d = "test"
-  )
+  "test" = custom_table
 )
 
 exportFromSeurat(
@@ -381,6 +385,36 @@ exportFromSeurat(
   assay = 'SCT',
   slot = 'data',
   file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
+  experiment_name = 'pbmc_Seurat',
+  organism = 'hg',
+  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  columns_cell_cycle = c('cell_cycle_seurat'),
+  column_nUMI = 'nCount_RNA',
+  column_nGene = 'nFeature_RNA',
+  add_all_meta_data = TRUE,
+  verbose = FALSE
+)
+```
+
+### Plot
+
+```{r eval=FALSE}
+library(ggplot2)
+
+pbmc_Seurat_copy <- pbmc_Seurat
+
+custom_plot <- ggplot(iris, aes(Sepal.Length, Sepal.Width, color = Species)) +
+  geom_point()
+
+pbmc_Seurat_copy@misc$extra_material$plots <- list(
+  "iris" = custom_plot
+)
+
+exportFromSeurat(
+  pbmc_Seurat_copy,
+  assay = 'SCT',
+  slot = 'data',
+  file = '~/Dropbox/Cerebro_development/pbmc_Seurat_dgCMatrix.crb',
   experiment_name = 'pbmc_Seurat',
   organism = 'hg',
   columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),

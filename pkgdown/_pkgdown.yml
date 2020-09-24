@@ -14,8 +14,8 @@ navbar:
           href: articles/Cerebro_interface_v1.2.html
       - text: "Export an SCE/SingleCellExperiment object"
         href: articles/export_a_data_set_in_SCE_format.html
-      - text: "Export and visualize custom tables"
-        href: articles/export_and_visualize_custom_tables.html
+      - text: "Export and visualize custom tables and plots"
+        href: articles/export_and_visualize_custom_tables_and_plots.html
       - text: "Launch Cerebro with pre-loaded data set"
         href: articles/launch_cerebro_with_pre-loaded_data_set.html
       - text: "Host Cerebro on shinyapps.io"

@@ -19,7 +19,7 @@ vignette: >
 This release of Cerebro/cerebroApp comes with some major changes, enough to justify a dedicated article.
 Here, I will go over the changes and motivations.
 
-TL;DR: Maybe the best thing to happen in 2020!
+TL;DR: Possibly the best thing to happen in 2020!
 
 # Flexible grouping variables
 
@@ -143,7 +143,7 @@ In the "Marker genes" and "Enriched pathways" tabs, in addition to the group lev
 
 <a target="_blank" href="release_notes_v1.3_files/marker_genes.png"><img src="release_notes_v1.3_files/marker_genes.png" alt="Marker genes" width="100%" height="auto" /></a>
 
-Moreover, it is now possible to export results for marker genes / differentially expressed genes and enriched pathways generated other tools. You can find an example on how to do that in this vignette: [Export and visualize custom tables](export_and_visualize_custom_tables.html).
+Moreover, it is now possible to export results for marker genes / differentially expressed genes and enriched pathways generated other tools. You can find an example on how to do that in this vignette: [Export and visualize custom tables and plots](export_and_visualize_custom_tables_and_plots.html).
 
 As in previous versions of Cerebro, you can export the tables in CSV or Excel format and hide columns using the "Column visibility" button.
 
@@ -173,13 +173,19 @@ The "States by group" panel works similar to the "Composition by other group" in
 
 In the "Expression metrics" panel you can visualize the number of transcripts, number of expressed genes, and the percentage of mitochondrial and ribosomal transcripts for each state.
 
+__Note:__ This tab is only visible if any trajectory is present in the currently loaded data set.
+
 ## Extra material
 
-In some cases, it is useful to share material with Cerebro users that doesn't fit into any of the existing categories. For those cases, a new tab called "Extra material" has been created. It will only appear if extra material is present in the data set. At the moment, only tables (data frames) can be exported as extra material, but support for other types of content can be added in the future upon user request. You can see an example below:
+In some cases, it is useful to share material with Cerebro users that doesn't fit into any of the existing categories. For those cases, a new tab called "Extra material" has been created. It will only appear if extra material is present in the data set. At the moment, only tables (data frames) and plots (made with ggplot2) can be exported as extra material, but support for other types of content can be added in the future upon user request. You can see two examples below:
 
-<a target="_blank" href="release_notes_v1.3_files/extra_material.png"><img src="release_notes_v1.3_files/extra_material.png" alt="Extra material" width="100%" height="auto" /></a>
+<a target="_blank" href="release_notes_v1.3_files/extra_material_table.png"><img src="release_notes_v1.3_files/extra_material_table.png" alt="Extra material" width="100%" height="auto" /></a>
 
-Have a look at this vignette if you would like to know how you can export your tables as additional material: [Export and visualize custom tables](export_and_visualize_custom_tables.html).
+<a target="_blank" href="release_notes_v1.3_files/extra_material_plot.png"><img src="release_notes_v1.3_files/extra_material_plot.png" alt="Extra material" width="100%" height="auto" /></a>
+
+Have a look at this vignette if you would like to know how you can export your tables as additional material: [Export and visualize custom tables and plots](export_and_visualize_custom_tables_and_plots.html).
+
+__Note:__ This tab is only visible if any extra material is present in the currently loaded data set.
 
 ## Miscellaneous
 
@@ -208,7 +214,7 @@ I prepared a couple of vignettes to highlight some of the new features and optio
 
 * [The cerebroApp workflow (Seurat)](cerebroApp_workflow_Seurat.html)
 * [Export an SCE/SingleCellExperiment object](export_a_data_set_in_SCE_format.html)
-* [Export and visualize custom tables](export_and_visualize_custom_tables.html)
+* [Export and visualize custom tables and plots](export_and_visualize_custom_tables_and_plots.html)
 * [Launch Cerebro with pre-loaded data set](launch_cerebro_with_pre-loaded_data_set.html)
 * [Host Cerebro on shinyapps.io](host_cerebro_on_shinyapps.html)
 * [Control access to Cerebro with a login page](control_access_to_cerebro_with_a_login_page.html)
