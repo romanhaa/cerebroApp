@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get marker genes for every sample and cluster in Seurat object. — getMarkerGenes • cerebroApp</title>
+<title>Get marker genes for specified grouping variables in Seurat object. — getMarkerGenes • cerebroApp</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,9 @@
 
 
 
-<meta property="og:title" content="Get marker genes for every sample and cluster in Seurat object. — getMarkerGenes" />
-<meta property="og:description" content="This function gets marker genes for every sample and cluster of
-the Seurat object." />
+<meta property="og:title" content="Get marker genes for specified grouping variables in Seurat object. — getMarkerGenes" />
+<meta property="og:description" content="This function gets marker genes for one or multiple grouping variables in
+the meta data of the provided Seurat object." />
 
 
 
@@ -73,7 +73,7 @@ the Seurat object." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cerebroApp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
       </span>
     </div>
 
@@ -90,16 +90,51 @@ the Seurat object." />
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Vignettes
+    Articles
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/cerebroApp_workflow.html">The cerebroApp workflow</a>
+      <a href="../articles/cerebroApp_workflow_Seurat.html">The cerebroApp workflow (Seurat)</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">The Cerebro interface</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="../articles/Cerebro_interface_v1.2.html">Cerebro v1.2 and older</a>
+        </li>
+      </ul>
     </li>
     <li>
-      <a href="../articles/Cerebro_interface.html">The Cerebro interface</a>
+      <a href="../articles/export_a_data_set_in_SCE_format.html">Export an SCE/SingleCellExperiment object</a>
+    </li>
+    <li>
+      <a href="../articles/export_and_visualize_custom_tables_and_plots.html">Export and visualize custom tables and plots</a>
+    </li>
+    <li>
+      <a href="../articles/launch_cerebro_with_pre-loaded_data_set.html">Launch Cerebro with pre-loaded data set</a>
+    </li>
+    <li>
+      <a href="../articles/host_cerebro_on_shinyapps.html">Host Cerebro on shinyapps.io</a>
+    </li>
+    <li>
+      <a href="../articles/control_access_to_cerebro_with_a_login_page.html">Control access to Cerebro with a login page</a>
+    </li>
+    <li>
+      <a href="../articles/overview_of_cerebro_v1.3_class.html">Overview of the Cerebro v1.3 class</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Release notes
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/release_notes_v1.3.html">v1.3</a>
     </li>
   </ul>
 </li>
@@ -111,6 +146,12 @@ the Seurat object." />
         <li>
   <a href="https://github.com/romanhaa/cerebroApp/">
     <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://twitter.com/fakechek1">
+    <span class="fab fa fab fa-twitter fa-lg"></span>
      
   </a>
 </li>
@@ -127,22 +168,22 @@ the Seurat object." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get marker genes for every sample and cluster in Seurat object.</h1>
+    <h1>Get marker genes for specified grouping variables in Seurat object.</h1>
     <small class="dont-index">Source: <a href='https://github.com/romanhaa/cerebroApp/blob/master/R/getMarkerGenes.R'><code>R/getMarkerGenes.R</code></a></small>
     <div class="hidden name"><code>getMarkerGenes.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function gets marker genes for every sample and cluster of
-the Seurat object.</p>
+    <p>This function gets marker genes for one or multiple grouping variables in
+the meta data of the provided Seurat object.</p>
     </div>
 
     <pre class="usage"><span class='fu'>getMarkerGenes</span>(
   <span class='no'>object</span>,
   <span class='kw'>assay</span> <span class='kw'>=</span> <span class='st'>"RNA"</span>,
   <span class='kw'>organism</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>column_sample</span> <span class='kw'>=</span> <span class='st'>"sample"</span>,
-  <span class='kw'>column_cluster</span> <span class='kw'>=</span> <span class='st'>"cluster"</span>,
+  <span class='kw'>groups</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"cerebro_seurat"</span>,
   <span class='kw'>only_pos</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>min_pct</span> <span class='kw'>=</span> <span class='fl'>0.7</span>,
   <span class='kw'>thresh_logFC</span> <span class='kw'>=</span> <span class='fl'>0.25</span>,
@@ -161,8 +202,7 @@ the Seurat object.</p>
     </tr>
     <tr>
       <th>assay</th>
-      <td><p>Assay to pull counts from; defaults to 'RNA'. Only relevant in
-Seurat v3.0 or higher since the concept of assays wasn't implemented before.</p></td>
+      <td><p>Assay to pull transcripts counts from; defaults to 'RNA'.</p></td>
     </tr>
     <tr>
       <th>organism</th>
@@ -171,14 +211,14 @@ marker genes of cell surface; can be omitted if already saved in Seurat
 object; defaults to NULL.</p></td>
     </tr>
     <tr>
-      <th>column_sample</th>
-      <td><p>Column in object@meta.data that contains information
-about sample; defaults to 'sample'.</p></td>
+      <th>groups</th>
+      <td><p>Grouping variables (columns) in object@meta.data for which
+marker genes should be calculated.</p></td>
     </tr>
     <tr>
-      <th>column_cluster</th>
-      <td><p>Column in object@meta.data that contains information
-about cluster; defaults to 'cluster'.</p></td>
+      <th>name</th>
+      <td><p>Name of list that should be used to store the results in
+<code>object@misc$marker_genes$&lt;name&gt;</code>; defaults to 'cerebro_seurat'.</p></td>
     </tr>
     <tr>
       <th>only_pos</th>
@@ -215,27 +255,33 @@ Seurat::FindAllMakers().</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Seurat object with marker gene results for samples and clusters
-stored in object@misc$marker_genes.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>Get marker genes for every sample and cluster in Seurat object.</p>
+    <p>Seurat object with marker gene results for the specified grouping variables
+stored in <code>object@misc$marker_genes</code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata/v1.2/seurat_pbmc.rds"</span>,
+    <pre class="examples"><div class='input'><span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata/v1.3/pbmc_seurat.rds"</span>,
   <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"cerebroApp"</span>))
 <span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'>getMarkerGenes</span>(
   <span class='kw'>object</span> <span class='kw'>=</span> <span class='no'>pbmc</span>,
+  <span class='kw'>assay</span> <span class='kw'>=</span> <span class='st'>'RNA'</span>,
   <span class='kw'>organism</span> <span class='kw'>=</span> <span class='st'>'hg'</span>,
-  <span class='kw'>column_sample</span> <span class='kw'>=</span> <span class='st'>'sample'</span>,
-  <span class='kw'>column_cluster</span> <span class='kw'>=</span> <span class='st'>'seurat_clusters'</span>,
+  <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>'sample'</span>,<span class='st'>'seurat_clusters'</span>),
+  <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>'cerebro_seurat'</span>,
   <span class='kw'>only_pos</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>min_pct</span> <span class='kw'>=</span> <span class='fl'>0.7</span>,
   <span class='kw'>thresh_logFC</span> <span class='kw'>=</span> <span class='fl'>0.25</span>,
   <span class='kw'>thresh_p_val</span> <span class='kw'>=</span> <span class='fl'>0.01</span>,
   <span class='kw'>test</span> <span class='kw'>=</span> <span class='st'>'wilcox'</span>,
   <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
-)</div><div class='output co'>#&gt; <span class='message'>Cache found</span></div><div class='output co'>#&gt; <span class='message'>[16:12:42] Sample column provided but only 1 sample found.</span></div><div class='output co'>#&gt; <span class='message'>[16:12:42] Get marker genes for 3 clusters...</span></div><div class='output co'>#&gt; <span class='message'>Calculating cluster 0</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='warning'>Warning: cannot compute exact p-value with ties</span></div><div class='output co'>#&gt; <span class='message'>Calculating cluster 1</span></div><div class='output co'>#&gt; <span class='message'>Calculating cluster 2</span></div></pre>
+)</div><div class='output co'>#&gt; <span class='warning'>Warning: `select_()` is deprecated as of dplyr 0.7.0.</span>
+#&gt; <span class='warning'>Please use `select()` instead.</span>
+#&gt; <span class='warning'><span style='color: #555555;'>This warning is displayed once every 8 hours.</span><span></span>
+#&gt; <span class='warning'></span><span style='color: #555555;'>Call `lifecycle::last_warnings()` to see where this warning was generated.</span><span></span></div><div class='output co'>#&gt; <span class='warning'>Warning: `filter_()` is deprecated as of dplyr 0.7.0.</span>
+#&gt; <span class='warning'>Please use `filter()` instead.</span>
+#&gt; <span class='warning'>See vignette('programming') for more help</span>
+#&gt; <span class='warning'></span><span style='color: #555555;'>This warning is displayed once every 8 hours.</span><span></span>
+#&gt; <span class='warning'></span><span style='color: #555555;'>Call `lifecycle::last_warnings()` to see where this warning was generated.</span><span></span></div><div class='output co'>#&gt; <span class='message'>Cache found</span></div><div class='output co'>#&gt; <span class='message'>[12:37:22] Get marker genes for 2 groups in `sample`...</span></div><div class='output co'>#&gt; <span class='message'>Calculating cluster pbmc_1</span></div><div class='output co'>#&gt; <span class='message'>Calculating cluster pbmc_2</span></div><div class='output co'>#&gt; <span class='message'>[12:37:23] Get marker genes for 3 groups in `seurat_clusters`...</span></div><div class='output co'>#&gt; <span class='message'>Calculating cluster 0</span></div><div class='output co'>#&gt; <span class='message'>Calculating cluster 1</span></div><div class='output co'>#&gt; <span class='message'>Calculating cluster 2</span></div><div class='input'>
+</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

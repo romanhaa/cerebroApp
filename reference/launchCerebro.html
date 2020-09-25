@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cerebroApp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
       </span>
     </div>
 
@@ -89,16 +89,51 @@
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Vignettes
+    Articles
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/cerebroApp_workflow.html">The cerebroApp workflow</a>
+      <a href="../articles/cerebroApp_workflow_Seurat.html">The cerebroApp workflow (Seurat)</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">The Cerebro interface</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="../articles/Cerebro_interface_v1.2.html">Cerebro v1.2 and older</a>
+        </li>
+      </ul>
     </li>
     <li>
-      <a href="../articles/Cerebro_interface.html">The Cerebro interface</a>
+      <a href="../articles/export_a_data_set_in_SCE_format.html">Export an SCE/SingleCellExperiment object</a>
+    </li>
+    <li>
+      <a href="../articles/export_and_visualize_custom_tables_and_plots.html">Export and visualize custom tables and plots</a>
+    </li>
+    <li>
+      <a href="../articles/launch_cerebro_with_pre-loaded_data_set.html">Launch Cerebro with pre-loaded data set</a>
+    </li>
+    <li>
+      <a href="../articles/host_cerebro_on_shinyapps.html">Host Cerebro on shinyapps.io</a>
+    </li>
+    <li>
+      <a href="../articles/control_access_to_cerebro_with_a_login_page.html">Control access to Cerebro with a login page</a>
+    </li>
+    <li>
+      <a href="../articles/overview_of_cerebro_v1.3_class.html">Overview of the Cerebro v1.3 class</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Release notes
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/release_notes_v1.3.html">v1.3</a>
     </li>
   </ul>
 </li>
@@ -110,6 +145,12 @@
         <li>
   <a href="https://github.com/romanhaa/cerebroApp/">
     <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://twitter.com/fakechek1">
+    <span class="fab fa fab fa-twitter fa-lg"></span>
      
   </a>
 </li>
@@ -135,32 +176,38 @@
     <p>Launch Cerebro interface.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>launchCerebro</span>(<span class='kw'>version</span> <span class='kw'>=</span> <span class='st'>"v1.2"</span>, <span class='kw'>maxFileSize</span> <span class='kw'>=</span> <span class='fl'>800</span>)</pre>
+    <pre class="usage"><span class='fu'>launchCerebro</span>(<span class='kw'>version</span> <span class='kw'>=</span> <span class='st'>"v1.3"</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>version</th>
-      <td><p>Which version of Cerebro to launch: "v1.0", "v1.1", "v1.2".
-Defaults to "v1.2".</p></td>
+      <td><p>Which version of Cerebro to launch: "v1.0", "v1.1", "v1.2",
+"v1.3"; defaults to "v1.3".</p></td>
     </tr>
     <tr>
-      <th>maxFileSize</th>
-      <td><p>Maximum size of input file; defaults to 800 MB.</p></td>
+      <th>...</th>
+      <td><p>Further parameters that are used by <code><a href='https://shiny.rstudio.com/reference/shiny/latest/runApp.html'>shiny::runApp</a></code>, e.g.
+<code>host</code> an <code>port</code>, and the specific versions of Cerebro. See
+<code>launchCerebroV1.x</code> for details.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>Shiny application.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <p>Launch Cerebro interface.</p>
+    <div class='dont-index'><p><code><a href='launchCerebroV1.0.html'>launchCerebroV1.0</a></code>, <code><a href='launchCerebroV1.1.html'>launchCerebroV1.1</a></code>,
+<code><a href='launchCerebroV1.2.html'>launchCerebroV1.2</a></code>, <code><a href='launchCerebroV1.3.html'>launchCerebroV1.3</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> ( <span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span>() ) {
-  <span class='fu'>launchCerebro</span>(<span class='kw'>maxFileSize</span> <span class='kw'>=</span> <span class='fl'>800</span>)
+  <span class='fu'>launchCerebro</span>(
+    <span class='kw'>version</span> <span class='kw'>=</span> <span class='st'>"v1.3"</span>,
+    <span class='kw'>options</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>port</span> <span class='kw'>=</span> <span class='fl'>1337</span>)
+  )
 }</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

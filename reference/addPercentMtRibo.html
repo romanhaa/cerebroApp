@@ -40,8 +40,8 @@
 
 
 <meta property="og:title" content="Add percentage of mitochondrial and ribosomal transcripts. — addPercentMtRibo" />
-<meta property="og:description" content="Get percentage of transcripts of gene list compared to all
-transcripts per cell." />
+<meta property="og:description" content="Get percentage of transcripts of gene list compared to all transcripts per
+cell." />
 
 
 
@@ -73,7 +73,7 @@ transcripts per cell." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cerebroApp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
       </span>
     </div>
 
@@ -90,16 +90,51 @@ transcripts per cell." />
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Vignettes
+    Articles
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/cerebroApp_workflow.html">The cerebroApp workflow</a>
+      <a href="../articles/cerebroApp_workflow_Seurat.html">The cerebroApp workflow (Seurat)</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">The Cerebro interface</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="../articles/Cerebro_interface_v1.2.html">Cerebro v1.2 and older</a>
+        </li>
+      </ul>
     </li>
     <li>
-      <a href="../articles/Cerebro_interface.html">The Cerebro interface</a>
+      <a href="../articles/export_a_data_set_in_SCE_format.html">Export an SCE/SingleCellExperiment object</a>
+    </li>
+    <li>
+      <a href="../articles/export_and_visualize_custom_tables_and_plots.html">Export and visualize custom tables and plots</a>
+    </li>
+    <li>
+      <a href="../articles/launch_cerebro_with_pre-loaded_data_set.html">Launch Cerebro with pre-loaded data set</a>
+    </li>
+    <li>
+      <a href="../articles/host_cerebro_on_shinyapps.html">Host Cerebro on shinyapps.io</a>
+    </li>
+    <li>
+      <a href="../articles/control_access_to_cerebro_with_a_login_page.html">Control access to Cerebro with a login page</a>
+    </li>
+    <li>
+      <a href="../articles/overview_of_cerebro_v1.3_class.html">Overview of the Cerebro v1.3 class</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Release notes
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/release_notes_v1.3.html">v1.3</a>
     </li>
   </ul>
 </li>
@@ -111,6 +146,12 @@ transcripts per cell." />
         <li>
   <a href="https://github.com/romanhaa/cerebroApp/">
     <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://twitter.com/fakechek1">
+    <span class="fab fa fab fa-twitter fa-lg"></span>
      
   </a>
 </li>
@@ -133,8 +174,8 @@ transcripts per cell." />
     </div>
 
     <div class="ref-description">
-    <p>Get percentage of transcripts of gene list compared to all
-transcripts per cell.</p>
+    <p>Get percentage of transcripts of gene list compared to all transcripts per
+cell.</p>
     </div>
 
     <pre class="usage"><span class='fu'>addPercentMtRibo</span>(<span class='no'>object</span>, <span class='kw'>assay</span> <span class='kw'>=</span> <span class='st'>"RNA"</span>, <span class='no'>organism</span>, <span class='no'>gene_nomenclature</span>)</pre>
@@ -165,20 +206,20 @@ ENSEMBL ID ('ensembl') or GENCODE ID ('gencode_v27', 'gencode_vM16').</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Seurat object with two new meta data columns containing the
-percentage of mitochondrial and ribosomal gene expression for each cell.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>Add percentage of mitochondrial and ribosomal transcripts.</p>
+    <p>Seurat object with two new meta data columns containing the percentage of
+mitochondrial and ribosomal gene expression for each cell.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata/v1.2/seurat_pbmc.rds"</span>,
-  <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"cerebroApp"</span>))
-<span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'>addPercentMtRibo</span>(
+    <pre class="examples"><div class='input'><span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata/v1.3/pbmc_seurat.rds"</span>,
+  <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"cerebroApp"</span>))</div><div class='output co'>#&gt; <span class='message'>Registered S3 method overwritten by 'spatstat':</span>
+#&gt; <span class='message'>  method     from</span>
+#&gt; <span class='message'>  print.boxx cli </span></div><div class='input'><span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'>addPercentMtRibo</span>(
   <span class='kw'>object</span> <span class='kw'>=</span> <span class='no'>pbmc</span>,
+  <span class='kw'>assay</span> <span class='kw'>=</span> <span class='st'>'RNA'</span>,
   <span class='kw'>organism</span> <span class='kw'>=</span> <span class='st'>'hg'</span>,
   <span class='kw'>gene_nomenclature</span> <span class='kw'>=</span> <span class='st'>'name'</span>
-)</div><div class='output co'>#&gt; <span class='message'>[16:11:59] No mitochondrial genes found in data set.</span></div><div class='output co'>#&gt; <span class='message'>[16:11:59] Calculate percentage of 1 ribosomal transcript(s) present in the data set...</span></div></pre>
+)</div><div class='output co'>#&gt; <span class='message'>[12:37:03] No mitochondrial genes found in data set.</span></div><div class='output co'>#&gt; <span class='message'>[12:37:03] Calculate percentage of 1 ribosomal transcript(s) present in the data set...</span></div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

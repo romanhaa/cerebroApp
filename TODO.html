@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">cerebroApp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
       </span>
     </div>
 
@@ -88,16 +88,51 @@
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Vignettes
+    Articles
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="articles/cerebroApp_workflow.html">The cerebroApp workflow</a>
+      <a href="articles/cerebroApp_workflow_Seurat.html">The cerebroApp workflow (Seurat)</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">The Cerebro interface</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="articles/Cerebro_interface_v1.2.html">Cerebro v1.2 and older</a>
+        </li>
+      </ul>
     </li>
     <li>
-      <a href="articles/Cerebro_interface.html">The Cerebro interface</a>
+      <a href="articles/export_a_data_set_in_SCE_format.html">Export an SCE/SingleCellExperiment object</a>
+    </li>
+    <li>
+      <a href="articles/export_and_visualize_custom_tables_and_plots.html">Export and visualize custom tables and plots</a>
+    </li>
+    <li>
+      <a href="articles/launch_cerebro_with_pre-loaded_data_set.html">Launch Cerebro with pre-loaded data set</a>
+    </li>
+    <li>
+      <a href="articles/host_cerebro_on_shinyapps.html">Host Cerebro on shinyapps.io</a>
+    </li>
+    <li>
+      <a href="articles/control_access_to_cerebro_with_a_login_page.html">Control access to Cerebro with a login page</a>
+    </li>
+    <li>
+      <a href="articles/overview_of_cerebro_v1.3_class.html">Overview of the Cerebro v1.3 class</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Release notes
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="articles/release_notes_v1.3.html">v1.3</a>
     </li>
   </ul>
 </li>
@@ -109,6 +144,12 @@
         <li>
   <a href="https://github.com/romanhaa/cerebroApp/">
     <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://twitter.com/fakechek1">
+    <span class="fab fa fab fa-twitter fa-lg"></span>
      
   </a>
 </li>
@@ -131,37 +172,104 @@
 
 <div id="ideas-of-what-to-implement-in-cerebrocerebroapp-in-the-future" class="section level1">
 
-<p>Many of these are just wild ideas, some are pretty unlikely to be implemented but I wanted to keep track of the ideas anyway.</p>
+<div id="general" class="section level2">
+<h2 class="hasAnchor">
+<a href="#general" class="anchor"></a>General</h2>
 <ul>
-<li>Store cerebroApp as subfolder in Cerebro repository.</li>
-<li>Use SingleCellExperiment as an object to store data. This would make conversion easier and the structure more intuitive.</li>
-<li>Extract trajectories from slingshot. Detect what type of trajectory it is and then plot accordingly.</li>
-<li>Test genes (single and gene sets) for the ones which are highly expressed and which are different between the samples/clusters (idea is ANOVA but it’s slow).</li>
-<li>Make function to extract trajectory from Monocle 3 and display in Cerebro.</li>
-<li>Use “usethis” package.</li>
-<li>Bring back gene id conversion.</li>
-<li>Include report of read counts.</li>
-<li>Upload own list of genes.</li>
-<li>Add progress indicators.</li>
-<li>Use semantic.dashboard</li>
-<li>Check if difference of expression between samples is significant or not.</li>
-<li>Come up with sustainable update strategy.</li>
-<li>Make Linux version.</li>
-<li>Allow users to change colors in plots.</li>
-<li>Send log file through email.</li>
+<li>FAQ on website</li>
+<li>List articles that have used Cerebro.</li>
+<li>Update article about the Cerebro UI</li>
+</ul>
+</div>
+<div id="cerebroapp" class="section level2">
+<h2 class="hasAnchor">
+<a href="#cerebroapp" class="anchor"></a>cerebroApp</h2>
+<ul>
+<li>General
+<ul>
+<li>Use unit testing</li>
+<li>Use modules in Shiny app where it makes sense</li>
+<li>Warning when exporting very large expression data (e.g. non-sparse)</li>
+<li>Check which tasks are carried out in multiple places and create function for them</li>
+<li>Show warning if version of loaded Cerebro object doesn’t match the current Cerebro UI version</li>
+<li>Use glue to build messages.</li>
+<li>Round values in DT column filtering for numeric values (currently it shows too many decimals)</li>
+<li>Thorough performance check with profvis</li>
+<li>Make functions compatible with SCE object. Shouldn’t be too much work.</li>
+<li>Test memory usage with dgCMatrix and RleMatrix for larger data set.</li>
+<li>Don’t call functions in CRB object that don’t exist.</li>
+<li>“x_unified” for trend lines: hovering over trend line shows vertical line.</li>
 <li>Horizontally align title in box and info button.</li>
-<li>Drag resize scatter plots.</li>
-<li>Find a way to display optional info fields.</li>
-<li>Mark mitochondrial and ribosomal genes in tables.</li>
-<li>Gene set names is cut off when too long, make box larger or resizable?</li>
-<li>Allow users to label/rename clusters.</li>
-<li>Save changes to input file.</li>
-<li>pyqt to make it faster?</li>
-<li>Python Dash + Python Qt + fbs??
-<ul>
-<li>Can this be bottled up?</li>
 </ul>
 </li>
+<li>New features
+<ul>
+<li>QC tab</li>
+<li>Rename group levels, e.g. clusters</li>
+<li>Assign new labels to cells based on selection (create new grouping variable on-the-fly)</li>
+<li>Save changes to file</li>
+<li>Visualize velocyto results (<code>ggquiver</code>)</li>
+<li>Visualize PAGA results</li>
+<li>Dot plot as alternative representation of expression of multiple genes across selected grouping variable</li>
+<li>Perform statistical analysis on expression of selected genes</li>
+<li>Allow export of multiple assays? Paves the way for scRNA-seq + scATAC-seq</li>
+<li>Trajectory compatibility with slingshot and Monocle 3.</li>
+<li>Upload gene list from file.</li>
+<li>Drag resize scatter plots.</li>
+</ul>
+</li>
+<li>Ideas
+<ul>
+<li>Use “usethis” package.</li>
+<li>Function to update old Cerebro objects? It’s easy to just export the Seurat/SCE object again to get the new format.</li>
+<li>Store more data in <code>reactiveValues()</code>.</li>
+<li>Clean up reactivity dependencies</li>
+<li>Function to export cerebroApp for &lt;shinyapps.io&gt;</li>
+<li>Use the <a href="https://rinterface.github.io/bs4Dash/index.html"><code>bs4Dash</code> package</a>?</li>
+<li>Display logo somewhere more visible in the app?</li>
+<li>Build example data set into package and make it loadable.</li>
+<li>Save colors in CRB object so it can be loaded next time. [would be solved with new dedicated classes]</li>
+<li>Store description of extra material somewhere? [would be solved with new dedicated classes]</li>
+<li>Dedicated classes for certain types of content
+<ul>
+<li>groups (also cell cycle), tables, plots, projections, trajectories</li>
+<li>Allows storing descriptions along with tables/plots, etc.</li>
+<li>The goal of having very specific classes for Cerebro is to have better control of the data format, as well as being able to combine different types of data that belong together, for example a table (data frame) and a description (string). While R is a functional programming language, I believe it is ok in the context of Cerebro to use introduce specific classes, because they are only meant to be used inside Cerebro, not for other purposes and not for further processing.</li>
+<li>Possible problems of using specific classes:
+<ul>
+<li>How to deal with possible changes to the classes in the future? The object will look the same to Cerebro, but the fields/methods might be different.</li>
+</ul>
+</li>
+<li>Before implementing dedicated object classes, make sure they can be easily integrated in the next release.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div id="standalone-version" class="section level2">
+<h2 class="hasAnchor">
+<a href="#standalone-version" class="anchor"></a>Standalone version</h2>
+<ul>
+<li>Make it work
+<ul>
+<li>Figure out a way to programmatically create the standalone version, e.g. with the <a href="https://chasemc.github.io/electricShine/"><code>electricShine</code></a> package. Without that, I am stuck with the R version that was provided with the original framework, which is too old for some cerebroApp dependencies.</li>
+</ul>
+</li>
+<li>Other
+<ul>
+<li>Test memory usage with dgCMatrix and RleMatrix for larger data set.</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="apps-to-take-inspiration-from" class="section level1">
+<h1 class="hasAnchor">
+<a href="#apps-to-take-inspiration-from" class="anchor"></a>Apps to take inspiration from</h1>
+<ul>
+<li><a href="https://www.biorxiv.org/content/10.1101/2020.01.25.919712v2">SCANNER</a></li>
+<li><a href="https://www.sciencedirect.com/science/article/pii/S0014483520304620">Spectacle</a></li>
 </ul>
 </div>
 <div id="other-useful-links" class="section level1">
@@ -170,7 +278,14 @@
 <ul>
 <li>Discussion on how to make caged/prisoned R installation: <a href="http://r.789695.n4.nabble.com/How-do-I-put-ldpaths-in-a-specific-place-td2964241.html" class="uri">http://r.789695.n4.nabble.com/How-do-I-put-ldpaths-in-a-specific-place-td2964241.html</a>
 </li>
-<li>Generating Rd files for documentation: <a href="https://cran.r-project.org/web/packages/roxygen2/vignettes/rd.html" class="uri">https://cran.r-project.org/web/packages/roxygen2/vignettes/rd.html</a>
+<li>Managing multiple R versions on one machine (could be useful for making standalone version)
+<ul>
+<li><a href="https://mac.r-project.org/#nightly" class="uri">https://mac.r-project.org/#nightly</a></li>
+<li><a href="http://r-sig-mac.29524.n8.nabble.com/R-SIG-Mac-R-latest-pkg-link-returning-a-403-Forbidden-error-td693.html#a702" class="uri">http://r-sig-mac.29524.n8.nabble.com/R-SIG-Mac-R-latest-pkg-link-returning-a-403-Forbidden-error-td693.html#a702</a></li>
+<li><a href="https://rud.is/rswitch/guide/" class="uri">https://rud.is/rswitch/guide/</a></li>
+<li><a href="https://jacobrprice.github.io/2019/09/19/Installing-multiple-parallel-R-versions.html" class="uri">https://jacobrprice.github.io/2019/09/19/Installing-multiple-parallel-R-versions.html</a></li>
+<li><a href="https://cran.rstudio.org/doc/manuals/R-admin.html#Uninstalling-under-macOS" class="uri">https://cran.rstudio.org/doc/manuals/R-admin.html#Uninstalling-under-macOS</a></li>
+</ul>
 </li>
 </ul>
 </div>

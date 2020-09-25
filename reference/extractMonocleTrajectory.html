@@ -40,10 +40,10 @@
 
 
 <meta property="og:title" content="Extract trajectory from Monocle and add to Seurat object. — extractMonocleTrajectory" />
-<meta property="og:description" content="This function takes a Monocle object, extracts a trajectory that
-was calculated, and stores it in the specified Seurat object. Trajectory info
+<meta property="og:description" content="This function takes a Monocle object, extracts a trajectory that was
+calculated, and stores it in the specified Seurat object. Trajectory info
 (state, pseudotime, projection and tree) will be stored in
-seurat@misc$trajectory under the specified name." />
+object@misc$trajectories$monocle2 under the specified name." />
 
 
 
@@ -75,7 +75,7 @@ seurat@misc$trajectory under the specified name." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cerebroApp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
       </span>
     </div>
 
@@ -92,16 +92,51 @@ seurat@misc$trajectory under the specified name." />
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Vignettes
+    Articles
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/cerebroApp_workflow.html">The cerebroApp workflow</a>
+      <a href="../articles/cerebroApp_workflow_Seurat.html">The cerebroApp workflow (Seurat)</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">The Cerebro interface</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="../articles/Cerebro_interface_v1.2.html">Cerebro v1.2 and older</a>
+        </li>
+      </ul>
     </li>
     <li>
-      <a href="../articles/Cerebro_interface.html">The Cerebro interface</a>
+      <a href="../articles/export_a_data_set_in_SCE_format.html">Export an SCE/SingleCellExperiment object</a>
+    </li>
+    <li>
+      <a href="../articles/export_and_visualize_custom_tables_and_plots.html">Export and visualize custom tables and plots</a>
+    </li>
+    <li>
+      <a href="../articles/launch_cerebro_with_pre-loaded_data_set.html">Launch Cerebro with pre-loaded data set</a>
+    </li>
+    <li>
+      <a href="../articles/host_cerebro_on_shinyapps.html">Host Cerebro on shinyapps.io</a>
+    </li>
+    <li>
+      <a href="../articles/control_access_to_cerebro_with_a_login_page.html">Control access to Cerebro with a login page</a>
+    </li>
+    <li>
+      <a href="../articles/overview_of_cerebro_v1.3_class.html">Overview of the Cerebro v1.3 class</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Release notes
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/release_notes_v1.3.html">v1.3</a>
     </li>
   </ul>
 </li>
@@ -113,6 +148,12 @@ seurat@misc$trajectory under the specified name." />
         <li>
   <a href="https://github.com/romanhaa/cerebroApp/">
     <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://twitter.com/fakechek1">
+    <span class="fab fa fab fa-twitter fa-lg"></span>
      
   </a>
 </li>
@@ -135,10 +176,10 @@ seurat@misc$trajectory under the specified name." />
     </div>
 
     <div class="ref-description">
-    <p>This function takes a Monocle object, extracts a trajectory that
-was calculated, and stores it in the specified Seurat object. Trajectory info
+    <p>This function takes a Monocle object, extracts a trajectory that was
+calculated, and stores it in the specified Seurat object. Trajectory info
 (state, pseudotime, projection and tree) will be stored in
-seurat@misc$trajectory under the specified name.</p>
+<code>object@misc$trajectories$monocle2</code> under the specified name.</p>
     </div>
 
     <pre class="usage"><span class='fu'>extractMonocleTrajectory</span>(
@@ -180,20 +221,17 @@ pseudotime of a cell; defaults to 'Pseudotime'.</p></td>
 
     <p>Returns Seurat object with added trajectory. Trajectory info (state,
 pseudotime, projection and tree) will be stored in
-`object@misc$trajectory$monocle2` under the specified name.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>Extract trajectory from Monocle and add to Seurat object.</p>
+<code>object@misc$trajectories$monocle2</code>` under the specified name.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='no'>seurat</span> <span class='kw'>&lt;-</span> <span class='fu'>extractMonocleTrajectory</span>(
-  <span class='kw'>monocle</span> <span class='kw'>=</span> <span class='no'>monocle</span>,
-  <span class='kw'>seurat</span> <span class='kw'>=</span> <span class='no'>seurat</span>,
-  <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>'trajectory_1'</span>,
-  <span class='kw'>column_state</span> <span class='kw'>=</span> <span class='st'>'State'</span>,
-  <span class='kw'>column_pseudotime</span> <span class='kw'>=</span> <span class='st'>'Pseudotime'</span>
-)
+  <span class='no'>seurat</span> <span class='kw'>&lt;-</span> <span class='fu'>extractMonocleTrajectory</span>(
+    <span class='kw'>monocle</span> <span class='kw'>=</span> <span class='no'>monocle</span>,
+    <span class='kw'>seurat</span> <span class='kw'>=</span> <span class='no'>seurat</span>,
+    <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>'trajectory_1'</span>,
+    <span class='kw'>column_state</span> <span class='kw'>=</span> <span class='st'>'State'</span>,
+    <span class='kw'>column_pseudotime</span> <span class='kw'>=</span> <span class='st'>'Pseudotime'</span>
+  )
 }</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

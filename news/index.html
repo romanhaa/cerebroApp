@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cerebroApp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
       </span>
     </div>
 
@@ -88,16 +88,51 @@
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Vignettes
+    Articles
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/cerebroApp_workflow.html">The cerebroApp workflow</a>
+      <a href="../articles/cerebroApp_workflow_Seurat.html">The cerebroApp workflow (Seurat)</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">The Cerebro interface</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="../articles/Cerebro_interface_v1.2.html">Cerebro v1.2 and older</a>
+        </li>
+      </ul>
     </li>
     <li>
-      <a href="../articles/Cerebro_interface.html">The Cerebro interface</a>
+      <a href="../articles/export_a_data_set_in_SCE_format.html">Export an SCE/SingleCellExperiment object</a>
+    </li>
+    <li>
+      <a href="../articles/export_and_visualize_custom_tables_and_plots.html">Export and visualize custom tables and plots</a>
+    </li>
+    <li>
+      <a href="../articles/launch_cerebro_with_pre-loaded_data_set.html">Launch Cerebro with pre-loaded data set</a>
+    </li>
+    <li>
+      <a href="../articles/host_cerebro_on_shinyapps.html">Host Cerebro on shinyapps.io</a>
+    </li>
+    <li>
+      <a href="../articles/control_access_to_cerebro_with_a_login_page.html">Control access to Cerebro with a login page</a>
+    </li>
+    <li>
+      <a href="../articles/overview_of_cerebro_v1.3_class.html">Overview of the Cerebro v1.3 class</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Release notes
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/release_notes_v1.3.html">v1.3</a>
     </li>
   </ul>
 </li>
@@ -109,6 +144,12 @@
         <li>
   <a href="https://github.com/romanhaa/cerebroApp/">
     <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://twitter.com/fakechek1">
+    <span class="fab fa fab fa-twitter fa-lg"></span>
      
   </a>
 </li>
@@ -129,6 +170,33 @@
       <small>Source: <a href='https://github.com/romanhaa/cerebroApp/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="cerebroapp-130" class="section level1">
+<h1 class="page-header" data-toc-text="1.3.0">
+<a href="#cerebroapp-130" class="anchor"></a>cerebroApp 1.3.0</h1>
+<p>Because this is a relatively big release, I have prepared a dedicated article with release notes for cerebroApp v1.3 that you can find in the navigation bar.</p>
+<div id="major-changes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#major-changes" class="anchor"></a>Major changes</h2>
+<ul>
+<li>With data sets becoming more complex, users often have more than just the two grouping variables Cerebro was initially made to work with (‘sample’ and ‘cluster’). To provide a more generalized interface, users can now specify multiple grouping variables (or a single one). Consequently, the ‘Samples’ and ‘Clusters’ tabs in the Cerebro interface have been replaced by the ‘Groups’ tab, where users can select one of the available grouping variables (with the same content as before). This can be useful when you cluster the cells with different methods/settings or have additional grouping variables, such as treatments, and want to provide the Cerebro user with both results.</li>
+<li>Data loaded into Cerebro is now stored in a dedicated class: <code>Cerebro_v1.3</code>.</li>
+<li>Due to the changes in data structure, files exported with cerebroApp v1.3 can only be visualized in Cerebro v1.3. Moreover, files exported with cerebroApp v1.2 and earlier cannot be loaded into Cerebro v1.3. I apologize for any inconvenience but I believe these changes will lead to more stability coming releases.</li>
+<li>Removed support for Seurat objects before v3.0. Users who need to continue working with older version of Seurat have two options: (1) use the <code><a href="https://rdrr.io/pkg/Seurat/man/UpdateSeuratObject.html">Seurat::UpdateSeuratObject()</a></code> function to update their Seurat object before exporting it for visualization in Cerebro; (2) use older Cerebro version. I apologize for the any trouble this may cause.</li>
+<li>The “Gene expression” and “Gene set expression” tabs have been merged into the new “Gene (set) expression)” which gives you access to both.</li>
+<li>The new “Extra material” tab allows you to export additional material related to the data set that you want to share with others. At the moment, only tables and plots (from ggplot2) are supported, but support for other types of content can be added upon user request in the future.</li>
+</ul>
+</div>
+<div id="new-features" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-features" class="anchor"></a>New features</h2>
+<ul>
+<li>It is now possible to export single cell data stored in <code>SingleCellExperiment</code> (SCE) objects.</li>
+<li>Gene (set) expression can now also be visualized in trajectories (generated by Monocle 2).</li>
+<li>
+<code>NA</code> values for cell assignment to one of the specified grouping variables will be replaced by <code>N/A</code> and put into a separate group (“N/A”) when exporting the data.</li>
+</ul>
+</div>
+</div>
     <div id="cerebroapp-122" class="section level1">
 <h1 class="page-header" data-toc-text="1.2.2">
 <a href="#cerebroapp-122" class="anchor"></a>cerebroApp 1.2.2</h1>
@@ -146,9 +214,9 @@
     <div id="cerebroapp-121" class="section level1">
 <h1 class="page-header" data-toc-text="1.2.1">
 <a href="#cerebroapp-121" class="anchor"></a>cerebroApp 1.2.1</h1>
-<div id="new-features" class="section level2">
+<div id="new-features-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features" class="anchor"></a>New features</h2>
+<a href="#new-features-1" class="anchor"></a>New features</h2>
 <ul>
 <li>It is now possible to select cells in the dimensional reduction plots (‘Overview’, ‘Gene expression’, and ‘Gene set expression’ tabs) and retrieve additional info for them. For example, users can get tables of meta data or expression values and save them as a file for further analysis. Also, gene expression can be shown in the selected vs. non-selected cells.</li>
 </ul>
@@ -165,9 +233,9 @@
     <div id="cerebroapp-120" class="section level1">
 <h1 class="page-header" data-toc-text="1.2.0">
 <a href="#cerebroapp-120" class="anchor"></a>cerebroApp 1.2.0</h1>
-<div id="new-features-1" class="section level2">
+<div id="new-features-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-1" class="anchor"></a>New features</h2>
+<a href="#new-features-2" class="anchor"></a>New features</h2>
 <ul>
 <li>New button for composition plots (e.g. samples by clusters or cell cycle) that allows to choose whether to scale by actual cell count (default) or percentage.</li>
 <li>New button for composition plots that allows to show/hide the respective table of numbers behind them.</li>
@@ -202,9 +270,9 @@
 <ul>
 <li>Release along with manuscript revision.</li>
 </ul>
-<div id="new-features-2" class="section level2">
+<div id="new-features-3" class="section level2">
 <h2 class="hasAnchor">
-<a href="#new-features-2" class="anchor"></a>New features</h2>
+<a href="#new-features-3" class="anchor"></a>New features</h2>
 <ul>
 <li>New function <code><a href="../reference/extractMonocleTrajectory.html">extractMonocleTrajectory()</a></code>: Users can extract data from trajectories calculated with Monocle v2.</li>
 <li>New tab “Trajectories”: Allows visualization of trajectories calculated with Monocle v2.</li>

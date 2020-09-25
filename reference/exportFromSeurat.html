@@ -40,8 +40,7 @@
 
 
 <meta property="og:title" content="Export Seurat object to Cerebro. — exportFromSeurat" />
-<meta property="og:description" content="This function allows to export a Seurat object to visualize in
-Cerebro." />
+<meta property="og:description" content="This function allows to export a Seurat object to visualize in Cerebro." />
 
 
 
@@ -73,7 +72,7 @@ Cerebro." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cerebroApp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
       </span>
     </div>
 
@@ -90,16 +89,51 @@ Cerebro." />
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Vignettes
+    Articles
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/cerebroApp_workflow.html">The cerebroApp workflow</a>
+      <a href="../articles/cerebroApp_workflow_Seurat.html">The cerebroApp workflow (Seurat)</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">The Cerebro interface</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="../articles/Cerebro_interface_v1.2.html">Cerebro v1.2 and older</a>
+        </li>
+      </ul>
     </li>
     <li>
-      <a href="../articles/Cerebro_interface.html">The Cerebro interface</a>
+      <a href="../articles/export_a_data_set_in_SCE_format.html">Export an SCE/SingleCellExperiment object</a>
+    </li>
+    <li>
+      <a href="../articles/export_and_visualize_custom_tables_and_plots.html">Export and visualize custom tables and plots</a>
+    </li>
+    <li>
+      <a href="../articles/launch_cerebro_with_pre-loaded_data_set.html">Launch Cerebro with pre-loaded data set</a>
+    </li>
+    <li>
+      <a href="../articles/host_cerebro_on_shinyapps.html">Host Cerebro on shinyapps.io</a>
+    </li>
+    <li>
+      <a href="../articles/control_access_to_cerebro_with_a_login_page.html">Control access to Cerebro with a login page</a>
+    </li>
+    <li>
+      <a href="../articles/overview_of_cerebro_v1.3_class.html">Overview of the Cerebro v1.3 class</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Release notes
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/release_notes_v1.3.html">v1.3</a>
     </li>
   </ul>
 </li>
@@ -111,6 +145,12 @@ Cerebro." />
         <li>
   <a href="https://github.com/romanhaa/cerebroApp/">
     <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://twitter.com/fakechek1">
+    <span class="fab fa fab fa-twitter fa-lg"></span>
      
   </a>
 </li>
@@ -133,23 +173,23 @@ Cerebro." />
     </div>
 
     <div class="ref-description">
-    <p>This function allows to export a Seurat object to visualize in
-Cerebro.</p>
+    <p>This function allows to export a Seurat object to visualize in Cerebro.</p>
     </div>
 
     <pre class="usage"><span class='fu'>exportFromSeurat</span>(
   <span class='no'>object</span>,
   <span class='kw'>assay</span> <span class='kw'>=</span> <span class='st'>"RNA"</span>,
+  <span class='kw'>slot</span> <span class='kw'>=</span> <span class='st'>"data"</span>,
   <span class='no'>file</span>,
   <span class='no'>experiment_name</span>,
   <span class='no'>organism</span>,
-  <span class='kw'>column_sample</span> <span class='kw'>=</span> <span class='st'>"sample"</span>,
-  <span class='kw'>column_cluster</span> <span class='kw'>=</span> <span class='st'>"cluster"</span>,
-  <span class='kw'>column_nUMI</span> <span class='kw'>=</span> <span class='st'>"nUMI"</span>,
-  <span class='kw'>column_nGene</span> <span class='kw'>=</span> <span class='st'>"nGene"</span>,
-  <span class='kw'>column_cell_cycle_seurat</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>column_cell_cycle_cyclone</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>add_all_meta_data</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+  <span class='no'>groups</span>,
+  <span class='kw'>cell_cycle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>nUMI</span> <span class='kw'>=</span> <span class='st'>"nUMI"</span>,
+  <span class='kw'>nGene</span> <span class='kw'>=</span> <span class='st'>"nGene"</span>,
+  <span class='kw'>add_all_meta_data</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>use_delayed_array</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -161,8 +201,14 @@ Cerebro.</p>
     </tr>
     <tr>
       <th>assay</th>
-      <td><p>Assay to pull counts from; defaults to 'RNA'. Only relevant in
-Seurat v3.0 or higher since the concept of assays wasn't implemented before.</p></td>
+      <td><p>Assay to pull expression values from; defaults to <code>RNA</code>.</p></td>
+    </tr>
+    <tr>
+      <th>slot</th>
+      <td><p>Slot to pull expression values from; defaults to <code>data</code>. It
+is recommended to use sparse data (such as log-transformed or raw counts)
+instead of dense data (such as the <code>scaled</code> slot) to avoid performance
+bottlenecks in the Cerebro interface.</p></td>
     </tr>
     <tr>
       <th>file</th>
@@ -174,67 +220,89 @@ Seurat v3.0 or higher since the concept of assays wasn't implemented before.</p>
     </tr>
     <tr>
       <th>organism</th>
-      <td><p>Organism, e.g. hg (human), mm (mouse), etc.</p></td>
+      <td><p>Organism, e.g. <code>hg</code> (human), <code>mm</code> (mouse), etc.</p></td>
     </tr>
     <tr>
-      <th>column_sample</th>
-      <td><p>Column in object@meta.data that contains information
-about sample; defaults to 'sample'.</p></td>
+      <th>groups</th>
+      <td><p>Names of grouping variables in meta data
+(<code>object@meta.data</code>), e.g. <code><a href='https://rdrr.io/r/base/c.html'>c("sample","cluster")</a></code>; at least one
+must be provided; defaults to <code>NULL</code>.</p></td>
     </tr>
     <tr>
-      <th>column_cluster</th>
-      <td><p>Column in object@meta.data that contains information
-about cluster; defaults to 'cluster'.</p></td>
+      <th>cell_cycle</th>
+      <td><p>Names of columns in meta data
+(<code>object@meta.data</code>) that contain cell cycle information, e.g.
+<code><a href='https://rdrr.io/r/base/c.html'>c("Phase")</a></code>; defaults to <code>NULL</code>.</p></td>
     </tr>
     <tr>
-      <th>column_nUMI</th>
-      <td><p>Column in object@meta.data that contains information about
-number of transcripts per cell; defaults to 'nUMI'.</p></td>
+      <th>nUMI</th>
+      <td><p>Column in <code>object@meta.data</code> that contains information about
+number of transcripts per cell; defaults to <code>nUMI</code>.</p></td>
     </tr>
     <tr>
-      <th>column_nGene</th>
-      <td><p>Column in object@meta.data that contains information
-about number of expressed genes per cell; defaults to 'nGene'.</p></td>
-    </tr>
-    <tr>
-      <th>column_cell_cycle_seurat</th>
-      <td><p>Optional column in object@meta.data that
-contains information about cell cycle phase based on Regev method (default of
-Seurat); defaults to NULL.</p></td>
-    </tr>
-    <tr>
-      <th>column_cell_cycle_cyclone</th>
-      <td><p>Optional column in object@meta.data that
-contains information about cell cycle phase based on Cyclone method; defaults
-to NULL.</p></td>
+      <th>nGene</th>
+      <td><p>Column in <code>object@meta.data</code> that contains information
+about number of expressed genes per cell; defaults to <code>nGene</code>.</p></td>
     </tr>
     <tr>
       <th>add_all_meta_data</th>
-      <td><p>If set to TRUE, all further meta data columns will
-be extracted as well.</p></td>
+      <td><p>If set to <code>TRUE</code>, all further meta data columns
+will be extracted as well.</p></td>
+    </tr>
+    <tr>
+      <th>use_delayed_array</th>
+      <td><p>When set to <code>TRUE</code>, the expression matrix will
+be stored as an <code>RleMatrix</code> (see <code>DelayedArray</code> package). This can
+be useful for very large data sets, as the matrix won't be loaded into memory
+and instead values will be read from the disk directly, at the cost of
+performance. Note that it is necessary to install the <code>DelayedArray</code>
+package. If set to <code>FALSE</code> (default), the expression matrix will be
+copied from the input object as is. It is recommended to use a sparse format,
+such as <code>dgCMatrix</code> from the <code>Matrix</code> package.</p></td>
+    </tr>
+    <tr>
+      <th>verbose</th>
+      <td><p>Set this to <code>TRUE</code> if you want additional log messages;
+defaults to <code>FALSE</code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Nothing.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>Export Seurat object to Cerebro.</p>
+    <p>No data returned.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata/v1.2/seurat_pbmc.rds"</span>,
+    <pre class="examples"><div class='input'><span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata/v1.3/pbmc_seurat.rds"</span>,
   <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"cerebroApp"</span>))
 <span class='fu'>exportFromSeurat</span>(
   <span class='kw'>object</span> <span class='kw'>=</span> <span class='no'>pbmc</span>,
-  <span class='kw'>file</span> <span class='kw'>=</span> <span class='st'>'pbmc.crb'</span>,
+  <span class='kw'>file</span> <span class='kw'>=</span> <span class='st'>'pbmc_Seurat.crb'</span>,
   <span class='kw'>experiment_name</span> <span class='kw'>=</span> <span class='st'>'PBMC'</span>,
   <span class='kw'>organism</span> <span class='kw'>=</span> <span class='st'>'hg'</span>,
-  <span class='kw'>column_sample</span> <span class='kw'>=</span> <span class='st'>'sample'</span>,
-  <span class='kw'>column_cluster</span> <span class='kw'>=</span> <span class='st'>'seurat_clusters'</span>,
-  <span class='kw'>column_nUMI</span> <span class='kw'>=</span> <span class='st'>'nCount_RNA'</span>,
-  <span class='kw'>column_nGene</span> <span class='kw'>=</span> <span class='st'>'nFeature_RNA'</span>
-)</div><div class='output co'>#&gt; <span class='message'>[16:12:00] Initializing Cerebro object...</span></div><div class='output co'>#&gt; <span class='message'>[16:12:00] Collecting available meta data...</span></div><div class='output co'>#&gt; <span class='message'>[16:12:00] Extracting all meta data columns...</span></div><div class='output co'>#&gt; <span class='message'>[16:12:00] Extracting tables of marker genes...</span></div><div class='output co'>#&gt; <span class='message'>[16:12:00] Extracting dimensional reductions...</span></div><div class='output co'>#&gt; <span class='message'>[16:12:00] Will export the following dimensional reductions: umap</span></div><div class='output co'>#&gt; <span class='message'>[16:12:00] No trajectories to extract...</span></div><div class='output co'>#&gt; <span class='message'>[16:12:00] Extracting log-normalized expression data...</span></div><div class='output co'>#&gt; <span class='message'>[16:12:00] Saving Cerebro file...</span></div></pre>
+  <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>'sample'</span>,<span class='st'>'seurat_clusters'</span>),
+  <span class='kw'>nUMI</span> <span class='kw'>=</span> <span class='st'>'nCount_RNA'</span>,
+  <span class='kw'>nGene</span> <span class='kw'>=</span> <span class='st'>'nFeature_RNA'</span>,
+  <span class='kw'>use_delayed_array</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+)</div><div class='output co'>#&gt; <span class='message'>[12:37:08] Initializing Cerebro object...</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] Collecting available meta data...</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] Extracting all meta data columns...</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] Extracting dimensional reductions...</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] Will export the following dimensional reductions: UMAP</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] Extracting tables of marker genes...</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] No trajectories to extract...</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] Overview of Cerebro object:</span></div><div class='output co'>#&gt; <span class='message'>class: Cerebro_v1.3</span>
+#&gt; <span class='message'>cerebroApp version: 1.3.0</span>
+#&gt; <span class='message'>experiment name: PBMC</span>
+#&gt; <span class='message'>organism: hg</span>
+#&gt; <span class='message'>date of analysis: </span>
+#&gt; <span class='message'>date of export: 2020-09-25</span>
+#&gt; <span class='message'>number of cells: 80</span>
+#&gt; <span class='message'>number of genes: 230</span>
+#&gt; <span class='message'>grouping variables (2): sample, seurat_clusters</span>
+#&gt; <span class='message'>cell cycle variables (0): </span>
+#&gt; <span class='message'>projections (1): UMAP</span>
+#&gt; <span class='message'>trees (0): </span>
+#&gt; <span class='message'>most expressed genes: </span>
+#&gt; <span class='message'>marker genes:</span>
+#&gt; <span class='message'>  - cerebro_seurat (2): sample, seurat_clusters</span>
+#&gt; <span class='message'>enriched pathways:</span>
+#&gt; <span class='message'>trajectories:</span>
+#&gt; <span class='message'>extra material:</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] Saving Cerebro object to: pbmc_Seurat.crb</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] Done!</span></div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

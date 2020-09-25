@@ -40,12 +40,12 @@
 
 
 <meta property="og:title" content="Perform gene set enrichment analysis with GSVA. — performGeneSetEnrichmentAnalysis" />
-<meta property="og:description" content="This function calculates enrichment scores, p- and q-value
-statistics for provided gene sets for samples and clusters of cells in given
-Seurat object using gene set variation analysis (GSVA). Calculation of p- and
-q-values for gene sets is performed as done in &quot;Evaluation of methods to
-assign cell type labels to cell clusters from single-cell RNA-sequencing
-data&quot;, Diaz-Mejia et al., F1000Research (2019)." />
+<meta property="og:description" content="This function calculates enrichment scores, p- and q-value statistics for
+provided gene sets for specified groups of cells in given Seurat object using
+gene set variation analysis (GSVA). Calculation of p- and q-values for gene
+sets is performed as done in &quot;Evaluation of methods to assign cell type
+labels to cell clusters from single-cell RNA-sequencing data&quot;, Diaz-Mejia et
+al., F1000Research (2019)." />
 
 
 
@@ -77,7 +77,7 @@ data&quot;, Diaz-Mejia et al., F1000Research (2019)." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cerebroApp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
       </span>
     </div>
 
@@ -94,16 +94,51 @@ data&quot;, Diaz-Mejia et al., F1000Research (2019)." />
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Vignettes
+    Articles
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/cerebroApp_workflow.html">The cerebroApp workflow</a>
+      <a href="../articles/cerebroApp_workflow_Seurat.html">The cerebroApp workflow (Seurat)</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">The Cerebro interface</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="../articles/Cerebro_interface_v1.2.html">Cerebro v1.2 and older</a>
+        </li>
+      </ul>
     </li>
     <li>
-      <a href="../articles/Cerebro_interface.html">The Cerebro interface</a>
+      <a href="../articles/export_a_data_set_in_SCE_format.html">Export an SCE/SingleCellExperiment object</a>
+    </li>
+    <li>
+      <a href="../articles/export_and_visualize_custom_tables_and_plots.html">Export and visualize custom tables and plots</a>
+    </li>
+    <li>
+      <a href="../articles/launch_cerebro_with_pre-loaded_data_set.html">Launch Cerebro with pre-loaded data set</a>
+    </li>
+    <li>
+      <a href="../articles/host_cerebro_on_shinyapps.html">Host Cerebro on shinyapps.io</a>
+    </li>
+    <li>
+      <a href="../articles/control_access_to_cerebro_with_a_login_page.html">Control access to Cerebro with a login page</a>
+    </li>
+    <li>
+      <a href="../articles/overview_of_cerebro_v1.3_class.html">Overview of the Cerebro v1.3 class</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Release notes
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/release_notes_v1.3.html">v1.3</a>
     </li>
   </ul>
 </li>
@@ -115,6 +150,12 @@ data&quot;, Diaz-Mejia et al., F1000Research (2019)." />
         <li>
   <a href="https://github.com/romanhaa/cerebroApp/">
     <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://twitter.com/fakechek1">
+    <span class="fab fa fab fa-twitter fa-lg"></span>
      
   </a>
 </li>
@@ -137,20 +178,20 @@ data&quot;, Diaz-Mejia et al., F1000Research (2019)." />
     </div>
 
     <div class="ref-description">
-    <p>This function calculates enrichment scores, p- and q-value
-statistics for provided gene sets for samples and clusters of cells in given
-Seurat object using gene set variation analysis (GSVA). Calculation of p- and
-q-values for gene sets is performed as done in "Evaluation of methods to
-assign cell type labels to cell clusters from single-cell RNA-sequencing
-data", Diaz-Mejia et al., F1000Research (2019).</p>
+    <p>This function calculates enrichment scores, p- and q-value statistics for
+provided gene sets for specified groups of cells in given Seurat object using
+gene set variation analysis (GSVA). Calculation of p- and q-values for gene
+sets is performed as done in "Evaluation of methods to assign cell type
+labels to cell clusters from single-cell RNA-sequencing data", Diaz-Mejia et
+al., F1000Research (2019).</p>
     </div>
 
     <pre class="usage"><span class='fu'>performGeneSetEnrichmentAnalysis</span>(
   <span class='no'>object</span>,
   <span class='kw'>assay</span> <span class='kw'>=</span> <span class='st'>"RNA"</span>,
   <span class='no'>GMT_file</span>,
-  <span class='kw'>column_sample</span> <span class='kw'>=</span> <span class='st'>"sample"</span>,
-  <span class='kw'>column_cluster</span> <span class='kw'>=</span> <span class='st'>"cluster"</span>,
+  <span class='kw'>groups</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"cerebro_GSVA"</span>,
   <span class='kw'>thresh_p_val</span> <span class='kw'>=</span> <span class='fl'>0.05</span>,
   <span class='kw'>thresh_q_val</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
   <span class='no'>...</span>
@@ -175,14 +216,14 @@ The Broad Institute provides many gene sets which can be downloaded:
 http://software.broadinstitute.org/gsea/msigdb/index.jsp</p></td>
     </tr>
     <tr>
-      <th>column_sample</th>
-      <td><p>Column in object@meta.data that contains information
-about sample; defaults to 'sample'.</p></td>
+      <th>groups</th>
+      <td><p>Grouping variables (columns) in object@meta.data for which
+gene set enrichment analysis should be performed</p></td>
     </tr>
     <tr>
-      <th>column_cluster</th>
-      <td><p>Column in object@meta.data that contains information
-about cluster; defaults to 'cluster'.</p></td>
+      <th>name</th>
+      <td><p>Name of list that should be used to store the results in
+object@misc$enriched_pathways$&lt;name&gt;; defaults to 'cerebro_GSVA'.</p></td>
     </tr>
     <tr>
       <th>thresh_p_val</th>
@@ -200,27 +241,30 @@ about cluster; defaults to 'cluster'.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Seurat object with GSVA results for samples and clusters stored in
-object@misc$enriched_pathways$GSVA.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>Perform gene set enrichment analysis with GSVA.</p>
+    <p>Seurat object with GSVA results for the specified grouping variables
+stored in object@misc$enriched_pathways$&lt;name&gt;</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata/v1.2/seurat_pbmc.rds"</span>,
+    <pre class="examples"><div class='input'><span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata/v1.3/pbmc_seurat.rds"</span>,
   <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"cerebroApp"</span>))
 <span class='no'>example_gene_set</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata/example_gene_set.gmt"</span>,
   <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"cerebroApp"</span>)
 <span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'>performGeneSetEnrichmentAnalysis</span>(
   <span class='kw'>object</span> <span class='kw'>=</span> <span class='no'>pbmc</span>,
   <span class='kw'>GMT_file</span> <span class='kw'>=</span> <span class='no'>example_gene_set</span>,
-  <span class='kw'>column_sample</span> <span class='kw'>=</span> <span class='st'>'sample'</span>,
-  <span class='kw'>column_cluster</span> <span class='kw'>=</span> <span class='st'>'seurat_clusters'</span>,
+  <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>'sample'</span>,<span class='st'>'seurat_clusters'</span>),
   <span class='kw'>thresh_p_val</span> <span class='kw'>=</span> <span class='fl'>0.05</span>,
-  <span class='kw'>thresh_q_val</span> <span class='kw'>=</span> <span class='fl'>0.1</span>,
-  <span class='kw'>parallel.sz</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
-)</div><div class='output co'>#&gt; <span class='message'>[16:12:44] Loading gene sets...</span></div><div class='output co'>#&gt; <span class='message'>[16:12:44] Loaded 1 gene sets from GMT file.</span></div><div class='output co'>#&gt; <span class='message'>[16:12:44] Extracting transcript counts...</span></div><div class='output co'>#&gt; <span class='message'>[16:12:44] Removing non-expressed genes...</span></div><div class='output co'>#&gt; <span class='message'>[16:12:44] Only 1 sample in the data set, will skip analysis by sample...</span></div><div class='output co'>#&gt; <span class='message'>[16:12:44] Performing GSVA for clusters...</span></div><div class='output co'>#&gt; <span class='message'>[16:12:44] Only 1 gene set available, therefore no p- and q-values can be calculated and no filtering of the results will be performed.</span></div><div class='output co'>#&gt; <span class='message'>[16:12:44] Only 1 gene set available, therefore no p- and q-values can be calculated and no filtering of the results will be performed.</span></div><div class='output co'>#&gt; <span class='message'>[16:12:44] Only 1 gene set available, therefore no p- and q-values can be calculated and no filtering of the results will be performed.</span></div><div class='output co'>#&gt; <span class='message'>[16:12:44] 3 gene sets passed the thresholds across all clusters.</span></div></pre>
+  <span class='kw'>thresh_q_val</span> <span class='kw'>=</span> <span class='fl'>0.1</span>
+)</div><div class='output co'>#&gt; <span class='message'>[12:37:24] Loading gene sets...</span></div><div class='output co'>#&gt; <span class='message'>[12:37:24] Loaded 2 gene sets from GMT file.</span></div><div class='output co'>#&gt; <span class='message'>[12:37:24] Extracting transcript counts from `data` slot of `RNA` assay...</span></div><div class='output co'>#&gt; <span class='message'>[12:37:24] Performing analysis for 2 subgroups of group `sample`...</span></div><div class='output co'>#&gt; Estimating GSVA scores for 2 gene sets.
+#&gt; Computing observed enrichment scores
+#&gt; Estimating ECDFs with Gaussian kernels
+#&gt; Using parallel with 4 cores
+#&gt;   |                                                                              |                                                                      |   0%</div><div class='output co'>#&gt; <span class='message'>[12:37:24] 0 gene sets passed the thresholds across all subgroups of group `sample`.</span></div><div class='output co'>#&gt; <span class='message'>[12:37:24] Performing analysis for 3 subgroups of group `seurat_clusters`...</span></div><div class='output co'>#&gt; Estimating GSVA scores for 2 gene sets.
+#&gt; Computing observed enrichment scores
+#&gt; Estimating ECDFs with Gaussian kernels
+#&gt; Using parallel with 4 cores
+#&gt;   |                                                                              |                                                                      |   0%</div><div class='output co'>#&gt; <span class='message'>[12:37:25] 0 gene sets passed the thresholds across all subgroups of group `seurat_clusters`.</span></div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

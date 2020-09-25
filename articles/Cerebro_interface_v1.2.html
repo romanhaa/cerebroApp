@@ -5,13 +5,13 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Introduction to the Cerebro interface • cerebroApp</title>
+<title>Introduction to the Cerebro interface (v1.2 and older) • cerebroApp</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Introduction to the Cerebro interface">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Introduction to the Cerebro interface (v1.2 and older)">
 <meta property="og:description" content="cerebroApp">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cerebroApp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
       </span>
     </div>
 
@@ -48,16 +48,51 @@
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Vignettes
+    Articles
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/cerebroApp_workflow.html">The cerebroApp workflow</a>
+      <a href="../articles/cerebroApp_workflow_Seurat.html">The cerebroApp workflow (Seurat)</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">The Cerebro interface</a>
+      <ul class="dropdown-menu" role="menu">
+<li>
+          <a href="../articles/Cerebro_interface_v1.2.html">Cerebro v1.2 and older</a>
+        </li>
+      </ul>
+</li>
+    <li>
+      <a href="../articles/export_a_data_set_in_SCE_format.html">Export an SCE/SingleCellExperiment object</a>
     </li>
     <li>
-      <a href="../articles/Cerebro_interface.html">The Cerebro interface</a>
+      <a href="../articles/export_and_visualize_custom_tables_and_plots.html">Export and visualize custom tables and plots</a>
+    </li>
+    <li>
+      <a href="../articles/launch_cerebro_with_pre-loaded_data_set.html">Launch Cerebro with pre-loaded data set</a>
+    </li>
+    <li>
+      <a href="../articles/host_cerebro_on_shinyapps.html">Host Cerebro on shinyapps.io</a>
+    </li>
+    <li>
+      <a href="../articles/control_access_to_cerebro_with_a_login_page.html">Control access to Cerebro with a login page</a>
+    </li>
+    <li>
+      <a href="../articles/overview_of_cerebro_v1.3_class.html">Overview of the Cerebro v1.3 class</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Release notes
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+<li>
+      <a href="../articles/release_notes_v1.3.html">v1.3</a>
     </li>
   </ul>
 </li>
@@ -72,6 +107,12 @@
      
   </a>
 </li>
+<li>
+  <a href="https://twitter.com/fakechek1">
+    <span class="fab fa fab fa-twitter fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
 </div>
 <!--/.nav-collapse -->
@@ -82,16 +123,16 @@
 
       
 
-      </header><div class="row">
+      </header><script src="Cerebro_interface_v1.2_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Introduction to the Cerebro interface</h1>
+      <h1 data-toc-skip>Introduction to the Cerebro interface (v1.2 and older)</h1>
                         <h4 class="author">Roman Hillje</h4>
             
-            <h4 class="date">17 June, 2020</h4>
+            <h4 class="date">25 September, 2020</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/romanhaa/cerebroApp/blob/master/vignettes/Cerebro_interface.Rmd"><code>vignettes/Cerebro_interface.Rmd</code></a></small>
-      <div class="hidden name"><code>Cerebro_interface.Rmd</code></div>
+      <small class="dont-index">Source: <a href="https://github.com/romanhaa/cerebroApp/blob/master/vignettes/Cerebro_interface_v1.2.Rmd"><code>vignettes/Cerebro_interface_v1.2.Rmd</code></a></small>
+      <div class="hidden name"><code>Cerebro_interface_v1.2.Rmd</code></div>
 
     </div>
 
@@ -125,13 +166,13 @@
 <div id="load-data" class="section level3">
 <h3 class="hasAnchor">
 <a href="#load-data" class="anchor"></a>Load data</h3>
-<p><img src="https://github.com/romanhaa/Cerebro/blob/master/screenshots/cerebro_v1.1.0_pbmc_10k_v3/2019-09-23_01.png?raw=true" alt="Load data" width="100%" height="auto"></p>
+<p><a target="_blank" href="Cerebro_interface_v1.2_files/2019-09-23_01.png"><img src="Cerebro_interface_v1.2_files/2019-09-23_01.png" alt="Load data" width="100%" height="auto"></a></p>
 <p>This is the panel that we will be shown to you when you launch Cerebro. In the top input panel you can choose your data which is the file you received from your colleague or downloaded from the examples mentioned earlier. The input file usually has the <code>.crb</code> or <code>.rds</code> extension. After selecting the file in the dialog box, the file will be loaded. Please be patient during this process and wait until the progress bar says “Upload complete.”. The numbers in the different tiles will now update and give you some numbers about your data sets, including the number of cells, number of samples, number of clusters, the organism, and the experiment name. After loading the sample, there is not much more to do here so let’s move on to the “Overview” panel.</p>
 </div>
 <div id="overview" class="section level3">
 <h3 class="hasAnchor">
 <a href="#overview" class="anchor"></a>Overview</h3>
-<p><img src="https://github.com/romanhaa/Cerebro/blob/master/screenshots/cerebro_v1.1.0_pbmc_10k_v3/2019-09-23_02_01.png?raw=true" alt="t-SNE projection with cells colored by sample" width="49%" height="auto"><img src="https://github.com/romanhaa/Cerebro/blob/master/screenshots/cerebro_v1.1.0_pbmc_10k_v3/2019-09-23_02_02.png?raw=true" alt="UMAP projection with cells colored by cell cycle" width="49%" height="auto"></p>
+<p><a target="_blank" href="Cerebro_interface_v1.2_files/2019-09-23_02_01.png"><img src="Cerebro_interface_v1.2_files/2019-09-23_02_01.png" alt="t-SNE projection with cells colored by sample" width="49%" height="auto"></a><a target="_blank" href="Cerebro_interface_v1.2_files/2019-09-23_02_02.png"><img src="Cerebro_interface_v1.2_files/2019-09-23_02_02.png" alt="UMAP projection with cells colored by cell cycle" width="49%" height="auto"></a></p>
 <p>In the “Overview” panel, you have access to all the dimensional reductions (e.g. t-SNE or UMAP) that have been generated for this data set. Dimensional reductions can be either 2- or 3-dimensional and aim to represent the complex expression profiles of all the cells in a more interpretable way.</p>
 <p>The plot is interactive which means you can hover over the cells with your cursor to get extra info, zoom in and out, and pan around. You may also export the plot to a PDF image by hitting the “export to PDF” button in the title bar. The file will the stored on your desktop.</p>
 <p>In the input box on the left, you can select a bunch of parameters for the plot. For example, if there are multiple dimensional reductions, you can choose which one should be shown. Also, you can exclude entire samples or clusters from the plot. Sometimes, data sets can become quite large which can make the plots dreadfully slow on older machines. In those cases, consider showing only a random subset of cells by dragging the slider down from 100% to a lower value. Next, you can choose which meta information to color the cells by. By default, they will be colored by the sample the cells originate from, but you can change this to any meta information that is available, e.g. cluster label, cell cycle phase, etc. The rest of the parameters are aesthetic and allow you to adjust dot size, dot opacity (transparency), and range of the X and Y scale.</p>
@@ -139,7 +180,7 @@
 <div id="samples" class="section level3">
 <h3 class="hasAnchor">
 <a href="#samples" class="anchor"></a>Samples</h3>
-<p><img src="https://github.com/romanhaa/Cerebro/blob/master/screenshots/cerebro_v1.1.0_pbmc_10k_v3/2019-09-23_03.png?raw=true" alt="Composition of samples by cluster" width="49%" height="auto"><img src="https://github.com/romanhaa/Cerebro/blob/master/screenshots/cerebro_v1.1.0_pbmc_10k_v3/2019-09-23_04.png?raw=true" alt="Distribution of cell cycle states by sample" width="49%" height="auto"></p>
+<p><a target="_blank" href="Cerebro_interface_v1.2_files/2019-09-23_03.png"><img src="Cerebro_interface_v1.2_files/2019-09-23_03.png" alt="Composition of samples by cluster" width="49%" height="auto"></a><a target="_blank" href="Cerebro_interface_v1.2_files/2019-09-23_04.png"><img src="Cerebro_interface_v1.2_files/2019-09-23_04.png" alt="Distribution of cell cycle states by sample" width="49%" height="auto"></a></p>
 <p>The “Samples” panel gives you a sample-centric view of the loaded data. That means, cells are grouped by the sample they came from.</p>
 <p>First, you’ll see a table and bar plot showing you the composition of samples by the identified cluster.</p>
 <p>Then, you will see the distribution of the number of transcripts by sample in the form of a violin plot. More statistical info, such as the mean, median, quartiles, and min/max values, is shown when hovering over the distributions.</p>
@@ -149,7 +190,7 @@
 <div id="clusters" class="section level3">
 <h3 class="hasAnchor">
 <a href="#clusters" class="anchor"></a>Clusters</h3>
-<p><img src="https://github.com/romanhaa/Cerebro/blob/master/screenshots/cerebro_v1.1.0_pbmc_10k_v3/2019-09-23_05.png?raw=true" alt="Cluster tree" width="49%" height="auto"><img src="https://github.com/romanhaa/Cerebro/blob/master/screenshots/cerebro_v1.1.0_pbmc_10k_v3/2019-09-23_06.png?raw=true" alt="Number of transcripts and expressed genes by cluster" width="49%" height="auto"></p>
+<p><a target="_blank" href="Cerebro_interface_v1.2_files/2019-09-23_05.png"><img src="Cerebro_interface_v1.2_files/2019-09-23_05.png" alt="Cluster tree" width="49%" height="auto"></a><a target="_blank" href="Cerebro_interface_v1.2_files/2019-09-23_06.png"><img src="Cerebro_interface_v1.2_files/2019-09-23_06.png" alt="Number of transcripts and expressed genes by cluster" width="49%" height="auto"></a></p>
 <p>The “Clusters” panel gives a cluster-centric view of the data. Except for the first plot (the cluster tree), it shows the same info as the “Samples” panel however now the cells are grouped by the cluster they were assigned to.</p>
 <p>The cluster tree shows you the similarity between clusters. This can be useful if you want to merge clusters and want to know which ones are most similar to each other.</p>
 <p>Then, the composition of each cluster by sample is provided in the form of a table and plot, followed by distributions of the number of transcripts, expressed genes, and, if available, mitochondrial and ribosomal gene expression.</p>
@@ -158,14 +199,14 @@
 <div id="most-expressed-genes" class="section level3">
 <h3 class="hasAnchor">
 <a href="#most-expressed-genes" class="anchor"></a>Most expressed genes</h3>
-<p><img src="https://github.com/romanhaa/Cerebro/blob/master/screenshots/cerebro_v1.1.0_pbmc_10k_v3/2019-09-23_07.png?raw=true" alt="Table of most expressed by sample and cluster" width="100%" height="auto"></p>
+<p><a target="_blank" href="Cerebro_interface_v1.2_files/2019-09-23_07.png"><img src="Cerebro_interface_v1.2_files/2019-09-23_07.png" alt="Table of most expressed by sample and cluster" width="100%" height="auto"></a></p>
 <p>The “Most expressed genes” panel provides tables with precisely the information promised by the title.</p>
 <p>For each sample and cluster (select in the respective input box), you will see the 100 most expressed genes and what percentage of all transcripts they account for. Feel free to search the table through the search box, or download it in CSV or Excel format.</p>
 </div>
 <div id="marker-genes" class="section level3">
 <h3 class="hasAnchor">
 <a href="#marker-genes" class="anchor"></a>Marker genes</h3>
-<p><img src="https://github.com/romanhaa/Cerebro/blob/master/screenshots/cerebro_v1.1.0_pbmc_10k_v3/2019-09-23_08.png?raw=true" alt="Table of marker genes by sample and cluster" width="100%" height="auto"></p>
+<p><a target="_blank" href="Cerebro_interface_v1.2_files/2019-09-23_08.png"><img src="Cerebro_interface_v1.2_files/2019-09-23_08.png" alt="Table of marker genes by sample and cluster" width="100%" height="auto"></a></p>
 <p>The “Marker genes” panel provides tables of - surprise - marker genes for each sample and cluster.</p>
 <p>In the case of marker genes per sample, this list conceptually resembles differential expression analysis of a bulk RNA-seq experiment. Instead, the expression profiles of clusters are expected to be more homogeneous.</p>
 <p>Marker genes should help to identify the cell type of a sample or cluster, and find new markers to purify that cell population.</p>
@@ -175,7 +216,7 @@
 <div id="enriched-pathways" class="section level3">
 <h3 class="hasAnchor">
 <a href="#enriched-pathways" class="anchor"></a>Enriched pathways</h3>
-<p><img src="https://github.com/romanhaa/Cerebro/blob/master/screenshots/cerebro_v1.1.0_pbmc_10k_v3/2019-09-23_09.png?raw=true" alt="Table of enriched pathways in marker genes of samples and clusters" width="100%" height="auto"></p>
+<p><a target="_blank" href="Cerebro_interface_v1.2_files/2019-09-23_09.png"><img src="Cerebro_interface_v1.2_files/2019-09-23_09.png" alt="Table of enriched pathways in marker genes of samples and clusters" width="100%" height="auto"></a></p>
 <p>The “Enriched pathways” panel shows results of pathway enrichment analysis, again for each sample and cluster. There are currently two supported methods:</p>
 <ul>
 <li><a href="https://amp.pharm.mssm.edu/Enrichr/">Enrichr</a></li>
@@ -188,7 +229,7 @@
 <div id="gene-expression" class="section level3">
 <h3 class="hasAnchor">
 <a href="#gene-expression" class="anchor"></a>Gene expression</h3>
-<p><img src="https://github.com/romanhaa/Cerebro/blob/master/screenshots/cerebro_v1.1.0_pbmc_10k_v3/2019-09-23_10.png?raw=true" alt="Expression of individual genes in t-SNE projection" width="49%" height="auto"><img src="https://github.com/romanhaa/Cerebro/blob/master/screenshots/cerebro_v1.1.0_pbmc_10k_v3/2019-09-23_11.png?raw=true" alt="Expression of individual genes by sample and cluster" width="49%" height="auto"></p>
+<p><a target="_blank" href="Cerebro_interface_v1.2_files/2019-09-23_10.png"><img src="Cerebro_interface_v1.2_files/2019-09-23_10.png" alt="Expression of individual genes in t-SNE projection" width="49%" height="auto"></a><a target="_blank" href="Cerebro_interface_v1.2_files/2019-09-23_11.png"><img src="Cerebro_interface_v1.2_files/2019-09-23_11.png" alt="Expression of individual genes by sample and cluster" width="49%" height="auto"></a></p>
 <p>The “Gene expression” panel allows you to visualize the log-normalized expression of one or multiple genes.</p>
 <p>The interface is similar to the one in the “Overview” panel. Cells are shown in the selected dimensional reduction, samples and clusters can be removed from the plot, and dot size size, opacity, as well as X and Y axis ranges can be adjusted. The color of each cell represents the expression of the queried genes (“Genes(s)” text box in top left corner). If inserting multiple genes, these must be posted on separate lines or separated through a comma (<code>,</code>), a space (<code></code>), or semicolon (<code>;</code>). The colors are updated after you press <code>ENTER</code> or <code>SPACE</code>.</p>
 <p>In addition to the dimensional reduction plot shown in the “Overview” panel, you may also choose whether cells should be plotted in random order or if you prefer to have cells with highest expression to be on top of the others.</p>
@@ -199,14 +240,14 @@
 <div id="gene-set-expression" class="section level3">
 <h3 class="hasAnchor">
 <a href="#gene-set-expression" class="anchor"></a>Gene set expression</h3>
-<p><img src="https://github.com/romanhaa/Cerebro/blob/master/screenshots/cerebro_v1.1.0_pbmc_10k_v3/2019-09-23_12.png?raw=true" alt="Expression of MSigDB gene sets in t-SNE projection" width="49%" height="auto"><img src="https://github.com/romanhaa/Cerebro/blob/master/screenshots/cerebro_v1.1.0_pbmc_10k_v3/2019-09-23_13.png?raw=true" alt="Expression of MSigDB gene sets by sample and cluster and average expression of 50 most expressed genes in gene set" width="49%" height="auto"></p>
+<p><a target="_blank" href="Cerebro_interface_v1.2_files/2019-09-23_12.png"><img src="Cerebro_interface_v1.2_files/2019-09-23_12.png" alt="Expression of MSigDB gene sets in t-SNE projection" width="49%" height="auto"></a><a target="_blank" href="Cerebro_interface_v1.2_files/2019-09-23_13.png"></a><img src="Cerebro_interface_v1.2_files/2019-09-23_13.png" alt="Expression of MSigDB gene sets by sample and cluster and average expression of 50 most expressed genes in gene set" width="49%" height="auto"></p>
 <p>The “Gene set expression” panel is essentially the same as the “Gene expression” panel, except that it allows to select gene sets from <a href="https://http://software.broadinstitute.org/gsea/msigdb">MSigDB</a> (requires internet connection). The MSigDB database is quite large, depending on your internet connection, it might take a few seconds to load the lists.</p>
 <p>This feature is only available for human and mouse data.</p>
 </div>
 <div id="trajectory" class="section level3">
 <h3 class="hasAnchor">
 <a href="#trajectory" class="anchor"></a>Trajectory</h3>
-<p><img src="https://github.com/romanhaa/Cerebro/blob/master/screenshots/cerebro_v1.1.0_pbmc_10k_v3/2019-09-23_14.png?raw=true" alt="Monocle trajectory - dimensional reduction" width="33%" height="auto"><img src="https://github.com/romanhaa/Cerebro/blob/master/screenshots/cerebro_v1.1.0_pbmc_10k_v3/2019-09-23_15.png?raw=true" alt="Monocle trajectory - distribution of states along pseudotime" width="33%" height="auto"><img src="https://github.com/romanhaa/Cerebro/blob/master/screenshots/cerebro_v1.1.0_pbmc_10k_v3/2019-09-23_16.png?raw=true" alt="Monocle trajectory - distribution of states by cluster and cell cycle" width="33%" height="auto"></p>
+<p><a target="_blank" href="Cerebro_interface_v1.2_files/2019-09-23_14.png"><img src="Cerebro_interface_v1.2_files/2019-09-23_14.png" alt="Monocle trajectory - dimensional reduction" width="33%" height="auto"></a><a target="_blank" href="Cerebro_interface_v1.2_files/2019-09-23_15.png"><img src="Cerebro_interface_v1.2_files/2019-09-23_15.png" alt="Monocle trajectory - distribution of states along pseudotime" width="33%" height="auto"></a><a target="_blank" href="Cerebro_interface_v1.2_files/2019-09-23_16.png"><img src="Cerebro_interface_v1.2_files/2019-09-23_16.png" alt="Monocle trajectory - distribution of states by cluster and cell cycle" width="33%" height="auto"></a></p>
 <p>This “Trajectory” panel gives you access to trajectory information (if data is available).</p>
 <p>Trajectories are another form of dimensional reduction which aim to preserve and highlight transitions within the data set.</p>
 <p>Currently, we support trajectories generated by <a href="https://cole-trapnell-lab.github.io/monocle-release/">Monocle v2</a>.</p>
@@ -219,14 +260,14 @@
 <div id="gene-id-conversion" class="section level3">
 <h3 class="hasAnchor">
 <a href="#gene-id-conversion" class="anchor"></a>Gene ID conversion</h3>
-<p><img src="https://github.com/romanhaa/Cerebro/blob/master/screenshots/cerebro_v1.1.0_pbmc_10k_v3/2019-09-23_17.png?raw=true" alt="Gene ID conversion table" width="100%" height="auto"></p>
+<p><a target="_blank" href="Cerebro_interface_v1.2_files/2019-09-23_17.png"><img src="Cerebro_interface_v1.2_files/2019-09-23_17.png" alt="Gene ID conversion table" width="100%" height="auto"></a></p>
 <p>The “Gene ID conversion” panel provides tables which allow to convert gene IDs and names.</p>
 <p>For the moment, only tables for mouse and human genes are available. The tables include GENCODE identifier, ENSEMBL identifier, HAVANA identifier, gene symbol and gene type and have been derived from the GENCODE annotation version M16 (mouse) and version 27 (human).</p>
 </div>
 <div id="analysis-info" class="section level3">
 <h3 class="hasAnchor">
 <a href="#analysis-info" class="anchor"></a>Analysis info</h3>
-<p><img src="https://github.com/romanhaa/Cerebro/blob/master/screenshots/cerebro_v1.1.0_pbmc_10k_v3/2019-09-23_18.png?raw=true" alt="Information about analysis" width="100%" height="auto"></p>
+<p><a target="_blank" href="Cerebro_interface_v1.2_files/2019-09-23_18.png"><img src="Cerebro_interface_v1.2_files/2019-09-23_18.png" alt="Information about analysis" width="100%" height="auto"></a></p>
 <p>The “Analysis info” panel gives you an overview of the parameters which were used during the analysis (as long as they were recorded).</p>
 <p>Shown can be:</p>
 <ul>
@@ -241,7 +282,7 @@
 <div id="about" class="section level3">
 <h3 class="hasAnchor">
 <a href="#about" class="anchor"></a>About</h3>
-<p><img src="https://github.com/romanhaa/Cerebro/blob/master/screenshots/cerebro_v1.1.0_pbmc_10k_v3/2019-09-23_19.png?raw=true" alt="About Cerebro" width="100%" height="auto"></p>
+<p><a target="_blank" href="Cerebro_interface_v1.2_files/2019-09-23_19.png"><img src="Cerebro_interface_v1.2_files/2019-09-23_19.png" alt="About Cerebro" width="100%" height="auto"></a></p>
 <p>The “About” panel, apart from providing information about Cerebro and the author (me), allows to switch off WebGL (see “Preferences” at the bottom). Without going into detail, WebGL is a technology used to accelerate generation and interaction with complex graphics, such as the dimensional reduction plot with many cells. Most modern browsers should be compatible with WebGL, but if you experience problems with the dimensional reduction plots, for example cells/dots are not visible, switching off WebGL might fix that.</p>
 </div>
 </div>

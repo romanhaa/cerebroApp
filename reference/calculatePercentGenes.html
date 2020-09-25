@@ -40,8 +40,8 @@
 
 
 <meta property="og:title" content="Calculate percentage of transcripts of gene list. — calculatePercentGenes" />
-<meta property="og:description" content="Get percentage of transcripts of gene list compared to all
-transcripts per cell." />
+<meta property="og:description" content="Get percentage of transcripts of gene list compared to all transcripts per
+cell." />
 
 
 
@@ -73,7 +73,7 @@ transcripts per cell." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cerebroApp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
       </span>
     </div>
 
@@ -90,16 +90,51 @@ transcripts per cell." />
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Vignettes
+    Articles
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/cerebroApp_workflow.html">The cerebroApp workflow</a>
+      <a href="../articles/cerebroApp_workflow_Seurat.html">The cerebroApp workflow (Seurat)</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">The Cerebro interface</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="../articles/Cerebro_interface_v1.2.html">Cerebro v1.2 and older</a>
+        </li>
+      </ul>
     </li>
     <li>
-      <a href="../articles/Cerebro_interface.html">The Cerebro interface</a>
+      <a href="../articles/export_a_data_set_in_SCE_format.html">Export an SCE/SingleCellExperiment object</a>
+    </li>
+    <li>
+      <a href="../articles/export_and_visualize_custom_tables_and_plots.html">Export and visualize custom tables and plots</a>
+    </li>
+    <li>
+      <a href="../articles/launch_cerebro_with_pre-loaded_data_set.html">Launch Cerebro with pre-loaded data set</a>
+    </li>
+    <li>
+      <a href="../articles/host_cerebro_on_shinyapps.html">Host Cerebro on shinyapps.io</a>
+    </li>
+    <li>
+      <a href="../articles/control_access_to_cerebro_with_a_login_page.html">Control access to Cerebro with a login page</a>
+    </li>
+    <li>
+      <a href="../articles/overview_of_cerebro_v1.3_class.html">Overview of the Cerebro v1.3 class</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Release notes
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/release_notes_v1.3.html">v1.3</a>
     </li>
   </ul>
 </li>
@@ -111,6 +146,12 @@ transcripts per cell." />
         <li>
   <a href="https://github.com/romanhaa/cerebroApp/">
     <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://twitter.com/fakechek1">
+    <span class="fab fa fab fa-twitter fa-lg"></span>
      
   </a>
 </li>
@@ -133,8 +174,8 @@ transcripts per cell." />
     </div>
 
     <div class="ref-description">
-    <p>Get percentage of transcripts of gene list compared to all
-transcripts per cell.</p>
+    <p>Get percentage of transcripts of gene list compared to all transcripts per
+cell.</p>
     </div>
 
     <pre class="usage"><span class='fu'>calculatePercentGenes</span>(<span class='no'>object</span>, <span class='kw'>assay</span> <span class='kw'>=</span> <span class='st'>"RNA"</span>, <span class='no'>genes</span>)</pre>
@@ -159,52 +200,17 @@ Seurat v3.0 or higher since the concept of assays wasn't implemented before.</p>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>List of lists containing the percentages of expression for each
-provided gene list.</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>Calculate percentage of transcripts of gene list.</p>
+    <p>List of lists containing the percentages of expression for each provided
+gene list.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata/v1.2/seurat_pbmc.rds"</span>,
+    <pre class="examples"><div class='input'><span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata/v1.3/pbmc_seurat.rds"</span>,
   <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"cerebroApp"</span>))
-<span class='fu'>calculatePercentGenes</span>(
+<span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'>calculatePercentGenes</span>(
   <span class='kw'>object</span> <span class='kw'>=</span> <span class='no'>pbmc</span>,
+  <span class='kw'>assay</span> <span class='kw'>=</span> <span class='st'>'RNA'</span>,
   <span class='kw'>genes</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>'example'</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>'FCN1'</span>,<span class='st'>'CD3D'</span>))
-)</div><div class='output co'>#&gt; $example
-#&gt; ATGCCAGAACGACT CATGGCCTGTGCAT GAACCTGATGAACC TGACTGGATTCTCA AGTCAGACTGCACA 
-#&gt;    0.071428571    0.058823529    0.045977011    0.039370079    0.023121387 
-#&gt; TCTGATACACGTGT TGGTATCTAAACAG GCAGCTCTGTTTCT GATATAACACGCAT AATGTTGACAGTCA 
-#&gt;    0.057142857    0.046875000    0.027777778    0.057692308    0.020000000 
-#&gt; AGGTCATGAGTGTC AGAGATGATCTCGC GGGTAACTCTAGTG CATGAGACACGGGA TACGCCACTCCGAA 
-#&gt;    0.016129032    0.000000000    0.000000000    0.000000000    0.000000000 
-#&gt; CTAAACCTGTGCAT GTAAGCACTCATTC TTGGTACTGAATCC CATCATACGGAGCA TACATCACGCTAAC 
-#&gt;    0.000000000    0.000000000    0.000000000    0.000000000    0.000000000 
-#&gt; TTACCATGAATCGC ATAGGAGAAACAGA GCGCACGACTTTAC ACTCGCACGAAAGT ATTACCTGCCTTAT 
-#&gt;    0.033557047    0.014778325    0.023474178    0.038961039    0.017278618 
-#&gt; CCCAACTGCAATCG AAATTCGAATCACG CCATCCGATTCGCC TCCACTCTGAGCTT CATCAGGATGCACA 
-#&gt;    0.011494253    0.003058104    0.008928571    0.022160665    0.019830028 
-#&gt; CTAAACCTCTGACA GATAGAGAAGGGTG CTAACGGAACCGAT AGATATACCCGTAA TACTCTGAATCGAC 
-#&gt;    0.000000000    0.060869565    0.000000000    0.000000000    0.000000000 
-#&gt; GCGCATCTTGCTCC GTTGACGATATCGG ACAGGTACTGGTGT GGCATATGCTTATC CATTACACCAACTG 
-#&gt;    0.000000000    0.004524887    0.006622517    0.007936508    0.000000000 
-#&gt; TAGGGACTGAACTC GCTCCATGAGAAGT TACAATGATGCTAG CTTCATGACCGAAT CTGCCAACAGGAGC 
-#&gt;    0.000000000    0.014388489    0.027777778    0.000000000    0.020547945 
-#&gt; TTGCATTGAGCTAC AAGCAAGAGCTTAG CGGCACGAACTCAG GGTGGAGATTACTC GGCCGATGTACTCT 
-#&gt;    0.144230769    0.015873016    0.031914894    0.029411765    0.060606061 
-#&gt; CGTAGCCTGTATGC TGAGCTGAATGCTG CCTATAACGAGACG ATAAGTTGGTACGT AAGCGACTTTGACG 
-#&gt;    0.035040431    0.018087855    0.035971223    0.010101010    0.009029345 
-#&gt; ACCAGTGAATACCG ATTGCACTTGCTTT CTAGGTGATGGTTG GCACTAGACCTTTA CATGCGCTAGTCAC 
-#&gt;    0.007194245    0.001992032    0.003086420    0.006849315    0.000000000 
-#&gt; TTGAGGACTACGCA ATACCACTCTAAGC CATATAGACTAAGC TTTAGCTGTACTCT GACATTCTCCACCT 
-#&gt;    0.000000000    0.000000000    0.010489510    0.002164502    0.002293578 
-#&gt; ACGTGATGCCATGA ATTGTAGATTCCCG GATAGAGATCACGA AATGCGTGGACGGA GCGTAAACACGGTT 
-#&gt;    0.005641749    0.008053691    0.003048780    0.000000000    0.001326260 
-#&gt; ATTCAGCTCATTGG GGCATATGGGGAGT ATCATCTGACACCA GTCATACTTCGCCT TTACGTACGTTCAG 
-#&gt;    0.000000000    0.000000000    0.000000000    0.000000000    0.000000000 
-#&gt; GAGTTGTGGTAGCT GACGCTCTCTCTCG AGTCTTACTTCGGA GGAACACTTCAGAC CTTGATTGATCTTC 
-#&gt;    0.000000000    0.000000000    0.000000000    0.000000000    0.000000000 
-#&gt; </div></pre>
+)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">cerebroApp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
       </span>
     </div>
 
@@ -48,16 +48,51 @@
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Vignettes
+    Articles
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="articles/cerebroApp_workflow.html">The cerebroApp workflow</a>
+      <a href="articles/cerebroApp_workflow_Seurat.html">The cerebroApp workflow (Seurat)</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">The Cerebro interface</a>
+      <ul class="dropdown-menu" role="menu">
+<li>
+          <a href="articles/Cerebro_interface_v1.2.html">Cerebro v1.2 and older</a>
+        </li>
+      </ul>
+</li>
+    <li>
+      <a href="articles/export_a_data_set_in_SCE_format.html">Export an SCE/SingleCellExperiment object</a>
     </li>
     <li>
-      <a href="articles/Cerebro_interface.html">The Cerebro interface</a>
+      <a href="articles/export_and_visualize_custom_tables_and_plots.html">Export and visualize custom tables and plots</a>
+    </li>
+    <li>
+      <a href="articles/launch_cerebro_with_pre-loaded_data_set.html">Launch Cerebro with pre-loaded data set</a>
+    </li>
+    <li>
+      <a href="articles/host_cerebro_on_shinyapps.html">Host Cerebro on shinyapps.io</a>
+    </li>
+    <li>
+      <a href="articles/control_access_to_cerebro_with_a_login_page.html">Control access to Cerebro with a login page</a>
+    </li>
+    <li>
+      <a href="articles/overview_of_cerebro_v1.3_class.html">Overview of the Cerebro v1.3 class</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Release notes
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+<li>
+      <a href="articles/release_notes_v1.3.html">v1.3</a>
     </li>
   </ul>
 </li>
@@ -69,6 +104,12 @@
 <li>
   <a href="https://github.com/romanhaa/cerebroApp/">
     <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://twitter.com/fakechek1">
+    <span class="fab fa fab fa-twitter fa-lg"></span>
      
   </a>
 </li>
@@ -90,47 +131,10 @@
 <div id="cerebroapp" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#cerebroapp" class="anchor"></a>cerebroApp</h1></div>
-<p>R package upon which the <a href="https://github.com/romanhaa/Cerebro">Cerebro</a> is built. Contains helper function that prepare single-cell RNA-seq data stored in a Seurat object for visualization in Cerebro. Both Seurat v2 and Seurat v3 are supported.</p>
+<p>R package upon which the <a href="https://github.com/romanhaa/Cerebro">Cerebro</a> is built. Contains helper function that prepare single-cell RNA-seq data stored in a Seurat object for visualization in Cerebro. Seurat v3 and <code>SCE</code>/<code>SingleCellExperiment</code> objects are supported.</p>
 <p>Make sure to install the package using <code><a href="https://rdrr.io/pkg/BiocManager/man/install.html">BiocManager::install()</a></code> because <code><a href="https://devtools.r-lib.org//reference/remote-reexports.html">devtools::install_github()</a></code> will otherwise pull old versions of dependencies that can result in errors.</p>
 <div class="sourceCode" id="cb1"><pre class="r"><span class="kw pkg">BiocManager</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html">install</a></span>(<span class="st">'romanhaa/cerebroApp'</span>)</pre></div>
-<p>For further details, please refer to the official <a href="https://github.com/romanhaa/Cerebro">Cerebro</a> repository.</p>
-<div id="how-to-use" class="section level2">
-<h2 class="hasAnchor">
-<a href="#how-to-use" class="anchor"></a>How to use</h2>
-<div id="export-data-stored-in-seurat-object" class="section level3">
-<h3 class="hasAnchor">
-<a href="#export-data-stored-in-seurat-object" class="anchor"></a>Export data stored in Seurat object</h3>
-<p><strong>Required meta data:</strong></p>
-<ul>
-<li>Experiment name.</li>
-<li>Organism, e.g. ‘hg’ (human) or ‘mm’ (mouse).</li>
-<li>Sample.</li>
-<li>Cluster.</li>
-<li>Number of transcripts (usually created by Seurat by default; <code>nUMI</code> / <code>nCounts_RNA</code> in Seurat v2 and v3).</li>
-<li>Number of expressed genes (usually created by Seurat by default; <code>nGene</code> / <code>nFeature_RNA</code> in Seurat v2 and v3).</li>
-</ul>
-<p><strong>Note:</strong> It is recommended to save sample information in a column called <code>sample</code> and cluster information in a column called <code>cluster</code>. Otherwise, the respective column names need to specified below.</p>
-<p>Prepare data:</p>
-<div class="sourceCode" id="cb2"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">'cerebroApp'</span>)
-<span class="fu"><a href="reference/exportFromSeurat.html">exportFromSeurat</a></span>(<span class="no">seurat</span>, <span class="st">'my_experiment.crb'</span>)</pre></div>
-</div>
-<div id="launch-cerebro" class="section level3">
-<h3 class="hasAnchor">
-<a href="#launch-cerebro" class="anchor"></a>Launch Cerebro</h3>
-<p>Launch Cerebro and load the <code>.crb</code> (or <code>.rds</code>) file you just exported from R.</p>
-<div class="sourceCode" id="cb3"><pre class="r"><span class="fu"><a href="reference/launchCerebro.html">launchCerebro</a></span>()</pre></div>
-</div>
-<div id="optional-but-recommended-steps" class="section level3">
-<h3 class="hasAnchor">
-<a href="#optional-but-recommended-steps" class="anchor"></a>Optional (but recommended) steps</h3>
-<p>To take full advantage of Cerebro, it is recommended to also run the commands below before exporting the data.</p>
-<div class="sourceCode" id="cb4"><pre class="r"><span class="no">seurat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/addPercentMtRibo.html">addPercentMtRibo</a></span>(<span class="no">seurat</span>)
-<span class="no">seurat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/getMostExpressedGenes.html">getMostExpressedGenes</a></span>(<span class="no">seurat</span>)
-<span class="no">seurat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/getMarkerGenes.html">getMarkerGenes</a></span>(<span class="no">seurat</span>)
-<span class="no">seurat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/getEnrichedPathways.html">getEnrichedPathways</a></span>(<span class="no">seurat</span>)
-<span class="no">seurat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/performGeneSetEnrichmentAnalysis.html">performGeneSetEnrichmentAnalysis</a></span>(<span class="no">seurat</span>, <span class="kw">GMT_file</span> <span class="kw">=</span> <span class="st">'c2.all.v7.0.symbols.gmt'</span>)</pre></div>
-</div>
-</div>
+<p>For further details, please refer to the official <a href="https://romanhaa.github.io/cerebroApp/">cerebroApp</a> website.</p>
 <div id="credit" class="section level2">
 <h2 class="hasAnchor">
 <a href="#credit" class="anchor"></a>Credit</h2>
