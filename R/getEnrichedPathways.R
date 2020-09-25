@@ -177,6 +177,7 @@ getEnrichedPathways <- function(
 
     ## ... input data frame doesn't contain required "gene" column
     } else if ( "gene" %in% colnames(current_marker_genes) == FALSE ) {
+
       message(
         paste0(
           '[', format(Sys.time(), '%H:%M:%S'),

@@ -52,7 +52,7 @@ Because this is a relatively big release, I have prepared a dedicated article wi
 ## Minor changes
 
 - Add citation info.
-- Composition tables (e.g. samples by clusters or cell cycle) are now calculated in the Shiny app rather than being expected to be present in the `.crb file.
+- Composition tables (e.g. samples by clusters or cell cycle) are now calculated in the Shiny app rather than being expected to be present in the `.crb` file.
 - Fix log message in `exportFromSeurat()` when extracting trajectories.
 - The gene set selection box in the "Gene set expression" tab will not crash anymore when typing a sequence of letters that doesn't match any gene set names.
 - Remove dependency on pre-assigned colors in the `.crb` file. If no colors have been assigned to samples and clusters when loading a data set, they will be assigned then.
