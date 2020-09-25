@@ -179,7 +179,9 @@ Again, this table isn't particularly informative, but hopefully you got an idea 
 
 # Plots
 
-Custom plots can be exported and visualized in the "Extra material" tab as well. The only requirement is that they were produced with ggplot2.
+Custom plots can be exported and visualized in the "Extra material" tab as well. The only requirement is that they were produced with ggplot2. You can switch between an interactive version of the plot (converted with plotly) or the unmodified plot.
+
+## Example #1
 
 Let's look at an example in which we create a simple plot with ggplot2, call it `iris`, and add it to the Seurat object:
 
@@ -244,4 +246,162 @@ In the log messages of the export process, we see that the plot was correctly ex
 
 In Cerebro, we can now access this table in the "Extra material" tab through the "plots" category.
 
-<a target="_blank" href="export_and_visualize_custom_tables_and_plots_files/plot_extra_material.png"><img src="export_and_visualize_custom_tables_and_plots_files/plot_extra_material.png" alt="Custom plot as extra material in Cerebro" width="100%" height="auto" /></a>
+<a target="_blank" href="export_and_visualize_custom_tables_and_plots_files/plot_extra_material_1.png"><img src="export_and_visualize_custom_tables_and_plots_files/plot_extra_material_1.png" alt="Custom plot as extra material in Cerebro" width="100%" height="auto" /></a>
+
+## Example #2
+
+In the second example, we prepare a dot plot showing the expression of the most significant marker gene for each cluster.
+
+```{r eval=FALSE}
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+
+# cells will be grouped by clusters that they have been assigned to
+cluster_ids <- levels(seurat@meta.data$seurat_clusters)
+
+# select a set of genes for which we want to show expression
+genes_to_show <- seurat@misc$marker_genes$cerebro_seurat$seurat_clusters %>%
+  group_by(seurat_clusters) %>%
+  arrange(p_val_adj) %>%
+  slice(1) %>%
+  pull(gene)
+
+# for every cluster-gene combination, calculate the average expression across
+# all cells and then transform the data into a data frame
+expression_levels_per_cluster <- vapply(
+    cluster_ids, FUN.VALUE = numeric(length(cluster_ids)), function(x) {
+      cells_in_current_cluster <- which(seurat@meta.data$seurat_cluster == x)
+      Matrix::rowMeans(seurat@assays$SCT@data[genes_to_show,cells_in_current_cluster])
+    }
+  ) %>%
+  t() %>%
+  as.data.frame() %>%
+  mutate(cluster = rownames(.)) %>%
+  select(cluster, everything()) %>%
+  pivot_longer(
+    cols = c(2:ncol(.)),
+    names_to = 'gene'
+  ) %>%
+  rename(expression = value) %>%
+  mutate(id_to_merge = paste0(cluster, '_', gene))
+
+# for every cluster-gene combination, calculate the percentage of cells in the
+# respective group that has at least 1 transcript (this means we consider it
+# as expressing the gene) and then transform the data into a data frame
+percentage_of_cells_expressing_gene <- vapply(
+    cluster_ids, FUN.VALUE = numeric(length(cluster_ids)), function(x) {
+      cells_in_current_cluster <- which(seurat@meta.data$seurat_cluster == x)
+      Matrix::rowSums(seurat@assays$SCT@data[genes_to_show,cells_in_current_cluster] != 0)
+    }
+  ) %>%
+  t() %>%
+  as.data.frame() %>%
+  mutate(cluster = rownames(.)) %>%
+  select(cluster, everything()) %>%
+  pivot_longer(
+    cols = c(2:ncol(.)),
+    names_to = 'gene'
+  ) %>%
+  rename(cell_count = value) %>%
+  left_join(
+    .,
+    seurat@meta.data %>%
+      group_by(seurat_clusters) %>%
+      tally() %>%
+      rename(cluster = seurat_clusters),
+    by = 'cluster') %>%
+  mutate(
+    id_to_merge = paste0(cluster, '_', gene),
+    percent_cells = cell_count / n
+  )
+
+# merge the two data frames created before and plot the data
+custom_plot <- left_join(
+    expression_levels_per_cluster,
+    percentage_of_cells_expressing_gene %>% select(id_to_merge, percent_cells),
+    by = 'id_to_merge'
+  ) %>%
+  mutate(
+    cluster = factor(cluster, levels = rev(cluster_ids)),
+    gene = factor(gene, levels = genes_to_show)
+  ) %>%
+  ggplot(aes(gene, cluster)) +
+  geom_point(aes(color = expression, size = percent_cells)) +
+  scale_color_distiller(
+    palette = 'Reds',
+    direction = 1,
+    name = 'Log-normalised\nexpression',
+    guide = guide_colorbar(frame.colour = "black", ticks.colour = "black")
+  ) +
+  scale_size(name = 'Percent\nof cells', labels = scales::percent) +
+  labs(y = 'Cluster', color = 'Expression') +
+  coord_fixed() +
+  theme_bw() +
+  theme(
+    axis.title.x = element_blank(),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+```
+
+With the plot ready, we can store it in the Seurat object and export it as before.
+
+```{r eval=FALSE}
+seurat@misc$extra_material$plots <- list(
+  "dot_plot_marker_genes_clusters" = custom_plot
+)
+
+exportFromSeurat(
+  seurat,
+  assay = 'SCT',
+  slot = 'data',
+  file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
+  experiment_name = 'pbmc_Seurat',
+  organism = 'hg',
+  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  columns_cell_cycle = c('cell_cycle_seurat'),
+  column_nUMI = 'nCount_RNA',
+  column_nGene = 'nFeature_RNA',
+  add_all_meta_data = TRUE,
+  verbose = FALSE
+)
+```
+
+```
+[10:03:13] Start collecting data...
+[10:03:14] Overview of Cerebro object:
+
+class: Cerebro_v1.3
+cerebroApp version: 1.3.0
+experiment name: pbmc_Seurat
+organism: hg
+date of analysis: 2020-02-19
+date of export: 2020-09-25
+number of cells: 5,697
+number of genes: 15,907
+grouping variables (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main
+cell cycle variables (1): cell_cycle_seurat
+projections (2): UMAP, UMAP_3D
+trees (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main
+most expressed genes: sample, seurat_clusters, cell_type_singler_blueprintencode_main
+marker genes:
+  - cerebro_seurat (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main
+enriched pathways:
+  - cerebro_seurat_enrichr (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main, 
+  - cerebro_GSVA (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main
+trajectories:
+  - monocle2 (1): highly_variable_genes
+extra material:
+  - plots (1): dot_plot_marker_genes_clusters
+
+[10:03:14] Saving Cerebro object to: ~/Dropbox/Cerebro_development/pbmc_Seurat.crb
+[10:03:18] Done!
+```
+
+Shown in the first screenshot is the interactive version of the plot:
+
+<a target="_blank" href="export_and_visualize_custom_tables_and_plots_files/plot_extra_material_2_interactive.png"><img src="export_and_visualize_custom_tables_and_plots_files/plot_extra_material_2_interactive.png" alt="Custom plot as extra material in Cerebro" width="100%" height="auto" /></a>
+
+We notice that the legend for the dot size is missing. In cases where the plot isn't shown correctly (conversion with plotly works well but not always perfectly), you can switch of interactivity and see the plain, unmodified plot:
+
+<a target="_blank" href="export_and_visualize_custom_tables_and_plots_files/plot_extra_material_2_plain.png"><img src="export_and_visualize_custom_tables_and_plots_files/plot_extra_material_2_plain.png" alt="Custom plot as extra material in Cerebro" width="100%" height="auto" /></a>
