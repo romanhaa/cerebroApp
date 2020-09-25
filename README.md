@@ -8,7 +8,7 @@
 
 R package upon which the [Cerebro](https://github.com/romanhaa/Cerebro) is built.
 Contains helper function that prepare single-cell RNA-seq data stored in a Seurat object for visualization in Cerebro.
-Both Seurat v2 and Seurat v3 are supported.
+Seurat v3 and `SCE`/`SingleCellExperiment` objects are supported.
 
 Make sure to install the package using `BiocManager::install()` because `devtools::install_github()` will otherwise pull old versions of dependencies that can result in errors.
 
@@ -16,49 +16,7 @@ Make sure to install the package using `BiocManager::install()` because `devtool
 BiocManager::install('romanhaa/cerebroApp')
 ```
 
-For further details, please refer to the official [Cerebro](https://github.com/romanhaa/Cerebro) repository.
-
-## How to use
-
-### Export data stored in Seurat object
-
-**Required meta data:**
-
-* Experiment name.
-* Organism, e.g. 'hg' (human) or 'mm' (mouse).
-* Sample.
-* Cluster.
-* Number of transcripts (usually created by Seurat by default; `nUMI` / `nCounts_RNA` in Seurat v2 and v3).
-* Number of expressed genes (usually created by Seurat by default; `nGene` / `nFeature_RNA` in Seurat v2 and v3).
-
-**Note:** It is recommended to save sample information in a column called `sample` and cluster information in a column called `cluster`. Otherwise, the respective column names need to specified below.
-
-Prepare data:
-
-```r
-library('cerebroApp')
-exportFromSeurat(seurat, 'my_experiment.crb')
-```
-
-### Launch Cerebro
-
-Launch Cerebro and load the `.crb` (or `.rds`) file you just exported from R.
-
-```r
-launchCerebro()
-```
-
-### Optional (but recommended) steps
-
-To take full advantage of Cerebro, it is recommended to also run the commands below before exporting the data.
-
-```r
-seurat <- addPercentMtRibo(seurat)
-seurat <- getMostExpressedGenes(seurat)
-seurat <- getMarkerGenes(seurat)
-seurat <- getEnrichedPathways(seurat)
-seurat <- performGeneSetEnrichmentAnalysis(seurat, GMT_file = 'c2.all.v7.0.symbols.gmt')
-```
+For further details, please refer to the official [cerebroApp](https://romanhaa.github.io/cerebroApp/) website.
 
 ## Credit
 
