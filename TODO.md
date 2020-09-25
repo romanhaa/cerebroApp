@@ -1,38 +1,80 @@
 # Ideas of what to implement in Cerebro/cerebroApp in the future
 
-Many of these are just wild ideas, some are pretty unlikely to be implemented but I wanted to keep track of the ideas anyway.
+## General
 
-* Store cerebroApp as subfolder in Cerebro repository.
-* Use SingleCellExperiment as an object to store data. This would make conversion easier and the structure more intuitive.
-* Extract trajectories from slingshot. Detect what type of trajectory it is and then plot accordingly.
-* Test genes (single and gene sets) for the ones which are highly expressed and which are different between the samples/clusters (idea is ANOVA but it's slow).
-* Make function to extract trajectory from Monocle 3 and display in Cerebro.
-* Use “usethis" package.
-* Bring back gene id conversion.
-* Include report of read counts.
-* Upload own list of genes.
-* Add progress indicators.
-* Use semantic.dashboard
-* Check if difference of expression between samples is significant or not.
-* Come up with sustainable update strategy.
-* Make Linux version.
-* Allow users to change colors in plots.
-* Send log file through email.
-* Horizontally align title in box and info button.
-* Drag resize scatter plots.
-* Find a way to display optional info fields.
-* Mark mitochondrial and ribosomal genes in tables.
-* Gene set names is cut off when too long, make box larger or resizable?
-* Allow users to label/rename clusters.
-* Save changes to input file.
-* pyqt to make it faster?
-* Python Dash + Python Qt + fbs??
-    * Can this be bottled up?
+- FAQ on website
+- List articles that have used Cerebro.
+- Update article about the Cerebro UI
+
+## cerebroApp
+
+- General
+  - Use unit testing
+  - Use modules in Shiny app where it makes sense
+  - Warning when exporting very large expression data (e.g. non-sparse)
+  - Check which tasks are carried out in multiple places and create function for them
+  - Show warning if version of loaded Cerebro object doesn't match the current Cerebro UI version
+  - Use glue to build messages.
+  - Round values in DT column filtering for numeric values (currently it shows too many decimals)
+  - Thorough performance check with profvis
+  - Make functions compatible with SCE object. Shouldn’t be too much work.
+  - Test memory usage with dgCMatrix and RleMatrix for larger data set.
+  - Don’t call functions in CRB object that don’t exist.
+  - “x_unified” for trend lines: hovering over trend line shows vertical line.
+  - Horizontally align title in box and info button.
+- New features
+  - QC tab
+  - Rename group levels, e.g. clusters
+  - Assign new labels to cells based on selection (create new grouping variable on-the-fly)
+  - Save changes to file
+  - Visualize velocyto results (`ggquiver`)
+  - Visualize PAGA results
+  - Dot plot as alternative representation of expression of multiple genes across selected grouping variable
+  - Perform statistical analysis on expression of selected genes
+  - Allow export of multiple assays? Paves the way for scRNA-seq + scATAC-seq
+  - Trajectory compatibility with slingshot and Monocle 3.
+  - Upload gene list from file.
+  - Drag resize scatter plots.
+- Ideas
+  - Use “usethis" package.
+  - Function to update old Cerebro objects? It's easy to just export the Seurat/SCE object again to get the new format.
+  - Store more data in `reactiveValues()`.
+  - Clean up reactivity dependencies
+  - Function to export cerebroApp for <shinyapps.io>
+  - Use the [`bs4Dash` package](https://rinterface.github.io/bs4Dash/index.html)?
+  - Display logo somewhere more visible in the app?
+  - Build example data set into package and make it loadable.
+  - Save colors in CRB object so it can be loaded next time. [would be solved with new dedicated classes]
+  - Store description of extra material somewhere? [would be solved with new dedicated classes]
+  - Dedicated classes for certain types of content
+    - groups (also cell cycle), tables, plots, projections, trajectories
+    - Allows storing descriptions along with tables/plots, etc.
+    - The goal of having very specific classes for Cerebro is to have better control of the data format, as well as being able to combine different types of data that belong together, for example a table (data frame) and a description (string). While R is a functional programming language, I believe it is ok in the context of Cerebro to use introduce specific classes, because they are only meant to be used inside Cerebro, not for other purposes and not for further processing.
+    - Possible problems of using specific classes:
+      - How to deal with possible changes to the classes in the future? The object will look the same to Cerebro, but the fields/methods might be different.
+    - Before implementing dedicated object classes, make sure they can be easily integrated in the next release.
+
+## Standalone version
+
+- Make it work
+  - Figure out a way to programmatically create the standalone version, e.g. with the [`electricShine`](https://chasemc.github.io/electricShine/) package. Without that, I am stuck with the R version that was provided with the original framework, which is too old for some cerebroApp dependencies.
+- Other
+  - Test memory usage with dgCMatrix and RleMatrix for larger data set.
+
+# Apps to take inspiration from
+
+- [SCANNER](https://www.biorxiv.org/content/10.1101/2020.01.25.919712v2)
+- [Spectacle](https://www.sciencedirect.com/science/article/pii/S0014483520304620)
 
 # Other useful links
 
-* Discussion on how to make caged/prisoned R installation: http://r.789695.n4.nabble.com/How-do-I-put-ldpaths-in-a-specific-place-td2964241.html
-* Generating Rd files for documentation: https://cran.r-project.org/web/packages/roxygen2/vignettes/rd.html
+- Discussion on how to make caged/prisoned R installation: http://r.789695.n4.nabble.com/How-do-I-put-ldpaths-in-a-specific-place-td2964241.html
+- Managing multiple R versions on one machine (could be useful for making standalone version)
+  - https://mac.r-project.org/#nightly
+  - http://r-sig-mac.29524.n8.nabble.com/R-SIG-Mac-R-latest-pkg-link-returning-a-403-Forbidden-error-td693.html#a702
+  - https://rud.is/rswitch/guide/
+  - https://jacobrprice.github.io/2019/09/19/Installing-multiple-parallel-R-versions.html
+  - https://cran.rstudio.org/doc/manuals/R-admin.html#Uninstalling-under-macOS
 
 # More details for some TO DOs
 
