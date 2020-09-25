@@ -274,9 +274,9 @@ exportFromSCE(
   file = paste0('cerebro_pbmc_SCE_', Sys.Date(), '.crb'),
   experiment_name = 'pbmc',
   organism = 'hg',
-  columns_groups = c('sample','cluster','cell_type_singler_blueprintencode_main'),
-  column_nUMI = 'sum',
-  column_nGene = 'detected',
+  groups = c('sample','cluster','cell_type_singler_blueprintencode_main'),
+  nUMI = 'sum',
+  nGene = 'detected',
   add_all_meta_data = TRUE,
   verbose = FALSE
 )

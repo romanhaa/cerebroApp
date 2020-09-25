@@ -10,10 +10,10 @@ exportFromSCE(
   file,
   experiment_name,
   organism,
-  columns_groups,
-  column_nUMI = "nUMI",
-  column_nGene = "nGene",
-  columns_cell_cycle = NULL,
+  groups,
+  cell_cycle = NULL,
+  nUMI = "nUMI",
+  nGene = "nGene",
   add_all_meta_data = TRUE,
   use_delayed_array = FALSE,
   verbose = FALSE
@@ -33,20 +33,19 @@ slot) to avoid performance bottlenecks in the Cerebro interface.}
 
 \item{organism}{Organism, e.g. \code{hg} (human), \code{mm} (mouse), etc.}
 
-\item{columns_groups}{Names of grouping variables in meta data
+\item{groups}{Names of grouping variables in meta data
 (\code{colData(object)}), e.g. \code{c("sample","cluster")}; at least one
 must be provided; defaults to \code{NULL}.}
 
-\item{column_nUMI}{Column in \code{colData(object)} that contains information
-about number of transcripts per cell; defaults to \code{nUMI}.}
+\item{cell_cycle}{Names of columns in meta data (\code{colData(object)}) that#
+contain cell cycle information, e.g. \code{c("Phase")}; defaults to
+\code{NULL}.}
 
-\item{column_nGene}{Column in \code{colData(object)} that contains
-information about number of expressed genes per cell; defaults to
-\code{nGene}.}
+\item{nUMI}{Column in \code{colData(object)} that contains information about
+number of transcripts per cell; defaults to \code{nUMI}.}
 
-\item{columns_cell_cycle}{Names of columns in meta data
-(\code{colData(object)}) that contain cell cycle information, e.g.
-\code{c("Phase")}; defaults to \code{NULL}.}
+\item{nGene}{Column in \code{colData(object)} that contains information about
+number of expressed genes per cell; defaults to \code{nGene}.}
 
 \item{add_all_meta_data}{If set to \code{TRUE}, all further meta data columns
 will be extracted as well.}
@@ -78,9 +77,9 @@ exportFromSCE(
   file = 'pbmc_SCE.crb',
   experiment_name = 'PBMC',
   organism = 'hg',
-  columns_groups = c('sample','cluster'),
-  column_nUMI = 'nUMI',
-  column_nGene = 'nGene',
+  groups = c('sample','cluster'),
+  nUMI = 'nUMI',
+  nGene = 'nGene',
   use_delayed_array = FALSE,
   verbose = TRUE
 )

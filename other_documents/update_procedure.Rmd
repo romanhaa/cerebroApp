@@ -1,0 +1,47 @@
+---
+title: "Update procedure"
+author: "Roman Hillje"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    toc: true
+    number_sections: true
+    self_contained: yes
+    mode: selfcontained
+vignette: >
+  %\VignetteIndexEntry{Update procedure}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+__Creation of standalone version is currently suspended because the internal R version is too old and I haven't been able to update it.__
+
+- Create new branch, e.g. `v1.3`.
+- Make changes to cerebroApp functions, Shiny app, etc.
+- Test extensively.
+- Prepare example data set.
+- Prepare pre-processed data set for function examples.
+- Build `NAMESPACE` with `devtools::document()` (run it twice).
+- Test installation: `devtools::install_local('.')`
+- Update `NEWS.md`.
+- Build website with `pkgdown`:
+
+```{r eval=FALSE}
+pkgdown::build_site(
+  pkg = ".",
+  examples = TRUE,
+  run_dont_run = FALSE,
+  seed = 1014,
+  lazy = FALSE,
+  override = list(),
+  preview = NA,
+  devel = FALSE,
+  new_process = !devel,
+  install = !devel
+)
+```
+
+- Copy results to other branch (`gh-pages`; dedicated directory) and commit.
+- Merge current branch into `master` branch.
+- Push changes in `master` and `gh-pages` branch.
+- Create release of current version.

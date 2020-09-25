@@ -37,9 +37,9 @@ exportFromSeurat(
   file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
   experiment_name = 'pbmc_Seurat',
   organism = 'hg',
-  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
-  column_nUMI = 'nCount_RNA',
-  column_nGene = 'nFeature_RNA',
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  nUMI = 'nCount_RNA',
+  nGene = 'nFeature_RNA',
   add_all_meta_data = TRUE,
   verbose = TRUE
 )
@@ -57,9 +57,9 @@ exportFromSeurat(
   file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
   experiment_name = 'pbmc_Seurat',
   organism = 'hg',
-  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
-  column_nUMI = 'nCount_RNA',
-  column_nGene = 'nFeature_RNA',
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  nUMI = 'nCount_RNA',
+  nGene = 'nFeature_RNA',
   add_all_meta_data = TRUE,
   verbose = FALSE
 )
@@ -75,9 +75,9 @@ exportFromSeurat(
   file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
   experiment_name = 'pbmc_Seurat',
   organism = 'hg',
-  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
-  column_nUMI = 'nCount_RNA',
-  column_nGene = 'nFeature_RNA',
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  nUMI = 'nCount_RNA',
+  nGene = 'nFeature_RNA',
   add_all_meta_data = TRUE,
   verbose = FALSE
 )
@@ -95,9 +95,9 @@ exportFromSeurat(
   file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
   experiment_name = 'pbmc_Seurat',
   organism = 'hg',
-  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
-  column_nUMI = 'nCount_RNA',
-  column_nGene = 'nFeature_RNA',
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  nUMI = 'nCount_RNA',
+  nGene = 'nFeature_RNA',
   add_all_meta_data = TRUE,
   verbose = FALSE
 )
@@ -117,10 +117,10 @@ exportFromSeurat(
   file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
   experiment_name = 'pbmc_Seurat',
   organism = 'hg',
-  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
-  columns_cell_cycle = c('cell_cycle_seurat'),
-  column_nUMI = 'nCount_RNA',
-  column_nGene = 'nFeature_RNA',
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  cell_cycle = c('cell_cycle_seurat'),
+  nUMI = 'nCount_RNA',
+  nGene = 'nFeature_RNA',
   add_all_meta_data = TRUE,
   verbose = FALSE
 )
@@ -140,10 +140,10 @@ exportFromSeurat(
   file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
   experiment_name = 'pbmc_Seurat',
   organism = 'hg',
-  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
-  columns_cell_cycle = c('cell_cycle_seurat'),
-  column_nUMI = 'nCount_RNA',
-  column_nGene = 'nFeature_RNA',
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  cell_cycle = c('cell_cycle_seurat'),
+  nUMI = 'nCount_RNA',
+  nGene = 'nFeature_RNA',
   add_all_meta_data = TRUE,
   verbose = FALSE
 )
@@ -161,10 +161,10 @@ exportFromSeurat(
   file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
   experiment_name = 'pbmc_Seurat',
   organism = 'hg',
-  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
-  columns_cell_cycle = c('cell_cycle_seurat'),
-  column_nUMI = 'nCount_RNA',
-  column_nGene = 'nFeature_RNA',
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  cell_cycle = c('cell_cycle_seurat'),
+  nUMI = 'nCount_RNA',
+  nGene = 'nFeature_RNA',
   add_all_meta_data = TRUE,
   verbose = FALSE
 )
@@ -190,10 +190,10 @@ exportFromSeurat(
   file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
   experiment_name = 'pbmc_Seurat',
   organism = 'hg',
-  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
-  columns_cell_cycle = c('cell_cycle_seurat'),
-  column_nUMI = 'nCount_RNA',
-  column_nGene = 'nFeature_RNA',
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  cell_cycle = c('cell_cycle_seurat'),
+  nUMI = 'nCount_RNA',
+  nGene = 'nFeature_RNA',
   add_all_meta_data = TRUE,
   verbose = FALSE
 )
@@ -234,10 +234,10 @@ exportFromSeurat(
   file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
   experiment_name = 'pbmc_Seurat',
   organism = 'hg',
-  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
-  columns_cell_cycle = c('cell_cycle_seurat'),
-  column_nUMI = 'nCount_RNA',
-  column_nGene = 'nFeature_RNA',
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  cell_cycle = c('cell_cycle_seurat'),
+  nUMI = 'nCount_RNA',
+  nGene = 'nFeature_RNA',
   add_all_meta_data = TRUE,
   verbose = FALSE
 )
@@ -258,10 +258,10 @@ exportFromSeurat(
   file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
   experiment_name = 'pbmc_Seurat',
   organism = 'hg',
-  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
-  columns_cell_cycle = c('cell_cycle_seurat'),
-  column_nUMI = 'nCount_RNA',
-  column_nGene = 'nFeature_RNA',
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  cell_cycle = c('cell_cycle_seurat'),
+  nUMI = 'nCount_RNA',
+  nGene = 'nFeature_RNA',
   add_all_meta_data = TRUE,
   verbose = FALSE
 )
@@ -279,10 +279,10 @@ exportFromSeurat(
   file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
   experiment_name = 'pbmc_Seurat',
   organism = 'hg',
-  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
-  columns_cell_cycle = c('cell_cycle_seurat'),
-  column_nUMI = 'nCount_RNA',
-  column_nGene = 'nFeature_RNA',
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  cell_cycle = c('cell_cycle_seurat'),
+  nUMI = 'nCount_RNA',
+  nGene = 'nFeature_RNA',
   add_all_meta_data = TRUE,
   verbose = FALSE
 )
@@ -309,10 +309,10 @@ exportFromSeurat(
   file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
   experiment_name = 'pbmc_Seurat',
   organism = 'hg',
-  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
-  columns_cell_cycle = c('cell_cycle_seurat'),
-  column_nUMI = 'nCount_RNA',
-  column_nGene = 'nFeature_RNA',
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  cell_cycle = c('cell_cycle_seurat'),
+  nUMI = 'nCount_RNA',
+  nGene = 'nFeature_RNA',
   add_all_meta_data = TRUE,
   verbose = FALSE
 )
@@ -353,10 +353,10 @@ exportFromSeurat(
   file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
   experiment_name = 'pbmc_Seurat',
   organism = 'hg',
-  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
-  columns_cell_cycle = c('cell_cycle_seurat'),
-  column_nUMI = 'nCount_RNA',
-  column_nGene = 'nFeature_RNA',
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  cell_cycle = c('cell_cycle_seurat'),
+  nUMI = 'nCount_RNA',
+  nGene = 'nFeature_RNA',
   add_all_meta_data = TRUE,
   verbose = FALSE
 )
@@ -387,10 +387,10 @@ exportFromSeurat(
   file = '~/Dropbox/Cerebro_development/pbmc_Seurat.crb',
   experiment_name = 'pbmc_Seurat',
   organism = 'hg',
-  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
-  columns_cell_cycle = c('cell_cycle_seurat'),
-  column_nUMI = 'nCount_RNA',
-  column_nGene = 'nFeature_RNA',
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  cell_cycle = c('cell_cycle_seurat'),
+  nUMI = 'nCount_RNA',
+  nGene = 'nFeature_RNA',
   add_all_meta_data = TRUE,
   verbose = FALSE
 )
@@ -417,10 +417,10 @@ exportFromSeurat(
   file = '~/Dropbox/Cerebro_development/pbmc_Seurat_dgCMatrix.crb',
   experiment_name = 'pbmc_Seurat',
   organism = 'hg',
-  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
-  columns_cell_cycle = c('cell_cycle_seurat'),
-  column_nUMI = 'nCount_RNA',
-  column_nGene = 'nFeature_RNA',
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  cell_cycle = c('cell_cycle_seurat'),
+  nUMI = 'nCount_RNA',
+  nGene = 'nFeature_RNA',
   add_all_meta_data = TRUE,
   verbose = FALSE
 )

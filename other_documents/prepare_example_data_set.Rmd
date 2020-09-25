@@ -344,10 +344,10 @@ exportFromSeurat(
   file = '~/Research/GitHub/cerebroApp_v1.3/inst/extdata/v1.3/example.crb',
   experiment_name = 'pbmc_10k_v3',
   organism = 'hg',
-  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
-  column_nUMI = 'nCount_RNA',
-  column_nGene = 'nFeature_RNA',
-  columns_cell_cycle = c('Phase'),
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  cell_cycle = c('Phase'),
+  nUMI = 'nCount_RNA',
+  nGene = 'nFeature_RNA',
   add_all_meta_data = TRUE
 )
 ```

@@ -11,10 +11,10 @@ exportFromSeurat(
   file,
   experiment_name,
   organism,
-  columns_groups,
-  column_nUMI = "nUMI",
-  column_nGene = "nGene",
-  columns_cell_cycle = NULL,
+  groups,
+  cell_cycle = NULL,
+  nUMI = "nUMI",
+  nGene = "nGene",
   add_all_meta_data = TRUE,
   use_delayed_array = FALSE,
   verbose = FALSE
@@ -36,20 +36,19 @@ bottlenecks in the Cerebro interface.}
 
 \item{organism}{Organism, e.g. \code{hg} (human), \code{mm} (mouse), etc.}
 
-\item{columns_groups}{Names of grouping variables in meta data
+\item{groups}{Names of grouping variables in meta data
 (\code{object@meta.data}), e.g. \code{c("sample","cluster")}; at least one
 must be provided; defaults to \code{NULL}.}
 
-\item{column_nUMI}{Column in \code{object@meta.data} that contains
-information about number of transcripts per cell; defaults to \code{nUMI}.}
-
-\item{column_nGene}{Column in \code{object@meta.data} that contains
-information about number of expressed genes per cell; defaults to
-\code{nGene}.}
-
-\item{columns_cell_cycle}{Names of columns in meta data
+\item{cell_cycle}{Names of columns in meta data
 (\code{object@meta.data}) that contain cell cycle information, e.g.
 \code{c("Phase")}; defaults to \code{NULL}.}
+
+\item{nUMI}{Column in \code{object@meta.data} that contains information about
+number of transcripts per cell; defaults to \code{nUMI}.}
+
+\item{nGene}{Column in \code{object@meta.data} that contains information
+about number of expressed genes per cell; defaults to \code{nGene}.}
 
 \item{add_all_meta_data}{If set to \code{TRUE}, all further meta data columns
 will be extracted as well.}
@@ -80,9 +79,9 @@ exportFromSeurat(
   file = 'pbmc_Seurat.crb',
   experiment_name = 'PBMC',
   organism = 'hg',
-  columns_groups = c('sample','seurat_clusters'),
-  column_nUMI = 'nCount_RNA',
-  column_nGene = 'nFeature_RNA',
+  groups = c('sample','seurat_clusters'),
+  nUMI = 'nCount_RNA',
+  nGene = 'nFeature_RNA',
   use_delayed_array = FALSE,
   verbose = TRUE
 )

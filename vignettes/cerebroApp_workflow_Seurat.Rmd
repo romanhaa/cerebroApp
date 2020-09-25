@@ -366,9 +366,9 @@ exportFromSeurat(
   file = paste0('cerebro_pbmc_seurat_', Sys.Date(), '.crb'),
   experiment_name = 'pbmc',
   organism = 'hg',
-  columns_groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
-  column_nUMI = 'nCount_RNA',
-  column_nGene = 'nFeature_RNA',
+  groups = c('sample','seurat_clusters','cell_type_singler_blueprintencode_main'),
+  nUMI = 'nCount_RNA',
+  nGene = 'nFeature_RNA',
   add_all_meta_data = TRUE,
   verbose = FALSE
 )
