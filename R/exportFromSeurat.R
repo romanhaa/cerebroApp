@@ -13,17 +13,16 @@
 #' @param file Where to save the output.
 #' @param experiment_name Experiment name.
 #' @param organism Organism, e.g. \code{hg} (human), \code{mm} (mouse), etc.
-#' @param columns_groups Names of grouping variables in meta data
+#' @param groups Names of grouping variables in meta data
 #' (\code{object@meta.data}), e.g. \code{c("sample","cluster")}; at least one
 #' must be provided; defaults to \code{NULL}.
-#' @param column_nUMI Column in \code{object@meta.data} that contains
-#' information about number of transcripts per cell; defaults to \code{nUMI}.
-#' @param column_nGene Column in \code{object@meta.data} that contains
-#' information about number of expressed genes per cell; defaults to
-#' \code{nGene}.
-#' @param columns_cell_cycle Names of columns in meta data
+#' @param cell_cycle Names of columns in meta data
 #' (\code{object@meta.data}) that contain cell cycle information, e.g.
 #' \code{c("Phase")}; defaults to \code{NULL}.
+#' @param nUMI Column in \code{object@meta.data} that contains information about
+#' number of transcripts per cell; defaults to \code{nUMI}.
+#' @param nGene Column in \code{object@meta.data} that contains information
+#' about number of expressed genes per cell; defaults to \code{nGene}.
 #' @param add_all_meta_data If set to \code{TRUE}, all further meta data columns
 #' will be extracted as well.
 #' @param use_delayed_array When set to \code{TRUE}, the expression matrix will
@@ -48,9 +47,9 @@
 #'   file = 'pbmc_Seurat.crb',
 #'   experiment_name = 'PBMC',
 #'   organism = 'hg',
-#'   columns_groups = c('sample','seurat_clusters'),
-#'   column_nUMI = 'nCount_RNA',
-#'   column_nGene = 'nFeature_RNA',
+#'   groups = c('sample','seurat_clusters'),
+#'   nUMI = 'nCount_RNA',
+#'   nGene = 'nFeature_RNA',
 #'   use_delayed_array = FALSE,
 #'   verbose = TRUE
 #' )
@@ -67,10 +66,10 @@ exportFromSeurat <- function(
   file,
   experiment_name,
   organism,
-  columns_groups,
-  column_nUMI = 'nUMI',
-  column_nGene = 'nGene',
-  columns_cell_cycle = NULL,
+  groups,
+  cell_cycle = NULL,
+  nUMI = 'nUMI',
+  nGene = 'nGene',
   add_all_meta_data = TRUE,
   use_delayed_array = FALSE,
   verbose = FALSE
@@ -119,13 +118,13 @@ exportFromSeurat <- function(
     )
   }
 
-  ## `columns_groups`
-  if ( any(columns_groups %in% names(object@meta.data) == FALSE ) ) {
+  ## `groups`
+  if ( any(groups %in% names(object@meta.data) == FALSE ) ) {
     stop(
       paste0(
         'Some group columns could not be found in meta data: ',
         paste0(
-          columns_groups[which(columns_groups %in% names(object@meta.data) == FALSE)],
+          groups[which(groups %in% names(object@meta.data) == FALSE)],
           collapse = ', '
         )
       ),
@@ -133,35 +132,35 @@ exportFromSeurat <- function(
     )
   }
 
-  ## `column_nUMI`
-  if ( ( column_nUMI %in% names(object@meta.data) == FALSE ) ) {
+  ## `nUMI`
+  if ( ( nUMI %in% names(object@meta.data) == FALSE ) ) {
     stop(
       paste0(
-        'Column with number of transcripts per cell (`', column_nUMI,
+        'Column with number of transcripts per cell (`', nUMI,
         '`) not found in meta data.'
       ),
       call. = FALSE
     )
   }
 
-  ## `column_nGene`
-  if ( (column_nGene %in% names(object@meta.data) == FALSE ) ) {
+  ## `nGene`
+  if ( (nGene %in% names(object@meta.data) == FALSE ) ) {
     stop(
       paste0(
-        'Column with number of expressed genes per cell (`', column_nGene,
+        'Column with number of expressed genes per cell (`', nGene,
         '`) not found in meta data.'
       ),
       call. = FALSE
     )
   }
 
-  ## `columns_cell_cycle`
-  if ( any(columns_cell_cycle %in% names(object@meta.data) == FALSE ) ) {
+  ## `cell_cycle`
+  if ( any(cell_cycle %in% names(object@meta.data) == FALSE ) ) {
     stop(
       paste0(
         'Some cell cycle columns could not be found in meta data: ',
         paste0(
-          columns_cell_cycle[which(columns_cell_cycle %in% names(object@meta.data) == FALSE)],
+          cell_cycle[which(cell_cycle %in% names(object@meta.data) == FALSE)],
           collapse = ', '
         )
       ),
@@ -316,7 +315,7 @@ exportFromSeurat <- function(
   ##--------------------------------------------------------------------------##
 
   ## go through grouping variables
-  for ( i in columns_groups ) {
+  for ( i in groups ) {
 
     ## check content of column in meta data
     ## ... content not factorized
@@ -373,23 +372,23 @@ exportFromSeurat <- function(
   }
 
   ## number of transcripts and expressed genes
-  temp_meta_data[["nUMI"]] = object@meta.data[[column_nUMI]]
-  temp_meta_data[["nGene"]] = object@meta.data[[column_nGene]]
+  temp_meta_data[["nUMI"]] = object@meta.data[[nUMI]]
+  temp_meta_data[["nGene"]] = object@meta.data[[nGene]]
 
   ## rest of meta data
   meta_data_columns <- names(object@meta.data)
-  meta_data_columns <- meta_data_columns[-which(meta_data_columns %in% columns_groups)]
-  meta_data_columns <- meta_data_columns[-which(meta_data_columns == column_nUMI)]
-  meta_data_columns <- meta_data_columns[-which(meta_data_columns == column_nGene)]
+  meta_data_columns <- meta_data_columns[-which(meta_data_columns %in% groups)]
+  meta_data_columns <- meta_data_columns[-which(meta_data_columns == nUMI)]
+  meta_data_columns <- meta_data_columns[-which(meta_data_columns == nGene)]
 
   ##--------------------------------------------------------------------------##
   ## cell cycle
   ##--------------------------------------------------------------------------##
   if (
-    !is.null(columns_cell_cycle) &&
-    length(columns_cell_cycle) > 0
+    !is.null(cell_cycle) &&
+    length(cell_cycle) > 0
   ) {
-    for ( i in columns_cell_cycle ) {
+    for ( i in cell_cycle ) {
       if ( is.factor(object@meta.data[[i]]) ) {
         tmp_names <- levels(object@meta.data[[i]])
       } else {
@@ -398,7 +397,7 @@ exportFromSeurat <- function(
       # colData(export$expression)[[i]] <- factor(object@meta.data[[i]], levels = tmp_names)
       temp_meta_data[[i]] <- factor(object@meta.data[[i]], levels = tmp_names)
     }
-    meta_data_columns <- meta_data_columns[-which(meta_data_columns %in% columns_cell_cycle)]
+    meta_data_columns <- meta_data_columns[-which(meta_data_columns %in% cell_cycle)]
   }
 
   ##--------------------------------------------------------------------------##
@@ -431,15 +430,15 @@ exportFromSeurat <- function(
   ##--------------------------------------------------------------------------##
   ## add grouping variables and cell cycle columns
   ##--------------------------------------------------------------------------##
-  for ( i in columns_groups ) {
+  for ( i in groups ) {
     export$addGroup(i, levels(temp_meta_data[[i]]))
   }
 
   if (
-    !is.null(columns_cell_cycle) &&
-    length(columns_cell_cycle) > 0
+    !is.null(cell_cycle) &&
+    length(cell_cycle) > 0
   ) {
-    export$setCellCycle(columns_cell_cycle)
+    export$setCellCycle(cell_cycle)
   }
 
   ##--------------------------------------------------------------------------##
