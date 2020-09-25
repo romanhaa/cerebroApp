@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------##
 ## Tab: Extra material
 ##
-## Table or info text when data is missing.
+## Show content or info text when data is missing.
 ##----------------------------------------------------------------------------##
 
 ##----------------------------------------------------------------------------##
@@ -59,10 +59,19 @@ output[["extra_material_content_UI"]] <- renderUI({
           boxTitle("Extra material"),
           cerebroInfoButton("extra_material_info")
         ),
-        plotly::plotlyOutput(
-          "extra_material_plot",
-          width = "auto",
-          height = "50vh"
+        fluidRow(
+          column(12,
+            shinyWidgets::materialSwitch(
+              inputId = "extra_material_plot_interactive_switch",
+              label = "Make plot interactive:",
+              value = TRUE,
+              status = "primary",
+              inline = TRUE
+            )
+          ),
+          column(12,
+            uiOutput("extra_material_plot_UI")
+          )
         )
       )
     )
@@ -124,7 +133,38 @@ output[["extra_material_table"]] <- DT::renderDataTable(server = FALSE, {
 ## Plot.
 ##----------------------------------------------------------------------------##
 
-output[["extra_material_plot"]] <- plotly::renderPlotly({
+##----------------------------------------------------------------------------##
+## UI element that contains interactive or plain version of plot, depending on
+## switch status
+##----------------------------------------------------------------------------##
+
+output[["extra_material_plot_UI"]] <- renderUI({
+
+  ##
+  req(
+    !is.null(input[["extra_material_plot_interactive_switch"]])
+  )
+
+  if ( input[["extra_material_plot_interactive_switch"]] == TRUE ) {
+    plotly::plotlyOutput(
+      "extra_material_plot_interactive",
+      width = "auto",
+      height = "70vh"
+    )
+  } else {
+    plotOutput(
+      "extra_material_plot_plain",
+      width = "auto",
+      height = "70vh"
+    )
+  }
+})
+
+##----------------------------------------------------------------------------##
+## UI element that contains interactive version of plot
+##----------------------------------------------------------------------------##
+
+output[["extra_material_plot_interactive"]] <- plotly::renderPlotly({
 
   ##
   req(
@@ -149,6 +189,30 @@ output[["extra_material_plot"]] <- plotly::renderPlotly({
   } else {
     plot
   }
+})
+
+##----------------------------------------------------------------------------##
+## UI element that contains plain version of plot
+##----------------------------------------------------------------------------##
+
+output[["extra_material_plot_plain"]] <- renderPlot({
+
+  ##
+  req(
+    input[["extra_material_selected_category"]],
+    input[["extra_material_selected_content"]]
+  )
+
+  ## fetch results
+  plot <- getExtraPlot(input[["extra_material_selected_content"]])
+
+  ## don't proceed if input is not of class "ggplot"
+  req(
+    "ggplot" %in% class(plot)
+  )
+
+  ##
+  return(plot)
 })
 
 ##----------------------------------------------------------------------------##
