@@ -129,7 +129,7 @@
       <h1 data-toc-skip>Release notes: Cerebro/cerebroApp v1.3</h1>
                         <h4 class="author">Roman Hillje</h4>
             
-            <h4 class="date">25 September, 2020</h4>
+            <h4 class="date">27 September, 2020</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/romanhaa/cerebroApp/blob/master/vignettes/release_notes_v1.3.Rmd"><code>vignettes/release_notes_v1.3.Rmd</code></a></small>
       <div class="hidden name"><code>release_notes_v1.3.Rmd</code></div>
@@ -332,10 +332,15 @@ trajectories:
 <a href="#backwards-incompatibility" class="anchor"></a>Backwards (in)compatibility</h2>
 <p>While the introduction of the <code>Cerebro_v1.3</code> object hopefully provides more stability of the data organization in future releases, it also means that data sets exported with cerebroApp version older than v1.3 will not be properly shown in Cerebro v1.3. Moreover, due to the re-work of some pre-processing functions, it is necessary to perform the pre-processing again if you want to export data sets that you already pre-processed with older cerebroApp version.</p>
 </div>
-<div id="launching-older-cerebroapp-version" class="section level2">
+<div id="launching-older-cerebroapp-versions" class="section level2">
 <h2 class="hasAnchor">
-<a href="#launching-older-cerebroapp-version" class="anchor"></a>Launching older cerebroApp version:</h2>
+<a href="#launching-older-cerebroapp-versions" class="anchor"></a>Launching older cerebroApp versions</h2>
 <p>Package dependencies specific to older version of Cerebro have been moved from <code>Imports</code> to <code>Suggests</code> in order to minimize the number of packages that are installed by default. When you are trying to run a function that requires these packages, you will receive a notification.</p>
+</div>
+<div id="standalone-version-of-cerebro" class="section level2">
+<h2 class="hasAnchor">
+<a href="#standalone-version-of-cerebro" class="anchor"></a>Standalone version of Cerebro</h2>
+<p>The standalone version of Cerebro relied on the <a href="https://github.com/ColumbusCollaboratory/electron-quick-start"><code>ColumbusCollaboratory/electron-quick-start</code></a> repository. Unfortunately, the R version used in that framework is outdated by now. Some dependencies of Cerebro v1.3 are not compatible with that old R version. To make a standalone version of Cerebro v1.3, it is necessary to make a new R version, such as 4.0, portable. I have spent a considerable amount of time trying but not been able to achieve it. A promising project is the <a href="https://chasemc.github.io/electricShine/"><code>electricShine</code></a> R package, but I didn’t manage to make it work with that either. Since the standalone version of Cerebro was one of its initial hallmarks, it is my goal to create a standalone version again in the future. Until then, I kindly ask for your patience. To compensate some of the consequences, I tried to make launching Cerebro from R more convenient (by providing additional parameters to load <code>.crb</code> file directly) and prepared a vignette explaining how to host Cerebro on <a href="host_cerebro_on_shinyapps.html"><code>shinyapps.io</code></a>.</p>
 </div>
 </div>
   </div>
