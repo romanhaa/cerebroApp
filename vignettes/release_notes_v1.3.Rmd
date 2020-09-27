@@ -227,6 +227,10 @@ I prepared a couple of vignettes to highlight some of the new features and optio
 While the introduction of the `Cerebro_v1.3` object hopefully provides more stability of the data organization in future releases, it also means that data sets exported with cerebroApp version older than v1.3 will not be properly shown in Cerebro v1.3.
 Moreover, due to the re-work of some pre-processing functions, it is necessary to perform the pre-processing again if you want to export data sets that you already pre-processed with older cerebroApp version.
 
-## Launching older cerebroApp version:
+## Launching older cerebroApp versions
 
 Package dependencies specific to older version of Cerebro have been moved from `Imports` to `Suggests` in order to minimize the number of packages that are installed by default. When you are trying to run a function that requires these packages, you will receive a notification.
+
+## Standalone version of Cerebro
+
+The standalone version of Cerebro relied on the [`ColumbusCollaboratory/electron-quick-start`](https://github.com/ColumbusCollaboratory/electron-quick-start) repository. Unfortunately, the R version used in that framework is outdated by now. Some dependencies of Cerebro v1.3 are not compatible with that old R version. To make a standalone version of Cerebro v1.3, it is necessary to make a new R version, such as 4.0, portable. I have spent a considerable amount of time trying but not been able to achieve it. A promising project is the [`electricShine`](https://chasemc.github.io/electricShine/) R package, but I didn't manage to make it work with that either. Since the standalone version of Cerebro was one of its initial hallmarks, it is my goal to create a standalone version again in the future. Until then, I kindly ask for your patience. To compensate some of the consequences, I tried to make launching Cerebro from R more convenient (by providing additional parameters to load `.crb` file directly) and prepared a vignette explaining how to host Cerebro on [`shinyapps.io`](host_cerebro_on_shinyapps.html).

@@ -16,7 +16,7 @@ vignette: >
 
 __Creation of standalone version is currently suspended because the internal R version is too old and I haven't been able to update it.__
 
-- Create new branch, e.g. `v1.3`.
+- Create new branch from `develop` branch, e.g. `v1.3`
 - Make changes to cerebroApp functions, Shiny app, etc.
 - Test extensively.
 - Prepare example data set.
@@ -42,6 +42,7 @@ pkgdown::build_site(
 ```
 
 - Copy results to other branch (`gh-pages`; dedicated directory) and commit.
-- Merge current branch into `master` branch.
-- Push changes in `master` and `gh-pages` branch.
+- Merge current branch into `develop` branch.
+- Merge `develop` branch into `master` branch.
+- Push changes in `master`, `develop` and `gh-pages` branches.
 - Create release of current version.
