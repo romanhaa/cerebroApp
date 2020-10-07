@@ -35,7 +35,8 @@ server <- function(input, output, session) {
   )
 
   preferences <- reactiveValues(
-    use_webgl = TRUE
+    use_webgl = TRUE,
+    show_hover_info_in_projections = TRUE
   )
 
   ## paths for storing plots
