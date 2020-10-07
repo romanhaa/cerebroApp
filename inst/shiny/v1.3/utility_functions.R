@@ -769,6 +769,54 @@ getGenesForGeneSet <- function(gene_set) {
 }
 
 ##----------------------------------------------------------------------------##
+## Function to calculate center of groups in projections/trajectories.
+##
+## 
+##----------------------------------------------------------------------------##
+centerOfGroups <- function(df, n_dimensions, group) {
+
+  ## check number of dimenions in projection
+  ## ... 2 dimensions
+  if ( n_dimensions == 2 ) {
+
+    ## calculate center for groups and return
+    tidyr::tibble(
+      x = df[,1],
+      y = df[,2],
+      group = df[[ group ]]
+    ) %>%
+    dplyr::group_by(group) %>%
+    dplyr::summarise(
+      x_median = median(x),
+      y_median = median(y),
+      .groups = 'drop_last'
+    ) %>%
+    dplyr::ungroup() %>%
+    return()
+
+  ## ... 3 dimensions
+  } else if ( n_dimensions == 3 ) {
+
+    ## calculate center for groups and return
+    tidyr::tibble(
+      x = df[,1],
+      y = df[,2],
+      z = df[,3],
+      group = df[[ group ]]
+    ) %>%
+    dplyr::group_by(group) %>%
+    dplyr::summarise(
+      x_median = median(x),
+      y_median = median(y),
+      z_median = median(z),
+      .groups = 'drop_last'
+    ) %>%
+    dplyr::ungroup() %>%
+    return()
+  }
+}
+
+##----------------------------------------------------------------------------##
 ## Functions to interact with data set.
 ##
 ## Never directly interact with data set: data_set()
