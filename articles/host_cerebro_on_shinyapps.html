@@ -129,7 +129,7 @@
       <h1 data-toc-skip>Host Cerebro on shinyapps.io</h1>
                         <h4 class="author">Roman Hillje</h4>
             
-            <h4 class="date">25 September, 2020</h4>
+            <h4 class="date">18 October, 2020</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/romanhaa/cerebroApp/blob/master/vignettes/host_cerebro_on_shinyapps.Rmd"><code>vignettes/host_cerebro_on_shinyapps.Rmd</code></a></small>
       <div class="hidden name"><code>host_cerebro_on_shinyapps.Rmd</code></div>
@@ -159,25 +159,27 @@
 <h1 class="hasAnchor">
 <a href="#prepare-shiny-files" class="anchor"></a>Prepare Shiny files</h1>
 <p>Next, we need to copy the Shiny files and some other data for Cerebro v1.3 to a dedicated directory, here <code>~/test_cerebro_shinyapps</code>. If you prefer to host a different version of Cerebro, adapt the code accordingly.</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/files2.html">dir.create</a></span>(<span class="st">'~/test_cerebro_shinyapps'</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/files2.html">dir.create</a></span>(<span class="st">'~/test_cerebro_shinyapps/shiny'</span>)
+<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">app_directory</span> <span class="kw">&lt;-</span> <span class="st">'~/test_cerebro_shinyapps'</span>
+
+<span class="fu"><a href="https://rdrr.io/r/base/files2.html">dir.create</a></span>(<span class="no">app_directory</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/files2.html">dir.create</a></span>(<span class="kw pkg">glue</span><span class="kw ns">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span>(<span class="st">'{app_directory}/shiny'</span>))
 
 <span class="fu"><a href="https://rdrr.io/r/base/files.html">file.copy</a></span>(
   <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">'extdata'</span>, <span class="kw">package</span> <span class="kw">=</span> <span class="st">'cerebroApp'</span>),
-  <span class="st">'~/test_cerebro_shinyapps/'</span>,
+  <span class="no">app_directory</span>,
   <span class="kw">recursive</span> <span class="kw">=</span> <span class="fl">TRUE</span>
 )
 
 <span class="fu"><a href="https://rdrr.io/r/base/unlink.html">unlink</a></span>(
-  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'~/test_cerebro_shinyapps/extdata/v1.0'</span>,
-    <span class="st">'~/test_cerebro_shinyapps/extdata/v1.1'</span>,
-    <span class="st">'~/test_cerebro_shinyapps/extdata/v1.2'</span>),
+  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw pkg">glue</span><span class="kw ns">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span>(<span class="st">'{app_directory}/extdata/v1.0'</span>),
+    <span class="kw pkg">glue</span><span class="kw ns">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span>(<span class="st">'{app_directory}/extdata/v1.1'</span>),
+    <span class="kw pkg">glue</span><span class="kw ns">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span>(<span class="st">'{app_directory}/extdata/v1.2'</span>)),
   <span class="kw">recursive</span> <span class="kw">=</span> <span class="fl">TRUE</span>
 )
 
 <span class="fu"><a href="https://rdrr.io/r/base/files.html">file.copy</a></span>(
   <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">'shiny'</span>, <span class="st">'v1.3'</span>, <span class="kw">package</span> <span class="kw">=</span> <span class="st">'cerebroApp'</span>),
-  <span class="st">'~/test_cerebro_shinyapps/shiny'</span>,
+  <span class="kw pkg">glue</span><span class="kw ns">::</span><span class="fu"><a href="https://glue.tidyverse.org/reference/glue.html">glue</a></span>(<span class="st">'{app_directory}/shiny'</span>),
   <span class="kw">recursive</span> <span class="kw">=</span> <span class="fl">TRUE</span>
 )</pre></body></html></div>
 </div>
@@ -194,7 +196,7 @@
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">shinyWidgets</span>)
 
 <span class="co">## set parameters ------------------------------------------------------------##</span>
-<span class="no">Cerebro.options</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
+<span class="no">Cerebro.options</span> <span class="kw">&lt;&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
   <span class="st">"mode"</span> <span class="kw">=</span> <span class="st">"open"</span>,
   <span class="st">"crb_file_to_load"</span> <span class="kw">=</span> <span class="st">"extdata/v1.3/example.crb"</span>,
   <span class="st">"cerebro_root"</span> <span class="kw">=</span> <span class="st">"."</span>
@@ -224,7 +226,7 @@
 <p>When you run the <code><a href="https://rdrr.io/pkg/rsconnect/man/deployApp.html">deployApp()</a></code> command, you might receive a warning about a hidden <code><a href="https://rdrr.io/r/base/browser.html">browser()</a></code> call in the <code>shiny/v1.3/about/server.R</code> file, but you can ignore that and proceed. Alternatively, you can simply comment out the respective line.</p>
 <div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/setRepositories.html">setRepositories</a></span>(<span class="kw">addURLs</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw">BioC</span> <span class="kw">=</span> <span class="st">"https://bioconductor.org/packages/3.11/bioc"</span>))
 
-<span class="kw pkg">rsconnect</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/rsconnect/man/deployApp.html">deployApp</a></span>(<span class="st">'~/test_cerebro_shinyapps/'</span>, <span class="kw">appName</span> <span class="kw">=</span> <span class="st">'Cerebro v1.3'</span>)</pre></body></html></div>
+<span class="kw pkg">rsconnect</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/rsconnect/man/deployApp.html">deployApp</a></span>(<span class="st">'~/test_cerebro_shinyapps/'</span>, <span class="kw">appName</span> <span class="kw">=</span> <span class="st">'Cerebro'</span>)</pre></body></html></div>
 <p>Uploading and preparing the app might take a few minutes, but once it finishes successfully, Cerebro should open in your browser. Using the shinyapps.io dashboard, you can manage the app, check usage metrics and logs, etc. An important parameter is the “Instance size”, which controls the available memory and can be controled in the “Settings” tab of the dashboard. The larger the data set you want to upload to Cerebro, the more memory will be necessary.</p>
 </div>
 <div id="see-also" class="section level1">
