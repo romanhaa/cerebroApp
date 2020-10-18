@@ -57,25 +57,27 @@ Next, we need to copy the Shiny files and some other data for Cerebro v1.3 to a 
 If you prefer to host a different version of Cerebro, adapt the code accordingly.
 
 ```{r eval=FALSE}
-dir.create('~/test_cerebro_shinyapps')
-dir.create('~/test_cerebro_shinyapps/shiny')
+app_directory <- '~/test_cerebro_shinyapps'
+
+dir.create(app_directory)
+dir.create(glue::glue('{app_directory}/shiny'))
 
 file.copy(
   system.file('extdata', package = 'cerebroApp'),
-  '~/test_cerebro_shinyapps/',
+  app_directory,
   recursive = TRUE
 )
 
 unlink(
-  c('~/test_cerebro_shinyapps/extdata/v1.0',
-    '~/test_cerebro_shinyapps/extdata/v1.1',
-    '~/test_cerebro_shinyapps/extdata/v1.2'),
+  c(glue::glue('{app_directory}/extdata/v1.0'),
+    glue::glue('{app_directory}/extdata/v1.1'),
+    glue::glue('{app_directory}/extdata/v1.2')),
   recursive = TRUE
 )
 
 file.copy(
   system.file('shiny', 'v1.3', package = 'cerebroApp'),
-  '~/test_cerebro_shinyapps/shiny',
+  glue::glue('{app_directory}/shiny'),
   recursive = TRUE
 )
 ```
@@ -95,7 +97,7 @@ library(shinydashboard)
 library(shinyWidgets)
 
 ## set parameters ------------------------------------------------------------##
-Cerebro.options <- list(
+Cerebro.options <<- list(
   "mode" = "open",
   "crb_file_to_load" = "extdata/v1.3/example.crb",
   "cerebro_root" = "."
@@ -133,7 +135,7 @@ Alternatively, you can simply comment out the respective line.
 ```{r eval=FALSE}
 setRepositories(addURLs = c(BioC = "https://bioconductor.org/packages/3.11/bioc"))
 
-rsconnect::deployApp('~/test_cerebro_shinyapps/', appName = 'Cerebro v1.3')
+rsconnect::deployApp('~/test_cerebro_shinyapps/', appName = 'Cerebro')
 ```
 
 Uploading and preparing the app might take a few minutes, but once it finishes successfully, Cerebro should open in your browser.
