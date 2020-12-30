@@ -817,6 +817,19 @@ centerOfGroups <- function(df, n_dimensions, group) {
 }
 
 ##----------------------------------------------------------------------------##
+## Set order of rows in data frame.
+##----------------------------------------------------------------------------##
+setRowOrder <- function(df, order) {
+  if ( order == 'Random' ) {
+    return(df[ sample(1:nrow(df)) , ])
+  } else if ( order == "Highest expression on top" ) {
+    return(dplyr::arrange(df, level))
+  } else {
+    return(df)
+  }
+}
+
+##----------------------------------------------------------------------------##
 ## Functions to interact with data set.
 ##
 ## Never directly interact with data set: data_set()
