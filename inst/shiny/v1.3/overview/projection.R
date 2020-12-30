@@ -81,6 +81,8 @@ output[["overview_projection_UI"]] <- renderUI({
           shinyWidgets::dropdownButton(
             tags$div(
               style = "color: black !important;",
+              uiOutput("overview_projection_show_group_label_UI"),
+              uiOutput("overview_projection_point_border_UI"),
               uiOutput("overview_projection_scales_UI")
             ),
             circle = FALSE,
@@ -120,7 +122,7 @@ output[["overview_projection_main_parameters_UI"]] <- renderUI({
       choices = availableProjections()
     ),
     selectInput(
-      "overview_point_color",
+      "overview_projection_point_color",
       label = "Color cells by",
       choices = colnames(getMetaData())[! colnames(getMetaData()) %in% c("cell_barcode")]
     )
@@ -166,7 +168,7 @@ overview_projection_main_parameters_info <- list(
 output[["overview_projection_additional_parameters_UI"]] <- renderUI({
   tagList(
     sliderInput(
-      "overview_point_size",
+      "overview_projection_point_size",
       label = "Point size",
       min = scatter_plot_point_size[["min"]],
       max = scatter_plot_point_size[["max"]],
@@ -174,7 +176,7 @@ output[["overview_projection_additional_parameters_UI"]] <- renderUI({
       value = scatter_plot_point_size[["default"]]
     ),
     sliderInput(
-      "overview_point_opacity",
+      "overview_projection_point_opacity",
       label = "Point opacity",
       min = scatter_plot_point_opacity[["min"]],
       max = scatter_plot_point_opacity[["max"]],
@@ -182,7 +184,7 @@ output[["overview_projection_additional_parameters_UI"]] <- renderUI({
       value = scatter_plot_point_opacity[["default"]]
     ),
     sliderInput(
-      "overview_percentage_cells_to_show",
+      "overview_projection_percentage_cells_to_show",
       label = "Show % of cells",
       min = scatter_plot_percentage_cells_to_show[["min"]],
       max = scatter_plot_percentage_cells_to_show[["max"]],
@@ -238,19 +240,31 @@ overview_projection_additional_parameters_info <- list(
 ##----------------------------------------------------------------------------##
 
 output[["overview_projection_group_filters_UI"]] <- renderUI({
+
   group_filters <- list()
+
   for ( i in getGroups() ) {
     group_filters[[i]] <- shinyWidgets::pickerInput(
       paste0("overview_projection_group_filter_", i),
       label = i,
       choices = getGroupLevels(i),
       selected = getGroupLevels(i),
-      options = list("actions-box" = TRUE),
+      options = list(
+        "actions-box" = TRUE
+      ),
       multiple = TRUE
     )
   }
+
   group_filters
 })
+
+## make sure elements are loaded even though the box is collapsed
+outputOptions(
+  output,
+  "overview_projection_group_filters_UI",
+  suspendWhenHidden = FALSE
+)
 
 ##----------------------------------------------------------------------------##
 ## Info box that gets shown when pressing the "info" button.
@@ -280,10 +294,48 @@ overview_projection_group_filters_info <- list(
   )
 )
 
+##----------------------------------------------------------------------------##
+## UI elements with switch to show group labels in projection.
+##----------------------------------------------------------------------------##
+
+output[["overview_projection_show_group_label_UI"]] <- renderUI({
+
+  req(
+    input[["overview_projection_point_color"]]
+  )
+
+  if ( input[["overview_projection_point_color"]] %in% getGroups() ) {
+    shinyWidgets::awesomeCheckbox(
+      inputId = "overview_projection_show_group_label",
+      label = "Show group labels in projection", 
+      value = TRUE
+    )
+  }
+})
+
 ## make sure elements are loaded even though the box is collapsed
 outputOptions(
   output,
-  "overview_projection_group_filters_UI",
+  "overview_projection_show_group_label_UI",
+  suspendWhenHidden = FALSE
+)
+
+##----------------------------------------------------------------------------##
+## UI elements with switch to draw border around cells.
+##----------------------------------------------------------------------------##
+
+output[["overview_projection_point_border_UI"]] <- renderUI({
+  shinyWidgets::awesomeCheckbox(
+    inputId = "overview_projection_point_border",
+    label = "Draw border around cells",
+    value = FALSE
+  )
+})
+
+## make sure elements are loaded even though the box is collapsed
+outputOptions(
+  output,
+  "overview_projection_point_border_UI",
   suspendWhenHidden = FALSE
 )
 
@@ -292,27 +344,31 @@ outputOptions(
 ##----------------------------------------------------------------------------##
 
 output[["overview_projection_scales_UI"]] <- renderUI({
-  projection_to_display <- if (
+
+  ##
+  if (
     is.null(input[["overview_projection_to_display"]]) ||
     is.na(input[["overview_projection_to_display"]])
   ) {
-    availableProjections()[1]
+    projection_to_display <- availableProjections()[1]
   } else {
-    input[["overview_projection_to_display"]]
+    projection_to_display <- input[["overview_projection_to_display"]]
   }
 
+  ##
   XYranges <- getXYranges(getProjection(projection_to_display))
 
+  ##
   tagList(
     sliderInput(
-      "overview_scale_x_manual_range",
+      "overview_projection_scale_x_manual_range",
       label = "Range of X axis",
       min = XYranges$x$min,
       max = XYranges$x$max,
       value = c(XYranges$x$min, XYranges$x$max)
     ),
     sliderInput(
-      "overview_scale_y_manual_range",
+      "overview_projection_scale_y_manual_range",
       label = "Range of Y axis",
       min = XYranges$y$min,
       max = XYranges$y$max,
@@ -329,6 +385,57 @@ outputOptions(
 )
 
 ##----------------------------------------------------------------------------##
+## Collect parameters for projection plot.
+##----------------------------------------------------------------------------##
+
+overview_projection_inputs <- reactive({
+
+  ## require input UI elements
+  req(
+    input[["overview_projection_to_display"]],
+    input[["overview_projection_point_color"]],
+    input[["overview_projection_point_size"]],
+    input[["overview_projection_point_opacity"]],
+    input[["overview_projection_percentage_cells_to_show"]],
+    !is.null(input[["overview_projection_show_group_label"]]),
+    !is.null(input[["overview_projection_point_border"]]),
+    input[["overview_projection_scale_x_manual_range"]],
+    input[["overview_projection_scale_y_manual_range"]],
+    !is.null(preferences[["use_webgl"]]),
+    !is.null(preferences[["show_hover_info_in_projections"]])
+  )
+
+  ## require group filters UI elements and at least 1 group level to be selected
+  for ( i in getGroups() ) {
+    req(input[[paste0("overview_projection_group_filter_", i)]])
+  }
+
+  ## collect parameters
+  parameters <- list(
+    projection = input[["overview_projection_to_display"]],
+    color_variable = input[["overview_projection_point_color"]],
+    point_size = input[["overview_projection_point_size"]],
+    point_opacity = input[["overview_projection_point_opacity"]],
+    pct_cells = input[["overview_projection_percentage_cells_to_show"]],
+    group_labels = input[["overview_projection_show_group_label"]],
+    draw_border = input[["overview_projection_point_border"]],
+    x_range = input[["overview_projection_scale_x_manual_range"]],
+    y_range = input[["overview_projection_scale_y_manual_range"]],
+    group_filters = list(),
+    webgl = preferences[["use_webgl"]],
+    hover_info = preferences[["show_hover_info_in_projections"]]
+  )
+
+  ## store group filters
+  for ( i in getGroups() ) {
+    parameters[['group_filters']][[ i ]] <- input[[paste0("overview_projection_group_filter_", i)]]
+  }
+
+  ## return parameters
+  return(parameters)
+})
+
+##----------------------------------------------------------------------------##
 ## Plotly plot of the selected projection.
 ##----------------------------------------------------------------------------##
 
@@ -336,42 +443,60 @@ output[["overview_projection"]] <- plotly::renderPlotly({
 
   ## don't proceed without these inputs
   req(
-    input[["overview_projection_to_display"]],
-    input[["overview_percentage_cells_to_show"]],
-    input[["overview_point_color"]],
-    input[["overview_point_size"]],
-    input[["overview_point_opacity"]],
-    input[["overview_scale_x_manual_range"]],
-    input[["overview_scale_y_manual_range"]]
+    overview_projection_inputs()
   )
 
-  projection_to_display <- input[["overview_projection_to_display"]]
+  ## save selected UMAP and coloring variable
+  projection_to_display <- overview_projection_inputs()[["projection"]]
+  variable_to_color_cells <- overview_projection_inputs()[["color_variable"]]
 
   ## build data frame with data
   cells_df <- cbind(getProjection(projection_to_display), getMetaData())
 
-  ## available group filters
-  group_filters <- names(input)[grepl(names(input), pattern = 'overview_projection_group_filter_')]
-
   ## remove cells based on group filters
-  for ( i in group_filters ) {
-    group <- strsplit(i, split = 'overview_projection_group_filter_')[[1]][2]
-    if ( group %in% colnames(cells_df) ) {
-      cells_df <- cells_df[which(cells_df[[group]] %in% input[[i]] ),]
+  for ( i in getGroups() ) {
+
+    ## make sure that group exists in meta data (as column) and that selected
+    ## groups are not NULL, then subset the data frame
+    if ( i %in% colnames(cells_df) ) {
+      cells_df <- cells_df[which(cells_df[[i]] %in% overview_projection_inputs()[["group_filters"]][[ i ]] ),]
     }
   }
 
   ## randomly remove cells (if necessary)
-  cells_df <- randomlySubsetCells(cells_df, input[["overview_percentage_cells_to_show"]])
+  cells_df <- randomlySubsetCells(cells_df, overview_projection_inputs()[["pct_cells"]])
 
   ## put rows in random order
   cells_df <- cells_df[ sample(1:nrow(cells_df)) , ]
 
   ## get colors for groups
-  colors_for_groups <- assignColorsToGroups(cells_df, input[["overview_point_color"]])
+  colors_for_groups <- assignColorsToGroups(cells_df, variable_to_color_cells)
 
-  ## prepare hover info
-  hover_info <- buildHoverInfoForProjections(cells_df)
+  ## check if border around cells should be drawn and set parameters if so
+  if ( overview_projection_inputs()[["draw_border"]] == TRUE ) {
+    line <- list(
+      color = "rgb(196,196,196)",
+      width = 1
+    )
+  } else {
+    line <- NULL
+  }
+
+  ## prepare hover info according to settings
+  ## ... hover info should be shown
+  if ( overview_projection_inputs()[["hover_info"]] == TRUE ) {
+
+    hover_info <- buildHoverInfoForProjections(cells_df)
+
+    parameter_hoverinfo <- "text"
+    parameter_text <- ~hover_info
+
+  ## ... no hover info to be shown
+  } else {
+
+    parameter_hoverinfo <- "skip"
+    parameter_text <- NULL
+  }
 
   ## check if projection consists of 3 or 2 dimensions
   ## ... selected projection contains 3 dimensions
@@ -379,7 +504,7 @@ output[["overview_projection"]] <- plotly::renderPlotly({
 
     ## check if selected coloring variable is categorical or numeric
     ## ... selected coloring variable is numeric
-    if ( is.numeric(cells_df[[ input[["overview_point_color"]] ]]) ) {
+    if ( is.numeric(cells_df[[ variable_to_color_cells ]]) ) {
       plot <- plotly::plot_ly(
           cells_df,
           x = ~cells_df[,1],
@@ -389,20 +514,17 @@ output[["overview_projection"]] <- plotly::renderPlotly({
           mode = "markers",
           marker = list(
             colorbar = list(
-              title = input[["overview_point_color"]]
+              title = variable_to_color_cells
             ),
-            color = ~cells_df[[ input[["overview_point_color"]] ]],
-            opacity = input[["overview_point_opacity"]],
+            color = ~cells_df[[ variable_to_color_cells ]],
+            opacity = overview_projection_inputs()[["point_opacity"]],
             colorscale = "YlGnBu",
             reversescale = TRUE,
-            line = list(
-              color = "rgb(196,196,196)",
-              width = 1
-            ),
-            size = input[["overview_point_size"]]
+            line = line,
+            size = overview_projection_inputs()[["point_size"]]
           ),
-          hoverinfo = "text",
-          text = ~hover_info,
+          hoverinfo = parameter_hoverinfo,
+          text = parameter_text,
           source = "overview_projection"
         )
 
@@ -413,22 +535,46 @@ output[["overview_projection"]] <- plotly::renderPlotly({
           x = ~cells_df[,1],
           y = ~cells_df[,2],
           z = ~cells_df[,3],
-          color = ~cells_df[[ input[["overview_point_color"]] ]],
+          color = ~cells_df[[ variable_to_color_cells ]],
           colors = colors_for_groups,
           type = "scatter3d",
           mode = "markers",
           marker = list(
-            opacity = input[["overview_point_opacity"]],
-            line = list(
-              color = "rgb(196,196,196)",
-              width = 1
-            ),
-            size = input[["overview_point_size"]]
+            opacity = overview_projection_inputs()[["point_opacity"]],
+            line = line,
+            size = overview_projection_inputs()[["point_size"]]
           ),
-          hoverinfo = "text",
-          text = ~hover_info,
+          hoverinfo = parameter_hoverinfo,
+          text = parameter_text,
           source = "overview_projection"
         )
+
+      ## check if group labels should be plotted and, if so, add them
+      if ( overview_projection_inputs()[["group_labels"]] == TRUE ) {
+
+        ## calculate group level centers
+        group_labels <- centerOfGroups(cells_df, 3, variable_to_color_cells)
+
+        ## add group level labels at center of respective groups
+        plot <- plot %>%
+          plotly::add_trace(
+            data = group_labels,
+            x = ~x_median,
+            y = ~y_median,
+            z = ~z_median,
+            type = 'scatter3d',
+            mode = 'text',
+            name = "Labels",
+            text = ~group,
+            textposition = 'middle center',
+            textfont = list(
+              color = '#000000',
+              size = 16
+            ),
+            hoverinfo = "skip",
+            inherit = FALSE
+          )
+      }
     }
 
     ## add layout to plot
@@ -457,7 +603,8 @@ output[["overview_projection"]] <- plotly::renderPlotly({
         hoverlabel = list(
           font = list(
             size = 11
-          )
+          ),
+          align = "left"
         )
       )
 
@@ -466,7 +613,7 @@ output[["overview_projection"]] <- plotly::renderPlotly({
 
     ## check if selected coloring variable is categorical or numeric
     ## ... selected coloring variable is numeric
-    if ( is.numeric(cells_df[[ input[["overview_point_color"]] ]]) ) {
+    if ( is.numeric(cells_df[[ variable_to_color_cells ]]) ) {
       plot <- plotly::plot_ly(
         cells_df,
         x = ~cells_df[,1],
@@ -475,45 +622,66 @@ output[["overview_projection"]] <- plotly::renderPlotly({
         mode = "markers",
         marker = list(
           colorbar = list(
-            title = input[["overview_point_color"]]
+            title = variable_to_color_cells
           ),
-          color = ~cells_df[[ input[["overview_point_color"]] ]],
-          opacity = input[["overview_point_opacity"]],
+          color = ~cells_df[[ variable_to_color_cells ]],
+          opacity = overview_projection_inputs()[["point_opacity"]],
           colorscale = "YlGnBu",
           reversescale = TRUE,
-          line = list(
-            color = "rgb(196,196,196)",
-            width = 1
-          ),
-          size = input[["overview_point_size"]]
+          line = line,
+          size = overview_projection_inputs()[["point_size"]]
         ),
-        hoverinfo = "text",
-        text = ~hover_info,
+        hoverinfo = parameter_hoverinfo,
+        text = parameter_text,
         source = "overview_projection"
       )
 
     ## ... selected coloring variable is not numeric
     } else {
+
       plot <- plotly::plot_ly(
         cells_df,
         x = ~cells_df[,1],
         y = ~cells_df[,2],
-        color = ~cells_df[[ input[["overview_point_color"]] ]],
+        color = ~cells_df[[ variable_to_color_cells ]],
         colors = colors_for_groups,
         type = "scatter",
         mode = "markers",
         marker = list(
-          opacity = input[["overview_point_opacity"]],
-          line = list(
-            color = "rgb(196,196,196)",
-            width = 1
-          ),
-          size = input[["overview_point_size"]]
+          opacity = overview_projection_inputs()[["point_opacity"]],
+          line = line,
+          size = overview_projection_inputs()[["point_size"]]
         ),
-        hoverinfo = "text",
-        text = ~hover_info,
+        hoverinfo = parameter_hoverinfo,
+        text = parameter_text,
         source = "overview_projection"
       )
+
+      ## check if group labels should be plotted and, if so, add them
+      if ( overview_projection_inputs()[["group_labels"]] == TRUE ) {
+
+        ## calculate group level centers
+        group_labels <- centerOfGroups(cells_df, 2, variable_to_color_cells)
+
+        ## add group level labels at center of respective groups
+        plot <- plot %>%
+          plotly::add_trace(
+            data = group_labels,
+            x = ~x_median,
+            y = ~y_median,
+            type = 'scatter',
+            mode = 'text',
+            name = "Labels",
+            text = ~group,
+            textposition = 'middle center',
+            textfont = list(
+              color = '#000000',
+              size = 16
+            ),
+            hoverinfo = "skip",
+            inherit = FALSE
+          )
+      }
     }
 
     ## add layout to plot
@@ -524,24 +692,61 @@ output[["overview_projection"]] <- plotly::renderPlotly({
           mirror = TRUE,
           showline = TRUE,
           zeroline = FALSE,
-          range = input[["overview_scale_x_manual_range"]]
+          range = overview_projection_inputs()[["x_range"]]
         ),
         yaxis = list(
           title = colnames(cells_df)[2],
           mirror = TRUE,
           showline = TRUE,
           zeroline = FALSE,
-          range = input[["overview_scale_y_manual_range"]]
+          range = overview_projection_inputs()[["y_range"]]
         ),
-        hoverlabel = list(font = list(size = 11))
+        hoverlabel = list(
+          font = list(
+            size = 11
+          ),
+          align = "left"
+        )
       )
 
     ## return plot either with WebGL or without, depending on setting
-    if ( preferences[["use_webgl"]] == TRUE ) {
+    if ( overview_projection_inputs()[["webgl"]] == TRUE ) {
       plot %>% plotly::toWebGL()
     } else {
       plot
     }
+  }
+})
+
+##----------------------------------------------------------------------------##
+## Reactive that holds IDs of selected cells (ID is built from position in
+## projection).
+##----------------------------------------------------------------------------##
+
+overview_projection_selected_cells <- reactive({
+
+  ## make sure plot parameters are set because it means that the plot can be
+  ## generated
+  req(
+    overview_projection_inputs()
+  )
+
+  ## check selection
+  ## ... selection has not been made or there is no cell in it
+  if (
+    is.null(plotly::event_data("plotly_selected", source = "overview_projection")) ||
+    length(plotly::event_data("plotly_selected", source = "overview_projection")) == 0
+  ) {
+
+    return(NULL)
+
+  ## ... selection has been made and at least 1 cell is in it
+  } else {
+
+    ## get number of selected cells
+    plotly::event_data("plotly_selected", source = "overview_projection") %>%
+    dplyr::mutate(identifier = paste0(x, '-', y)) %>%
+    return()
   }
 })
 
@@ -551,17 +756,9 @@ output[["overview_projection"]] <- plotly::renderPlotly({
 
 output[["overview_number_of_selected_cells"]] <- renderText({
 
-  ## don't proceed without these inputs
-  req(
-    input[["overview_projection_to_display"]]
-  )
-
   ## check selection
-  ## ... selection has not been made or there is not cell in it
-  if (
-    is.null(plotly::event_data("plotly_selected", source = "overview_projection")) ||
-    length(plotly::event_data("plotly_selected", source = "overview_projection")) == 0
-  ) {
+  ## ... selection has not been made or there is no cell in it
+  if ( is.null(overview_projection_selected_cells()) ) {
 
     ## manually set counter to 0
     number_of_selected_cells <- 0
@@ -570,7 +767,9 @@ output[["overview_number_of_selected_cells"]] <- renderText({
   } else {
 
     ## get number of selected cells
-    number_of_selected_cells <- formatC(nrow(plotly::event_data("plotly_selected", source = "overview_projection")), format = "f", big.mark = ",", digits = 0)
+    number_of_selected_cells <- overview_projection_selected_cells() %>%
+      nrow() %>%
+      formatC(format = "f", big.mark = ",", digits = 0)
   }
 
   ## prepare string to show
@@ -619,16 +818,14 @@ overview_projection_info <- list(
 
 observeEvent(input[["overview_projection_export"]], {
 
-  ## don't proceed without these inputs
+  ## make sure plot parameters are set because it means that the plot can be
+  ## generated
   req(
-    input[["overview_projection_to_display"]],
-    input[["overview_percentage_cells_to_show"]],
-    input[["overview_point_color"]],
-    input[["overview_point_size"]],
-    input[["overview_point_opacity"]],
-    input[["overview_scale_x_manual_range"]],
-    input[["overview_scale_y_manual_range"]]
+    overview_projection_inputs()
   )
+
+  ##
+  parameters <- overview_projection_inputs()
 
   ## open dialog to select where plot should be saved and how the file should
   ## be named
@@ -644,122 +841,187 @@ observeEvent(input[["overview_projection_export"]], {
   save_file_input <- shinyFiles::parseSavePath(available_storage_volumes, input[["overview_projection_export"]])
 
   ## only proceed if a path has been provided
-  if ( nrow(save_file_input) > 0 ) {
+  req(
+    nrow(save_file_input) > 0
+  )
 
-    ## extract specified file path
-    save_file_path <- as.character(save_file_input$datapath[1])
+  ## extract specified file path
+  save_file_path <- as.character(save_file_input$datapath[1])
 
-    ## ggplot2 functions are necessary to create the plot
-    require("ggplot2")
+  ## ggplot2 functions are necessary to create the plot
+  require("ggplot2")
 
-    ## get selected projection
-    projection_to_display <- input[["overview_projection_to_display"]]
+  ## get selected projection
+  projection_to_display <- parameters[["projection"]]
+  variable_to_color_cells <- parameters[["color_variable"]]
+
+  ## check if selection projection consists of 2 or 3 dimensions
+  ## ... selection projection consists of 2 dimensions
+  if ( ncol(getProjection(projection_to_display)) == 2 ) {
 
     ## merge cell positions in projection and meta data
     cells_df <- cbind(getProjection(projection_to_display), getMetaData())
 
     ## randomly remove cells (if necessary)
-    cells_df <- randomlySubsetCells(cells_df, input[["overview_percentage_cells_to_show"]])
+    cells_df <- randomlySubsetCells(cells_df, parameters[["pct_cells"]])
 
     ## put rows in random order
     cells_df <- cells_df[ sample(1:nrow(cells_df)) , ]
 
-    ## get X and Y scale limits
-    xlim <- c(
-      input[["overview_scale_x_manual_range"]][1],
-      input[["overview_scale_x_manual_range"]][2]
-    )
-    ylim <- c(
-      input[["overview_scale_y_manual_range"]][1],
-      input[["overview_scale_y_manual_range"]][2]
-    )
+    ##
+    if ( parameters[["draw_border"]] == TRUE ) {
+      stroke <- 0.2
+    } else {
+      stroke <- 0
+    }
 
-    ## check if selection projection consists of 2 or 3 dimensions
-    ## ... selection projection consists of 3 dimensions
-    if ( ncol(getProjection(projection_to_display)) == 3 ) {
+    ## start building the plot
+    plot <- ggplot(
+        cells_df,
+        aes_q(
+          x = as.name(colnames(cells_df)[1]),
+          y = as.name(colnames(cells_df)[2]),
+          fill = as.name(variable_to_color_cells)
+        )
+      ) +
+      geom_point(
+        shape = 21,
+        size = parameters[["point_size"]]/3,
+        stroke = stroke,
+        color = "#c4c4c4",
+        alpha = parameters[["point_opacity"]]
+      ) +
+      lims(
+        x = parameters[["x_range"]],
+        y = parameters[["y_range"]]
+      ) +
+      theme_bw()
 
-      ## give error message
+    ## depending on type of cell coloring, add different color scale
+    ## ... categorical
+    if (
+      is.factor(cells_df[[ variable_to_color_cells ]]) ||
+      is.character(cells_df[[ variable_to_color_cells ]])
+    ) {
+
+      ## get colors for groups
+      colors_for_groups <- assignColorsToGroups(cells_df, variable_to_color_cells)
+
+      ## add color assignments
+      plot <- plot + scale_fill_manual(values = colors_for_groups)
+
+      ## check if group labels should be plotted and, if so, add them
+      if ( parameters[["group_labels"]] == TRUE ) {
+
+        ## calculate group level centers
+        group_labels <- centerOfGroups(cells_df, 2, variable_to_color_cells)
+
+        ## add group level labels at center of respective groups
+        plot <- plot +
+          geom_label(
+            data = group_labels,
+            mapping = aes(x_median, y_median, label = group),
+            fill = 'white',
+            size = 4.5,
+            color = 'black',
+            alpha = 0.5,
+            fontface = 'bold',
+            label.size = 0,
+            show.legend = FALSE
+          )
+      }
+
+    ## ... not categorical (probably numerical)
+    } else {
+
+      ## add continuous color scale
+      plot <- plot +
+        scale_fill_distiller(
+          palette = "YlGnBu",
+          direction = 1,
+          guide = guide_colorbar(frame.colour = "black", ticks.colour = "black")
+        )
+    }
+
+    ## save plot
+    pdf(NULL)
+    ggsave(save_file_path, plot, height = 8, width = 11)
+
+    ## check if file was succesfully saved
+    ## ... successful
+    if ( file.exists(save_file_path) ) {
+
+      ## give positive message
       shinyWidgets::sendSweetAlert(
         session = session,
-        title = "Sorry!",
-        text = "It's currently not possible to create PDF plots from 3D dimensional reductions. Please use the PNG export button in the panel or a 2D dimensional reduction instead.",
-        type = "error"
+        title = "Success!",
+        text = paste0("Plot saved successfully as: ", save_file_path),
+        type = "success"
       )
 
-    ## ... selection projection consists of 2 dimensions
-    } else if ( ncol(getProjection(projection_to_display)) == 2 ) {
+    ## ... failed
+    } else {
 
-      ## start building the plot
-      plot <- ggplot(
-          cells_df,
-          aes_q(
-            x = as.name(colnames(cells_df)[1]),
-            y = as.name(colnames(cells_df)[2]),
-            fill = as.name(input[["overview_point_color"]])
-          )
-        ) +
-        geom_point(
-          shape = 21,
-          size = input[["overview_point_size"]]/3,
-          stroke = 0.2,
-          color = "#c4c4c4",
-          alpha = input[["overview_point_opacity"]]
-        ) +
-        lims(x = xlim, y = ylim) +
-        theme_bw()
-
-      ## depending on type of cell coloring, add different color scale
-      ## ... categorical
-      if (
-        is.factor(cells_df[[ input[["overview_point_color"]] ]]) ||
-        is.character(cells_df[[ input[["overview_point_color"]] ]])
-      ) {
-
-        ## get colors for groups
-        colors_for_groups <- assignColorsToGroups(cells_df, input[["overview_point_color"]])
-
-        ## add color assignments
-        plot <- plot + scale_fill_manual(values = colors_for_groups)
-
-      ## ... not categorical (probably numerical)
-      } else {
-
-        ## add continuous color scale
-        plot <- plot +
-          scale_fill_distiller(
-            palette = "YlGnBu",
-            direction = 1,
-            guide = guide_colorbar(frame.colour = "black", ticks.colour = "black")
-          )
-      }
-
-      ## save plot
-      pdf(NULL)
-      ggsave(save_file_path, plot, height = 8, width = 11)
-
-      ## check if file was succesfully saved
-      ## ... successful
-      if ( file.exists(save_file_path) ) {
-
-        ## give positive message
-        shinyWidgets::sendSweetAlert(
-          session = session,
-          title = "Success!",
-          text = paste0("Plot saved successfully as: ", save_file_path),
-          type = "success"
-        )
-
-      ## ... failed
-      } else {
-
-        ## give negative message
-        shinyWidgets::sendSweetAlert(
-          session = session,
-          title = "Error!",
-          text = "Sorry, it seems something went wrong...",
-          type = "error"
-        )
-      }
+      ## give negative message
+      shinyWidgets::sendSweetAlert(
+        session = session,
+        title = "Error!",
+        text = "Sorry, it seems something went wrong...",
+        type = "error"
+      )
     }
+
+  ## ... selection projection consists of 3 dimensions
+  } else if ( ncol(getProjection(projection_to_display)) == 3 ) {
+
+    ## give error message
+    shinyWidgets::sendSweetAlert(
+      session = session,
+      title = "Sorry!",
+      text = "It's currently not possible to create PDF plots from 3D dimensional reductions. Please use the PNG export button in the panel or a 2D dimensional reduction instead.",
+      type = "error"
+    )
   }
 })
+
+##----------------------------------------------------------------------------##
+## example for implementation of nested checkboxes with shinyTree for selection
+## of group levels to show; works similar to cellxgene; anyway decided against
+## it because it creates a new dependency and isn't as aesthetically pleasing as
+## the existing solution
+##----------------------------------------------------------------------------##
+
+# output[["overview_projection_group_filters_tree"]] <- shinyTree::renderTree({
+#   groups <- list()
+#   for ( i in getGroups() ) {
+#     groups[[i]] <- structure(
+#       as.list(
+#         setNames(
+#           getGroupLevels(i),
+#           getGroupLevels(i)
+#         )
+#       ),
+#       stselected = TRUE
+#     )
+#   }
+#   groups
+# })
+
+# output[["overview_projection_group_filters_selected_groups"]] <- renderPrint({
+#   tree <- input[["overview_projection_group_filters_tree"]]
+#   req(overview_projection_group_filters_tree)
+#   str(shinyTree::get_selected(tree, format = "slices"))
+# })
+
+# output[["overview_projection_group_filters_tree_UI"]] <- renderUI({
+#   tagList(
+#     shinyTree::shinyTree(
+#       "overview_projection_group_filters_tree",
+#       theme = "proton",
+#       themeIcons = FALSE,
+#       themeDots = FALSE,
+#       checkbox = TRUE
+#     ),
+#     verbatimTextOutput("sel_slices")
+#   )
+# })

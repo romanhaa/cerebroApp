@@ -44,15 +44,12 @@ output[["overview_details_selected_cells_table"]] <- DT::renderDataTable(server 
 
   ## don't proceed without these inputs
   req(
-    input[["overview_projection_to_display"]]
+    overview_projection_inputs()
   )
 
   ## check selection
-  ## ... selection has not been made or there is not cell in it
-  if (
-    is.null(plotly::event_data("plotly_selected", source = "overview_projection")) ||
-    length(plotly::event_data("plotly_selected", source = "overview_projection")) == 0
-  ) {
+  ## ... selection has not been made or there is no cell in it
+  if ( is.null(overview_projection_selected_cells()) ) {
 
     ## prepare empty table
     getMetaData() %>%
@@ -62,13 +59,9 @@ output[["overview_details_selected_cells_table"]] <- DT::renderDataTable(server 
   ## ... selection has been made and at least 1 cell is in it
   } else {
 
-    ## get info of selected cells and create identifier from X-Y coordinates
-    selected_cells <- plotly::event_data("plotly_selected", source = "overview_projection") %>%
-      dplyr::mutate(identifier = paste0(x, '-', y))
-
     ## extract cells for table
     cells_df <- cbind(
-        getProjection(input[["overview_projection_to_display"]]),
+        getProjection(overview_projection_inputs()[["projection"]]),
         getMetaData()
       ) %>% 
       as.data.frame()
@@ -77,7 +70,7 @@ output[["overview_details_selected_cells_table"]] <- DT::renderDataTable(server 
     cells_df <- cells_df %>%
       dplyr::rename(X1 = 1, X2 = 2) %>%
       dplyr::mutate(identifier = paste0(X1, '-', X2)) %>%
-      dplyr::filter(identifier %in% selected_cells$identifier) %>%
+      dplyr::filter(identifier %in% overview_projection_selected_cells()$identifier) %>%
       dplyr::select(-c(X1, X2, identifier)) %>%
       dplyr::select(cell_barcode, everything())
 

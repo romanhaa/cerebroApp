@@ -35,40 +35,35 @@ output[["overview_selected_cells_plot_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 
 output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
+
   req(
-    input[["overview_projection_to_display"]],
+    overview_projection_inputs()[["projection"]],
     input[["overview_selected_cells_plot_select_variable"]]
   )
 
   ## extract cells to plot
   cells_df <- cbind(
-      getProjection(input[["overview_projection_to_display"]]),
-      getMetaData()
-    )
+    getProjection(overview_projection_inputs()[["projection"]]),
+    getMetaData()
+  )
 
-  ##
-  ## ...
-  if (
-    is.null(plotly::event_data("plotly_selected", source = "overview_projection")) ||
-    length(plotly::event_data("plotly_selected", source = "overview_projection")) == 0
-  ) {
+  ## check selection
+  ## ... selection has not been made or there is no cell in it
+  if ( is.null(overview_projection_selected_cells()) ) {
 
     ###
-    cells_df <- cells_df %>% dplyr::mutate(group = 'not selected')
+    cells_df <- cells_df %>%
+      dplyr::mutate(group = 'not selected')
 
-  ## ...
+  ## ... selection has been made and at least 1 cell is in it
   } else {
-
-    ##
-    selected_cells <- plotly::event_data("plotly_selected", source = "overview_projection") %>%
-      dplyr::mutate(identifier = paste0(x, '-', y))
 
     ##
     cells_df <- cells_df %>%
       dplyr::rename(X1 = 1, X2 = 2) %>%
       dplyr::mutate(
         identifier = paste0(X1, '-', X2),
-        group = ifelse(identifier %in% selected_cells$identifier, 'selected', 'not selected'),
+        group = ifelse(identifier %in% overview_projection_selected_cells()$identifier, 'selected', 'not selected'),
         group = factor(group, levels = c('selected', 'not selected'))
       )
   }
@@ -164,7 +159,10 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
           visible = TRUE
         ),
         color = ~cells_df[[1]],
-        colors = setNames(c('#e74c3c','#7f8c8d'), c('selected', 'not selected')),
+        colors = setNames(
+          c('#e74c3c','#7f8c8d'),
+          c('selected', 'not selected')
+        ),
         source = "subset",
         showlegend = FALSE,
         hoverinfo = "y",
