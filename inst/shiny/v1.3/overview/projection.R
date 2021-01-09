@@ -297,7 +297,7 @@ output[["overview_projection_show_group_label_UI"]] <- renderUI({
   if ( input[["overview_projection_point_color"]] %in% getGroups() ) {
     shinyWidgets::awesomeCheckbox(
       inputId = "overview_projection_show_group_label",
-      label = "Show group labels in projection",
+      label = "Plot group labels in exported PDF",
       value = TRUE
     )
   }
