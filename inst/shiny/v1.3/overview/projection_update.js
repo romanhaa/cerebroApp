@@ -12,13 +12,15 @@ const layout = {
     autorange: true,
     mirror: true,
     showline: true,
-    zeroline: false
+    zeroline: false,
+    range: []
   },
   yaxis: {
     autorange: true,
     mirror: true,
     showline: true,
-    zeroline: false
+    zeroline: false,
+    range: []
   },
   zaxis: {
     autorange: true,
@@ -47,7 +49,9 @@ const defaultParams = {
     color: [],
     size: '',
     opacity: '',
-    line: {}
+    line: {},
+    x_range: [],
+    y_range: []
   },
   hover: {
     hoverinfo: '',
@@ -88,7 +92,12 @@ shinyjs.updatePlot2DContinuous = function(params) {
       showlegend: false
     }
   );
-  Plotly.react('overview_projection', data, layout);
+  let layout_here = Object.assign(layout);
+  layout_here.xaxis["autorange"] = false;
+  layout_here.xaxis["range"] = params.data.x_range;
+  layout_here.yaxis["autorange"] = false;
+  layout_here.yaxis["range"] = params.data.y_range;
+  Plotly.react('overview_projection', data, layout_here);
 }
 
 shinyjs.updatePlot3DContinuous = function(params) {
@@ -168,7 +177,12 @@ shinyjs.updatePlot2DCategorical = function(params) {
       }
     );
   }
-  Plotly.react('overview_projection', data, layout);
+  let layout_here = Object.assign(layout);
+  layout_here.xaxis["autorange"] = false;
+  layout_here.xaxis["range"] = params.data.x_range;
+  layout_here.yaxis["autorange"] = false;
+  layout_here.yaxis["range"] = params.data.y_range;
+  Plotly.react('overview_projection', data, layout_here);
 }
 
 

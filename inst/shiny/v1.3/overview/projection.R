@@ -539,7 +539,9 @@ overview_projection_update_plot <- function(input) {
       color = color_input,
       point_size = plot_parameters[["point_size"]],
       point_opacity = plot_parameters[["point_opacity"]],
-      point_line = list()
+      point_line = list(),
+      x_range = plot_parameters[["x_range"]],
+      y_range = plot_parameters[["y_range"]]
     )
     if ( plot_parameters[["draw_border"]] ) {
       output_data[['point_line']] <- list(
@@ -578,7 +580,9 @@ overview_projection_update_plot <- function(input) {
       color = list(),
       point_size = plot_parameters[["point_size"]],
       point_opacity = plot_parameters[["point_opacity"]],
-      point_line = list()
+      point_line = list(),
+      x_range = plot_parameters[["x_range"]],
+      y_range = plot_parameters[["y_range"]]
     )
     if ( plot_parameters[["draw_border"]] ) {
       output_data[['point_line']] <- list(
