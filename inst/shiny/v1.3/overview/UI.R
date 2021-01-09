@@ -1,7 +1,6 @@
 ##----------------------------------------------------------------------------##
 ## Tab: Overview
 ##----------------------------------------------------------------------------##
-
 tab_overview <- tabItem(
   tabName = "overview",
   ## necessary to ensure alignment of table headers and content
