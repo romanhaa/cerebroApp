@@ -14,6 +14,8 @@ tab_overview <- tabItem(
     }
     "
   ),
+  shinyjs::useShinyjs(),
+  shinyjs::extendShinyjs(script = paste0(Cerebro.options[["cerebro_root"]], "/shiny/v1.3/overview/projection_update.js")),
   uiOutput("overview_projection_UI"),
   uiOutput("overview_selected_cells_plot_UI"),
   uiOutput("overview_selected_cells_table_UI")
