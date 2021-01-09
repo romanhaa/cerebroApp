@@ -6,3 +6,4 @@ vignettes/*.crb
 docs
 tests
 .Rproj.user
+*.Rproj
