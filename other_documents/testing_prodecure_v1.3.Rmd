@@ -388,8 +388,8 @@ cerebro_seurat
 ```{r eval=FALSE}
 Cerebro.options <- list(
   "mode" = "open",
-  "crb_file_to_load" = "~/Dropbox/Cerebro_development/pbmc_Seurat_dgCMatrix.crb",
-  "cerebro_root" = "~/Research/GitHub/cerebroApp_v1.3/inst/"
+  "crb_file_to_load" = "~/Dropbox/Cerebro/development/pbmc_Seurat_dgCMatrix.crb",
+  "cerebro_root" = "~/Research/GitHub/cerebroApp_develop/inst/"
 )
 ```
 
@@ -399,7 +399,7 @@ Cerebro.options <- list(
 Cerebro.options <- list(
   "mode" = "open",
   "crb_file_to_load" = "~/Dropbox/Cerebro_development/pbmc_Seurat_RleMatrix.crb",
-  "cerebro_root" = "~/Research/GitHub/cerebroApp_v1.3/inst/"
+  "cerebro_root" = "~/Research/GitHub/cerebroApp_develop/inst/"
 )
 ```
 
@@ -408,8 +408,8 @@ Cerebro.options <- list(
 ```{r eval=FALSE}
 Cerebro.options <- list(
   "mode" = "open",
-  "crb_file_to_load" = "~/Research/GitHub/cerebroApp_v1.3/inst/extdata/v1.3/example.crb",
-  "cerebro_root" = "~/Research/GitHub/cerebroApp_v1.3/inst"
+  "crb_file_to_load" = "~/Research/GitHub/cerebroApp_develop/inst/extdata/v1.3/example.crb",
+  "cerebro_root" = "~/Research/GitHub/cerebroApp_develop/inst/"
 )
 ```
 
@@ -418,7 +418,7 @@ Cerebro.options <- list(
 ```{r eval=FALSE}
 Cerebro.options <- list(
   "mode" = "open",
-  "cerebro_root" = "~/Research/GitHub/cerebroApp_v1.3/inst"
+  "cerebro_root" = "~/Research/GitHub/cerebroApp_develop/inst/"
 )
 ```
 
@@ -429,8 +429,8 @@ Cerebro.options <- list(
 ```{r eval=FALSE}
 options(shiny.maxRequestSize = 800 * 1024^2)
 
-source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/shiny_UI.R")
-source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/shiny_server.R")
+source("~/Research/GitHub/cerebroApp_develop/inst/shiny/v1.3/shiny_UI.R")
+source("~/Research/GitHub/cerebroApp_develop/inst/shiny/v1.3/shiny_server.R")
 
 shiny::shinyApp(ui = ui, server = server)
 ```
@@ -440,8 +440,8 @@ shiny::shinyApp(ui = ui, server = server)
 ```{r eval=FALSE}
 options(shiny.maxRequestSize = 800 * 1024^2)
 
-source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/shiny_UI.R")
-source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/shiny_server.R")
+source("~/Research/GitHub/cerebroApp_develop/inst/shiny/v1.3/shiny_UI.R")
+source("~/Research/GitHub/cerebroApp_develop/inst/shiny/v1.3/shiny_server.R")
 
 profvis::profvis(shiny::runApp(shiny::shinyApp(ui = ui, server = server)))
 ```
