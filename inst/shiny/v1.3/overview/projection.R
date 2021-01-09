@@ -551,8 +551,11 @@ overview_projection_update_plot <- function(input) {
     }
     output_hover <- list(
       hoverinfo = ifelse(plot_parameters[["hover_info"]], 'text', 'skip'),
-      text = ifelse(plot_parameters[["hover_info"]], unname(hover_info), 'test')
+      text = 'empty'
     )
+    if ( plot_parameters[["hover_info"]] ) {
+      output_hover[['text']] <- unname(hover_info)
+    }
     if ( plot_parameters[['n_dimensions']] == 2 ) {
       shinyjs::js$updatePlot2DContinuous(
         output_meta,
