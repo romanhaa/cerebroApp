@@ -37,13 +37,13 @@ output[["overview_selected_cells_plot_UI"]] <- renderUI({
 output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
 
   req(
-    overview_projection_inputs()[["projection"]],
+    overview_projection_parameters_plot()[["projection"]],
     input[["overview_selected_cells_plot_select_variable"]]
   )
 
   ## extract cells to plot
   cells_df <- cbind(
-    getProjection(overview_projection_inputs()[["projection"]]),
+    getProjection(overview_projection_parameters_plot()[["projection"]]),
     getMetaData()
   )
 

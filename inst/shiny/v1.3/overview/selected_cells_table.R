@@ -44,7 +44,7 @@ output[["overview_details_selected_cells_table"]] <- DT::renderDataTable(server 
 
   ## don't proceed without these inputs
   req(
-    overview_projection_inputs()
+    overview_projection_parameters_plot()
   )
 
   ## check selection
@@ -61,9 +61,9 @@ output[["overview_details_selected_cells_table"]] <- DT::renderDataTable(server 
 
     ## extract cells for table
     cells_df <- cbind(
-        getProjection(overview_projection_inputs()[["projection"]]),
+        getProjection(overview_projection_parameters_plot()[["projection"]]),
         getMetaData()
-      ) %>% 
+      ) %>%
       as.data.frame()
 
     ## filter out non-selected cells with X-Y identifier

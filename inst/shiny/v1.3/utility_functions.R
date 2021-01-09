@@ -659,16 +659,16 @@ buildHoverInfoForProjections <- function(table) {
 
   ## put together cell ID, number of transcripts and number of expressed genes
   hover_info <- glue::glue(
-    "<b>Cell</b>: {table[[ 'cell_barcode' ]]}
-    <b>Transcripts</b>: {table[[ 'nUMI' ]]}
-    <b>Expressed genes</b>: {table[[ 'nGene' ]]}"
+    "<b>Cell</b>: {table[[ 'cell_barcode' ]]}<br>",
+    "<b>Transcripts</b>: {formatC(table[[ 'nUMI' ]], format = 'f', big.mark = ',', digits = 0)}<br>",
+    "<b>Expressed genes</b>: {formatC(table[[ 'nGene' ]], format = 'f', big.mark = ',', digits = 0)}"
   )
 
   ## add info for known grouping variables
   for ( group in getGroups() ) {
     hover_info <- glue::glue(
-      "{hover_info}
-      <b>{group}</b>: {table[[ group ]]}"
+      "{hover_info}<br>",
+      "<b>{group}</b>: {table[[ group ]]}"
     )
   }
 
@@ -770,8 +770,6 @@ getGenesForGeneSet <- function(gene_set) {
 
 ##----------------------------------------------------------------------------##
 ## Function to calculate center of groups in projections/trajectories.
-##
-## 
 ##----------------------------------------------------------------------------##
 centerOfGroups <- function(df, n_dimensions, group) {
 
@@ -971,7 +969,7 @@ getTrajectory <- function(method, name) {
 }
 getExtraMaterialCategories <- function() {
   if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
-   return(data_set()$getExtraMaterialCategories())
+    return(data_set()$getExtraMaterialCategories())
   }
 }
 checkForExtraTables <- function() {
