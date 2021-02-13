@@ -2,7 +2,7 @@
 ## Plotly plot of the selected projection.
 ##----------------------------------------------------------------------------##
 output[["overview_projection"]] <- plotly::renderPlotly({
-  plot_ly(type = 'scattergl', mode = 'markers', source = "overview_projection")
+  plotly::plot_ly(type = 'scattergl', mode = 'markers', source = "overview_projection")
 })
 
 ##----------------------------------------------------------------------------##

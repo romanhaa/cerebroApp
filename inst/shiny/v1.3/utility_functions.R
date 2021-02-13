@@ -793,7 +793,7 @@ centerOfGroups <- function(df, n_dimensions, group) {
     return()
 
   ## ... 3 dimensions
-  } else if ( n_dimensions == 3 ) {
+  } else if ( n_dimensions == 3 && is.numeric(df[,3]) ) {
 
     ## calculate center for groups and return
     tidyr::tibble(
