@@ -2,8 +2,8 @@
 ## Tab: Overview
 ##----------------------------------------------------------------------------##
 
-jsCode <- "
-const layout = {
+js_code_overview_projection <- "
+const layout_2D = {
   uirevision: 'true',
   hovermode: 'closest',
   margin: {
@@ -30,11 +30,48 @@ const layout = {
     zeroline: false,
     range: []
   },
-  zaxis: {
-    autorange: true,
-    mirror: true,
-    showline: true,
-    zeroline: false
+  hoverlabel: {
+    font: {
+      size: 11
+    },
+    align: 'left'
+  }
+};
+
+const layout_3D = {
+  uirevision: 'true',
+  hovermode: 'closest',
+  margin: {
+    l: 50,
+    r: 50,
+    b: 50,
+    t: 50,
+    pad: 4
+  },
+  legend: {
+    itemsizing: 'constant',
+  },
+  scene: {
+    xaxis: {
+      autorange: true,
+      mirror: true,
+      showline: true,
+      zeroline: false,
+      range: []
+    },
+    yaxis: {
+      autorange: true,
+      mirror: true,
+      showline: true,
+      zeroline: false,
+      range: []
+    },
+    zaxis: {
+      autorange: true,
+      mirror: true,
+      showline: true,
+      zeroline: false
+    },
   },
   hoverlabel: {
     font: {
@@ -100,7 +137,7 @@ shinyjs.updatePlot2DContinuous = function(params) {
       showlegend: false
     }
   );
-  let layout_here = Object.assign(layout);
+  const layout_here = Object.assign(layout_2D);
   layout_here.xaxis['autorange'] = false;
   layout_here.xaxis['range'] = params.data.x_range;
   layout_here.yaxis['autorange'] = false;
@@ -136,9 +173,8 @@ shinyjs.updatePlot3DContinuous = function(params) {
       showlegend: false
     }
   );
-  Plotly.react('overview_projection', data, layout);
+  Plotly.react('overview_projection', data, layout_3D);
 }
-
 
 shinyjs.updatePlot2DCategorical = function(params) {
   params = shinyjs.getParams(params, defaultParams);
@@ -185,14 +221,13 @@ shinyjs.updatePlot2DCategorical = function(params) {
       }
     );
   }
-  let layout_here = Object.assign(layout);
+  const layout_here = Object.assign(layout_2D);
   layout_here.xaxis['autorange'] = false;
   layout_here.xaxis['range'] = params.data.x_range;
   layout_here.yaxis['autorange'] = false;
   layout_here.yaxis['range'] = params.data.y_range;
   Plotly.react('overview_projection', data, layout_here);
 }
-
 
 shinyjs.updatePlot3DCategorical = function(params) {
   params = shinyjs.getParams(params, defaultParams);
@@ -241,7 +276,7 @@ shinyjs.updatePlot3DCategorical = function(params) {
       }
     );
   }
-  Plotly.react('overview_projection', data, layout);
+  Plotly.react('overview_projection', data, layout_3D);
 }
 "
 
@@ -259,7 +294,7 @@ tab_overview <- tabItem(
   ),
   shinyjs::useShinyjs(),
   shinyjs::extendShinyjs(
-    text = jsCode,
+    text = js_code_overview_projection,
     functions = c(
       "updatePlot2DContinuous",
       "updatePlot3DContinuous",
