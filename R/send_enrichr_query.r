@@ -8,7 +8,7 @@
 #' score between 0 and 1 in the other.
 #' @param databases Databases to search.
 #' @param URL_API URL to send requests to (Enrichr API).
-#' See http://amp.pharm.mssm.edu/Enrichr/ for available databases.
+#' See https://maayanlab.cloud/Enrichr/#stats for available databases.
 #'
 #' @return
 #' Returns a data frame of enrichment terms, p-values, ...
@@ -33,7 +33,7 @@
 
     ## send request with gene names
     temp <- httr::POST(
-      url = URL_API,
+      url = paste0(URL_API, "/enrich"),
       body = list(
         list = paste(genes, collapse = '\n')
       )
@@ -44,7 +44,7 @@
 
     ## send request with gene names and scores
     temp <- httr::POST(
-      url = URL_API,
+      url = paste0(URL_API, "/enrich"),
       body = list(
         list = paste(paste(genes[,1], genes[,2], sep = ','), collapse = '\n')
       )
@@ -61,7 +61,7 @@
   }
 
   ## 
-  httr::GET(url = 'http://amp.pharm.mssm.edu/Enrichr/share')
+  httr::GET(url = paste0(URL_API, "/share"))
 
   ##
   dfSAF <- options()$stringsAsFactors
@@ -79,7 +79,7 @@
 
     ##
     r <- httr::GET(
-      url = 'http://amp.pharm.mssm.edu/Enrichr/export',
+      url = paste0(URL_API, "/export"),
       query = list(
         file = 'API',
         backgroundType = x
