@@ -2,7 +2,21 @@
 ## Plotly plot of the selected projection.
 ##----------------------------------------------------------------------------##
 output[["overview_projection"]] <- plotly::renderPlotly({
-  plotly::plot_ly(type = 'scattergl', mode = 'markers', source = "overview_projection")
+  plotly::plot_ly(type = 'scattergl', mode = 'markers', source = "overview_projection") %>%
+  plotly::layout(
+    xaxis = list(
+      autorange = TRUE,
+      mirror = TRUE,
+      showline = TRUE,
+      zeroline = FALSE
+    ),
+    yaxis = list(
+      autorange = TRUE,
+      mirror = TRUE,
+      showline = TRUE,
+      zeroline = FALSE
+    )
+  )
 })
 
 ##----------------------------------------------------------------------------##

@@ -1,7 +1,6 @@
 ##----------------------------------------------------------------------------##
 ## Tab: Most expressed genes
 ##----------------------------------------------------------------------------##
-
 tab_most_expressed_genes <- tabItem(
   tabName = "mostExpressedGenes",
   shinyjs::inlineCSS("

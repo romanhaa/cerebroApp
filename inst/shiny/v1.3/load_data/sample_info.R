@@ -1,13 +1,10 @@
 ##----------------------------------------------------------------------------##
-## Tab: Load data
-##
 ## Sample info.
 ##----------------------------------------------------------------------------##
 
 ##----------------------------------------------------------------------------##
 ## UI elements that show some basic information about the loaded data set.
 ##----------------------------------------------------------------------------##
-
 output[["load_data_sample_info_UI"]] <- renderUI({
   tagList(
     fluidRow(
@@ -32,7 +29,6 @@ output[["load_data_sample_info_UI"]] <- renderUI({
 ## - date of analysis
 ## - date of export
 ##----------------------------------------------------------------------------##
-
 ## experiment name
 output[["load_data_experiment_name"]] <- renderValueBox({
   valueBox(

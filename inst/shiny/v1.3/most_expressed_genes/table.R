@@ -1,30 +1,33 @@
 ##----------------------------------------------------------------------------##
-## Tab: Most expressed genes
-##
 ## Table or info text when data is missing.
 ##----------------------------------------------------------------------------##
 
 ##----------------------------------------------------------------------------##
 ## UI element for output.
 ##----------------------------------------------------------------------------##
-
 output[["most_expressed_genes_table_UI"]] <- renderUI({
-
-  ##
-  req(
-    input[["most_expressed_genes_selected_group"]]
-  )
-
-  ##
-  fluidRow(
-    cerebroBox(
-      title = tagList(
-        boxTitle("Most expressed genes"),
-        cerebroInfoButton("most_expressed_genes_info")
-      ),
-      uiOutput("most_expressed_genes_table_or_text_UI")
+  selected_group <- input[['most_expressed_genes_selected_group']]
+  if (
+    is.null(selected_group) ||
+    selected_group %in% getGroups() == FALSE
+  ) {
+    fluidRow(
+      cerebroBox(
+        title = boxTitle("Most expressed genes"),
+        textOutput("most_expressed_genes_message_no_data_found")
+      )
     )
-  )
+  } else {
+    fluidRow(
+      cerebroBox(
+        title = tagList(
+          boxTitle("Most expressed genes"),
+          cerebroInfoButton("most_expressed_genes_info")
+        ),
+        uiOutput("most_expressed_genes_table_or_text_UI")
+      )
+    )
+  }
 })
 
 ##----------------------------------------------------------------------------##
@@ -32,10 +35,7 @@ output[["most_expressed_genes_table_UI"]] <- renderUI({
 ## of results and the corresponding selector, or a text message if data is
 ## missing.
 ##----------------------------------------------------------------------------##
-
 output[["most_expressed_genes_table_or_text_UI"]] <- renderUI({
-
-  ##
   fluidRow(
     column(12,
       shinyWidgets::materialSwitch(
@@ -58,23 +58,14 @@ output[["most_expressed_genes_table_or_text_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 ## UI element for sub-filtering of results (if toggled).
 ##----------------------------------------------------------------------------##
-
 output[["most_expressed_genes_filter_subgroups_UI"]] <- renderUI({
-
-  ##
-  req(
-    input[["most_expressed_genes_selected_group"]],
-    !is.null(input[["most_expressed_genes_table_filter_switch"]])
-  )
-
+  req(!is.null(input[["most_expressed_genes_table_filter_switch"]]))
+  selected_group <- input[['most_expressed_genes_selected_group']]
+  req(selected_group %in% getGroups())
   ## fetch results
-  results_df <- getMostExpressedGenes(
-    input[["most_expressed_genes_selected_group"]]
-  )
-
+  results_df <- getMostExpressedGenes(selected_group)
   ## don't proceed if input is not a data frame
   req(is.data.frame(results_df))
-
   ## check if pre-filtering is activated and name of first column in table is
   ## one of the registered groups
   ## ... it's not
@@ -82,20 +73,16 @@ output[["most_expressed_genes_filter_subgroups_UI"]] <- renderUI({
     input[["most_expressed_genes_table_filter_switch"]] == TRUE ||
     colnames(results_df)[1] %in% getGroups() == FALSE
   ) {
-
     ## return nothing (empty row)
     fluidRow()
-
   ## ... it is
   } else {
-
     ## check for which groups results exist
     if ( is.character(results_df[[1]]) ) {
       available_groups <- unique(results_df[[1]])
     } else if ( is.factor(results_df[[1]]) ) {
       available_groups <- levels(results_df[[1]])
     }
-
     fluidRow(
       column(12,
         selectInput(
@@ -111,34 +98,21 @@ output[["most_expressed_genes_filter_subgroups_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 ## Table with results.
 ##----------------------------------------------------------------------------##
-
 output[["most_expressed_genes_table"]] <- DT::renderDataTable(server = FALSE, {
-
-  ##
-  req(
-    input[["most_expressed_genes_selected_group"]]
-  )
-
+  selected_group <- input[['most_expressed_genes_selected_group']]
+  req(selected_group %in% getGroups())
   ## fetch results
-  results_df <- getMostExpressedGenes(
-    input[["most_expressed_genes_selected_group"]]
-  )
-
+  results_df <- getMostExpressedGenes(selected_group)
   ## don't proceed if input is not a data frame
-  req(
-    is.data.frame(results_df)
-  )
-
+  req(is.data.frame(results_df))
   ## filter the table for a specific subgroup only if specified by the user,
   ## otherwise show all results
   if (
     input[["most_expressed_genes_table_filter_switch"]] == FALSE &&
     colnames(results_df)[1] %in% getGroups() == TRUE
   ) {
-
     ## don't proceed if selection of subgroup is not available
     req(input[["most_expressed_genes_table_select_group_level"]])
-
     ## filter table
     results_df <- results_df[ which(results_df[[1]] == input[["most_expressed_genes_table_select_group_level"]]) , ]
   }
@@ -147,15 +121,12 @@ output[["most_expressed_genes_table"]] <- DT::renderDataTable(server = FALSE, {
   ## subgroup did not work properly, skip the processing and show and empty
   ## table (otherwise the procedure would result in an error)
   if ( nrow(results_df) == 0 ) {
-
     results_df %>%
     as.data.frame() %>%
     dplyr::slice(0) %>%
     prepareEmptyTable()
-
   ## if there is at least 1 row in the table, create proper table
   } else {
-
     results_df %>%
     dplyr::rename("% of total expression" = pct) %>%
     prettifyTable(
@@ -177,9 +148,15 @@ output[["most_expressed_genes_table"]] <- DT::renderDataTable(server = FALSE, {
 })
 
 ##----------------------------------------------------------------------------##
+## Alternative text message if data is missing.
+##----------------------------------------------------------------------------##
+output[["most_expressed_genes_message_no_data_found"]] <- renderText({
+  "No data available."
+})
+
+##----------------------------------------------------------------------------##
 ## Info box that gets shown when pressing the "info" button.
 ##----------------------------------------------------------------------------##
-
 observeEvent(input[["most_expressed_genes_info"]], {
   showModal(
     modalDialog(
@@ -195,7 +172,6 @@ observeEvent(input[["most_expressed_genes_info"]], {
 ##----------------------------------------------------------------------------##
 ## Text in info box.
 ##----------------------------------------------------------------------------##
-
 most_expressed_genes_info <- list(
   title = "Most expressed genes",
   text = HTML("

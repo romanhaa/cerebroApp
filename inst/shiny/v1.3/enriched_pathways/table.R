@@ -9,23 +9,33 @@
 ##----------------------------------------------------------------------------##
 
 output[["enriched_pathways_table_UI"]] <- renderUI({
-
-  ##
-  req(
-    input[["enriched_pathways_selected_method"]],
-    input[["enriched_pathways_selected_table"]]
-  )
-
-  ##
-  fluidRow(
-    cerebroBox(
-      title = tagList(
-        boxTitle("Enriched pathways"),
-        cerebroInfoButton("enriched_pathways_info")
-      ),
-      uiOutput("enriched_pathways_table_or_text_UI")
+  selected_method <- input[["enriched_pathways_selected_method"]]
+  selected_table <- input[["enriched_pathways_selected_table"]]
+  if (
+    is.null(selected_method) ||
+    selected_method %in% getMethodsForEnrichedPathways() == FALSE
+  ) {
+    fluidRow(
+      cerebroBox(
+        title = boxTitle("Enriched pathways"),
+        textOutput("enriched_pathways_message_no_method_found")
+      )
     )
-  )
+  } else {
+    req(
+      input[["enriched_pathways_selected_method"]],
+      input[["enriched_pathways_selected_table"]]
+    )
+    fluidRow(
+      cerebroBox(
+        title = tagList(
+          boxTitle("Enriched pathways"),
+          cerebroInfoButton("enriched_pathways_info")
+        ),
+        uiOutput("enriched_pathways_table_or_text_UI")
+      )
+    )
+  }
 })
 
 ##----------------------------------------------------------------------------##
@@ -36,21 +46,15 @@ output[["enriched_pathways_table_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 
 output[["enriched_pathways_table_or_text_UI"]] <- renderUI({
-
-  ##
   req(
     input[["enriched_pathways_selected_method"]],
     input[["enriched_pathways_selected_table"]],
     input[["enriched_pathways_selected_table"]] %in% getGroupsWithEnrichedPathways(input[["enriched_pathways_selected_method"]])
-
   )
-
-  ## fetch results
   results_type <- getEnrichedPathways(
     input[["enriched_pathways_selected_method"]],
     input[["enriched_pathways_selected_table"]]
   )
-
   ## depending on the content of the results slot, show a text message or
   ## switches and table
   if (

@@ -3,7 +3,10 @@
 ##----------------------------------------------------------------------------##
 output[["overview_details_selected_cells_table"]] <- DT::renderDataTable(server = FALSE, {
   ## don't proceed without these inputs
-  req(overview_projection_parameters_plot())
+  req(
+    input[["overview_projection_to_display"]],
+    input[["overview_projection_to_display"]] %in% availableProjections()
+  )
   ## check selection
   ## ... selection has not been made or there is no cell in it
   if ( is.null(overview_projection_selected_cells()) ) {
@@ -15,7 +18,7 @@ output[["overview_details_selected_cells_table"]] <- DT::renderDataTable(server 
   } else {
     ## extract cells for table
     cells_df <- cbind(
-        getProjection(overview_projection_parameters_plot()[["projection"]]),
+        getProjection(input[["overview_projection_to_display"]]),
         getMetaData()
       ) %>%
       as.data.frame()

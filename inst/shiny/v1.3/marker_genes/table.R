@@ -1,21 +1,15 @@
 ##----------------------------------------------------------------------------##
-## Tab: Marker genes
-##
 ## Table or info text when data is missing.
 ##----------------------------------------------------------------------------##
 
 ##----------------------------------------------------------------------------##
 ## UI element for output.
 ##----------------------------------------------------------------------------##
-
 output[["marker_genes_table_UI"]] <- renderUI({
-
-  ##
   req(
     input[["marker_genes_selected_method"]],
     input[["marker_genes_selected_table"]]
   )
-
   fluidRow(
     cerebroBox(
       title = tagList(
@@ -32,23 +26,17 @@ output[["marker_genes_table_UI"]] <- renderUI({
 ## results, automatic number formatting, automatic coloring of values), or text
 ## messages if no marker genes were found or data is missing.
 ##----------------------------------------------------------------------------##
-
 output[["marker_genes_table_or_text_UI"]] <- renderUI({
-
-  ##
   req(
     input[["marker_genes_selected_method"]],
     input[["marker_genes_selected_table"]],
     input[["marker_genes_selected_table"]] %in% getGroupsWithMarkerGenes(input[["marker_genes_selected_method"]])
   )
-
   ## fetch results
   results_type <- getMarkerGenes(
     input[["marker_genes_selected_method"]],
     input[["marker_genes_selected_table"]]
   )
-
-  ##
   if ( length(results_type) > 0 ) {
     if ( is.data.frame(results_type) ) {
       fluidRow(
@@ -96,26 +84,20 @@ output[["marker_genes_table_or_text_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 ## UI element for sub-filtering of results if toggled.
 ##----------------------------------------------------------------------------##
-
 output[["marker_genes_filter_subgroups_UI"]] <- renderUI({
-
-  ##
   req(
     input[["marker_genes_selected_method"]],
     input[["marker_genes_selected_table"]],
     input[["marker_genes_selected_table"]] %in% getGroupsWithMarkerGenes(input[["marker_genes_selected_method"]]),
     !is.null(input[["marker_genes_table_filter_switch"]])
   )
-
   ## fetch results
   results_df <- getMarkerGenes(
     input[["marker_genes_selected_method"]],
     input[["marker_genes_selected_table"]]
   )
-
   ## don't proceed if input is not a data frame
   req(is.data.frame(results_df))
-
   ## check if pre-filtering is activated and name of first column in table is
   ## one of the registered groups
   ## ... it's not
@@ -123,20 +105,16 @@ output[["marker_genes_filter_subgroups_UI"]] <- renderUI({
     input[["marker_genes_table_filter_switch"]] == TRUE ||
     colnames(results_df)[1] %in% getGroups() == FALSE
   ) {
-
     ## return nothing (empty row)
     fluidRow()
-
   ## ... it is
   } else {
-
     ## check for which groups results exist
     if ( is.character(results_df[[1]]) ) {
       available_groups <- unique(results_df[[1]])
     } else if ( is.factor(results_df[[1]]) ) {
       available_groups <- levels(results_df[[1]])
     }
-
     ## create input selection for available groups
     fluidRow(
       column(12,
@@ -153,52 +131,40 @@ output[["marker_genes_filter_subgroups_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 ## Table with results.
 ##----------------------------------------------------------------------------##
-
 output[["marker_genes_table"]] <- DT::renderDataTable(server = FALSE, {
-
-  ##
   req(
     input[["marker_genes_selected_method"]],
     input[["marker_genes_selected_table"]],
     input[["marker_genes_selected_table"]] %in% getGroupsWithMarkerGenes(input[["marker_genes_selected_method"]])
   )
-
   ## fetch results
   results_df <- getMarkerGenes(
     input[["marker_genes_selected_method"]],
     input[["marker_genes_selected_table"]]
   )
-
   ## don't proceed if input is not a data frame
   req(is.data.frame(results_df))
-
   ## filter the table for a specific subgroup only if specified by the user
   ## (otherwise show all results)
   if (
     input[["marker_genes_table_filter_switch"]] == FALSE &&
     colnames(results_df)[1] %in% getGroups() == TRUE
   ) {
-
     ## don't proceed if selection of subgroup is not available
     req(input[["marker_genes_table_select_group_level"]])
-
     ## filter table
     results_df <- results_df[ which(results_df[[1]] == input[["marker_genes_table_select_group_level"]]) , ]
   }
-
   ## if the table is empty, e.g. because the filtering of results for a specific
   ## subgroup did not work properly, skip the processing and show and empty
   ## table (otherwise the procedure would result in an error)
   if ( nrow(results_df) == 0 ) {
-
     results_df %>%
     as.data.frame() %>%
     dplyr::slice(0) %>%
     prepareEmptyTable()
-
   ## if there is at least 1 row, create proper table
   } else {
-
     prettifyTable(
       results_df,
       filter = list(position = "top", clear = TRUE),
@@ -221,7 +187,6 @@ output[["marker_genes_table"]] <- DT::renderDataTable(server = FALSE, {
 ##----------------------------------------------------------------------------##
 ## Alternative text message if no marker genes were found.
 ##----------------------------------------------------------------------------##
-
 output[["marker_genes_table_no_markers_found"]] <- renderText({
   "No marker genes were identified for any of the subpopulations of this grouping variable."
 })
@@ -229,7 +194,6 @@ output[["marker_genes_table_no_markers_found"]] <- renderText({
 ##----------------------------------------------------------------------------##
 ## Alternative text message if data is missing.
 ##----------------------------------------------------------------------------##
-
 output[["marker_genes_table_no_data"]] <- renderText({
   "Data not available. Possible reasons: Only 1 group in this data set or data not generated."
 })
@@ -237,7 +201,6 @@ output[["marker_genes_table_no_data"]] <- renderText({
 ##----------------------------------------------------------------------------##
 ## Info box that gets shown when pressing the "info" button.
 ##----------------------------------------------------------------------------##
-
 observeEvent(input[["marker_genes_info"]], {
   showModal(
     modalDialog(
@@ -253,7 +216,6 @@ observeEvent(input[["marker_genes_info"]], {
 ##----------------------------------------------------------------------------##
 ## Text in info box.
 ##----------------------------------------------------------------------------##
-
 marker_genes_info <- list(
   title = "Marker genes",
   text = HTML("

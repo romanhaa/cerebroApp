@@ -9,7 +9,6 @@ plotlyViolin <- function(
   y_title,
   mode
 ) {
-
   if ( mode == "percent" ) {
     y_range <- c(0,1)
     y_tickformat <- ",.0%"
@@ -19,7 +18,6 @@ plotlyViolin <- function(
     y_tickformat <- ",.0f"
     y_hoverformat <- ",.0f"
   }
-
   ##
   plot <- table %>%
     plotly::plot_ly(
@@ -74,36 +72,28 @@ plotlyBarChart <- function(
   colors,
   percent
 ) {
-
   ## TODO: safety checks?
-
   ##
   if ( percent == FALSE ) {
-
     y_title <- "Number of cells"
     y_range <- NULL
     y_tickformat <- ",.0f"
     y_hoverformat <- ",.0f"
-
     hover_info <- glue::glue(
       "<b>{table[[ second_grouping_variable ]]}:</b> ",
       "{formatC(table[['count']], big.mark = ',')}"
     )
-
   ##
   } else if ( percent == TRUE ) {
-
     y_title <- "Percent of cells"
     y_range <- c(0,1)
     y_tickformat <- ",.0%"
     y_hoverformat <- ".1%"
-
     hover_info <- glue::glue(
       "<b>{table[[ second_grouping_variable ]]}:</b> ",
       "{format(round(table[['count']]*100, 1), nsmall = 1)}%"
     )
   }
-
   ## generate plot
   plot <- table %>%
     plotly::plot_ly(
@@ -147,17 +137,13 @@ plotlySankeyPlot <- function(
   second_grouping_variable,
   colors_for_groups
 ) {
-
   ## transform factor levels to integers (necessary for plotly)
   table[["source"]] <- as.numeric(table[[1]]) - 1
   table[["target"]] <- as.numeric(table[[2]]) - 1 + length(unique(table[[1]]))
-
   ## combine all factor levels in a single vector
   all_groups <- c(levels(table[[1]]), levels(table[[2]]))
-
   ## match color codes to group levels (from both groups)
   colors_for_groups_all <- colors_for_groups[names(colors_for_groups) %in% all_groups]
-
   ## prepare plot
   plot <- plotly::plot_ly(
       type = "sankey",
@@ -193,7 +179,6 @@ plotlySankeyPlot <- function(
         )
       )
     )
-
   ##
   return(plot)
 }

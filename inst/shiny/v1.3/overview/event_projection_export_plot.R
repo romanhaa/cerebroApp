@@ -2,14 +2,12 @@
 ## Export projection plot to PDF when pressing the "export to PDF" button.
 ##----------------------------------------------------------------------------##
 observeEvent(input[["overview_projection_export"]], {
-  ## make sure plot parameters are set because it means that the plot can be
-  ## generated
   req(overview_projection_data_to_plot())
-  ##
-  cells_df <- overview_projection_data_to_plot()[['cells_df']]
-  plot_parameters <- overview_projection_data_to_plot()[['plot_parameters']]
-  color_assignments <- overview_projection_data_to_plot()[['color_assignments']]
-  hover_info <- overview_projection_data_to_plot()[['hover_info']]
+  input_data <- overview_projection_data_to_plot()
+  cells_df <- input_data[['cells_df']]
+  coordinates <- input_data[['coordinates']]
+  plot_parameters <- input_data[['plot_parameters']]
+  color_assignments <- input_data[['color_assignments']]
   ## open dialog to select where plot should be saved and how the file should
   ## be named
   shinyFiles::shinyFileSave(
@@ -20,15 +18,17 @@ observeEvent(input[["overview_projection_export"]], {
     restrictions = system.file(package = "base")
   )
   ## retrieve info from dialog
-  save_file_input <- shinyFiles::parseSavePath(available_storage_volumes, input[["overview_projection_export"]])
+  save_file_input <- shinyFiles::parseSavePath(
+    available_storage_volumes,
+    input[["overview_projection_export"]]
+  )
   ## only proceed if a path has been provided
   req(nrow(save_file_input) > 0)
-  ## extract specified file path
-  save_file_path <- as.character(save_file_input$datapath[1])
   ## ggplot2 functions are necessary to create the plot
   require("ggplot2")
-  ## get selected projection
-  projection_to_display <- plot_parameters[["projection"]]
+  ## extract specified file path
+  save_file_path <- as.character(save_file_input$datapath[1])
+  ##
   variable_to_color_cells <- plot_parameters[["color_variable"]]
   ## check if selection projection consists of 2 or 3 dimensions
   ## ... selection projection consists of 2 dimensions
@@ -37,10 +37,10 @@ observeEvent(input[["overview_projection_export"]], {
     stroke <- ifelse(plot_parameters[["draw_border"]], 0.2, 0)
     ## start building the plot
     plot <- ggplot(
-        cells_df,
+        cbind(coordinates, cells_df),
         aes_q(
-          x = as.name(colnames(cells_df)[1]),
-          y = as.name(colnames(cells_df)[2]),
+          x = as.name(colnames(coordinates)[1]),
+          y = as.name(colnames(coordinates)[2]),
           fill = as.name(variable_to_color_cells)
         )
       ) +
@@ -67,7 +67,7 @@ observeEvent(input[["overview_projection_export"]], {
       ## check if group labels should be plotted and, if so, add them
       if ( plot_parameters[["group_labels"]] == TRUE ) {
         ## calculate group level centers
-        group_labels <- centerOfGroups(cells_df, 2, variable_to_color_cells)
+        group_labels <- centerOfGroups(coordinates, cells_df, 2, variable_to_color_cells)
         ## add group level labels at center of respective groups
         plot <- plot +
           geom_label(

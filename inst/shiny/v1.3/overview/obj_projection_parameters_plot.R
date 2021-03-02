@@ -4,7 +4,9 @@
 overview_projection_parameters_plot_raw <- reactive({
   req(
     input[["overview_projection_to_display"]],
+    input[["overview_projection_to_display"]] %in% availableProjections(),
     input[["overview_projection_point_color"]],
+    input[["overview_projection_point_color"]] %in% colnames(getMetaData()),
     input[["overview_projection_point_size"]],
     input[["overview_projection_point_opacity"]],
     !is.null(input[["overview_projection_point_border"]]),
@@ -13,6 +15,7 @@ overview_projection_parameters_plot_raw <- reactive({
     !is.null(preferences[["use_webgl"]]),
     !is.null(preferences[["show_hover_info_in_projections"]])
   )
+  # message('--> trigger "overview_projection_parameters_plot"')
   parameters <- list(
     projection = input[["overview_projection_to_display"]],
     n_dimensions = ncol(getProjection(input[["overview_projection_to_display"]])),
@@ -26,7 +29,19 @@ overview_projection_parameters_plot_raw <- reactive({
     webgl = preferences[["use_webgl"]],
     hover_info = preferences[["show_hover_info_in_projections"]]
   )
+  # message(str(parameters))
   return(parameters)
 })
 
 overview_projection_parameters_plot <- debounce(overview_projection_parameters_plot_raw, 150)
+
+##
+overview_projection_parameters_other <- reactiveValues(
+  reset_axes = FALSE
+)
+
+##
+observeEvent(input[['overview_projection_to_display']], {
+  # message('--> set "overview: reset_axes"')
+  overview_projection_parameters_other[['reset_axes']] <- TRUE
+})

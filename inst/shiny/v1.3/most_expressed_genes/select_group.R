@@ -7,10 +7,7 @@
 ##----------------------------------------------------------------------------##
 ## UI element to select which group should be shown.
 ##----------------------------------------------------------------------------##
-
 output[["most_expressed_genes_select_group_UI"]] <- renderUI({
-
-  ## ...
   if (
     !is.null(getGroupsWithMostExpressedGenes()) &&
     length(getGroupsWithMostExpressedGenes()) > 0
@@ -32,20 +29,5 @@ output[["most_expressed_genes_select_group_UI"]] <- renderUI({
         column(2)
       )
     )
-  } else {
-    fluidRow(
-      cerebroBox(
-        title = boxTitle("Most expressed genes"),
-        textOutput("most_expressed_genes_message_no_data_found")
-      )
-    )
   }
-})
-
-##----------------------------------------------------------------------------##
-## Alternative text message if data is missing.
-##----------------------------------------------------------------------------##
-
-output[["most_expressed_genes_message_no_data_found"]] <- renderText({
-  "No data available."
 })

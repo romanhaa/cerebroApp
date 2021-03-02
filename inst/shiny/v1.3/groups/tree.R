@@ -1,13 +1,10 @@
 ##----------------------------------------------------------------------------##
-## Tab: Groups
-##
 ## Relationship tree.
 ##----------------------------------------------------------------------------##
 
 ##----------------------------------------------------------------------------##
 ## UI element for output.
 ##----------------------------------------------------------------------------##
-
 output[["groups_tree_UI"]] <- renderUI({
   fluidRow(
     cerebroBox(
@@ -70,13 +67,7 @@ output[["groups_tree_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 
 output[["groups_tree_plot_or_message"]] <- renderUI({
-
-  ##
-  req(
-    input[["groups_selected_group"]]
-  )
-
-  ##
+  req(input[["groups_selected_group"]])
   if ( !is.null(getTree( input[["groups_selected_group"]] )) ) {
     tagList(
       shinyWidgets::radioGroupButtons(
@@ -100,8 +91,6 @@ output[["groups_tree_plot_or_message"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 
 output[["groups_tree_plot"]] <- renderPlot({
-
-  ##
   req(
     input[["groups_selected_group"]],
     input[["groups_tree_edge_width"]],
@@ -109,23 +98,18 @@ output[["groups_tree_plot"]] <- renderPlot({
     input[["groups_tree_label_offset"]],
     !is.null(input[["groups_tree_margin"]])
   )
-
   ## only proceed if tree is present (this check is necessary because it can
   ## otherwise result in an error when switching between groups)
   if (
     !is.null(getTree( input[["groups_selected_group"]] )) &&
     class(getTree( input[["groups_selected_group"]] )) == 'phylo'
   ) {
-
     ## retrieve tree from Cerebro object
     tree <- getTree( input[["groups_selected_group"]] )
-
     ## get color assignments for groups
     group_colors <- reactive_colors()[[ input[["groups_selected_group"]] ]]
-
     ## get put colors in correct order
     tip_colors <- group_colors[match(tree$tip.label, names(group_colors))]
-
     ##
     if ( input[["groups_tree_plot_type"]] == "Unrooted" ) {
       ape::plot.phylo(
@@ -140,7 +124,6 @@ output[["groups_tree_plot"]] <- renderPlot({
         cex = input[["groups_tree_label_size"]],
         no.margin = input[["groups_tree_margin"]]
       )
-
     ##
     } else if ( input[["groups_tree_plot_type"]] == "Phylogram" ) {
       ape::plot.phylo(
@@ -164,13 +147,11 @@ output[["groups_tree_plot"]] <- renderPlot({
 ##----------------------------------------------------------------------------##
 ## Alternative text message if data is missing.
 ##----------------------------------------------------------------------------##
-
 output[["groups_tree_text"]] <- renderText({ "Data not available." })
 
 ##----------------------------------------------------------------------------##
 ## Info box that gets shown when pressing the "info" button.
 ##----------------------------------------------------------------------------##
-
 observeEvent(input[["groups_tree_info"]], {
   showModal(
     modalDialog(
@@ -186,7 +167,6 @@ observeEvent(input[["groups_tree_info"]], {
 ##----------------------------------------------------------------------------##
 ## Text in info box.
 ##----------------------------------------------------------------------------##
-
 groups_tree_info <- list(
   title = "Relationship tree",
   text = p("The relationship tree reflects the similarity of groups based on their expression profiles. Instead of using the expression values, the correlation is calculated using the user-specified number of principal components (see 'Analysis info' tab on the left).")
