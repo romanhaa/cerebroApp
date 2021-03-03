@@ -463,6 +463,10 @@ prettifyTable <- function(
     }
   }
 
+  # show cellular barcodes in monospace font
+  table <- table %>%
+    DT::formatStyle('cell_barcode', target="cell", fontFamily="courier")
+
   ## return the table
   return(table)
 
