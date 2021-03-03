@@ -1,6 +1,4 @@
 ##----------------------------------------------------------------------------##
-## Tab: Marker genes
-##
 ## Select method and table (group).
 ##----------------------------------------------------------------------------##
 
@@ -8,10 +6,7 @@
 ## UI element to set layout for selection of method and group, which are split
 ## because the group depends on which method is selected.
 ##----------------------------------------------------------------------------##
-
 output[["marker_genes_select_method_and_table_UI"]] <- renderUI({
-
-  ## ...
    if (
     !is.null(getMethodsForMarkerGenes()) &&
     length(getMethodsForMarkerGenes()) > 0
@@ -28,8 +23,6 @@ output[["marker_genes_select_method_and_table_UI"]] <- renderUI({
         )
       )
     )
-
-  ## ...
   } else {
     fluidRow(
       cerebroBox(
@@ -43,7 +36,6 @@ output[["marker_genes_select_method_and_table_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 ## UI element to select from which method the results should be shown.
 ##----------------------------------------------------------------------------##
-
 output[["marker_genes_selected_method_UI"]] <- renderUI({
   tagList(
     div(
@@ -67,15 +59,8 @@ output[["marker_genes_selected_method_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 ## UI element to select which group should be shown.
 ##----------------------------------------------------------------------------##
-
 output[["marker_genes_selected_table_UI"]] <- renderUI({
-
-  ##
-  req(
-    input[["marker_genes_selected_method"]]
-  )
-
-  ##
+  req(input[["marker_genes_selected_method"]])
   tagList(
     div(
       HTML('<h3 style="text-align: center; margin-top: 0"><strong>Choose a table:</strong></h2>')
@@ -98,7 +83,6 @@ output[["marker_genes_selected_table_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 ## Alternative text message if data is missing.
 ##----------------------------------------------------------------------------##
-
 output[["marker_genes_message_no_method_found"]] <- renderText({
   "No data available."
 })

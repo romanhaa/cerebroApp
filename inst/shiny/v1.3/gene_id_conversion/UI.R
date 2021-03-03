@@ -1,7 +1,6 @@
 ##----------------------------------------------------------------------------##
 ## Tab: Gene ID/symbol conversion
 ##----------------------------------------------------------------------------##
-
 tab_gene_id_conversion <- tabItem(
   tabName = "geneIdConversion",
   fluidRow(

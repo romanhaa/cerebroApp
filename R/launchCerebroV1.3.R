@@ -16,6 +16,15 @@
 #' @param welcome_message \code{string} with custom welcome message to display
 #' in the "Load data" tab. Can contain HTML formatting, e.g.
 #' \code{'<h3>Hi!</h3>'}. Defaults to \code{NULL}.
+#' @param projections_default_point_size Default point size in projections. This
+#' value can be changed in the UI; defaults to 5.
+#' @param projections_default_point_opacity Default point opacity in
+#' projections. This value can be changed in the UI; defaults to 1.0.
+#' @param projections_default_percentage_cells_to_show Default percentage of
+#' cells to show in projections. This value can be changed in the UI; defaults
+#' to 100.
+#' @param projections_show_hover_info Show hover infos in projections. This
+#" setting can be changed in the UI; defaults to TRUE.
 #' @param ... Further parameters that are used by \code{shiny::runApp}, e.g.
 #' \code{host} or \code{port}.
 #'
@@ -59,15 +68,52 @@ launchCerebroV1.3 <- function(
   maxFileSize = 800,
   crb_file_to_load = NULL,
   welcome_message = NULL,
+  projections_default_point_size = 5,
+  projections_default_point_opacity = 1.0,
+  projections_default_percentage_cells_to_show = 100,
+  projections_show_hover_info = TRUE,
   ...
 ){
 
   ##--------------------------------------------------------------------------##
-  ## Check validity of 'mode' parameter.
+  ## Check validity of input parameters.
   ##--------------------------------------------------------------------------##
   if ( mode %in% c('open','closed') == FALSE ) {
     stop(
       "'mode' parameter must be set to either 'open' or 'closed'.",
+      call. = FALSE
+    )
+  }
+  if (
+    projections_default_point_size < 0 ||
+    projections_default_point_size > 20
+  ) {
+    stop(
+      "'projections_default_point_size' parameter must be between 1 and 20",
+      call. = FALSE
+    )
+  }
+  if (
+    projections_default_point_opacity < 0 ||
+    projections_default_point_opacity > 1
+  ) {
+    stop(
+      "'projections_default_point_opacity' parameter must be between 0 and 1",
+      call. = FALSE
+    )
+  }
+  if (
+    projections_default_percentage_cells_to_show < 0 ||
+    projections_default_percentage_cells_to_show > 100
+  ) {
+    stop(
+      "'projections_default_percentage_cells_to_show' parameter must be between 0 and 100",
+      call. = FALSE
+    )
+  }
+  if ( projections_show_hover_info %in% c(TRUE, FALSE) == FALSE ) {
+    stop(
+      "'projections_show_hover_info' parameter must be set to either TRUE or FALSE.",
       call. = FALSE
     )
   }
@@ -80,7 +126,11 @@ launchCerebroV1.3 <- function(
     "mode" = mode,
     "crb_file_to_load" = crb_file_to_load,
     "welcome_message" = welcome_message,
-    "cerebro_root" = system.file(package = "cerebroApp")
+    "cerebro_root" = system.file(package = "cerebroApp"),
+    "projections_default_point_size" = projections_default_point_size,
+    "projections_default_point_opacity" = projections_default_point_opacity,
+    "projections_default_percentage_cells_to_show" = projections_default_percentage_cells_to_show,
+    "projections_show_hover_info" = projections_show_hover_info
   )
 
   ##--------------------------------------------------------------------------##

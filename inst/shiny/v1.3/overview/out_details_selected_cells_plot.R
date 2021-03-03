@@ -1,63 +1,28 @@
 ##----------------------------------------------------------------------------##
-## Tab: Overview
-##
-## Plot of selected cells.
-##----------------------------------------------------------------------------##
-
-##----------------------------------------------------------------------------##
-## UI element for output.
-##----------------------------------------------------------------------------##
-
-output[["overview_selected_cells_plot_UI"]] <- renderUI({
-  fluidRow(
-    cerebroBox(
-      title = tagList(
-        boxTitle("Plot of selected cells"),
-        cerebroInfoButton("overview_details_selected_cells_plot_info")
-      ),
-      tagList(
-        selectInput(
-          "overview_selected_cells_plot_select_variable",
-          label = "Variable to compare:",
-          choices = colnames(getMetaData())[! colnames(getMetaData()) %in% c("cell_barcode")]
-        ),
-        plotly::plotlyOutput("overview_details_selected_cells_plot")
-      )
-    )
-  )
-})
-
-##----------------------------------------------------------------------------##
 ## Plot for selected cells.
 ## - in sync with selected color variable
 ##   - if categorical: number of cells in each group
 ##   - if numerical: box/violin plot
 ##----------------------------------------------------------------------------##
-
 output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
-
   req(
-    overview_projection_inputs()[["projection"]],
+    input[["overview_projection_to_display"]],
+    input[["overview_projection_to_display"]] %in% availableProjections(),
     input[["overview_selected_cells_plot_select_variable"]]
   )
-
   ## extract cells to plot
   cells_df <- cbind(
-    getProjection(overview_projection_inputs()[["projection"]]),
+    getProjection(input[["overview_projection_to_display"]]),
     getMetaData()
   )
-
   ## check selection
   ## ... selection has not been made or there is no cell in it
   if ( is.null(overview_projection_selected_cells()) ) {
-
     ###
     cells_df <- cells_df %>%
       dplyr::mutate(group = 'not selected')
-
   ## ... selection has been made and at least 1 cell is in it
   } else {
-
     ##
     cells_df <- cells_df %>%
       dplyr::rename(X1 = 1, X2 = 2) %>%
@@ -67,48 +32,37 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
         group = factor(group, levels = c('selected', 'not selected'))
       )
   }
-
   color_variable <- input[["overview_selected_cells_plot_select_variable"]]
-
   ## if the selected coloring variable is categorical, represent the selected
   ## cells in a bar chart
   if (
     is.factor(cells_df[[ color_variable ]]) ||
     is.character(cells_df[[ color_variable ]])
   ) {
-
     ## filter table for selected cells
     cells_df <- cells_df %>%
       dplyr::filter(group == 'selected')
-
     ## prepare table, depending on whether at least a single cell is selected
     ## ... at least 1 cell is selected
     if ( nrow(cells_df) > 0 ) {
-
       ## count the number of cells by selected meta data column
       cells_df <- cells_df %>%
         dplyr::group_by(dplyr::across(c(color_variable))) %>%
         dplyr::tally() %>%
         dplyr::ungroup()
-
     ## ... no cell is selected
     } else {
-
       ## check whether the selected meta data column contains a registered
       ## grouping variable
       ## ... the column is a grouping variable
       if ( color_variable %in% getGroups() ) {
-
         ## get levels for the grouping variable
         group_levels <- getGroupLevels(color_variable)
-
       ## ... the column is not a known grouping variable
       } else {
-
         ## get unique values on the meta data column
         group_levels <- unique(getMetaData()[[color_variable]])
       }
-
       ## create empty table to show
       cells_df <- data.frame(
           group = group_levels,
@@ -116,14 +70,11 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
         ) %>%
         dplyr::rename(!!color_variable := group)
     }
-
     ## convert factor to character to avoid empty bars when selecting cells of
     ## certain groups
     cells_df[[1]] <- as.character(cells_df[[1]])
-
     ## get colors for groups
     colors_for_groups <- assignColorsToGroups(cells_df, color_variable)
-
     ## make bar chart
     plot <- plotly::plot_ly(
         cells_df,
@@ -136,16 +87,12 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
         showlegend = FALSE,
         hoverinfo = "y"
       )
-
     y_axis_title <- "Number of cells"
-
   ## if the selected coloring variable is numeric/continuous
   } else if ( is.numeric(cells_df[[ color_variable ]]) ) {
-
     ## remove unnecessary columns
     cells_df <- cells_df %>%
       dplyr::select(group, tidyselect::all_of(color_variable))
-
     ## create violin/box plot
     plot <- plotly::plot_ly(
         cells_df,
@@ -170,10 +117,8 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
           size = 5
         )
       )
-
     y_axis_title <- colnames(cells_df)[2]
   }
-
   plot %>%
   plotly::layout(
     title = "",
@@ -192,28 +137,3 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
     hovermode = "compare"
   )
 })
-
-##----------------------------------------------------------------------------##
-## Info box that gets shown when pressing the "info" button.
-##----------------------------------------------------------------------------##
-
-observeEvent(input[["overview_details_selected_cells_plot_info"]], {
-  showModal(
-    modalDialog(
-      overview_details_selected_cells_plot_info$text,
-      title = overview_details_selected_cells_plot_info$title,
-      easyClose = TRUE,
-      footer = NULL,
-      size = "l"
-    )
-  )
-})
-
-##----------------------------------------------------------------------------##
-## Text in info box.
-##----------------------------------------------------------------------------##
-
-overview_details_selected_cells_plot_info <- list(
-  title = "Plot of selected cells",
-  text = p("Depending on the variable selected to color cells in the dimensional reduction, this plot will show different things. If you select a categorical variable, e.g. 'sample' or 'cluster', you will get a bar plot showing which groups the cells selected with the box or lasso tool come from. Instead, if you select a continuous variable, e.g. the number of transcripts (nUMI), you will see a violin/box plot showing the distribution of that variable in the selected vs. non-selected cells.")
-)

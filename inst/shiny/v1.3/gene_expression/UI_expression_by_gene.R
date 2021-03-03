@@ -1,13 +1,10 @@
 ##----------------------------------------------------------------------------##
-## Tab: Gene (set) expression
-##
 ## Expression by gene.
 ##----------------------------------------------------------------------------##
 
 ##----------------------------------------------------------------------------##
 ## UI element for plot.
 ##----------------------------------------------------------------------------##
-
 output[["expression_by_gene_UI"]] <- renderUI({
   fluidRow(
     cerebroBox(
@@ -23,44 +20,32 @@ output[["expression_by_gene_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 ## Bar plot.
 ##----------------------------------------------------------------------------##
-
 output[["expression_by_gene"]] <- plotly::renderPlotly({
-
-  ## don't proceed without these inputs
-  req(
-    input[["expression_projection_color_scale"]]
-  )
-
+  req(input[["expression_projection_color_scale"]])
   ## prepare expression levels, depending on genes provided by user
   ## ... if no genes are available
-  if ( length(genesToPlot()$genes_to_display_present) == 0 ) {
-
+  if ( length(expression_selected_genes()$genes_to_display_present) == 0 ) {
     ## manually prepare empty data frame
     expression_levels <- data.frame(
       "gene" = character(),
       "expression" = integer()
     )
-
   ## ... if at least 1 gene has been provided
-  } else if ( length(genesToPlot()$genes_to_display_present) >= 1 ) {
-
+  } else if ( length(expression_selected_genes()$genes_to_display_present) >= 1 ) {
     ## - calculate mean expression for every gene across all cells
     ## - sort genes by mean expression from high to low
     ## - show only first 50 genes if more are available
-    expression_levels <- getMeanExpressionForGenes(genesToPlot()$genes_to_display_present) %>%
+    expression_levels <- getMeanExpressionForGenes(expression_selected_genes()$genes_to_display_present) %>%
     dplyr::slice_max(expression, n = 50)
   }
-
   ## prepare color scale, either "viridis" or other
   ## ...
   if ( input[["expression_projection_color_scale"]] == 'viridis' ) {
     color_scale <- 'Viridis'
-
   ## ...
   } else {
     color_scale <- input[["expression_projection_color_scale"]]
   }
-
   ## prepare plot
   plotly::plot_ly(
     expression_levels,
@@ -106,7 +91,6 @@ output[["expression_by_gene"]] <- plotly::renderPlotly({
 ##----------------------------------------------------------------------------##
 ## Info box that gets shown when pressing the "info" button.
 ##----------------------------------------------------------------------------##
-
 observeEvent(input[["expression_by_gene_info"]], {
   showModal(
     modalDialog(
@@ -122,7 +106,6 @@ observeEvent(input[["expression_by_gene_info"]], {
 ##----------------------------------------------------------------------------##
 ## Text in info box.
 ##----------------------------------------------------------------------------##
-
 expression_by_gene_info <- list(
   title = "Expression levels by gene",
   text = p("Log-normalised expression of 50 highest expressed genes inserted above. Shows mean across all cells.")

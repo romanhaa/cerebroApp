@@ -28,43 +28,28 @@ cell_cycle_colorset <- setNames(
 ## Assign colors to groups.
 ##----------------------------------------------------------------------------##
 reactive_colors <- reactive({
-
-  req(
-    data_set()
-  )
-
+  req(data_set())
   ## get cell meta data
   meta_data <- getMetaData()
-
   colors <- list()
-
   ## go through all groups
   for ( group_name in getGroups() ) {
-
     ## if color selection from the "Color management" tab exist, assign those
     ## colors, otherwise assign colors from default colorset
     if ( !is.null(input[[ paste0('color_', group_name, '_', getGroupLevels(group_name)[1]) ]]) ) {
-
       for ( group_level in getGroupLevels(group_name) ) {
-
         ## it seems that special characters are not handled well in input/output
         ## so I replace them with underscores using gsub()
         colors[[ group_name ]][ group_level ] <- input[[ paste0('color_', group_name, '_', gsub(group_level, pattern = '[^[:alnum:]]', replacement = '_')) ]]
       }
-
     } else {
-
       colors[[ group_name ]] <- default_colorset[seq_along(getGroupLevels(group_name))]
       names(colors[[ group_name ]]) <- getGroupLevels(group_name)
-
       if ( 'N/A' %in% getGroupLevels(group_name) ) {
-
         colors[[ group_name ]][ which(names(colors[[ group_name ]]) == 'N/A') ] <- '#898989'
       }
-
     }
   }
-
   ## go through columns with cell cycle info
   if ( length(getCellCycle()) > 0 ) {
     for ( column in getCellCycle() ) {
@@ -82,6 +67,5 @@ reactive_colors <- reactive({
       }
     }
   }
-
   return(colors)
 })

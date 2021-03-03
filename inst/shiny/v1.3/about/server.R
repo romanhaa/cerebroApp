@@ -10,8 +10,6 @@ output[["about"]] <- renderText({
     <br>
     <b>Author</b><br>
     Roman Hillje<br>
-    Department of Experimental Oncology<br>
-    IEO, European Institute of Oncology IRCCS, Milan<br>
     <br>
     <b>Links</b><br>
     <ul>
@@ -25,9 +23,6 @@ output[["about"]] <- renderText({
     If you used Cerebro for your research, please cite the following publication:
     <br>
     Roman Hillje, Pier Giuseppe Pelicci, Lucilla Luzi, Cerebro: Interactive visualization of scRNA-seq data, Bioinformatics, btz877, <a href=https://doi.org/10.1093/bioinformatics/btz877 title="DOI" target="_blank">https://doi.org/10.1093/bioinformatics/btz877</a><br>
-    <br>
-    <b>Contact</b><br>
-    <a href="mailto:roman.hillje@ieo.it?subject=Cerebro">roman.hillje@ieo.it</a><br>
     <br>
     <b>License</b><br>
     Cerebro is distributed under the terms of the <a href=https://github.com/romanhaa/Cerebro/blob/master/LICENSE.md title="MIT license" target="_blank">MIT license.</a><br>
@@ -57,7 +52,7 @@ output[["preferences"]] <- renderUI({
       checkboxInput(
         "hover_info_in_projections_checkbox",
         label = "Show hover info in projections",
-        value = TRUE
+        value = Cerebro.options[['projections_show_hover_info']]
       )
     )
   )

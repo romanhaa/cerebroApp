@@ -1,13 +1,10 @@
 ##----------------------------------------------------------------------------##
-## Tab: Groups
-##
 ## Composition of selected group by other group.
 ##----------------------------------------------------------------------------##
 
 ##----------------------------------------------------------------------------##
 ## UI element for output.
 ##----------------------------------------------------------------------------##
-
 output[["groups_composition_UI"]] <- renderUI({
   fluidRow(
     cerebroBox(
@@ -26,14 +23,8 @@ output[["groups_composition_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 ## UI elements to select second grouping variable and buttons.
 ##----------------------------------------------------------------------------##
-
 output[["groups_by_other_group_other_group_buttons_UI"]] <- renderUI({
-
-  ##
-  req(
-    input[[ "groups_selected_group" ]]
-  )
-
+  req(input[[ "groups_selected_group" ]])
   tagList(
     selectInput(
       "groups_by_other_group_second_group",
@@ -77,10 +68,7 @@ output[["groups_by_other_group_other_group_buttons_UI"]] <- renderUI({
 ## UI element that shows either just the plot or also the table, depending on
 ## buttons.
 ##----------------------------------------------------------------------------##
-
 output[["groups_by_other_group_output_UI"]] <- renderUI({
-
-  ##
   tagList(
     plotly::plotlyOutput("groups_by_other_group_plot"),
     {
@@ -97,9 +85,7 @@ output[["groups_by_other_group_output_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 ## Plot showing composition of groups, either as a bar chart or a Sankey plot.
 ##----------------------------------------------------------------------------##
-
 output[["groups_by_other_group_plot"]] <- plotly::renderPlotly({
-
   ## only proceed if the two groups are not the same (otherwise it can give an
   ## error when switching between groups)
   req(
@@ -108,10 +94,8 @@ output[["groups_by_other_group_plot"]] <- plotly::renderPlotly({
     input[["groups_selected_group"]] != input[["groups_by_other_group_second_group"]],
     input[["groups_by_other_group_plot_type"]]
   )
-
   ##
   if ( input[["groups_by_other_group_plot_type"]] == "Bar chart" ) {
-
     ## calculate table
     composition_df <- calculateTableAB(
       getMetaData(),
@@ -120,7 +104,6 @@ output[["groups_by_other_group_plot"]] <- plotly::renderPlotly({
       mode = "long",
       percent = input[["groups_by_other_group_show_as_percent"]]
     )
-
     ## generate plot
     plotlyBarChart(
       table = composition_df,
@@ -129,10 +112,8 @@ output[["groups_by_other_group_plot"]] <- plotly::renderPlotly({
       colors = reactive_colors()[[ input[[ "groups_by_other_group_second_group" ]] ]],
       percent = input[["groups_by_other_group_show_as_percent"]]
     )
-
   ##
   } else if ( input[["groups_by_other_group_plot_type"]] == "Sankey plot" ) {
-
     ## calculate table
     composition_df <- calculateTableAB(
       getMetaData(),
@@ -141,13 +122,11 @@ output[["groups_by_other_group_plot"]] <- plotly::renderPlotly({
       mode = "long",
       percent = FALSE
     )
-
     ## get color code for all group levels (from both groups)
     colors_for_groups <- c(
       assignColorsToGroups(composition_df, input[[ "groups_selected_group" ]]),
       assignColorsToGroups(composition_df, input[[ "groups_by_other_group_second_group" ]])
     )
-
     ## generate plot
     plotlySankeyPlot(
       table = composition_df,
@@ -161,9 +140,7 @@ output[["groups_by_other_group_plot"]] <- plotly::renderPlotly({
 ##----------------------------------------------------------------------------##
 ## Table showing numbers of plot.
 ##----------------------------------------------------------------------------##
-
 output[["groups_by_other_group_table"]] <- DT::renderDataTable({
-
   ## only proceed if the two groups are not the same (otherwise it can give an
   ## error when switching between groups)
   req(
@@ -171,7 +148,6 @@ output[["groups_by_other_group_table"]] <- DT::renderDataTable({
     input[[ "groups_by_other_group_second_group" ]],
     input[[ "groups_selected_group" ]] != input[[ "groups_by_other_group_second_group" ]]
   )
-
   ## generate table
   composition_df <- calculateTableAB(
     getMetaData(),
@@ -180,14 +156,12 @@ output[["groups_by_other_group_table"]] <- DT::renderDataTable({
     mode = "wide",
     percent = input[["groups_by_other_group_show_as_percent"]]
   )
-
   ## get indices of columns that should be formatted as percent
   if ( input[["groups_by_other_group_show_as_percent"]] == TRUE ) {
     columns_percentage <- c(3:ncol(composition_df))
   } else {
     columns_percentage <- NULL
   }
-
   composition_df %>%
   dplyr::rename("# of cells" = total_cell_count) %>%
   prettifyTable(
@@ -204,7 +178,6 @@ output[["groups_by_other_group_table"]] <- DT::renderDataTable({
 ##----------------------------------------------------------------------------##
 ## Info box that gets shown when pressing the "info" button.
 ##----------------------------------------------------------------------------##
-
 observeEvent(input[["groups_by_other_group_info"]], {
   showModal(
     modalDialog(
@@ -220,7 +193,6 @@ observeEvent(input[["groups_by_other_group_info"]], {
 ##----------------------------------------------------------------------------##
 ## Text in info box.
 ##----------------------------------------------------------------------------##
-
 groups_by_other_group_info <- list(
   title = "Composition of group by another group",
   text = HTML("This plot allows to see how cell groups are related to each other. This can be represented as a bar char or a Sankey plot. Optionally, a table can be shown below. To highlight composition in very small cell groups, results can be shown as percentages rather than actual cell counts. Groups can be removed from the plot by clicking on them in the legend.")

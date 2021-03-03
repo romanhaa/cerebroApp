@@ -656,38 +656,19 @@ assignColorsToGroups <- function(table, grouping_variable) {
 ## Build hover info for projections.
 ##----------------------------------------------------------------------------##
 buildHoverInfoForProjections <- function(table) {
-
-  # ## put together cell ID, number of transcripts and number of expressed genes
-  # hover_info <- glue::glue(
-  #   "<b>Cell</b>: {table[[ 'cell_barcode' ]]}
-  #   <b>Transcripts</b>: {formatC(table[[ 'nUMI' ]], format = 'f', big.mark = ',', digits = 0)}
-  #   <b>Expressed genes</b>: {formatC(table[[ 'nGene' ]], format = 'f', big.mark = ',', digits = 0)}"
-  # )
-
-  # ## add info for known grouping variables
-  # for ( group in getGroups() ) {
-  #   hover_info <- glue::glue(
-  #     "{hover_info}
-  #     <b>{group}</b>: {table[[ group ]]}"
-  #   )
-  # }
-
   ## put together cell ID, number of transcripts and number of expressed genes
   hover_info <- glue::glue(
-    "<b>Cell</b>: {table[[ 'cell_barcode' ]]}
-    <b>Transcripts</b>: {table[[ 'nUMI' ]]}
-    <b>Expressed genes</b>: {table[[ 'nGene' ]]}"
+    "<b>Cell</b>: {table[[ 'cell_barcode' ]]}<br>",
+    "<b>Transcripts</b>: {formatC(table[[ 'nUMI' ]], format = 'f', big.mark = ',', digits = 0)}<br>",
+    "<b>Expressed genes</b>: {formatC(table[[ 'nGene' ]], format = 'f', big.mark = ',', digits = 0)}"
   )
-
   ## add info for known grouping variables
   for ( group in getGroups() ) {
     hover_info <- glue::glue(
-      "{hover_info}
-      <b>{group}</b>: {table[[ group ]]}"
+      "{hover_info}<br>",
+      "<b>{group}</b>: {table[[ group ]]}"
     )
   }
-
-  ##
   return(hover_info)
 }
 
@@ -695,26 +676,19 @@ buildHoverInfoForProjections <- function(table) {
 ## Randomly subset cells in data frame, if necessary.
 ##----------------------------------------------------------------------------##
 randomlySubsetCells <- function(table, percentage) {
-
   ## check if subsetting is necessary
   ## ... percentage is less than 100
   if ( percentage < 100 ) {
-
     ## calculate how many cells should be left after subsetting
     size_of_subset <- ceiling(percentage / 100 * nrow(table))
-
     ## get IDs of all cells
     cell_ids <- rownames(table)
-
     ## subset cell IDs
     subset_of_cell_ids <- cell_ids[ sample(seq_along(cell_ids), size_of_subset) ]
-
     ## subset table and return
     return(table[subset_of_cell_ids,])
-
   ## ... percentage is 100 -> no subsetting needed
   } else {
-
     ## return original table
     return(table)
   }
@@ -726,15 +700,14 @@ randomlySubsetCells <- function(table, percentage) {
 getXYranges <- function(table) {
   ranges <- list(
     x = list(
-      min = table[,1] %>% min() %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round(),
-      max = table[,1] %>% max() %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
+      min = table[,1] %>% min(na.rm=TRUE) %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round(),
+      max = table[,1] %>% max(na.rm=TRUE) %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
     ),
     y = list(
-      min = table[,2] %>% min() %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round(),
-      max = table[,2] %>% max() %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
+      min = table[,2] %>% min(na.rm=TRUE) %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round(),
+      max = table[,2] %>% max(na.rm=TRUE) %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
     )
   )
-
   return(ranges)
 }
 
@@ -785,19 +758,15 @@ getGenesForGeneSet <- function(gene_set) {
 
 ##----------------------------------------------------------------------------##
 ## Function to calculate center of groups in projections/trajectories.
-##
-## 
 ##----------------------------------------------------------------------------##
-centerOfGroups <- function(df, n_dimensions, group) {
-
+centerOfGroups <- function(coordinates, df, n_dimensions, group) {
   ## check number of dimenions in projection
   ## ... 2 dimensions
   if ( n_dimensions == 2 ) {
-
     ## calculate center for groups and return
     tidyr::tibble(
-      x = df[,1],
-      y = df[,2],
+      x = coordinates[,1],
+      y = coordinates[,2],
       group = df[[ group ]]
     ) %>%
     dplyr::group_by(group) %>%
@@ -808,15 +777,13 @@ centerOfGroups <- function(df, n_dimensions, group) {
     ) %>%
     dplyr::ungroup() %>%
     return()
-
   ## ... 3 dimensions
-  } else if ( n_dimensions == 3 ) {
-
+  } else if ( n_dimensions == 3 && is.numeric(coordinates[,3]) ) {
     ## calculate center for groups and return
     tidyr::tibble(
-      x = df[,1],
-      y = df[,2],
-      z = df[,3],
+      x = coordinates[,1],
+      y = coordinates[,2],
+      z = coordinates[,3],
       group = df[[ group ]]
     ) %>%
     dplyr::group_by(group) %>%
@@ -986,7 +953,7 @@ getTrajectory <- function(method, name) {
 }
 getExtraMaterialCategories <- function() {
   if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
-   return(data_set()$getExtraMaterialCategories())
+    return(data_set()$getExtraMaterialCategories())
   }
 }
 checkForExtraTables <- function() {
