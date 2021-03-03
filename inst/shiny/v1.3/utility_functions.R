@@ -23,7 +23,7 @@ findColumnsPercentage <- function(df) {
       any(is.na(df[[i]])) == FALSE &&
       is.numeric(df[[i]]) &&
       min(df[[i]], na.rm = TRUE) >= 0 &&
-      max(df[[i]], na.rm = TRUE)
+      max(df[[i]], na.rm = TRUE) <= 100
     ) {
       columns_indices <- c(columns_indices, i)
     }
@@ -40,7 +40,7 @@ findColumnsPValues <- function(df) {
       any(is.na(df[[i]])) == FALSE &&
       is.numeric(df[[i]]) &&
       min(df[[i]], na.rm = TRUE) >= 0 &&
-      max(df[[i]], na.rm = TRUE)
+      max(df[[i]], na.rm = TRUE) <= 1
     ) {
       columns_indices <- c(columns_indices, i)
     }
@@ -125,6 +125,17 @@ prettifyTable <- function(
   ## add manually specified column types
   if ( is.null(columns_percentage) == FALSE ) {
     columns_percent <- c(columns_percent, columns_percentage)
+  }
+
+  ## check whether percentage values were given on a 0-100 scale and convert
+  ## them to 0-1 if so
+  if (number_formatting == TRUE && length(columns_percent) > 0) {
+    for (col in columns_percent) {
+      col_name <- colnames(table)[col]
+      if (max(getMetaData()[,col_name] > 1)) {
+        table[,col] <- table[,col] / 100
+      }
+    }
   }
 
   ## add manually specified columns to hide
