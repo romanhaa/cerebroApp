@@ -18,38 +18,22 @@ server <- function(input, output, session) {
       min = 1,
       max = 20,
       step = 1,
-      default = ifelse(
-        !is.null(Cerebro.options[['point_size']]),
-        Cerebro.options[['point_size']],
-        5
-      )
+      default = Cerebro.options[['projections_default_point_size']]
     ),
     scatter_plot_point_opacity = list(
       min = 0.1,
       max = 1.0,
       step = 0.1,
-      default = ifelse(
-        !is.null(Cerebro.options[['point_opacity']]),
-        Cerebro.options[['point_opacity']],
-        1.0
-      )
+      default = Cerebro.options[['projections_default_point_opacity']]
     ),
     scatter_plot_percentage_cells_to_show = list(
       min = 10,
       max = 100,
       step = 10,
-      default = ifelse(
-        !is.null(Cerebro.options[['percentage_cells_to_show']]),
-        Cerebro.options[['percentage_cells_to_show']],
-        100
-      )
+      default = Cerebro.options[['projections_default_percentage_cells_to_show']]
     ),
     use_webgl = TRUE,
-    show_hover_info_in_projections = ifelse(
-      !is.null(Cerebro.options[['show_hover_info_in_projections']]),
-      Cerebro.options[['show_hover_info_in_projections']],
-      TRUE
-    )
+    show_hover_info_in_projections = Cerebro.options[['projections_show_hover_info']]
   )
 
   ## paths for storing plots

@@ -52,11 +52,7 @@ output[["preferences"]] <- renderUI({
       checkboxInput(
         "hover_info_in_projections_checkbox",
         label = "Show hover info in projections",
-        value = ifelse(
-          !is.null(Cerebro.options[['show_hover_info_in_projections']]),
-          Cerebro.options[['show_hover_info_in_projections']],
-          TRUE
-        )
+        value = Cerebro.options[['projections_show_hover_info']]
       )
     )
   )
