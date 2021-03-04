@@ -132,7 +132,7 @@ prettifyTable <- function(
   if (number_formatting == TRUE && length(columns_percent) > 0) {
     for (col in columns_percent) {
       col_name <- colnames(table)[col]
-      if (max(getMetaData()[,col_name] > 1)) {
+      if (max(table[,col_name] > 1)) {
         table[,col] <- table[,col] / 100
       }
     }
@@ -464,8 +464,10 @@ prettifyTable <- function(
   }
 
   # show cellular barcodes in monospace font
-  table <- table %>%
-    DT::formatStyle('cell_barcode', target="cell", fontFamily="courier")
+  if ('cell_barcode' %in% colnames(table)) {
+    table <- table %>%
+      DT::formatStyle('cell_barcode', target="cell", fontFamily="courier")
+  }
 
   ## return the table
   return(table)
