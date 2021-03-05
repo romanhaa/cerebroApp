@@ -67,7 +67,7 @@ output[["groups_tree_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 
 output[["groups_tree_plot_or_message"]] <- renderUI({
-  req(input[["groups_selected_group"]])
+  req(input[["groups_selected_group"]] %in% getGroups())
   if ( !is.null(getTree( input[["groups_selected_group"]] )) ) {
     tagList(
       shinyWidgets::radioGroupButtons(
@@ -92,7 +92,7 @@ output[["groups_tree_plot_or_message"]] <- renderUI({
 
 output[["groups_tree_plot"]] <- renderPlot({
   req(
-    input[["groups_selected_group"]],
+    input[["groups_selected_group"]] %in% getGroups(),
     input[["groups_tree_edge_width"]],
     input[["groups_tree_label_size"]],
     input[["groups_tree_label_offset"]],

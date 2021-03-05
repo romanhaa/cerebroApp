@@ -89,8 +89,8 @@ output[["groups_by_cell_cycle_UI_rest"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 output[["groups_by_cell_cycle_plot"]] <- plotly::renderPlotly({
   req(
-    input[["groups_selected_group"]],
-    input[["groups_by_cell_cycle_column"]],
+    input[["groups_selected_group"]] %in% getGroups(),
+    input[["groups_by_cell_cycle_column"]] %in% getCellCycle(),
     input[["groups_by_cell_cycle_plot_type"]]
   )
   if ( input[["groups_by_cell_cycle_plot_type"]] == "Bar chart" ) {
@@ -142,8 +142,8 @@ output[["groups_by_cell_cycle_plot"]] <- plotly::renderPlotly({
 output[["groups_by_cell_cycle_table"]] <- DT::renderDataTable({
   ##
   req(
-    input[["groups_selected_group"]],
-    input[["groups_by_cell_cycle_column"]],
+    input[["groups_selected_group"]] %in% getGroups(),
+    input[["groups_by_cell_cycle_column"]] %in% getCellCycle(),
   )
   ##
   composition_df <- calculateTableAB(

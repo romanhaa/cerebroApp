@@ -57,7 +57,7 @@ output[["groups_nUMI_text"]] <- renderText({
 })
 
 output[["groups_nUMI_plot"]] <- plotly::renderPlotly({
-  req(input[["groups_selected_group"]])
+  req(input[["groups_selected_group"]] %in% getGroups())
   plotlyViolin(
     table = getMetaData(),
     metric = "nUMI",
@@ -84,7 +84,7 @@ output[["groups_nGene_text"]] <- renderText({
 })
 
 output[["groups_nGene_plot"]] <- plotly::renderPlotly({
-  req(input[["groups_selected_group"]])
+  req(input[["groups_selected_group"]] %in% getGroups())
   plotlyViolin(
     table = getMetaData(),
     metric = "nGene",
@@ -111,7 +111,7 @@ output[["groups_percent_mt_text"]] <- renderText({
 })
 
 output[["groups_percent_mt_plot"]] <- plotly::renderPlotly({
-  req(input[["groups_selected_group"]])
+  req(input[["groups_selected_group"]] %in% getGroups())
   plotlyViolin(
     table = getMetaData(),
     metric = "percent_mt",
@@ -138,7 +138,7 @@ output[["groups_percent_ribo_text"]] <- renderText({
 })
 
 output[["groups_percent_ribo_plot"]] <- plotly::renderPlotly({
-  req(input[["groups_selected_group"]])
+  req(input[["groups_selected_group"]] %in% getGroups())
   plotlyViolin(
     table = getMetaData(),
     metric = "percent_ribo",

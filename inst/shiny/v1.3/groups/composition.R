@@ -24,7 +24,7 @@ output[["groups_composition_UI"]] <- renderUI({
 ## UI elements to select second grouping variable and buttons.
 ##----------------------------------------------------------------------------##
 output[["groups_by_other_group_other_group_buttons_UI"]] <- renderUI({
-  req(input[[ "groups_selected_group" ]])
+  req(input[[ "groups_selected_group" ]] %in% getGroups())
   tagList(
     selectInput(
       "groups_by_other_group_second_group",
@@ -89,8 +89,8 @@ output[["groups_by_other_group_plot"]] <- plotly::renderPlotly({
   ## only proceed if the two groups are not the same (otherwise it can give an
   ## error when switching between groups)
   req(
-    input[["groups_selected_group"]],
-    input[["groups_by_other_group_second_group"]],
+    input[["groups_selected_group"]] %in% getGroups(),
+    input[["groups_by_other_group_second_group"]] %in% getGroups(),
     input[["groups_selected_group"]] != input[["groups_by_other_group_second_group"]],
     input[["groups_by_other_group_plot_type"]]
   )
