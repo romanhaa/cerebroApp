@@ -46,7 +46,7 @@ output[["trajectory_selected_cells_table_UI"]] <- renderUI({
 ## Table.
 ##----------------------------------------------------------------------------##
 
-output[["trajectory_details_selected_cells_table"]] <- DT::renderDataTable(server = FALSE, {
+output[["trajectory_details_selected_cells_table"]] <- DT::renderDataTable({
 
   ## don't do anything before these inputs are selected
   req(

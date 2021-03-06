@@ -170,7 +170,7 @@ output[["enriched_pathways_filter_subgroups_UI"]] <- renderUI({
 ## Table with results.
 ##----------------------------------------------------------------------------##
 
-output[["enriched_pathways_table"]] <- DT::renderDataTable(server = FALSE, {
+output[["enriched_pathways_table"]] <- DT::renderDataTable({
 
   ##
   req(
