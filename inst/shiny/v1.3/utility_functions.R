@@ -228,6 +228,15 @@ prettifyTable <- function(
       textAlign = 'right'
     )
 
+  # show cellular barcodes in monospace font
+  if ('cell_barcode' %in% colnames(table_original)) {
+    table <- table %>%
+      DT::formatStyle(
+        columns = which(colnames(table_original)=='cell_barcode'),
+        target="cell", fontFamily="courier"
+      )
+  }
+
   ## if automatic number formatting is on...
   ## - remove decimals from integers
   ## - show 3 significant decimals for p-values
@@ -461,12 +470,6 @@ prettifyTable <- function(
         }
       }
     }
-  }
-
-  # show cellular barcodes in monospace font
-  if ('cell_barcode' %in% colnames(table)) {
-    table <- table %>%
-      DT::formatStyle('cell_barcode', target="cell", fontFamily="courier")
   }
 
   ## return the table
