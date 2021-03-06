@@ -70,7 +70,7 @@ output[["extra_material_content_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 ## Table.
 ##----------------------------------------------------------------------------##
-output[["extra_material_table"]] <- DT::renderDataTable(server = FALSE, {
+output[["extra_material_table"]] <- DT::renderDataTable({
   req(
     input[["extra_material_selected_category"]],
     input[["extra_material_selected_content"]]

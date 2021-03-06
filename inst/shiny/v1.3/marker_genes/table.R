@@ -131,7 +131,7 @@ output[["marker_genes_filter_subgroups_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 ## Table with results.
 ##----------------------------------------------------------------------------##
-output[["marker_genes_table"]] <- DT::renderDataTable(server = FALSE, {
+output[["marker_genes_table"]] <- DT::renderDataTable({
   req(
     input[["marker_genes_selected_method"]],
     input[["marker_genes_selected_table"]],

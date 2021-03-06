@@ -98,7 +98,7 @@ output[["most_expressed_genes_filter_subgroups_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 ## Table with results.
 ##----------------------------------------------------------------------------##
-output[["most_expressed_genes_table"]] <- DT::renderDataTable(server = FALSE, {
+output[["most_expressed_genes_table"]] <- DT::renderDataTable({
   selected_group <- input[['most_expressed_genes_selected_group']]
   req(selected_group %in% getGroups())
   ## fetch results

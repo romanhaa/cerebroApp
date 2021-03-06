@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------##
 ## Table.
 ##----------------------------------------------------------------------------##
-output[["overview_details_selected_cells_table"]] <- DT::renderDataTable(server = FALSE, {
+output[["overview_details_selected_cells_table"]] <- DT::renderDataTable({
   ## don't proceed without these inputs
   req(
     input[["overview_projection_to_display"]],

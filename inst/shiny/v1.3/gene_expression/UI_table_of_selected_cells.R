@@ -37,7 +37,7 @@ output[["expression_details_selected_cells_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 ## Table with results.
 ##----------------------------------------------------------------------------##
-output[["expression_details_selected_cells"]] <- DT::renderDataTable(server = FALSE, {
+output[["expression_details_selected_cells"]] <- DT::renderDataTable({
   req(
     expression_projection_data(),
     expression_projection_coordinates(),
