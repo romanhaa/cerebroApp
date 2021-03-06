@@ -3,7 +3,9 @@
 ##----------------------------------------------------------------------------##
 overview_projection_cells_to_show <- reactive({
   req(input[["overview_projection_percentage_cells_to_show"]])
-  # message('--> trigger "overview_projection_cells_to_show"')
+  if (exists('mode_debugging') && grepl('v', mode_debugging, ignore.case=TRUE)) {
+    message('--> trigger "overview_projection_cells_to_show"')
+  }
   groups <- getGroups()
   ## require group filters UI elements and at least 1 group level to be selected
   for ( i in groups ) {
@@ -32,6 +34,8 @@ overview_projection_cells_to_show <- reactive({
   ## put rows in random order
   cells_df <- cells_df[ sample(1:nrow(cells_df)) , ]
   cells_to_show <- cells_df$row_id
-  # message(str(cells_to_show))
+  if (exists('mode_debugging') && grepl('vv', mode_debugging, ignore.case=TRUE)) {
+    message(str(cells_to_show))
+  }
   return(cells_to_show)
 })

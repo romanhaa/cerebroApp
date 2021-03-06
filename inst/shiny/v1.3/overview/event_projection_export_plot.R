@@ -33,27 +33,22 @@ observeEvent(input[["overview_projection_export"]], {
   ## check if selection projection consists of 2 or 3 dimensions
   ## ... selection projection consists of 2 dimensions
   if ( plot_parameters[['n_dimensions']] == 2 ) {
-    ##
-    stroke <- ifelse(plot_parameters[["draw_border"]], 0.2, 0)
     ## start building the plot
     plot <- ggplot(
         cbind(coordinates, cells_df),
         aes_q(
           x = as.name(colnames(coordinates)[1]),
           y = as.name(colnames(coordinates)[2]),
-          fill = as.name(variable_to_color_cells)
+          color = as.name(variable_to_color_cells)
         )
       ) +
       geom_point(
-        shape = 21,
         size = plot_parameters[["point_size"]]/3,
-        stroke = stroke,
-        color = "#c4c4c4",
         alpha = plot_parameters[["point_opacity"]]
       ) +
-      lims(
-        x = plot_parameters[["x_range"]],
-        y = plot_parameters[["y_range"]]
+      coord_cartesian(
+        xlim = overview_projection_ranges$x,
+        ylim = overview_projection_ranges$y
       ) +
       theme_bw()
     ## depending on type of cell coloring, add different color scale
@@ -63,7 +58,8 @@ observeEvent(input[["overview_projection_export"]], {
       is.character(cells_df[[ variable_to_color_cells ]])
     ) {
       ## add color assignments
-      plot <- plot + scale_fill_manual(values = color_assignments)
+      plot <- plot + scale_color_manual(values = color_assignments) +
+        guides(color = guide_legend(override.aes = list(size=4)))
       ## check if group labels should be plotted and, if so, add them
       if ( plot_parameters[["group_labels"]] == TRUE ) {
         ## calculate group level centers
@@ -86,7 +82,7 @@ observeEvent(input[["overview_projection_export"]], {
     } else {
       ## add continuous color scale
       plot <- plot +
-        scale_fill_distiller(
+        scale_color_distiller(
           palette = "YlGnBu",
           direction = 1,
           guide = guide_colorbar(frame.colour = "black", ticks.colour = "black")

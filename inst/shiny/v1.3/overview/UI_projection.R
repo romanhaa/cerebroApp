@@ -71,29 +71,16 @@ output[["overview_projection_UI"]] <- renderUI({
             viewtype = "icon",
             class = "btn-xs",
             style = "margin-right: 3px"
-          ),
-          shinyWidgets::dropdownButton(
-            tags$div(
-              style = "color: black !important;",
-              uiOutput("overview_projection_show_group_label_UI"),
-              uiOutput("overview_projection_point_border_UI"),
-              uiOutput("overview_projection_scales_UI")
-            ),
-            circle = FALSE,
-            icon = icon("cog"),
-            inline = TRUE,
-            size = "xs"
           )
         ),
         tagList(
-          shinycssloaders::withSpinner(
-            plotly::plotlyOutput(
-              "overview_projection",
-              width = "auto",
-              height = "85vh"
-            ),
-            type = 8,
-            hide.ui = FALSE
+          plotOutput("overview_projection",
+            height = '85vh',
+            dblclick = "overview_projection_dblclick",
+            brush = brushOpts(
+              id = "overview_projection_brush",
+              resetOnNew = TRUE
+            )
           ),
           tags$br(),
           htmlOutput("overview_number_of_selected_cells"),

@@ -26,7 +26,8 @@ output[["overview_projection_additional_parameters_UI"]] <- renderUI({
       max = preferences[["scatter_plot_percentage_cells_to_show"]][["max"]],
       step = preferences[["scatter_plot_percentage_cells_to_show"]][["step"]],
       value = preferences[["scatter_plot_percentage_cells_to_show"]][["default"]]
-    )
+    ),
+    uiOutput('overview_projection_show_group_label_UI')
   )
 })
 

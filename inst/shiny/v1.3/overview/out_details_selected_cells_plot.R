@@ -10,25 +10,19 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
     input[["overview_projection_to_display"]] %in% availableProjections(),
     input[["overview_selected_cells_plot_select_variable"]]
   )
-  ## extract cells to plot
-  cells_df <- cbind(
-    getProjection(input[["overview_projection_to_display"]]),
-    getMetaData()
-  )
   ## check selection
   ## ... selection has not been made or there is no cell in it
-  if ( is.null(overview_projection_selected_cells()) ) {
+  if ( nrow(overview_projection_selected_cells())==0 ) {
     ###
-    cells_df <- cells_df %>%
+    cells_df <- getMetaData() %>%
       dplyr::mutate(group = 'not selected')
   ## ... selection has been made and at least 1 cell is in it
   } else {
+    selected_cells <- overview_projection_selected_cells()$cell_barcode
     ##
-    cells_df <- cells_df %>%
-      dplyr::rename(X1 = 1, X2 = 2) %>%
+    cells_df <- getMetaData() %>%
       dplyr::mutate(
-        identifier = paste0(X1, '-', X2),
-        group = ifelse(identifier %in% overview_projection_selected_cells()$identifier, 'selected', 'not selected'),
+        group = ifelse(cell_barcode %in% selected_cells, 'selected', 'not selected'),
         group = factor(group, levels = c('selected', 'not selected'))
       )
   }

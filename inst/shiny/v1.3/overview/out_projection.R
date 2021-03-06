@@ -1,22 +1,77 @@
 ##----------------------------------------------------------------------------##
 ## Plotly plot of the selected projection.
 ##----------------------------------------------------------------------------##
-output[["overview_projection"]] <- plotly::renderPlotly({
-  plotly::plot_ly(type = 'scattergl', mode = 'markers', source = "overview_projection") %>%
-  plotly::layout(
-    xaxis = list(
-      autorange = TRUE,
-      mirror = TRUE,
-      showline = TRUE,
-      zeroline = FALSE
-    ),
-    yaxis = list(
-      autorange = TRUE,
-      mirror = TRUE,
-      showline = TRUE,
-      zeroline = FALSE
-    )
-  )
+output[["overview_projection"]] <- renderPlot({
+  req(overview_projection_data_to_plot())
+  require('scattermore')
+  cells_df <- overview_projection_data_to_plot()[['cells_df']]
+  coordinates <- overview_projection_data_to_plot()[['coordinates']]
+  plot_parameters <- overview_projection_data_to_plot()[['plot_parameters']]
+  color_assignments <- overview_projection_data_to_plot()[['color_assignments']]
+  variable_to_color_cells <- plot_parameters[["color_variable"]]
+  ## check if selection projection consists of 2 or 3 dimensions
+  ## ... selection projection consists of 2 dimensions
+  if ( plot_parameters[['n_dimensions']] == 2 ) {
+    ## start building the plot
+    plot <- ggplot(
+        cbind(coordinates, cells_df),
+        aes_q(
+          x = as.name(colnames(coordinates)[1]),
+          y = as.name(colnames(coordinates)[2]),
+          color = as.name(variable_to_color_cells)
+        )
+      ) +
+      geom_scattermore(
+        pointsize = plot_parameters[["point_size"]]/2,
+        alpha = plot_parameters[["point_opacity"]],
+        pixels = c(700,700)
+      ) +
+      coord_cartesian(
+        xlim = overview_projection_ranges$x,
+        ylim = overview_projection_ranges$y
+      ) +
+      theme_bw()
+    ## depending on type of cell coloring, add different color scale
+    ## ... categorical
+    if (
+      is.factor(cells_df[[ variable_to_color_cells ]]) ||
+      is.character(cells_df[[ variable_to_color_cells ]])
+    ) {
+      ## add color assignments
+      plot <- plot + scale_color_manual(values = color_assignments) +
+        guides(color = guide_legend(override.aes = list(size=4)))
+      ## check if group labels should be plotted and, if so, add them
+      if ( plot_parameters[["group_labels"]] == TRUE ) {
+        ## calculate group level centers
+        group_labels <- centerOfGroups(coordinates, cells_df, 2, variable_to_color_cells)
+        ## add group level labels at center of respective groups
+        plot <- plot +
+          geom_label(
+            data = group_labels,
+            mapping = aes(x_median, y_median, label = group),
+            fill = 'white',
+            size = 4.5,
+            color = 'black',
+            alpha = 0.5,
+            fontface = 'bold',
+            label.size = 0,
+            show.legend = FALSE
+          )
+      }
+    ## ... not categorical (probably numerical)
+    } else {
+      ## add continuous color scale
+      plot <- plot +
+        scale_color_distiller(
+          palette = "YlGnBu",
+          direction = 1,
+          guide = guide_colorbar(frame.colour = "black", ticks.colour = "black")
+        )
+    }
+    return(plot)
+  } else {
+    ggplot()
+  }
 })
 
 ##----------------------------------------------------------------------------##
