@@ -3,6 +3,7 @@
 ##----------------------------------------------------------------------------##
 output[["overview_projection"]] <- renderPlot({
   req(overview_projection_data_to_plot())
+  require('ggplot2')
   require('scattermore')
   cells_df <- overview_projection_data_to_plot()[['cells_df']]
   coordinates <- overview_projection_data_to_plot()[['coordinates']]
