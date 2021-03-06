@@ -129,7 +129,8 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
     ),
     yaxis = list(
       title = y_axis_title,
-      hoverformat = ".0f",
+      tickformat = ",.0f",
+      hoverformat = ",.0f",
       mirror = TRUE,
       showline = TRUE
     ),
