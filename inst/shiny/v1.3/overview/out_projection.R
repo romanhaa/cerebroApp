@@ -65,7 +65,8 @@ output[["overview_projection"]] <- renderPlot({
         scale_color_distiller(
           palette = "YlGnBu",
           direction = 1,
-          guide = guide_colorbar(frame.colour = "black", ticks.colour = "black")
+          guide = guide_colorbar(frame.colour = "black", ticks.colour = "black"),
+          labels = function(x) format(x, big.mark = ",", scientific = FALSE)
         )
     }
     return(plot)
