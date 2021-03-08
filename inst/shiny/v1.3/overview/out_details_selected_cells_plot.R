@@ -70,11 +70,11 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
         ) %>%
         dplyr::rename(!!color_variable := group)
     }
+    ## get colors for groups
+    colors_for_groups <- assignColorsToGroups(cells_df, color_variable)
     ## convert factor to character to avoid empty bars when selecting cells of
     ## certain groups
     cells_df[[1]] <- as.character(cells_df[[1]])
-    ## get colors for groups
-    colors_for_groups <- assignColorsToGroups(cells_df, color_variable)
     ## make bar chart
     plot <- plotly::plot_ly(
         cells_df,
