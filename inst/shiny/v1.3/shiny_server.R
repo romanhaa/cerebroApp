@@ -51,34 +51,45 @@ server <- function(input, output, session) {
 
   ## listen to selected 'input_file', initialize before UI element is loaded
   observeEvent(input[['input_file']], ignoreNULL = FALSE, {
+    path_to_load <- ''
     ## grab path from 'input_file' if one is specified
     if (
       !is.null(input[["input_file"]]) &&
       !is.na(input[["input_file"]]) &&
       file.exists(input[["input_file"]]$datapath)
     ) {
-      new_path <- input[["input_file"]]$datapath
-    ## take path from 'Cerebro.options' if it is set
+      path_to_load <- input[["input_file"]]$datapath
+    ## take path or object from 'Cerebro.options' if it is set and points to an
+    ## existing file or object
     } else if (
       exists('Cerebro.options') &&
-      !is.null(Cerebro.options[["crb_file_to_load"]]) &&
-      file.exists(Cerebro.options[["crb_file_to_load"]])
+      !is.null(Cerebro.options[["crb_file_to_load"]])
     ) {
-      new_path <- .GlobalEnv$Cerebro.options$crb_file_to_load
-    ## if none of the above apply, get path of example data set
-    } else {
-      new_path <- system.file("extdata/v1.3/example.crb", package = "cerebroApp")
+      file_to_load <- Cerebro.options[["crb_file_to_load"]]
+      if (file.exists(file_to_load) || exists(file_to_load)) {
+        path_to_load <- .GlobalEnv$Cerebro.options$crb_file_to_load
+      }
+    }
+    ## assign path to example file if none of the above apply
+    if (path_to_load=='') {
+      path_to_load <- system.file("extdata/v1.3/example.crb", package = "cerebroApp")
     }
     ## set reactive value to new file path
-    data_to_load$path <- new_path
+    data_to_load$path <- path_to_load
   })
 
   ## create reactive value holding the current data set
   data_set <- reactive({
-    ## log message
-    print(glue::glue("[{Sys.time()}] File to load: {data_to_load$path}"))
-    ## read the file
-    data <- readRDS(data_to_load$path)
+    dataset_to_load <- data_to_load$path
+    if (exists(dataset_to_load)) {
+      print(glue::glue("[{Sys.time()}] Load from variable: {dataset_to_load}"))
+      data <- get(dataset_to_load)
+    } else {
+      ## log message
+      print(glue::glue("[{Sys.time()}] File to load: {dataset_to_load}"))
+      ## read the file
+      data <- readRDS(dataset_to_load)
+    }
     ## log message
     message(data$print())
     ## check if 'expression' slot exists and print log message with its format
