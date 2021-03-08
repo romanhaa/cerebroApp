@@ -770,8 +770,8 @@ centerOfGroups <- function(coordinates, df, n_dimensions, group) {
   if ( n_dimensions == 2 ) {
     ## calculate center for groups and return
     tidyr::tibble(
-      x = coordinates[,1],
-      y = coordinates[,2],
+      x = coordinates[[1]],
+      y = coordinates[[2]],
       group = df[[ group ]]
     ) %>%
     dplyr::group_by(group) %>%
@@ -786,9 +786,9 @@ centerOfGroups <- function(coordinates, df, n_dimensions, group) {
   } else if ( n_dimensions == 3 && is.numeric(coordinates[,3]) ) {
     ## calculate center for groups and return
     tidyr::tibble(
-      x = coordinates[,1],
-      y = coordinates[,2],
-      z = coordinates[,3],
+      x = coordinates[[1]],
+      y = coordinates[[2]],
+      z = coordinates[[3]],
       group = df[[ group ]]
     ) %>%
     dplyr::group_by(group) %>%
