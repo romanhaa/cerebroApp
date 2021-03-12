@@ -73,7 +73,7 @@ object to visualize in Cerebro." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cerebroApp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.1</span>
       </span>
     </div>
 
@@ -81,7 +81,7 @@ object to visualize in Cerebro." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -145,13 +145,13 @@ object to visualize in Cerebro." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/romanhaa/cerebroApp/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
 <li>
   <a href="https://twitter.com/fakechek1">
-    <span class="fab fa fab fa-twitter fa-lg"></span>
+    <span class="fab fa-twitter fa-lg"></span>
      
   </a>
 </li>
@@ -178,20 +178,20 @@ object to visualize in Cerebro." />
 object to visualize in Cerebro.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>exportFromSCE</span>(
-  <span class='no'>object</span>,
-  <span class='kw'>assay</span> <span class='kw'>=</span> <span class='st'>"logcounts"</span>,
-  <span class='no'>file</span>,
-  <span class='no'>experiment_name</span>,
-  <span class='no'>organism</span>,
-  <span class='no'>groups</span>,
-  <span class='kw'>cell_cycle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>nUMI</span> <span class='kw'>=</span> <span class='st'>"nUMI"</span>,
-  <span class='kw'>nGene</span> <span class='kw'>=</span> <span class='st'>"nGene"</span>,
-  <span class='kw'>add_all_meta_data</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>use_delayed_array</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>exportFromSCE</span><span class='op'>(</span>
+  <span class='va'>object</span>,
+  assay <span class='op'>=</span> <span class='st'>"logcounts"</span>,
+  <span class='va'>file</span>,
+  <span class='va'>experiment_name</span>,
+  <span class='va'>organism</span>,
+  <span class='va'>groups</span>,
+  cell_cycle <span class='op'>=</span> <span class='cn'>NULL</span>,
+  nUMI <span class='op'>=</span> <span class='st'>"nUMI"</span>,
+  nGene <span class='op'>=</span> <span class='st'>"nGene"</span>,
+  add_all_meta_data <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  use_delayed_array <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  verbose <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -269,19 +269,37 @@ defaults to <code>FALSE</code>.</p></td>
     <p>No data returned.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata/v1.3/pbmc_SCE.rds"</span>,
-  <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"cerebroApp"</span>))
-<span class='fu'>exportFromSCE</span>(
-  <span class='kw'>object</span> <span class='kw'>=</span> <span class='no'>pbmc</span>,
-  <span class='kw'>file</span> <span class='kw'>=</span> <span class='st'>'pbmc_SCE.crb'</span>,
-  <span class='kw'>experiment_name</span> <span class='kw'>=</span> <span class='st'>'PBMC'</span>,
-  <span class='kw'>organism</span> <span class='kw'>=</span> <span class='st'>'hg'</span>,
-  <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>'sample'</span>,<span class='st'>'cluster'</span>),
-  <span class='kw'>nUMI</span> <span class='kw'>=</span> <span class='st'>'nUMI'</span>,
-  <span class='kw'>nGene</span> <span class='kw'>=</span> <span class='st'>'nGene'</span>,
-  <span class='kw'>use_delayed_array</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
-)</div><div class='output co'>#&gt; <span class='message'>Loading required package: SingleCellExperiment</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: SummarizedExperiment</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: GenomicRanges</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: stats4</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: BiocGenerics</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: parallel</span></div><div class='output co'>#&gt; <span class='message'></span>
+    <pre class="examples"><div class='input'><span class='va'>pbmc</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata/v1.3/pbmc_SCE.rds"</span>,
+  package <span class='op'>=</span> <span class='st'>"cerebroApp"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'>exportFromSCE</span><span class='op'>(</span>
+  object <span class='op'>=</span> <span class='va'>pbmc</span>,
+  file <span class='op'>=</span> <span class='st'>'pbmc_SCE.crb'</span>,
+  experiment_name <span class='op'>=</span> <span class='st'>'PBMC'</span>,
+  organism <span class='op'>=</span> <span class='st'>'hg'</span>,
+  groups <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>'sample'</span>,<span class='st'>'cluster'</span><span class='op'>)</span>,
+  nUMI <span class='op'>=</span> <span class='st'>'nUMI'</span>,
+  nGene <span class='op'>=</span> <span class='st'>'nGene'</span>,
+  use_delayed_array <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>Loading required package: SingleCellExperiment</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: SummarizedExperiment</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: MatrixGenerics</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: matrixStats</span></div><div class='output co'>#&gt; <span class='message'></span>
+#&gt; <span class='message'>Attaching package: ‘MatrixGenerics’</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from ‘package:matrixStats’:</span>
+#&gt; <span class='message'></span>
+#&gt; <span class='message'>    colAlls, colAnyNAs, colAnys, colAvgsPerRowSet, colCollapse,</span>
+#&gt; <span class='message'>    colCounts, colCummaxs, colCummins, colCumprods, colCumsums,</span>
+#&gt; <span class='message'>    colDiffs, colIQRDiffs, colIQRs, colLogSumExps, colMadDiffs,</span>
+#&gt; <span class='message'>    colMads, colMaxs, colMeans2, colMedians, colMins, colOrderStats,</span>
+#&gt; <span class='message'>    colProds, colQuantiles, colRanges, colRanks, colSdDiffs, colSds,</span>
+#&gt; <span class='message'>    colSums2, colTabulates, colVarDiffs, colVars, colWeightedMads,</span>
+#&gt; <span class='message'>    colWeightedMeans, colWeightedMedians, colWeightedSds,</span>
+#&gt; <span class='message'>    colWeightedVars, rowAlls, rowAnyNAs, rowAnys, rowAvgsPerColSet,</span>
+#&gt; <span class='message'>    rowCollapse, rowCounts, rowCummaxs, rowCummins, rowCumprods,</span>
+#&gt; <span class='message'>    rowCumsums, rowDiffs, rowIQRDiffs, rowIQRs, rowLogSumExps,</span>
+#&gt; <span class='message'>    rowMadDiffs, rowMads, rowMaxs, rowMeans2, rowMedians, rowMins,</span>
+#&gt; <span class='message'>    rowOrderStats, rowProds, rowQuantiles, rowRanges, rowRanks,</span>
+#&gt; <span class='message'>    rowSdDiffs, rowSds, rowSums2, rowTabulates, rowVarDiffs, rowVars,</span>
+#&gt; <span class='message'>    rowWeightedMads, rowWeightedMeans, rowWeightedMedians,</span>
+#&gt; <span class='message'>    rowWeightedSds, rowWeightedVars</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: GenomicRanges</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: stats4</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: BiocGenerics</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: parallel</span></div><div class='output co'>#&gt; <span class='message'></span>
 #&gt; <span class='message'>Attaching package: ‘BiocGenerics’</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from ‘package:parallel’:</span>
 #&gt; <span class='message'></span>
 #&gt; <span class='message'>    clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,</span>
@@ -295,27 +313,24 @@ defaults to <code>FALSE</code>.</p></td>
 #&gt; <span class='message'>    grepl, intersect, is.unsorted, lapply, Map, mapply, match, mget,</span>
 #&gt; <span class='message'>    order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,</span>
 #&gt; <span class='message'>    rbind, Reduce, rownames, sapply, setdiff, sort, table, tapply,</span>
-#&gt; <span class='message'>    union, unique, unsplit, which, which.max, which.min</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: S4Vectors</span></div><div class='output co'>#&gt; <span class='message'></span>
+#&gt; <span class='message'>    union, unique, unsplit, which.max, which.min</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: S4Vectors</span></div><div class='output co'>#&gt; <span class='message'></span>
 #&gt; <span class='message'>Attaching package: ‘S4Vectors’</span></div><div class='output co'>#&gt; <span class='message'>The following object is masked from ‘package:base’:</span>
 #&gt; <span class='message'></span>
 #&gt; <span class='message'>    expand.grid</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: IRanges</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: GenomeInfoDb</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: Biobase</span></div><div class='output co'>#&gt; <span class='message'>Welcome to Bioconductor</span>
 #&gt; <span class='message'></span>
 #&gt; <span class='message'>    Vignettes contain introductory material; view with</span>
 #&gt; <span class='message'>    'browseVignettes()'. To cite Bioconductor, see</span>
-#&gt; <span class='message'>    'citation("Biobase")', and for packages 'citation("pkgname")'.</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: DelayedArray</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: matrixStats</span></div><div class='output co'>#&gt; <span class='message'></span>
-#&gt; <span class='message'>Attaching package: ‘matrixStats’</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from ‘package:Biobase’:</span>
+#&gt; <span class='message'>    'citation("Biobase")', and for packages 'citation("pkgname")'.</span></div><div class='output co'>#&gt; <span class='message'></span>
+#&gt; <span class='message'>Attaching package: ‘Biobase’</span></div><div class='output co'>#&gt; <span class='message'>The following object is masked from ‘package:MatrixGenerics’:</span>
 #&gt; <span class='message'></span>
-#&gt; <span class='message'>    anyMissing, rowMedians</span></div><div class='output co'>#&gt; <span class='message'>Loading required package: BiocParallel</span></div><div class='output co'>#&gt; <span class='message'></span>
-#&gt; <span class='message'>Attaching package: ‘DelayedArray’</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from ‘package:matrixStats’:</span>
+#&gt; <span class='message'>    rowMedians</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from ‘package:matrixStats’:</span>
 #&gt; <span class='message'></span>
-#&gt; <span class='message'>    colMaxs, colMins, colRanges, rowMaxs, rowMins, rowRanges</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from ‘package:base’:</span>
-#&gt; <span class='message'></span>
-#&gt; <span class='message'>    aperm, apply, rowsum</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] Initializing Cerebro object...</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] Collecting available meta data...</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] Extracting all meta data columns...</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] Extracting dimensional reductions...</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] Will export the following dimensional reductions: UMAP</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] No trajectories to extract...</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] Overview of Cerebro object:</span></div><div class='output co'>#&gt; <span class='message'>class: Cerebro_v1.3</span>
-#&gt; <span class='message'>cerebroApp version: 1.3.0</span>
+#&gt; <span class='message'>    anyMissing, rowMedians</span></div><div class='output co'>#&gt; <span class='message'>[17:53:23] Initializing Cerebro object...</span></div><div class='output co'>#&gt; <span class='warning'>Warning: the condition has length &gt; 1 and only the first element will be used</span></div><div class='output co'>#&gt; <span class='message'>[17:53:23] Collecting available meta data...</span></div><div class='output co'>#&gt; <span class='message'>[17:53:23] Extracting all meta data columns...</span></div><div class='output co'>#&gt; <span class='message'>[17:53:23] Extracting dimensional reductions...</span></div><div class='output co'>#&gt; <span class='message'>[17:53:23] Will export the following dimensional reductions: UMAP</span></div><div class='output co'>#&gt; <span class='message'>[17:53:23] No trajectories to extract...</span></div><div class='output co'>#&gt; <span class='message'>[17:53:23] Overview of Cerebro object:</span></div><div class='output co'>#&gt; <span class='message'>class: Cerebro_v1.3</span>
+#&gt; <span class='message'>cerebroApp version: 1.3.1</span>
 #&gt; <span class='message'>experiment name: PBMC</span>
 #&gt; <span class='message'>organism: hg</span>
 #&gt; <span class='message'>date of analysis: </span>
-#&gt; <span class='message'>date of export: 2020-09-25</span>
+#&gt; <span class='message'>date of export: 2021-03-12</span>
 #&gt; <span class='message'>number of cells: 80</span>
 #&gt; <span class='message'>number of genes: 230</span>
 #&gt; <span class='message'>grouping variables (2): sample, cluster</span>
@@ -326,7 +341,7 @@ defaults to <code>FALSE</code>.</p></td>
 #&gt; <span class='message'>marker genes:</span>
 #&gt; <span class='message'>enriched pathways:</span>
 #&gt; <span class='message'>trajectories:</span>
-#&gt; <span class='message'>extra material:</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] Saving Cerebro object to: pbmc_SCE.crb</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] Done!</span></div><div class='input'>
+#&gt; <span class='message'>extra material:</span></div><div class='output co'>#&gt; <span class='message'>[17:53:23] Saving Cerebro object to: pbmc_SCE.crb</span></div><div class='output co'>#&gt; <span class='message'>[17:53:23] Done!</span></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -343,7 +358,7 @@ defaults to <code>FALSE</code>.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

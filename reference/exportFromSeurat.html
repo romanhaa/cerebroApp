@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cerebroApp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.1</span>
       </span>
     </div>
 
@@ -80,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -144,13 +144,13 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/romanhaa/cerebroApp/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
 <li>
   <a href="https://twitter.com/fakechek1">
-    <span class="fab fa fab fa-twitter fa-lg"></span>
+    <span class="fab fa-twitter fa-lg"></span>
      
   </a>
 </li>
@@ -176,21 +176,21 @@
     <p>This function allows to export a Seurat object to visualize in Cerebro.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>exportFromSeurat</span>(
-  <span class='no'>object</span>,
-  <span class='kw'>assay</span> <span class='kw'>=</span> <span class='st'>"RNA"</span>,
-  <span class='kw'>slot</span> <span class='kw'>=</span> <span class='st'>"data"</span>,
-  <span class='no'>file</span>,
-  <span class='no'>experiment_name</span>,
-  <span class='no'>organism</span>,
-  <span class='no'>groups</span>,
-  <span class='kw'>cell_cycle</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>nUMI</span> <span class='kw'>=</span> <span class='st'>"nUMI"</span>,
-  <span class='kw'>nGene</span> <span class='kw'>=</span> <span class='st'>"nGene"</span>,
-  <span class='kw'>add_all_meta_data</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>use_delayed_array</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>exportFromSeurat</span><span class='op'>(</span>
+  <span class='va'>object</span>,
+  assay <span class='op'>=</span> <span class='st'>"RNA"</span>,
+  slot <span class='op'>=</span> <span class='st'>"data"</span>,
+  <span class='va'>file</span>,
+  <span class='va'>experiment_name</span>,
+  <span class='va'>organism</span>,
+  <span class='va'>groups</span>,
+  cell_cycle <span class='op'>=</span> <span class='cn'>NULL</span>,
+  nUMI <span class='op'>=</span> <span class='st'>"nUMI"</span>,
+  nGene <span class='op'>=</span> <span class='st'>"nGene"</span>,
+  add_all_meta_data <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  use_delayed_array <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  verbose <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -272,24 +272,25 @@ defaults to <code>FALSE</code>.</p></td>
     <p>No data returned.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata/v1.3/pbmc_seurat.rds"</span>,
-  <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"cerebroApp"</span>))
-<span class='fu'>exportFromSeurat</span>(
-  <span class='kw'>object</span> <span class='kw'>=</span> <span class='no'>pbmc</span>,
-  <span class='kw'>file</span> <span class='kw'>=</span> <span class='st'>'pbmc_Seurat.crb'</span>,
-  <span class='kw'>experiment_name</span> <span class='kw'>=</span> <span class='st'>'PBMC'</span>,
-  <span class='kw'>organism</span> <span class='kw'>=</span> <span class='st'>'hg'</span>,
-  <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>'sample'</span>,<span class='st'>'seurat_clusters'</span>),
-  <span class='kw'>nUMI</span> <span class='kw'>=</span> <span class='st'>'nCount_RNA'</span>,
-  <span class='kw'>nGene</span> <span class='kw'>=</span> <span class='st'>'nFeature_RNA'</span>,
-  <span class='kw'>use_delayed_array</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
-)</div><div class='output co'>#&gt; <span class='message'>[12:37:08] Initializing Cerebro object...</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] Collecting available meta data...</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] Extracting all meta data columns...</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] Extracting dimensional reductions...</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] Will export the following dimensional reductions: UMAP</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] Extracting tables of marker genes...</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] No trajectories to extract...</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] Overview of Cerebro object:</span></div><div class='output co'>#&gt; <span class='message'>class: Cerebro_v1.3</span>
-#&gt; <span class='message'>cerebroApp version: 1.3.0</span>
+    <pre class="examples"><div class='input'><span class='va'>pbmc</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata/v1.3/pbmc_seurat.rds"</span>,
+  package <span class='op'>=</span> <span class='st'>"cerebroApp"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'>exportFromSeurat</span><span class='op'>(</span>
+  object <span class='op'>=</span> <span class='va'>pbmc</span>,
+  file <span class='op'>=</span> <span class='st'>'pbmc_Seurat.crb'</span>,
+  experiment_name <span class='op'>=</span> <span class='st'>'PBMC'</span>,
+  organism <span class='op'>=</span> <span class='st'>'hg'</span>,
+  groups <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>'sample'</span>,<span class='st'>'seurat_clusters'</span><span class='op'>)</span>,
+  nUMI <span class='op'>=</span> <span class='st'>'nCount_RNA'</span>,
+  nGene <span class='op'>=</span> <span class='st'>'nFeature_RNA'</span>,
+  use_delayed_array <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>[17:53:24] Initializing Cerebro object...</span></div><div class='output co'>#&gt; <span class='message'>[17:53:24] Collecting available meta data...</span></div><div class='output co'>#&gt; <span class='message'>[17:53:24] Extracting all meta data columns...</span></div><div class='output co'>#&gt; <span class='message'>[17:53:24] Extracting dimensional reductions...</span></div><div class='output co'>#&gt; <span class='message'>[17:53:24] Will export the following dimensional reductions: UMAP</span></div><div class='output co'>#&gt; <span class='message'>[17:53:24] Extracting tables of marker genes...</span></div><div class='output co'>#&gt; <span class='message'>[17:53:24] No trajectories to extract...</span></div><div class='output co'>#&gt; <span class='message'>[17:53:24] Overview of Cerebro object:</span></div><div class='output co'>#&gt; <span class='message'>class: Cerebro_v1.3</span>
+#&gt; <span class='message'>cerebroApp version: 1.3.1</span>
 #&gt; <span class='message'>experiment name: PBMC</span>
 #&gt; <span class='message'>organism: hg</span>
 #&gt; <span class='message'>date of analysis: </span>
-#&gt; <span class='message'>date of export: 2020-09-25</span>
+#&gt; <span class='message'>date of export: 2021-03-12</span>
 #&gt; <span class='message'>number of cells: 80</span>
 #&gt; <span class='message'>number of genes: 230</span>
 #&gt; <span class='message'>grouping variables (2): sample, seurat_clusters</span>
@@ -301,7 +302,7 @@ defaults to <code>FALSE</code>.</p></td>
 #&gt; <span class='message'>  - cerebro_seurat (2): sample, seurat_clusters</span>
 #&gt; <span class='message'>enriched pathways:</span>
 #&gt; <span class='message'>trajectories:</span>
-#&gt; <span class='message'>extra material:</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] Saving Cerebro object to: pbmc_Seurat.crb</span></div><div class='output co'>#&gt; <span class='message'>[12:37:08] Done!</span></div><div class='input'>
+#&gt; <span class='message'>extra material:</span></div><div class='output co'>#&gt; <span class='message'>[17:53:24] Saving Cerebro object to: pbmc_Seurat.crb</span></div><div class='output co'>#&gt; <span class='message'>[17:53:24] Done!</span></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -318,7 +319,7 @@ defaults to <code>FALSE</code>.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

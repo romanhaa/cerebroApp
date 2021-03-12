@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cerebroApp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.1</span>
       </span>
     </div>
 
@@ -39,7 +39,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -103,13 +103,13 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/romanhaa/cerebroApp/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
 <li>
   <a href="https://twitter.com/fakechek1">
-    <span class="fab fa fab fa-twitter fa-lg"></span>
+    <span class="fab fa-twitter fa-lg"></span>
      
   </a>
 </li>
@@ -123,13 +123,13 @@
 
       
 
-      </header><script src="export_and_visualize_custom_tables_and_plots_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="export_and_visualize_custom_tables_and_plots_files/header-attrs-2.6/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Export and visualize custom tables and plots</h1>
                         <h4 class="author">Roman Hillje</h4>
             
-            <h4 class="date">25 September, 2020</h4>
+            <h4 class="date">12 March, 2021</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/romanhaa/cerebroApp/blob/master/vignettes/export_and_visualize_custom_tables_and_plots.Rmd"><code>vignettes/export_and_visualize_custom_tables_and_plots.Rmd</code></a></small>
       <div class="hidden name"><code>export_and_visualize_custom_tables_and_plots.Rmd</code></div>
@@ -151,31 +151,34 @@
 <h2 class="hasAnchor">
 <a href="#marker-genes-and-enriched-pathways" class="anchor"></a>Marker genes and enriched pathways</h2>
 <p>Let’s assume you have a <code>Seurat</code> object but generated tables of differentially expressed genes and enriched pathways using other tools/methods than those built into cerebroApp. To export those tables, you just need to put it in the right place, following a “method” and “name” scheme. In this example, we assume you have a table of marker genes called <code>custom_table</code> that looks like this:</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">tibble</span>)
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/">tibble</a></span><span class="op">)</span>
 
-<span class="no">custom_table</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html">tribble</a></span>(
-      ~<span class="no">a</span>,   ~<span class="no">b</span>,  ~<span class="no">c</span>,       ~<span class="no">d</span>,      ~<span class="no">e</span>,
+<span class="va">custom_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html">tribble</a></span><span class="op">(</span>
+      <span class="op">~</span><span class="va">a</span>,   <span class="op">~</span><span class="va">b</span>,  <span class="op">~</span><span class="va">c</span>,       <span class="op">~</span><span class="va">d</span>,      <span class="op">~</span><span class="va">e</span>,
   <span class="st">"this"</span>, <span class="st">"is"</span>, <span class="st">"a"</span>, <span class="st">"custom"</span>, <span class="st">"table"</span>
-)</pre></body></html></div>
+<span class="op">)</span></code></pre></div>
 <p>To make sure it is exported when running <code><a href="../reference/exportFromSeurat.html">exportFromSeurat()</a></code>, simply save it in a list with a name for both the method and the table, e.g. <code>custom_method</code> and <code>custom_table</code>:</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="no">pbmc_Seurat</span>@<span class="kw">misc</span>$<span class="no">marker_genes</span><span class="kw">[[</span><span class="st">'custom_method'</span>]] <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
-  <span class="st">"custom_table"</span> <span class="kw">=</span> <span class="no">custom_table</span>
-)</pre></body></html></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">pbmc_Seurat</span><span class="op">@</span><span class="va">misc</span><span class="op">$</span><span class="va">marker_genes</span><span class="op">[[</span><span class="st">'custom_method'</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+  <span class="st">"custom_table"</span> <span class="op">=</span> <span class="va">custom_table</span>
+<span class="op">)</span></code></pre></div>
 <p>Then, you can export your data set:</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="fu"><a href="../reference/exportFromSeurat.html">exportFromSeurat</a></span>(
-  <span class="no">pbmc_Seurat</span>,
-  <span class="kw">assay</span> <span class="kw">=</span> <span class="st">'SCT'</span>,
-  <span class="kw">slot</span> <span class="kw">=</span> <span class="st">'data'</span>,
-  <span class="kw">file</span> <span class="kw">=</span> <span class="st">'~/Dropbox/Cerebro_development/pbmc_Seurat.crb'</span>,
-  <span class="kw">experiment_name</span> <span class="kw">=</span> <span class="st">'pbmc_Seurat'</span>,
-  <span class="kw">organism</span> <span class="kw">=</span> <span class="st">'hg'</span>,
-  <span class="kw">groups</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'sample'</span>,<span class="st">'seurat_clusters'</span>,<span class="st">'cell_type_singler_blueprintencode_main'</span>),
-  <span class="kw">cell_cycle</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'cell_cycle_seurat'</span>),
-  <span class="kw">nUMI</span> <span class="kw">=</span> <span class="st">'nCount_RNA'</span>,
-  <span class="kw">nGene</span> <span class="kw">=</span> <span class="st">'nFeature_RNA'</span>,
-  <span class="kw">add_all_meta_data</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
-  <span class="kw">verbose</span> <span class="kw">=</span> <span class="fl">FALSE</span>
-)</pre></body></html></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/exportFromSeurat.html">exportFromSeurat</a></span><span class="op">(</span>
+  <span class="va">pbmc_Seurat</span>,
+  assay <span class="op">=</span> <span class="st">'SCT'</span>,
+  slot <span class="op">=</span> <span class="st">'data'</span>,
+  file <span class="op">=</span> <span class="st">'~/Dropbox/Cerebro_development/pbmc_Seurat.crb'</span>,
+  experiment_name <span class="op">=</span> <span class="st">'pbmc_Seurat'</span>,
+  organism <span class="op">=</span> <span class="st">'hg'</span>,
+  groups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'sample'</span>,<span class="st">'seurat_clusters'</span>,<span class="st">'cell_type_singler_blueprintencode_main'</span><span class="op">)</span>,
+  cell_cycle <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'cell_cycle_seurat'</span><span class="op">)</span>,
+  nUMI <span class="op">=</span> <span class="st">'nCount_RNA'</span>,
+  nGene <span class="op">=</span> <span class="st">'nFeature_RNA'</span>,
+  add_all_meta_data <span class="op">=</span> <span class="cn">TRUE</span>,
+  verbose <span class="op">=</span> <span class="cn">FALSE</span>
+<span class="op">)</span></code></pre></div>
 <pre><code>[15:28:21] Start collecting data...
 [15:28:21] Overview of Cerebro object:
 
@@ -212,31 +215,32 @@ trajectories:
 <h2 class="hasAnchor">
 <a href="#extra-material" class="anchor"></a>Extra material</h2>
 <p>When you have tables that might be useful to interpret the data set but don’t contain marker genes, differentially expressed genes, or enriched pathways, then you can add them as extra material. Again, just make sure you follow the general structure. In the case of a <code>Seurat</code> object, store the tables with an interpretable name in a list at <code>@misc$extra_material$tables</code>. You can see an example below, where we store the same example table as before:</p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="no">custom_table</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span>(
-  <span class="kw">a</span> <span class="kw">=</span> <span class="st">"this"</span>,
-  <span class="kw">b</span> <span class="kw">=</span> <span class="st">"is"</span>,
-  <span class="kw">c</span> <span class="kw">=</span> <span class="st">"a"</span>,
-  <span class="kw">d</span> <span class="kw">=</span> <span class="st">"test"</span>
-)
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">custom_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>
+  a <span class="op">=</span> <span class="st">"this"</span>,
+  b <span class="op">=</span> <span class="st">"is"</span>,
+  c <span class="op">=</span> <span class="st">"a"</span>,
+  d <span class="op">=</span> <span class="st">"test"</span>
+<span class="op">)</span>
 
-<span class="no">pbmc_Seurat</span>@<span class="kw">misc</span>$<span class="no">extra_material</span>$<span class="no">tables</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
-  <span class="st">"test"</span> <span class="kw">=</span> <span class="no">custom_table</span>
-)
+<span class="va">pbmc_Seurat</span><span class="op">@</span><span class="va">misc</span><span class="op">$</span><span class="va">extra_material</span><span class="op">$</span><span class="va">tables</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+  <span class="st">"test"</span> <span class="op">=</span> <span class="va">custom_table</span>
+<span class="op">)</span>
 
-<span class="fu"><a href="../reference/exportFromSeurat.html">exportFromSeurat</a></span>(
-  <span class="no">pbmc_Seurat</span>,
-  <span class="kw">assay</span> <span class="kw">=</span> <span class="st">'SCT'</span>,
-  <span class="kw">slot</span> <span class="kw">=</span> <span class="st">'data'</span>,
-  <span class="kw">file</span> <span class="kw">=</span> <span class="st">'~/Dropbox/Cerebro_development/pbmc_Seurat.crb'</span>,
-  <span class="kw">experiment_name</span> <span class="kw">=</span> <span class="st">'pbmc_Seurat'</span>,
-  <span class="kw">organism</span> <span class="kw">=</span> <span class="st">'hg'</span>,
-  <span class="kw">groups</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'sample'</span>,<span class="st">'seurat_clusters'</span>,<span class="st">'cell_type_singler_blueprintencode_main'</span>),
-  <span class="kw">cell_cycle</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'cell_cycle_seurat'</span>),
-  <span class="kw">nUMI</span> <span class="kw">=</span> <span class="st">'nCount_RNA'</span>,
-  <span class="kw">nGene</span> <span class="kw">=</span> <span class="st">'nFeature_RNA'</span>,
-  <span class="kw">add_all_meta_data</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
-  <span class="kw">verbose</span> <span class="kw">=</span> <span class="fl">FALSE</span>
-)</pre></body></html></div>
+<span class="fu"><a href="../reference/exportFromSeurat.html">exportFromSeurat</a></span><span class="op">(</span>
+  <span class="va">pbmc_Seurat</span>,
+  assay <span class="op">=</span> <span class="st">'SCT'</span>,
+  slot <span class="op">=</span> <span class="st">'data'</span>,
+  file <span class="op">=</span> <span class="st">'~/Dropbox/Cerebro_development/pbmc_Seurat.crb'</span>,
+  experiment_name <span class="op">=</span> <span class="st">'pbmc_Seurat'</span>,
+  organism <span class="op">=</span> <span class="st">'hg'</span>,
+  groups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'sample'</span>,<span class="st">'seurat_clusters'</span>,<span class="st">'cell_type_singler_blueprintencode_main'</span><span class="op">)</span>,
+  cell_cycle <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'cell_cycle_seurat'</span><span class="op">)</span>,
+  nUMI <span class="op">=</span> <span class="st">'nCount_RNA'</span>,
+  nGene <span class="op">=</span> <span class="st">'nFeature_RNA'</span>,
+  add_all_meta_data <span class="op">=</span> <span class="cn">TRUE</span>,
+  verbose <span class="op">=</span> <span class="cn">FALSE</span>
+<span class="op">)</span></code></pre></div>
 <pre><code>[15:07:48] Start collecting data...
 [15:07:50] Overview of Cerebro object:
 
@@ -279,29 +283,30 @@ extra material:
 <h2 class="hasAnchor">
 <a href="#example-1" class="anchor"></a>Example #1</h2>
 <p>Let’s look at an example in which we create a simple plot with ggplot2, call it <code>iris</code>, and add it to the Seurat object:</p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
 
-<span class="no">custom_plot</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">iris</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="no">Sepal.Length</span>, <span class="no">Sepal.Width</span>, <span class="kw">color</span> <span class="kw">=</span> <span class="no">Species</span>)) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>()
+<span class="va">custom_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">iris</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">Sepal.Length</span>, <span class="va">Sepal.Width</span>, color <span class="op">=</span> <span class="va">Species</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span>
 
-<span class="no">pbmc_Seurat</span>@<span class="kw">misc</span>$<span class="no">extra_material</span>$<span class="no">plots</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
-  <span class="st">"iris"</span> <span class="kw">=</span> <span class="no">custom_plot</span>
-)
+<span class="va">pbmc_Seurat</span><span class="op">@</span><span class="va">misc</span><span class="op">$</span><span class="va">extra_material</span><span class="op">$</span><span class="va">plots</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+  <span class="st">"iris"</span> <span class="op">=</span> <span class="va">custom_plot</span>
+<span class="op">)</span>
 
-<span class="fu"><a href="../reference/exportFromSeurat.html">exportFromSeurat</a></span>(
-  <span class="no">pbmc_Seurat</span>,
-  <span class="kw">assay</span> <span class="kw">=</span> <span class="st">'SCT'</span>,
-  <span class="kw">slot</span> <span class="kw">=</span> <span class="st">'data'</span>,
-  <span class="kw">file</span> <span class="kw">=</span> <span class="st">'~/Dropbox/Cerebro_development/pbmc_Seurat.crb'</span>,
-  <span class="kw">experiment_name</span> <span class="kw">=</span> <span class="st">'pbmc_Seurat'</span>,
-  <span class="kw">organism</span> <span class="kw">=</span> <span class="st">'hg'</span>,
-  <span class="kw">groups</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'sample'</span>,<span class="st">'seurat_clusters'</span>,<span class="st">'cell_type_singler_blueprintencode_main'</span>),
-  <span class="kw">cell_cycle</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'cell_cycle_seurat'</span>),
-  <span class="kw">nUMI</span> <span class="kw">=</span> <span class="st">'nCount_RNA'</span>,
-  <span class="kw">nGene</span> <span class="kw">=</span> <span class="st">'nFeature_RNA'</span>,
-  <span class="kw">add_all_meta_data</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
-  <span class="kw">verbose</span> <span class="kw">=</span> <span class="fl">FALSE</span>
-)</pre></body></html></div>
+<span class="fu"><a href="../reference/exportFromSeurat.html">exportFromSeurat</a></span><span class="op">(</span>
+  <span class="va">pbmc_Seurat</span>,
+  assay <span class="op">=</span> <span class="st">'SCT'</span>,
+  slot <span class="op">=</span> <span class="st">'data'</span>,
+  file <span class="op">=</span> <span class="st">'~/Dropbox/Cerebro_development/pbmc_Seurat.crb'</span>,
+  experiment_name <span class="op">=</span> <span class="st">'pbmc_Seurat'</span>,
+  organism <span class="op">=</span> <span class="st">'hg'</span>,
+  groups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'sample'</span>,<span class="st">'seurat_clusters'</span>,<span class="st">'cell_type_singler_blueprintencode_main'</span><span class="op">)</span>,
+  cell_cycle <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'cell_cycle_seurat'</span><span class="op">)</span>,
+  nUMI <span class="op">=</span> <span class="st">'nCount_RNA'</span>,
+  nGene <span class="op">=</span> <span class="st">'nFeature_RNA'</span>,
+  add_all_meta_data <span class="op">=</span> <span class="cn">TRUE</span>,
+  verbose <span class="op">=</span> <span class="cn">FALSE</span>
+<span class="op">)</span></code></pre></div>
 <pre><code>[11:54:33] Start collecting data...
 [11:54:33] Overview of Cerebro object:
 
@@ -338,114 +343,116 @@ extra material:
 <h2 class="hasAnchor">
 <a href="#example-2" class="anchor"></a>Example #2</h2>
 <p>In the second example, we prepare a dot plot showing the expression of the most significant marker gene for each cluster.</p>
-<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">dplyr</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">tidyr</span>)
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org">tidyr</a></span><span class="op">)</span>
 
 <span class="co"># cells will be grouped by clusters that they have been assigned to</span>
-<span class="no">cluster_ids</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html">levels</a></span>(<span class="no">seurat</span>@<span class="kw">meta.data</span>$<span class="no">seurat_clusters</span>)
+<span class="va">cluster_ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html">levels</a></span><span class="op">(</span><span class="va">seurat</span><span class="op">@</span><span class="va">meta.data</span><span class="op">$</span><span class="va">seurat_clusters</span><span class="op">)</span>
 
 <span class="co"># select a set of genes for which we want to show expression</span>
-<span class="no">genes_to_show</span> <span class="kw">&lt;-</span> <span class="no">seurat</span>@<span class="kw">misc</span>$<span class="no">marker_genes</span>$<span class="no">cerebro_seurat</span>$<span class="no">seurat_clusters</span> <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(<span class="no">seurat_clusters</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span>(<span class="no">p_val_adj</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html">slice</a></span>(<span class="fl">1</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span>(<span class="no">gene</span>)
+<span class="va">genes_to_show</span> <span class="op">&lt;-</span> <span class="va">seurat</span><span class="op">@</span><span class="va">misc</span><span class="op">$</span><span class="va">marker_genes</span><span class="op">$</span><span class="va">cerebro_seurat</span><span class="op">$</span><span class="va">seurat_clusters</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">seurat_clusters</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">p_val_adj</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html">slice</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">gene</span><span class="op">)</span>
 
 <span class="co"># for every cluster-gene combination, calculate the average expression across</span>
 <span class="co"># all cells and then transform the data into a data frame</span>
-<span class="no">expression_levels_per_cluster</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">vapply</a></span>(
-    <span class="no">cluster_ids</span>, <span class="kw">FUN.VALUE</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">cluster_ids</span>)), <span class="kw">function</span>(<span class="no">x</span>) {
-      <span class="no">cells_in_current_cluster</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span>(<span class="no">seurat</span>@<span class="kw">meta.data</span>$<span class="no">seurat_cluster</span> <span class="kw">==</span> <span class="no">x</span>)
-      <span class="kw pkg">Matrix</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums.html">rowMeans</a></span>(<span class="no">seurat</span>@<span class="kw">assays</span>$<span class="no">SCT</span>@<span class="kw">data</span>[<span class="no">genes_to_show</span>,<span class="no">cells_in_current_cluster</span>])
-    }
-  ) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>() <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>() <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="kw">cluster</span> <span class="kw">=</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html">rownames</a></span>(<span class="no">.</span>)) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="no">cluster</span>, <span class="fu"><a href="https://dplyr.tidyverse.org/reference/reexports.html">everything</a></span>()) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html">pivot_longer</a></span>(
-    <span class="kw">cols</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">2</span>:<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span>(<span class="no">.</span>)),
-    <span class="kw">names_to</span> <span class="kw">=</span> <span class="st">'gene'</span>
-  ) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span>(<span class="kw">expression</span> <span class="kw">=</span> <span class="no">value</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="kw">id_to_merge</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="no">cluster</span>, <span class="st">'_'</span>, <span class="no">gene</span>))
+<span class="va">expression_levels_per_cluster</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">vapply</a></span><span class="op">(</span>
+    <span class="va">cluster_ids</span>, FUN.VALUE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">cluster_ids</span><span class="op">)</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span>
+      <span class="va">cells_in_current_cluster</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">seurat</span><span class="op">@</span><span class="va">meta.data</span><span class="op">$</span><span class="va">seurat_cluster</span> <span class="op">==</span> <span class="va">x</span><span class="op">)</span>
+      <span class="fu">Matrix</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums.html">rowMeans</a></span><span class="op">(</span><span class="va">seurat</span><span class="op">@</span><span class="va">assays</span><span class="op">$</span><span class="va">SCT</span><span class="op">@</span><span class="va">data</span><span class="op">[</span><span class="va">genes_to_show</span>,<span class="va">cells_in_current_cluster</span><span class="op">]</span><span class="op">)</span>
+    <span class="op">}</span>
+  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>cluster <span class="op">=</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html">rownames</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">cluster</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html">everything</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html">pivot_longer</a></span><span class="op">(</span>
+    cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span>,
+    names_to <span class="op">=</span> <span class="st">'gene'</span>
+  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span>expression <span class="op">=</span> <span class="va">value</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>id_to_merge <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">cluster</span>, <span class="st">'_'</span>, <span class="va">gene</span><span class="op">)</span><span class="op">)</span>
 
 <span class="co"># for every cluster-gene combination, calculate the percentage of cells in the</span>
 <span class="co"># respective group that has at least 1 transcript (this means we consider it</span>
 <span class="co"># as expressing the gene) and then transform the data into a data frame</span>
-<span class="no">percentage_of_cells_expressing_gene</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">vapply</a></span>(
-    <span class="no">cluster_ids</span>, <span class="kw">FUN.VALUE</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">cluster_ids</span>)), <span class="kw">function</span>(<span class="no">x</span>) {
-      <span class="no">cells_in_current_cluster</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span>(<span class="no">seurat</span>@<span class="kw">meta.data</span>$<span class="no">seurat_cluster</span> <span class="kw">==</span> <span class="no">x</span>)
-      <span class="kw pkg">Matrix</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums.html">rowSums</a></span>(<span class="no">seurat</span>@<span class="kw">assays</span>$<span class="no">SCT</span>@<span class="kw">data</span>[<span class="no">genes_to_show</span>,<span class="no">cells_in_current_cluster</span>] <span class="kw">!=</span> <span class="fl">0</span>)
-    }
-  ) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span>() <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span>() <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="kw">cluster</span> <span class="kw">=</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html">rownames</a></span>(<span class="no">.</span>)) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="no">cluster</span>, <span class="fu"><a href="https://dplyr.tidyverse.org/reference/reexports.html">everything</a></span>()) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html">pivot_longer</a></span>(
-    <span class="kw">cols</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">2</span>:<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span>(<span class="no">.</span>)),
-    <span class="kw">names_to</span> <span class="kw">=</span> <span class="st">'gene'</span>
-  ) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span>(<span class="kw">cell_count</span> <span class="kw">=</span> <span class="no">value</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join</a></span>(
-    <span class="no">.</span>,
-    <span class="no">seurat</span>@<span class="kw">meta.data</span> <span class="kw">%&gt;%</span>
-      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span>(<span class="no">seurat_clusters</span>) <span class="kw">%&gt;%</span>
-      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html">tally</a></span>() <span class="kw">%&gt;%</span>
-      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span>(<span class="kw">cluster</span> <span class="kw">=</span> <span class="no">seurat_clusters</span>),
-    <span class="kw">by</span> <span class="kw">=</span> <span class="st">'cluster'</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(
-    <span class="kw">id_to_merge</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="no">cluster</span>, <span class="st">'_'</span>, <span class="no">gene</span>),
-    <span class="kw">percent_cells</span> <span class="kw">=</span> <span class="no">cell_count</span> / <span class="no">n</span>
-  )
+<span class="va">percentage_of_cells_expressing_gene</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">vapply</a></span><span class="op">(</span>
+    <span class="va">cluster_ids</span>, FUN.VALUE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">cluster_ids</span><span class="op">)</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span>
+      <span class="va">cells_in_current_cluster</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">seurat</span><span class="op">@</span><span class="va">meta.data</span><span class="op">$</span><span class="va">seurat_cluster</span> <span class="op">==</span> <span class="va">x</span><span class="op">)</span>
+      <span class="fu">Matrix</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/colSums.html">rowSums</a></span><span class="op">(</span><span class="va">seurat</span><span class="op">@</span><span class="va">assays</span><span class="op">$</span><span class="va">SCT</span><span class="op">@</span><span class="va">data</span><span class="op">[</span><span class="va">genes_to_show</span>,<span class="va">cells_in_current_cluster</span><span class="op">]</span> <span class="op">!=</span> <span class="fl">0</span><span class="op">)</span>
+    <span class="op">}</span>
+  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>cluster <span class="op">=</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html">rownames</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">cluster</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html">everything</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html">pivot_longer</a></span><span class="op">(</span>
+    cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span>,
+    names_to <span class="op">=</span> <span class="st">'gene'</span>
+  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span>cell_count <span class="op">=</span> <span class="va">value</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join</a></span><span class="op">(</span>
+    <span class="va">.</span>,
+    <span class="va">seurat</span><span class="op">@</span><span class="va">meta.data</span> <span class="op">%&gt;%</span>
+      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">seurat_clusters</span><span class="op">)</span> <span class="op">%&gt;%</span>
+      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html">tally</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span>cluster <span class="op">=</span> <span class="va">seurat_clusters</span><span class="op">)</span>,
+    by <span class="op">=</span> <span class="st">'cluster'</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>
+    id_to_merge <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">cluster</span>, <span class="st">'_'</span>, <span class="va">gene</span><span class="op">)</span>,
+    percent_cells <span class="op">=</span> <span class="va">cell_count</span> <span class="op">/</span> <span class="va">n</span>
+  <span class="op">)</span>
 
 <span class="co"># merge the two data frames created before and plot the data</span>
-<span class="no">custom_plot</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join</a></span>(
-    <span class="no">expression_levels_per_cluster</span>,
-    <span class="no">percentage_of_cells_expressing_gene</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(<span class="no">id_to_merge</span>, <span class="no">percent_cells</span>),
-    <span class="kw">by</span> <span class="kw">=</span> <span class="st">'id_to_merge'</span>
-  ) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(
-    <span class="kw">cluster</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="no">cluster</span>, <span class="kw">levels</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rev.html">rev</a></span>(<span class="no">cluster_ids</span>)),
-    <span class="kw">gene</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="no">gene</span>, <span class="kw">levels</span> <span class="kw">=</span> <span class="no">genes_to_show</span>)
-  ) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="no">gene</span>, <span class="no">cluster</span>)) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">color</span> <span class="kw">=</span> <span class="no">expression</span>, <span class="kw">size</span> <span class="kw">=</span> <span class="no">percent_cells</span>)) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html">scale_color_distiller</a></span>(
-    <span class="kw">palette</span> <span class="kw">=</span> <span class="st">'Reds'</span>,
-    <span class="kw">direction</span> <span class="kw">=</span> <span class="fl">1</span>,
-    <span class="kw">name</span> <span class="kw">=</span> <span class="st">'Log-normalised\nexpression'</span>,
-    <span class="kw">guide</span> <span class="kw">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_colourbar.html">guide_colorbar</a></span>(<span class="kw">frame.colour</span> <span class="kw">=</span> <span class="st">"black"</span>, <span class="kw">ticks.colour</span> <span class="kw">=</span> <span class="st">"black"</span>)
-  ) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_size.html">scale_size</a></span>(<span class="kw">name</span> <span class="kw">=</span> <span class="st">'Percent\nof cells'</span>, <span class="kw">labels</span> <span class="kw">=</span> <span class="kw pkg">scales</span><span class="kw ns">::</span><span class="no"><a href="https://scales.r-lib.org//reference/label_percent.html">percent</a></span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span>(<span class="kw">y</span> <span class="kw">=</span> <span class="st">'Cluster'</span>, <span class="kw">color</span> <span class="kw">=</span> <span class="st">'Expression'</span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span>() +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>() +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(
-    <span class="kw">axis.title.x</span> <span class="kw">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span>(),
-    <span class="kw">axis.text.x</span> <span class="kw">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="kw">angle</span> <span class="kw">=</span> <span class="fl">45</span>, <span class="kw">hjust</span> <span class="kw">=</span> <span class="fl">1</span>)
-  )</pre></body></html></div>
+<span class="va">custom_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join</a></span><span class="op">(</span>
+    <span class="va">expression_levels_per_cluster</span>,
+    <span class="va">percentage_of_cells_expressing_gene</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">id_to_merge</span>, <span class="va">percent_cells</span><span class="op">)</span>,
+    by <span class="op">=</span> <span class="st">'id_to_merge'</span>
+  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>
+    cluster <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">cluster</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rev.html">rev</a></span><span class="op">(</span><span class="va">cluster_ids</span><span class="op">)</span><span class="op">)</span>,
+    gene <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">gene</span>, levels <span class="op">=</span> <span class="va">genes_to_show</span><span class="op">)</span>
+  <span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">gene</span>, <span class="va">cluster</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">expression</span>, size <span class="op">=</span> <span class="va">percent_cells</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html">scale_color_distiller</a></span><span class="op">(</span>
+    palette <span class="op">=</span> <span class="st">'Reds'</span>,
+    direction <span class="op">=</span> <span class="fl">1</span>,
+    name <span class="op">=</span> <span class="st">'Log-normalised\nexpression'</span>,
+    guide <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_colourbar.html">guide_colorbar</a></span><span class="op">(</span>frame.colour <span class="op">=</span> <span class="st">"black"</span>, ticks.colour <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span>
+  <span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_size.html">scale_size</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">'Percent\nof cells'</span>, labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="va"><a href="https://scales.r-lib.org//reference/label_percent.html">percent</a></span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="st">'Cluster'</span>, color <span class="op">=</span> <span class="st">'Expression'</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_fixed</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>
+    axis.title.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_blank</a></span><span class="op">(</span><span class="op">)</span>,
+    axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">45</span>, hjust <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
+  <span class="op">)</span></code></pre></div>
 <p>With the plot ready, we can store it in the Seurat object and export it as before.</p>
-<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="no">seurat</span>@<span class="kw">misc</span>$<span class="no">extra_material</span>$<span class="no">plots</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
-  <span class="st">"dot_plot_marker_genes_clusters"</span> <span class="kw">=</span> <span class="no">custom_plot</span>
-)
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">seurat</span><span class="op">@</span><span class="va">misc</span><span class="op">$</span><span class="va">extra_material</span><span class="op">$</span><span class="va">plots</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+  <span class="st">"dot_plot_marker_genes_clusters"</span> <span class="op">=</span> <span class="va">custom_plot</span>
+<span class="op">)</span>
 
-<span class="fu"><a href="../reference/exportFromSeurat.html">exportFromSeurat</a></span>(
-  <span class="no">seurat</span>,
-  <span class="kw">assay</span> <span class="kw">=</span> <span class="st">'SCT'</span>,
-  <span class="kw">slot</span> <span class="kw">=</span> <span class="st">'data'</span>,
-  <span class="kw">file</span> <span class="kw">=</span> <span class="st">'~/Dropbox/Cerebro_development/pbmc_Seurat.crb'</span>,
-  <span class="kw">experiment_name</span> <span class="kw">=</span> <span class="st">'pbmc_Seurat'</span>,
-  <span class="kw">organism</span> <span class="kw">=</span> <span class="st">'hg'</span>,
-  <span class="kw">groups</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'sample'</span>,<span class="st">'seurat_clusters'</span>,<span class="st">'cell_type_singler_blueprintencode_main'</span>),
-  <span class="kw">cell_cycle</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'cell_cycle_seurat'</span>),
-  <span class="kw">nUMI</span> <span class="kw">=</span> <span class="st">'nCount_RNA'</span>,
-  <span class="kw">nGene</span> <span class="kw">=</span> <span class="st">'nFeature_RNA'</span>,
-  <span class="kw">add_all_meta_data</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
-  <span class="kw">verbose</span> <span class="kw">=</span> <span class="fl">FALSE</span>
-)</pre></body></html></div>
+<span class="fu"><a href="../reference/exportFromSeurat.html">exportFromSeurat</a></span><span class="op">(</span>
+  <span class="va">seurat</span>,
+  assay <span class="op">=</span> <span class="st">'SCT'</span>,
+  slot <span class="op">=</span> <span class="st">'data'</span>,
+  file <span class="op">=</span> <span class="st">'~/Dropbox/Cerebro_development/pbmc_Seurat.crb'</span>,
+  experiment_name <span class="op">=</span> <span class="st">'pbmc_Seurat'</span>,
+  organism <span class="op">=</span> <span class="st">'hg'</span>,
+  groups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'sample'</span>,<span class="st">'seurat_clusters'</span>,<span class="st">'cell_type_singler_blueprintencode_main'</span><span class="op">)</span>,
+  cell_cycle <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'cell_cycle_seurat'</span><span class="op">)</span>,
+  nUMI <span class="op">=</span> <span class="st">'nCount_RNA'</span>,
+  nGene <span class="op">=</span> <span class="st">'nFeature_RNA'</span>,
+  add_all_meta_data <span class="op">=</span> <span class="cn">TRUE</span>,
+  verbose <span class="op">=</span> <span class="cn">FALSE</span>
+<span class="op">)</span></code></pre></div>
 <pre><code>[10:03:13] Start collecting data...
 [10:03:14] Overview of Cerebro object:
 
@@ -497,7 +504,7 @@ extra material:
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

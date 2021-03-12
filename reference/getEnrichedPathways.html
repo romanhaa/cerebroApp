@@ -73,7 +73,7 @@ gene sets of all available grouping variables." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cerebroApp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.1</span>
       </span>
     </div>
 
@@ -81,7 +81,7 @@ gene sets of all available grouping variables." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -145,13 +145,13 @@ gene sets of all available grouping variables." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/romanhaa/cerebroApp/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
 <li>
   <a href="https://twitter.com/fakechek1">
-    <span class="fab fa fab fa-twitter fa-lg"></span>
+    <span class="fab fa-twitter fa-lg"></span>
      
   </a>
 </li>
@@ -178,16 +178,16 @@ gene sets of all available grouping variables." />
 gene sets of all available grouping variables.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>getEnrichedPathways</span>(
-  <span class='no'>object</span>,
-  <span class='kw'>marker_genes_input</span> <span class='kw'>=</span> <span class='st'>"cerebro_seurat"</span>,
-  <span class='kw'>databases</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"GO_Biological_Process_2018"</span>, <span class='st'>"GO_Cellular_Component_2018"</span>,
+    <pre class="usage"><span class='fu'>getEnrichedPathways</span><span class='op'>(</span>
+  <span class='va'>object</span>,
+  marker_genes_input <span class='op'>=</span> <span class='st'>"cerebro_seurat"</span>,
+  databases <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"GO_Biological_Process_2018"</span>, <span class='st'>"GO_Cellular_Component_2018"</span>,
     <span class='st'>"GO_Molecular_Function_2018"</span>, <span class='st'>"KEGG_2016"</span>, <span class='st'>"WikiPathways_2016"</span>, <span class='st'>"Reactome_2016"</span>,
-    <span class='st'>"Panther_2016"</span>, <span class='st'>"Human_Gene_Atlas"</span>, <span class='st'>"Mouse_Gene_Atlas"</span>),
-  <span class='kw'>adj_p_cutoff</span> <span class='kw'>=</span> <span class='fl'>0.05</span>,
-  <span class='kw'>max_terms</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>URL_API</span> <span class='kw'>=</span> <span class='st'>"http://amp.pharm.mssm.edu/Enrichr/enrich"</span>
-)</pre>
+    <span class='st'>"Panther_2016"</span>, <span class='st'>"Human_Gene_Atlas"</span>, <span class='st'>"Mouse_Gene_Atlas"</span><span class='op'>)</span>,
+  adj_p_cutoff <span class='op'>=</span> <span class='fl'>0.05</span>,
+  max_terms <span class='op'>=</span> <span class='fl'>100</span>,
+  URL_API <span class='op'>=</span> <span class='st'>"http://maayanlab.cloud/Enrichr"</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -223,7 +223,7 @@ defaults to 0.05,</p></td>
       <td><p>URL to send requests to (Enrichr API). Allows to overwrite
 default URL with an alternative taken from the Enrichr website in case the
 original is out-of-service; defaults to
-'http://amp.pharm.mssm.edu/Enrichr/enrich'.</p></td>
+'http://maayanlab.cloud/Enrichr'.</p></td>
     </tr>
     </table>
 
@@ -233,16 +233,17 @@ original is out-of-service; defaults to
 stored in <code>object@misc$enriched_pathways$&lt;marker_genes_input&gt;_enrichr</code></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata/v1.3/pbmc_seurat.rds"</span>,
-  <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"cerebroApp"</span>))
-<span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'>getEnrichedPathways</span>(
-  <span class='kw'>object</span> <span class='kw'>=</span> <span class='no'>pbmc</span>,
-  <span class='kw'>marker_genes_input</span> <span class='kw'>=</span> <span class='st'>'cerebro_seurat'</span>,
-  <span class='kw'>databases</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>'GO_Biological_Process_2018'</span>,<span class='st'>'GO_Cellular_Component_2018'</span>),
-  <span class='kw'>adj_p_cutoff</span> <span class='kw'>=</span> <span class='fl'>0.01</span>,
-  <span class='kw'>max_terms</span> <span class='kw'>=</span> <span class='fl'>100</span>,
-  <span class='kw'>URL_API</span> <span class='kw'>=</span> <span class='st'>'http://amp.pharm.mssm.edu/Enrichr/enrich'</span>
-)</div><div class='output co'>#&gt; <span class='message'>[12:37:09] Found 2 groups: sample, seurat_clusters</span></div><div class='output co'>#&gt; <span class='message'>[12:37:09] Get enriched pathways for group `sample`...</span></div><div class='output co'>#&gt; <span class='message'>[12:37:11] 0 pathways passed the threshold across all group levels and databases for group `sample`.</span></div><div class='output co'>#&gt; <span class='message'>[12:37:11] Get enriched pathways for group `seurat_clusters`...</span></div><div class='output co'>#&gt; <span class='message'>[12:37:13] 40 pathways passed the thresholds across all group levels and databases.</span></div><div class='input'>
+    <pre class="examples"><div class='input'><span class='va'>pbmc</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata/v1.3/pbmc_seurat.rds"</span>,
+  package <span class='op'>=</span> <span class='st'>"cerebroApp"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>pbmc</span> <span class='op'>&lt;-</span> <span class='fu'>getEnrichedPathways</span><span class='op'>(</span>
+  object <span class='op'>=</span> <span class='va'>pbmc</span>,
+  marker_genes_input <span class='op'>=</span> <span class='st'>'cerebro_seurat'</span>,
+  databases <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>'GO_Biological_Process_2018'</span>,<span class='st'>'GO_Cellular_Component_2018'</span><span class='op'>)</span>,
+  adj_p_cutoff <span class='op'>=</span> <span class='fl'>0.01</span>,
+  max_terms <span class='op'>=</span> <span class='fl'>100</span>,
+  URL_API <span class='op'>=</span> <span class='st'>'http://maayanlab.cloud/Enrichr'</span>
+<span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>[17:53:24] Found 2 groups: sample, seurat_clusters</span></div><div class='output co'>#&gt; <span class='message'>[17:53:24] Get enriched pathways for group `sample`...</span></div><div class='output co'>#&gt; <span class='message'>[17:53:27] 5 pathways passed the thresholds across all group levels and databases.</span></div><div class='output co'>#&gt; <span class='message'>[17:53:27] Get enriched pathways for group `seurat_clusters`...</span></div><div class='output co'>#&gt; <span class='message'>[17:53:29] 70 pathways passed the thresholds across all group levels and databases.</span></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -259,7 +260,7 @@ stored in <code>object@misc$enriched_pathways$&lt;marker_genes_input&gt;_enrichr
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

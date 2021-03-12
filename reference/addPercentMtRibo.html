@@ -73,7 +73,7 @@ cell." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cerebroApp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.1</span>
       </span>
     </div>
 
@@ -81,7 +81,7 @@ cell." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -145,13 +145,13 @@ cell." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/romanhaa/cerebroApp/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
 <li>
   <a href="https://twitter.com/fakechek1">
-    <span class="fab fa fab fa-twitter fa-lg"></span>
+    <span class="fab fa-twitter fa-lg"></span>
      
   </a>
 </li>
@@ -178,7 +178,7 @@ cell." />
 cell.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>addPercentMtRibo</span>(<span class='no'>object</span>, <span class='kw'>assay</span> <span class='kw'>=</span> <span class='st'>"RNA"</span>, <span class='no'>organism</span>, <span class='no'>gene_nomenclature</span>)</pre>
+    <pre class="usage"><span class='fu'>addPercentMtRibo</span><span class='op'>(</span><span class='va'>object</span>, assay <span class='op'>=</span> <span class='st'>"RNA"</span>, <span class='va'>organism</span>, <span class='va'>gene_nomenclature</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -210,15 +210,15 @@ ENSEMBL ID ('ensembl') or GENCODE ID ('gencode_v27', 'gencode_vM16').</p></td>
 mitochondrial and ribosomal gene expression for each cell.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata/v1.3/pbmc_seurat.rds"</span>,
-  <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"cerebroApp"</span>))</div><div class='output co'>#&gt; <span class='message'>Registered S3 method overwritten by 'spatstat':</span>
-#&gt; <span class='message'>  method     from</span>
-#&gt; <span class='message'>  print.boxx cli </span></div><div class='input'><span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'>addPercentMtRibo</span>(
-  <span class='kw'>object</span> <span class='kw'>=</span> <span class='no'>pbmc</span>,
-  <span class='kw'>assay</span> <span class='kw'>=</span> <span class='st'>'RNA'</span>,
-  <span class='kw'>organism</span> <span class='kw'>=</span> <span class='st'>'hg'</span>,
-  <span class='kw'>gene_nomenclature</span> <span class='kw'>=</span> <span class='st'>'name'</span>
-)</div><div class='output co'>#&gt; <span class='message'>[12:37:03] No mitochondrial genes found in data set.</span></div><div class='output co'>#&gt; <span class='message'>[12:37:03] Calculate percentage of 1 ribosomal transcript(s) present in the data set...</span></div><div class='input'>
+    <pre class="examples"><div class='input'><span class='va'>pbmc</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata/v1.3/pbmc_seurat.rds"</span>,
+  package <span class='op'>=</span> <span class='st'>"cerebroApp"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>pbmc</span> <span class='op'>&lt;-</span> <span class='fu'>addPercentMtRibo</span><span class='op'>(</span>
+  object <span class='op'>=</span> <span class='va'>pbmc</span>,
+  assay <span class='op'>=</span> <span class='st'>'RNA'</span>,
+  organism <span class='op'>=</span> <span class='st'>'hg'</span>,
+  gene_nomenclature <span class='op'>=</span> <span class='st'>'name'</span>
+<span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>[17:53:22] No mitochondrial genes found in data set.</span></div><div class='output co'>#&gt; <span class='message'>[17:53:22] Calculate percentage of 1 ribosomal transcript(s) present in the data set...</span></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -235,7 +235,7 @@ mitochondrial and ribosomal gene expression for each cell.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

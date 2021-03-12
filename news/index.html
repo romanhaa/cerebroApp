@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cerebroApp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.1</span>
       </span>
     </div>
 
@@ -79,7 +79,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -143,13 +143,13 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/romanhaa/cerebroApp/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
 <li>
   <a href="https://twitter.com/fakechek1">
-    <span class="fab fa fab fa-twitter fa-lg"></span>
+    <span class="fab fa-twitter fa-lg"></span>
      
   </a>
 </li>
@@ -170,18 +170,56 @@
       <small>Source: <a href='https://github.com/romanhaa/cerebroApp/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="cerebroapp-130" class="section level1">
-<h1 class="page-header" data-toc-text="1.3.0">
-<a href="#cerebroapp-130" class="anchor"></a>cerebroApp 1.3.0</h1>
-<p>Because this is a relatively big release, I have prepared a dedicated article with release notes for cerebroApp v1.3 that you can find in the navigation bar.</p>
+    <div id="cerebroapp-131" class="section level1">
+<h1 class="page-header" data-toc-text="1.3.1">
+<a href="#cerebroapp-131" class="anchor"></a>cerebroApp 1.3.1</h1>
+<p>Despite the minor version bump, this update contains substantial performance improvements in the Shiny app, specifically in the projections.</p>
 <div id="major-changes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#major-changes" class="anchor"></a>Major changes</h2>
 <ul>
+<li>Projections in the “Overview” and “Gene (set) expression” are now updated using the <code>Plotly.react()</code> Javascript function instead of redrawn from scratch inside R when changing the input variables. For the user, that means that (1) plots are drawn much quicker and (2) the current zoom/pan settings are maintained when switching plot parameters (coloring variable, point size/opacity, etc).</li>
+</ul>
+</div>
+<div id="minor-changes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#minor-changes" class="anchor"></a>Minor changes</h2>
+<ul>
+<li>It is now possible to define several settings related to the projections shown in the “Overview” and “Gene (set) expression” tabs. For example, you can change the default point size and opacity, the default percentage of cells to show, and whether or not hover info should be activated in the projections. These settings are optional but useful when hosting a known data sets in <code>closed</code> mode, e.g. because you want to decrease the point size in a large data set. The respective parameters can be found in the description of the <code><a href="../reference/launchCerebroV1.3.html">launchCerebroV1.3()</a></code> function.</li>
+<li>Hover/tooltip info for cells in projections can be deactivated through a checkbox on the “About” tab. Deactivating hover info increases performance of projections.</li>
+<li>Hover/tooltip info for cells in the gene expression projection no longer contain the gene expression value. This is because preparing the hover info is an expensive computation with little return. As a result of removing the gene expression value, the hover info does not need to be recalculated every time a gene is added to or removed from the list of genes to show expression for. For the same reason, when plotting a trajectory, the state and pseudotime are not added to the hover info either.</li>
+<li>Internally, data for plotting in projections is rearranged, stored in different variables, and the final output is debounced to avoid unnecessary redrawing of the projections on initialization.</li>
+<li>The feature to show expression of multiple genes in separate panels has been matured. Up to 9 genes can be shown in a 3x3 panel matrix but all share the same color scale. While cells can be selected in any of the panels, the expression levels shown in the other UI element, e.g. table of selected cells or expression by group, refers to the mean expression of all selected genes (not just the one the cells were selected in).</li>
+<li>When coloring cells in projections by a caterogical variable, e.g. cell type, the dots in the legend are now larger and independent from the selected point size.</li>
+<li>Tables are now rendered server-side to improve performance for large tables.</li>
+<li>Cellular barcodes in tables of selected cells are formatted in monospace font.</li>
+<li>Columns in meta data tables, e.g. table of cells selected in projections, which are identified to contain percentage on a 0-100 scale are changed to a 0-1 scale to prevent non-sensical values such as 500%.</li>
+<li>Add comma to Y axis and hover info in bar chart of selected cells in projection (“Overview” tab).</li>
+<li>The <code>crb_file_to_load</code> parameter of the <code><a href="../reference/launchCerebroV1.3.html">launchCerebroV1.3()</a></code> function (or as part of <code>Cerebro.options</code>) can now be set to the name of a <code>Cerebro_v1.3</code> object. That means you can load the data set before launching Cerebro (with <code><a href="https://rdrr.io/r/base/readRDS.html">readRDS()</a></code>) and make Cerebro initialize itself with it. This is particularly useful when hosting Cerebro in <code>closed</code> mode, preventing that each user session has to read the data set from disk.</li>
+<li>Update author info in “About” tab.</li>
+</ul>
+</div>
+<div id="fixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#fixes" class="anchor"></a>Fixes</h2>
+<ul>
+<li>Colors assigned to groups in bar chart of selected cells in projection (“Overview” tab) sometimes did not match those shown in the projection. This only applied to categorical grouping variables that are not registered as grouping variables.</li>
+<li>Update Enrichr API for <code><a href="../reference/getEnrichedPathways.html">getEnrichedPathways()</a></code> function. Make it configurable in case of further changes to the API.</li>
+</ul>
+</div>
+</div>
+    <div id="cerebroapp-130" class="section level1">
+<h1 class="page-header" data-toc-text="1.3.0">
+<a href="#cerebroapp-130" class="anchor"></a>cerebroApp 1.3.0</h1>
+<p>Because this is a relatively big release, I have prepared a dedicated article with release notes for cerebroApp v1.3 that you can find in the navigation bar.</p>
+<div id="major-changes-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#major-changes-1" class="anchor"></a>Major changes</h2>
+<ul>
 <li>With data sets becoming more complex, users often have more than just the two grouping variables Cerebro was initially made to work with (‘sample’ and ‘cluster’). To provide a more generalized interface, users can now specify multiple grouping variables (or a single one). Consequently, the ‘Samples’ and ‘Clusters’ tabs in the Cerebro interface have been replaced by the ‘Groups’ tab, where users can select one of the available grouping variables (with the same content as before). This can be useful when you cluster the cells with different methods/settings or have additional grouping variables, such as treatments, and want to provide the Cerebro user with both results.</li>
 <li>Data loaded into Cerebro is now stored in a dedicated class: <code>Cerebro_v1.3</code>.</li>
 <li>Due to the changes in data structure, files exported with cerebroApp v1.3 can only be visualized in Cerebro v1.3. Moreover, files exported with cerebroApp v1.2 and earlier cannot be loaded into Cerebro v1.3. I apologize for any inconvenience but I believe these changes will lead to more stability coming releases.</li>
-<li>Removed support for Seurat objects before v3.0. Users who need to continue working with older version of Seurat have two options: (1) use the <code><a href="https://rdrr.io/pkg/Seurat/man/UpdateSeuratObject.html">Seurat::UpdateSeuratObject()</a></code> function to update their Seurat object before exporting it for visualization in Cerebro; (2) use older Cerebro version. I apologize for the any trouble this may cause.</li>
+<li>Removed support for Seurat objects before v3.0. Users who need to continue working with older version of Seurat have two options: (1) use the <code><a href="https://satijalab.org/seurat/reference/UpdateSeuratObject.html">Seurat::UpdateSeuratObject()</a></code> function to update their Seurat object before exporting it for visualization in Cerebro; (2) use older Cerebro version. I apologize for the any trouble this may cause.</li>
 <li>The “Gene expression” and “Gene set expression” tabs have been merged into the new “Gene (set) expression)” which gives you access to both.</li>
 <li>The new “Extra material” tab allows you to export additional material related to the data set that you want to share with others. At the moment, only tables and plots (from ggplot2) are supported, but support for other types of content can be added upon user request in the future.</li>
 </ul>
@@ -200,9 +238,9 @@
     <div id="cerebroapp-122" class="section level1">
 <h1 class="page-header" data-toc-text="1.2.2">
 <a href="#cerebroapp-122" class="anchor"></a>cerebroApp 1.2.2</h1>
-<div id="fixes" class="section level2">
+<div id="fixes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#fixes" class="anchor"></a>Fixes</h2>
+<a href="#fixes-1" class="anchor"></a>Fixes</h2>
 <ul>
 <li>The title in the browser tab now correctly says “Cerebro” instead of containing some HTML code.</li>
 <li>Cluster trees should now be displayed correctly.</li>
@@ -221,9 +259,9 @@
 <li>It is now possible to select cells in the dimensional reduction plots (‘Overview’, ‘Gene expression’, and ‘Gene set expression’ tabs) and retrieve additional info for them. For example, users can get tables of meta data or expression values and save them as a file for further analysis. Also, gene expression can be shown in the selected vs. non-selected cells.</li>
 </ul>
 </div>
-<div id="minor-changes" class="section level2">
+<div id="minor-changes-1" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-changes" class="anchor"></a>Minor changes</h2>
+<a href="#minor-changes-1" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>Scales for expression levels by sample and cluster in “Gene expression” and “Gene set expression” tabs are now set to be from 0 to 1.2 times the highest value. This is to limit the violin plots which cannot be trimmed to the actual data range and will extend beyond, giving a false impression of negative values existing in the data.</li>
 <li>Hover info in expression by gene plot in “Gene expression” and “Gene set expression” tabs now show both the gene name and the mean expression value instead of just the gene name.</li>
@@ -247,12 +285,12 @@
 <li>We added a vignette which explains how to use cerebroApp and its functions.</li>
 </ul>
 </div>
-<div id="minor-changes-1" class="section level2">
+<div id="minor-changes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-changes-1" class="anchor"></a>Minor changes</h2>
+<a href="#minor-changes-2" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>Add citation info.</li>
-<li>Composition tables (e.g. samples by clusters or cell cycle) are now calculated in the Shiny app rather than being expected to be present in the `.crb file.</li>
+<li>Composition tables (e.g. samples by clusters or cell cycle) are now calculated in the Shiny app rather than being expected to be present in the <code>.crb</code> file.</li>
 <li>Fix log message in <code><a href="../reference/exportFromSeurat.html">exportFromSeurat()</a></code> when extracting trajectories.</li>
 <li>The gene set selection box in the “Gene set expression” tab will not crash anymore when typing a sequence of letters that doesn’t match any gene set names.</li>
 <li>Remove dependency on pre-assigned colors in the <code>.crb</code> file. If no colors have been assigned to samples and clusters when loading a data set, they will be assigned then.</li>
@@ -303,7 +341,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

@@ -73,7 +73,7 @@ grouping variables in the meta data of the provided Seurat object." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cerebroApp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.1</span>
       </span>
     </div>
 
@@ -81,7 +81,7 @@ grouping variables in the meta data of the provided Seurat object." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -145,13 +145,13 @@ grouping variables in the meta data of the provided Seurat object." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/romanhaa/cerebroApp/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
 <li>
   <a href="https://twitter.com/fakechek1">
-    <span class="fab fa fab fa-twitter fa-lg"></span>
+    <span class="fab fa-twitter fa-lg"></span>
      
   </a>
 </li>
@@ -178,7 +178,7 @@ grouping variables in the meta data of the provided Seurat object." />
 grouping variables in the meta data of the provided Seurat object.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>getMostExpressedGenes</span>(<span class='no'>object</span>, <span class='kw'>assay</span> <span class='kw'>=</span> <span class='st'>"RNA"</span>, <span class='kw'>groups</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>getMostExpressedGenes</span><span class='op'>(</span><span class='va'>object</span>, assay <span class='op'>=</span> <span class='st'>"RNA"</span>, groups <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -204,13 +204,14 @@ which most expressed genes should be calculated; defaults to NULL.</p></td>
 specified groups stored in <code>object@misc$most_expressed_genes</code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata/v1.3/pbmc_seurat.rds"</span>,
-  <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"cerebroApp"</span>))
-<span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'>getMostExpressedGenes</span>(
-  <span class='kw'>object</span> <span class='kw'>=</span> <span class='no'>pbmc</span>,
-  <span class='kw'>assay</span> <span class='kw'>=</span> <span class='st'>'RNA'</span>,
-  <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>'sample'</span>,<span class='st'>'seurat_clusters'</span>)
-)</div><div class='output co'>#&gt; <span class='message'>[12:37:23] Get most expressed genes for 2 groups in `sample`...</span></div><div class='output co'>#&gt; <span class='message'>[12:37:23] Get most expressed genes for 3 groups in `seurat_clusters`...</span></div><div class='input'>
+    <pre class="examples"><div class='input'><span class='va'>pbmc</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata/v1.3/pbmc_seurat.rds"</span>,
+  package <span class='op'>=</span> <span class='st'>"cerebroApp"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>pbmc</span> <span class='op'>&lt;-</span> <span class='fu'>getMostExpressedGenes</span><span class='op'>(</span>
+  object <span class='op'>=</span> <span class='va'>pbmc</span>,
+  assay <span class='op'>=</span> <span class='st'>'RNA'</span>,
+  groups <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>'sample'</span>,<span class='st'>'seurat_clusters'</span><span class='op'>)</span>
+<span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>[17:53:53] Get most expressed genes for 2 groups in `sample`...</span></div><div class='output co'>#&gt; <span class='message'>[17:53:53] Get most expressed genes for 3 groups in `seurat_clusters`...</span></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -227,7 +228,7 @@ specified groups stored in <code>object@misc$most_expressed_genes</code>.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

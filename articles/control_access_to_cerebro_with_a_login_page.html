@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cerebroApp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.1</span>
       </span>
     </div>
 
@@ -39,7 +39,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -103,13 +103,13 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/romanhaa/cerebroApp/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
 <li>
   <a href="https://twitter.com/fakechek1">
-    <span class="fab fa fab fa-twitter fa-lg"></span>
+    <span class="fab fa-twitter fa-lg"></span>
      
   </a>
 </li>
@@ -123,13 +123,13 @@
 
       
 
-      </header><script src="control_access_to_cerebro_with_a_login_page_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="control_access_to_cerebro_with_a_login_page_files/header-attrs-2.6/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Control access to Cerebro with a login page</h1>
                         <h4 class="author">Roman Hillje</h4>
             
-            <h4 class="date">25 September, 2020</h4>
+            <h4 class="date">12 March, 2021</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/romanhaa/cerebroApp/blob/master/vignettes/control_access_to_cerebro_with_a_login_page.Rmd"><code>vignettes/control_access_to_cerebro_with_a_login_page.Rmd</code></a></small>
       <div class="hidden name"><code>control_access_to_cerebro_with_a_login_page.Rmd</code></div>
@@ -151,49 +151,53 @@
 <a href="#app-r" class="anchor"></a><code>app.R</code>
 </h2>
 <p>At the top of the <code>app.R</code> file, add the <code>shinymanager</code> package to be loaded alongside other packages that are required by Cerebro:</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="co">## load packages -------------------------------------------------------------##</span>
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">shinymanager</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">dplyr</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">DT</span>)
-<span class="co"># ...</span></pre></body></html></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co">## load packages -------------------------------------------------------------##</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/datastorm-open/shinymanager">shinymanager</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rstudio/DT">DT</a></span><span class="op">)</span>
+<span class="co"># ...</span></code></pre></div>
 </div>
 <div id="shiny_server-r" class="section level2">
 <h2 class="hasAnchor">
 <a href="#shiny_server-r" class="anchor"></a><code>shiny_server.R</code>
 </h2>
 <p>Add this to the top of the <code>shiny_server.R</code> file, before the definition of the <code>server</code> function starts:</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="no">user_credentials</span> <span class="kw">&lt;-</span> <span class="kw pkg">tibble</span><span class="kw ns">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html">tribble</a></span>(
-   ~<span class="no">user</span>,              ~<span class="no">password</span>,       ~<span class="no">start</span>, ~<span class="no">expire</span>, ~<span class="no">admin</span>,
-  <span class="st">"user1"</span>, <span class="st">"reallygoodpassword1"</span>, <span class="st">"2020-08-01"</span>,      <span class="fl">NA</span>,  <span class="fl">FALSE</span>,
-  <span class="st">"user2"</span>, <span class="st">"reallygoodpassword2"</span>, <span class="st">"2020-09-01"</span>,      <span class="fl">NA</span>,  <span class="fl">FALSE</span>
-)</pre></body></html></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">user_credentials</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html">tribble</a></span><span class="op">(</span>
+   <span class="op">~</span><span class="va">user</span>,              <span class="op">~</span><span class="va">password</span>,       <span class="op">~</span><span class="va">start</span>, <span class="op">~</span><span class="va">expire</span>, <span class="op">~</span><span class="va">admin</span>,
+  <span class="st">"user1"</span>, <span class="st">"reallygoodpassword1"</span>, <span class="st">"2020-08-01"</span>,      <span class="cn">NA</span>,  <span class="cn">FALSE</span>,
+  <span class="st">"user2"</span>, <span class="st">"reallygoodpassword2"</span>, <span class="st">"2020-09-01"</span>,      <span class="cn">NA</span>,  <span class="cn">FALSE</span>
+<span class="op">)</span></code></pre></div>
 <p>Within the definition of the <code>server</code> function, right at the top, add this:</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">res_auth</span> <span class="kw">&lt;-</span> <span class="kw pkg">shinymanager</span><span class="kw ns">::</span><span class="fu">secure_server</span>(
-  <span class="kw">check_credentials</span> <span class="kw">=</span> <span class="kw pkg">shinymanager</span><span class="kw ns">::</span><span class="fu">check_credentials</span>(<span class="no">user_credentials</span>)
-)</pre></body></html></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">res_auth</span> <span class="op">&lt;-</span> <span class="fu">shinymanager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/shinymanager/man/secure-app.html">secure_server</a></span><span class="op">(</span>
+  check_credentials <span class="op">=</span> <span class="fu">shinymanager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/shinymanager/man/check_credentials.html">check_credentials</a></span><span class="op">(</span><span class="va">user_credentials</span><span class="op">)</span>
+<span class="op">)</span></code></pre></div>
 <p>The head of the <code>shiny_server.R</code> file should now look similar to this:</p>
-<div class="sourceCode" id="cb4"><html><body><pre class="r">## define users that can access Cerebro --------------------------------------##
-user_credentials &lt;- tibble::tribble(
-   ~user,              ~password,       ~start, ~expire, ~admin,
-  "user1", "reallygoodpassword1", "2020-08-01",      NA,  FALSE,
-  "user2", "reallygoodpassword2", "2020-09-01",      NA,  FALSE
-)
-
-## server function -----------------------------------------------------------##
-server &lt;- function(input, output, session) {
-  
-  ## check user authentication -----------------------------------------------##
-  res_auth &lt;- secure_server(
-    check_credentials = check_credentials(user_credentials)
-  )
-# ...</pre></body></html></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="do">## define users that can access Cerebro --------------------------------------##</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>user_credentials <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tribble</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>   <span class="sc">~</span>user,              <span class="sc">~</span>password,       <span class="sc">~</span>start, <span class="sc">~</span>expire, <span class="sc">~</span>admin,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"user1"</span>, <span class="st">"reallygoodpassword1"</span>, <span class="st">"2020-08-01"</span>,      <span class="cn">NA</span>,  <span class="cn">FALSE</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"user2"</span>, <span class="st">"reallygoodpassword2"</span>, <span class="st">"2020-09-01"</span>,      <span class="cn">NA</span>,  <span class="cn">FALSE</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="do">## server function -----------------------------------------------------------##</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>server <span class="ot">&lt;-</span> <span class="cf">function</span>(input, output, session) {</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="do">## check user authentication -----------------------------------------------##</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  res_auth <span class="ot">&lt;-</span> <span class="fu">secure_server</span>(</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">check_credentials =</span> <span class="fu">check_credentials</span>(user_credentials)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co"># ...</span></span></code></pre></div>
 </div>
 <div id="shiny_ui-r" class="section level2">
 <h2 class="hasAnchor">
 <a href="#shiny_ui-r" class="anchor"></a><code>shiny_UI.R</code>
 </h2>
 <p>At the end of the file, after the definition of the <code>ui</code> function, add this:</p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="no">ui</span> <span class="kw">&lt;-</span> <span class="kw pkg">shinymanager</span><span class="kw ns">::</span><span class="fu">secure_app</span>(<span class="no">ui</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">ui</span> <span class="op">&lt;-</span> <span class="fu">shinymanager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/shinymanager/man/secure-app.html">secure_app</a></span><span class="op">(</span><span class="va">ui</span><span class="op">)</span></code></pre></div>
 </div>
 </div>
 <div id="usage" class="section level1">
@@ -228,7 +232,7 @@ server &lt;- function(input, output, session) {
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

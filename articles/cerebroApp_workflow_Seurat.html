@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cerebroApp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.1</span>
       </span>
     </div>
 
@@ -39,7 +39,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -103,13 +103,13 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/romanhaa/cerebroApp/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
 <li>
   <a href="https://twitter.com/fakechek1">
-    <span class="fab fa fab fa-twitter fa-lg"></span>
+    <span class="fab fa-twitter fa-lg"></span>
      
   </a>
 </li>
@@ -123,13 +123,13 @@
 
       
 
-      </header><script src="cerebroApp_workflow_Seurat_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="cerebroApp_workflow_Seurat_files/header-attrs-2.6/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Introduction to the cerebroApp workflow (Seurat)</h1>
                         <h4 class="author">Roman Hillje</h4>
             
-            <h4 class="date">25 September, 2020</h4>
+            <h4 class="date">12 March, 2021</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/romanhaa/cerebroApp/blob/master/vignettes/cerebroApp_workflow_Seurat.Rmd"><code>vignettes/cerebroApp_workflow_Seurat.Rmd</code></a></small>
       <div class="hidden name"><code>cerebroApp_workflow_Seurat.Rmd</code></div>
@@ -158,36 +158,45 @@
 <h1 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h1>
 <p>Before starting the workflow, we need to install <code>cerebroApp</code>, as well as the <a href="https://satijalab.org/seurat/"><code>Seurat</code></a>, <a href="https://cole-trapnell-lab.github.io/monocle-release/"><code>monocle</code></a> and <a href="https://www.bioconductor.org/packages/release/bioc/html/SingleR.html"><code>SingleR</code></a> packages, which are not installed as dependencies of cerebroApp because they are only necessary if you want/need to pre-process your scRNA-seq data. If you just want to launch the Cerebro user interface, e.g. because you already have the pre-processed data, you don’t need those packages.</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="kw">if</span> ( <span class="st">'BiocManager'</span> <span class="kw">%in%</span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html">installed.packages</a></span>() <span class="kw">==</span> <span class="fl">FALSE</span> ) <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">'BiocManager'</span>)
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw">if</span> <span class="op">(</span> <span class="st">'BiocManager'</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html">installed.packages</a></span><span class="op">(</span><span class="op">)</span> <span class="op">==</span> <span class="cn">FALSE</span> <span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">'BiocManager'</span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">BiocManager</span>)
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">BiocManager</span><span class="op">)</span>
 
-<span class="kw">if</span> ( <span class="st">'cerebroApp'</span> <span class="kw">%in%</span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html">installed.packages</a></span>() <span class="kw">==</span> <span class="fl">FALSE</span> ) <span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html">install</a></span>(<span class="st">'cerebroApp'</span>)
-<span class="kw">if</span> ( <span class="st">'Seurat'</span> <span class="kw">%in%</span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html">installed.packages</a></span>() <span class="kw">==</span> <span class="fl">FALSE</span> ) <span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html">install</a></span>(<span class="st">'Seurat'</span>)
-<span class="kw">if</span> ( <span class="st">'SingleR'</span> <span class="kw">%in%</span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html">installed.packages</a></span>() <span class="kw">==</span> <span class="fl">FALSE</span> ) <span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html">install</a></span>(<span class="st">'SingleR'</span>)
-<span class="kw">if</span> ( <span class="st">'monocle'</span> <span class="kw">%in%</span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html">installed.packages</a></span>() <span class="kw">==</span> <span class="fl">FALSE</span> ) <span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html">install</a></span>(<span class="st">'monocle'</span>)</pre></body></html></div>
+<span class="kw">if</span> <span class="op">(</span> <span class="st">'cerebroApp'</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html">installed.packages</a></span><span class="op">(</span><span class="op">)</span> <span class="op">==</span> <span class="cn">FALSE</span> <span class="op">)</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html">install</a></span><span class="op">(</span><span class="st">'cerebroApp'</span><span class="op">)</span>
+<span class="kw">if</span> <span class="op">(</span> <span class="st">'Seurat'</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html">installed.packages</a></span><span class="op">(</span><span class="op">)</span> <span class="op">==</span> <span class="cn">FALSE</span> <span class="op">)</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html">install</a></span><span class="op">(</span><span class="st">'Seurat'</span><span class="op">)</span>
+<span class="kw">if</span> <span class="op">(</span> <span class="st">'SingleR'</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html">installed.packages</a></span><span class="op">(</span><span class="op">)</span> <span class="op">==</span> <span class="cn">FALSE</span> <span class="op">)</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html">install</a></span><span class="op">(</span><span class="st">'SingleR'</span><span class="op">)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; The downloaded binary packages are in</span>
+<span class="co">#&gt;  /var/folders/7z/m3l07m8s6455y1mnykf307_c0000gn/T//RtmpfbO0gJ/downloaded_packages</span>
+<span class="kw">if</span> <span class="op">(</span> <span class="st">'monocle'</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html">installed.packages</a></span><span class="op">(</span><span class="op">)</span> <span class="op">==</span> <span class="cn">FALSE</span> <span class="op">)</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html">install</a></span><span class="op">(</span><span class="st">'monocle'</span><span class="op">)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; The downloaded binary packages are in</span>
+<span class="co">#&gt;  /var/folders/7z/m3l07m8s6455y1mnykf307_c0000gn/T//RtmpfbO0gJ/downloaded_packages</span></code></pre></div>
 </div>
 <div id="setup" class="section level1">
 <h1 class="hasAnchor">
 <a href="#setup" class="anchor"></a>Setup</h1>
 <p>Apart from the packages we just installed, we will also load the dplyr package and set a seed to make our analysis reproducible.</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">dplyr</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">Seurat</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">SingleR</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">monocle</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">cerebroApp</span>)
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://satijalab.org/seurat">Seurat</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/LTLA/SingleR">SingleR</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">monocle</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://romanhaa.github.io/cerebroApp/index.html">cerebroApp</a></span><span class="op">)</span>
 
-<span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span>(<span class="kw">width</span> <span class="kw">=</span> <span class="fl">100</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">1234567</span>)</pre></body></html></div>
+<span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1234567</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="load-count-data" class="section level1">
 <h1 class="hasAnchor">
 <a href="#load-count-data" class="anchor"></a>Load count data</h1>
 <p>In this example workflow, we will load a small transcript count table from the <a href="https://satijalab.org/seurat/">Seurat</a> package containing 80 cells and 230 genes. If you want to try the workflow with a real data set, you can find some transcript count matrices on the <a href="https://github.com/romanhaa/Cerebro/tree/master/examples">Cerebro GitHub repo</a>.</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">pbmc</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span>(
-  <span class="kw">file</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">'extdata'</span>, <span class="st">'pbmc_raw.txt'</span>, <span class="kw">package</span> <span class="kw">=</span> <span class="st">'Seurat'</span>),
-  <span class="kw">as.is</span> <span class="kw">=</span> <span class="fl">TRUE</span>
-)</pre></body></html></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">pbmc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.table</a></span><span class="op">(</span>
+  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">'extdata'</span>, <span class="st">'pbmc_raw.txt'</span>, package <span class="op">=</span> <span class="st">'Seurat'</span><span class="op">)</span>,
+  as.is <span class="op">=</span> <span class="cn">TRUE</span>
+<span class="op">)</span></code></pre></div>
 </div>
 <div id="pre-processing-with-seurat" class="section level1">
 <h1 class="hasAnchor">
@@ -199,25 +208,27 @@
 <li>scaling of expression values and regression for the number of transcripts per cell,</li>
 <li>principal component analysis (PCA).</li>
 </ul>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">seurat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/CreateSeuratObject.html">CreateSeuratObject</a></span>(
-  <span class="kw">project</span> <span class="kw">=</span> <span class="st">'pbmc'</span>,
-  <span class="kw">counts</span> <span class="kw">=</span> <span class="no">pbmc</span>,
-  <span class="kw">min.cells</span> <span class="kw">=</span> <span class="fl">5</span>
-)
-<span class="no">seurat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/subset.Seurat.html">subset</a></span>(<span class="no">seurat</span>, <span class="kw">subset</span> <span class="kw">=</span> <span class="no">nCount_RNA</span> <span class="kw">&gt;=</span> <span class="fl">50</span> <span class="kw">&amp;</span> <span class="no">nFeature_RNA</span> <span class="kw">&gt;=</span> <span class="fl">10</span>)
-<span class="no">seurat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/NormalizeData.html">NormalizeData</a></span>(<span class="no">seurat</span>, <span class="kw">verbose</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
-<span class="no">seurat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/FindVariableFeatures.html">FindVariableFeatures</a></span>(<span class="no">seurat</span>, <span class="kw">verbose</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
-<span class="no">seurat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/ScaleData.html">ScaleData</a></span>(<span class="no">seurat</span>, <span class="kw">vars.to.regress</span> <span class="kw">=</span> <span class="st">'nCount_RNA'</span>, <span class="kw">verbose</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
-<span class="no">seurat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/RunPCA.html">RunPCA</a></span>(<span class="no">seurat</span>, <span class="kw">features</span> <span class="kw">=</span> <span class="no">seurat</span>@<span class="kw">assays</span>$<span class="no">RNA</span>@<span class="kw">var.features</span>, <span class="kw">verbose</span> <span class="kw">=</span> <span class="fl">FALSE</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">seurat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/CreateSeuratObject.html">CreateSeuratObject</a></span><span class="op">(</span>
+  project <span class="op">=</span> <span class="st">'pbmc'</span>,
+  counts <span class="op">=</span> <span class="va">pbmc</span>,
+  min.cells <span class="op">=</span> <span class="fl">5</span>
+<span class="op">)</span>
+<span class="va">seurat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/subset.Seurat.html">subset</a></span><span class="op">(</span><span class="va">seurat</span>, subset <span class="op">=</span> <span class="va">nCount_RNA</span> <span class="op">&gt;=</span> <span class="fl">50</span> <span class="op">&amp;</span> <span class="va">nFeature_RNA</span> <span class="op">&gt;=</span> <span class="fl">10</span><span class="op">)</span>
+<span class="va">seurat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/NormalizeData.html">NormalizeData</a></span><span class="op">(</span><span class="va">seurat</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+<span class="va">seurat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/FindVariableFeatures.html">FindVariableFeatures</a></span><span class="op">(</span><span class="va">seurat</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+<span class="va">seurat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/ScaleData.html">ScaleData</a></span><span class="op">(</span><span class="va">seurat</span>, vars.to.regress <span class="op">=</span> <span class="st">'nCount_RNA'</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+<span class="va">seurat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/RunPCA.html">RunPCA</a></span><span class="op">(</span><span class="va">seurat</span>, features <span class="op">=</span> <span class="va">seurat</span><span class="op">@</span><span class="va">assays</span><span class="op">$</span><span class="va">RNA</span><span class="op">@</span><span class="va">var.features</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="clustering" class="section level1">
 <h1 class="hasAnchor">
 <a href="#clustering" class="anchor"></a>Clustering</h1>
 <p>Then, we identify clusters with a relatively low resolution, again, because of the small size of this data set.</p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="no">seurat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/FindNeighbors.html">FindNeighbors</a></span>(<span class="no">seurat</span>)
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">seurat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/FindNeighbors.html">FindNeighbors</a></span><span class="op">(</span><span class="va">seurat</span><span class="op">)</span>
 <span class="co">#&gt; Computing nearest neighbor graph</span>
 <span class="co">#&gt; Computing SNN</span>
-<span class="no">seurat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/FindClusters.html">FindClusters</a></span>(<span class="no">seurat</span>, <span class="kw">resolution</span> <span class="kw">=</span> <span class="fl">0.5</span>)
+<span class="va">seurat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/FindClusters.html">FindClusters</a></span><span class="op">(</span><span class="va">seurat</span>, resolution <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>
 <span class="co">#&gt; Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Number of nodes: 78</span>
@@ -227,119 +238,122 @@
 <span class="co">#&gt; Maximum modularity in 10 random starts: 0.5759</span>
 <span class="co">#&gt; Number of communities: 2</span>
 <span class="co">#&gt; Elapsed time: 0 seconds</span>
-<span class="no">seurat</span>@<span class="kw">meta.data</span>$<span class="no">RNA_snn_res.0.5</span> <span class="kw">&lt;-</span> <span class="kw">NULL</span></pre></body></html></div>
+<span class="va">seurat</span><span class="op">@</span><span class="va">meta.data</span><span class="op">$</span><span class="va">RNA_snn_res.0.5</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></code></pre></div>
 </div>
 <div id="cell-cycle-analysis" class="section level1">
 <h1 class="hasAnchor">
 <a href="#cell-cycle-analysis" class="anchor"></a>Cell cycle analysis</h1>
-<p>We could also perform cell cycle analysis using the <code><a href="https://rdrr.io/pkg/Seurat/man/CellCycleScoring.html">CellCycleScoring()</a></code> built into Seurat. However, too few of the cell cycle genes are present in this example data set so we will skip it here. The code below should work with a real data set.</p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="no">seurat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/CellCycleScoring.html">CellCycleScoring</a></span>(
-  <span class="no">seurat</span>,
-  <span class="kw">g2m.features</span> <span class="kw">=</span> <span class="no">cc.genes</span>$<span class="no">g2m.genes</span>,
-  <span class="kw">s.features</span> <span class="kw">=</span> <span class="no">cc.genes</span>$<span class="no">s.genes</span>
-)
+<p>We could also perform cell cycle analysis using the <code><a href="https://satijalab.org/seurat/reference/CellCycleScoring.html">CellCycleScoring()</a></code> built into Seurat. However, too few of the cell cycle genes are present in this example data set so we will skip it here. The code below should work with a real data set.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">seurat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/CellCycleScoring.html">CellCycleScoring</a></span><span class="op">(</span>
+  <span class="va">seurat</span>,
+  g2m.features <span class="op">=</span> <span class="va">cc.genes</span><span class="op">$</span><span class="va">g2m.genes</span>,
+  s.features <span class="op">=</span> <span class="va">cc.genes</span><span class="op">$</span><span class="va">s.genes</span>
+<span class="op">)</span>
 
-<span class="no">seurat</span>@<span class="kw">misc</span>$<span class="no">gene_lists</span>$<span class="no">G2M_phase_genes</span> <span class="kw">&lt;-</span> <span class="no">cc.genes</span>$<span class="no">g2m.genes</span>
-<span class="no">seurat</span>@<span class="kw">misc</span>$<span class="no">gene_lists</span>$<span class="no">S_phase_genes</span> <span class="kw">&lt;-</span> <span class="no">cc.genes</span>$<span class="no">s.genes</span></pre></body></html></div>
+<span class="va">seurat</span><span class="op">@</span><span class="va">misc</span><span class="op">$</span><span class="va">gene_lists</span><span class="op">$</span><span class="va">G2M_phase_genes</span> <span class="op">&lt;-</span> <span class="va">cc.genes</span><span class="op">$</span><span class="va">g2m.genes</span>
+<span class="va">seurat</span><span class="op">@</span><span class="va">misc</span><span class="op">$</span><span class="va">gene_lists</span><span class="op">$</span><span class="va">S_phase_genes</span> <span class="op">&lt;-</span> <span class="va">cc.genes</span><span class="op">$</span><span class="va">s.genes</span></code></pre></div>
 </div>
 <div id="dimensional-reduction" class="section level1">
 <h1 class="hasAnchor">
 <a href="#dimensional-reduction" class="anchor"></a>Dimensional reduction</h1>
 <p>Next, we use the UMAP technique to generate two- and three-dimensional projections.</p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="no">seurat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/RunUMAP.html">RunUMAP</a></span>(
-  <span class="no">seurat</span>,
-  <span class="kw">reduction.name</span> <span class="kw">=</span> <span class="st">'UMAP'</span>,
-  <span class="kw">reduction.key</span> <span class="kw">=</span> <span class="st">'UMAP_'</span>,
-  <span class="kw">dims</span> <span class="kw">=</span> <span class="fl">1</span>:<span class="fl">30</span>,
-  <span class="kw">n.components</span> <span class="kw">=</span> <span class="fl">2</span>,
-  <span class="kw">seed.use</span> <span class="kw">=</span> <span class="fl">100</span>,
-  <span class="kw">verbose</span> <span class="kw">=</span> <span class="fl">FALSE</span>
-)
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">seurat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/RunUMAP.html">RunUMAP</a></span><span class="op">(</span>
+  <span class="va">seurat</span>,
+  reduction.name <span class="op">=</span> <span class="st">'UMAP'</span>,
+  reduction.key <span class="op">=</span> <span class="st">'UMAP_'</span>,
+  dims <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">30</span>,
+  n.components <span class="op">=</span> <span class="fl">2</span>,
+  seed.use <span class="op">=</span> <span class="fl">100</span>,
+  verbose <span class="op">=</span> <span class="cn">FALSE</span>
+<span class="op">)</span>
 
-<span class="no">seurat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/RunUMAP.html">RunUMAP</a></span>(
-  <span class="no">seurat</span>,
-  <span class="kw">reduction.name</span> <span class="kw">=</span> <span class="st">'UMAP_3D'</span>,
-  <span class="kw">reduction.key</span> <span class="kw">=</span> <span class="st">'UMAP3D_'</span>,
-  <span class="kw">dims</span> <span class="kw">=</span> <span class="fl">1</span>:<span class="fl">30</span>,
-  <span class="kw">n.components</span> <span class="kw">=</span> <span class="fl">3</span>,
-  <span class="kw">seed.use</span> <span class="kw">=</span> <span class="fl">100</span>,
-  <span class="kw">verbose</span> <span class="kw">=</span> <span class="fl">FALSE</span>
-)</pre></body></html></div>
+<span class="va">seurat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/RunUMAP.html">RunUMAP</a></span><span class="op">(</span>
+  <span class="va">seurat</span>,
+  reduction.name <span class="op">=</span> <span class="st">'UMAP_3D'</span>,
+  reduction.key <span class="op">=</span> <span class="st">'UMAP3D_'</span>,
+  dims <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">30</span>,
+  n.components <span class="op">=</span> <span class="fl">3</span>,
+  seed.use <span class="op">=</span> <span class="fl">100</span>,
+  verbose <span class="op">=</span> <span class="cn">FALSE</span>
+<span class="op">)</span></code></pre></div>
 </div>
 <div id="curate-meta-data" class="section level1">
 <h1 class="hasAnchor">
 <a href="#curate-meta-data" class="anchor"></a>Curate meta data</h1>
 <p>This example data set consists of a single sample so we just add that name to the meta data. Moreover, in order to be able to understand how we did the analysis later, we add some meta data to the <code>misc</code> slot of our <code>Seurat</code> object, e.g. an experiment name and the species. The info we store there will later be collected for visualization in Cerebro.</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="no">seurat</span>@<span class="kw">meta.data</span>$<span class="no">sample</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="st">'pbmc'</span>, <span class="kw">levels</span> <span class="kw">=</span> <span class="st">'pbmc'</span>)
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">seurat</span><span class="op">@</span><span class="va">meta.data</span><span class="op">$</span><span class="va">sample</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="st">'pbmc'</span>, levels <span class="op">=</span> <span class="st">'pbmc'</span><span class="op">)</span>
 
-<span class="no">seurat</span>@<span class="kw">misc</span>$<span class="no">experiment</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
-  <span class="kw">experiment_name</span> <span class="kw">=</span> <span class="st">'pbmc'</span>,
-  <span class="kw">organism</span> <span class="kw">=</span> <span class="st">'hg'</span>,
-  <span class="kw">date_of_analysis</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.Date</a></span>()
-)
+<span class="va">seurat</span><span class="op">@</span><span class="va">misc</span><span class="op">$</span><span class="va">experiment</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+  experiment_name <span class="op">=</span> <span class="st">'pbmc'</span>,
+  organism <span class="op">=</span> <span class="st">'hg'</span>,
+  date_of_analysis <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.Date</a></span><span class="op">(</span><span class="op">)</span>
+<span class="op">)</span>
 
-<span class="no">seurat</span>@<span class="kw">misc</span>$<span class="no">parameters</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
-  <span class="kw">gene_nomenclature</span> <span class="kw">=</span> <span class="st">'gene_name'</span>,
-  <span class="kw">discard_genes_expressed_in_fewer_cells_than</span> <span class="kw">=</span> <span class="fl">10</span>,
-  <span class="kw">keep_mitochondrial_genes</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
-  <span class="kw">variables_to_regress_out</span> <span class="kw">=</span> <span class="st">'nUMI'</span>,
-  <span class="kw">number_PCs</span> <span class="kw">=</span> <span class="fl">30</span>,
-  <span class="kw">cluster_resolution</span> <span class="kw">=</span> <span class="fl">0.5</span>
-)
+<span class="va">seurat</span><span class="op">@</span><span class="va">misc</span><span class="op">$</span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+  gene_nomenclature <span class="op">=</span> <span class="st">'gene_name'</span>,
+  discard_genes_expressed_in_fewer_cells_than <span class="op">=</span> <span class="fl">10</span>,
+  keep_mitochondrial_genes <span class="op">=</span> <span class="cn">TRUE</span>,
+  variables_to_regress_out <span class="op">=</span> <span class="st">'nUMI'</span>,
+  number_PCs <span class="op">=</span> <span class="fl">30</span>,
+  cluster_resolution <span class="op">=</span> <span class="fl">0.5</span>
+<span class="op">)</span>
 
-<span class="no">seurat</span>@<span class="kw">misc</span>$<span class="no">parameters</span>$<span class="no">filtering</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
-  <span class="kw">UMI_min</span> <span class="kw">=</span> <span class="fl">50</span>,
-  <span class="kw">UMI_max</span> <span class="kw">=</span> <span class="fl">Inf</span>,
-  <span class="kw">genes_min</span> <span class="kw">=</span> <span class="fl">10</span>,
-  <span class="kw">genes_max</span> <span class="kw">=</span> <span class="fl">Inf</span>
-)
+<span class="va">seurat</span><span class="op">@</span><span class="va">misc</span><span class="op">$</span><span class="va">parameters</span><span class="op">$</span><span class="va">filtering</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+  UMI_min <span class="op">=</span> <span class="fl">50</span>,
+  UMI_max <span class="op">=</span> <span class="cn">Inf</span>,
+  genes_min <span class="op">=</span> <span class="fl">10</span>,
+  genes_max <span class="op">=</span> <span class="cn">Inf</span>
+<span class="op">)</span>
 
-<span class="no">seurat</span>@<span class="kw">misc</span>$<span class="no">technical_info</span>$<span class="no">cerebroApp_version</span> <span class="kw">&lt;-</span> <span class="kw pkg">utils</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/r/utils/packageDescription.html">packageVersion</a></span>(<span class="st">'cerebroApp'</span>)
-<span class="no">seurat</span>@<span class="kw">misc</span>$<span class="no">technical_info</span>$<span class="no">Seurat</span> <span class="kw">&lt;-</span> <span class="kw pkg">utils</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/r/utils/packageDescription.html">packageVersion</a></span>(<span class="st">'Seurat'</span>)
-<span class="no">seurat</span>@<span class="kw">misc</span>$<span class="no">technical_info</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(
-  <span class="st">'R'</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/capture.output.html">capture.output</a></span>(<span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/reexports.html">session_info</a></span>())
-)
+<span class="va">seurat</span><span class="op">@</span><span class="va">misc</span><span class="op">$</span><span class="va">technical_info</span><span class="op">$</span><span class="va">cerebroApp_version</span> <span class="op">&lt;-</span> <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/packageDescription.html">packageVersion</a></span><span class="op">(</span><span class="st">'cerebroApp'</span><span class="op">)</span>
+<span class="va">seurat</span><span class="op">@</span><span class="va">misc</span><span class="op">$</span><span class="va">technical_info</span><span class="op">$</span><span class="va">Seurat</span> <span class="op">&lt;-</span> <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/packageDescription.html">packageVersion</a></span><span class="op">(</span><span class="st">'Seurat'</span><span class="op">)</span>
+<span class="va">seurat</span><span class="op">@</span><span class="va">misc</span><span class="op">$</span><span class="va">technical_info</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>
+  <span class="st">'R'</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/capture.output.html">capture.output</a></span><span class="op">(</span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sessioninfo/man/session_info.html">session_info</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+<span class="op">)</span>
 <span class="co">#&gt; Registered S3 method overwritten by 'cli':</span>
 <span class="co">#&gt;   method     from    </span>
-<span class="co">#&gt;   print.boxx spatstat</span></pre></body></html></div>
+<span class="co">#&gt;   print.boxx spatstat</span></code></pre></div>
 </div>
 <div id="assign-cell-types" class="section level1">
 <h1 class="hasAnchor">
 <a href="#assign-cell-types" class="anchor"></a>Assign cell types</h1>
 <p>Using the <a href="https://www.bioconductor.org/packages/release/bioc/html/SingleR.html"><code>SingleR</code></a> package, we can get a suggestion of cell type for each cell. Apart from the suggested cell type, we also extract the score that might help us to understand how confident the assignment was.</p>
-<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="no">singler_ref</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/SingleR/man/BlueprintEncodeData.html">BlueprintEncodeData</a></span>()
-<span class="co">#&gt; Warning: `select_()` is deprecated as of dplyr 0.7.0.</span>
-<span class="co">#&gt; Please use `select()` instead.</span>
-<span class="co">#&gt; This warning is displayed once every 8 hours.</span>
-<span class="co">#&gt; Call `lifecycle::last_warnings()` to see where this warning was generated.</span>
-<span class="co">#&gt; Warning: `filter_()` is deprecated as of dplyr 0.7.0.</span>
-<span class="co">#&gt; Please use `filter()` instead.</span>
-<span class="co">#&gt; See vignette('programming') for more help</span>
-<span class="co">#&gt; This warning is displayed once every 8 hours.</span>
-<span class="co">#&gt; Call `lifecycle::last_warnings()` to see where this warning was generated.</span>
-<span class="co">#&gt; snapshotDate(): 2019-10-22</span>
-<span class="co">#&gt; see ?SingleR and browseVignettes('SingleR') for documentation</span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">singler_ref</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/SingleR/man/datasets.html">BlueprintEncodeData</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; Warning: 'BlueprintEncodeData' is deprecated.</span>
+<span class="co">#&gt; Use 'celldex::BlueprintEncodeData' instead.</span>
+<span class="co">#&gt; See help("Deprecated")</span>
+<span class="co">#&gt; using temporary cache /var/folders/7z/m3l07m8s6455y1mnykf307_c0000gn/T//RtmpfbO0gJ/BiocFileCache</span>
+<span class="co">#&gt; snapshotDate(): 2020-10-27</span>
+<span class="co">#&gt; see ?celldex and browseVignettes('celldex') for documentation</span>
+<span class="co">#&gt; downloading 1 resources</span>
+<span class="co">#&gt; retrieving 1 resource</span>
 <span class="co">#&gt; loading from cache</span>
-<span class="co">#&gt; see ?SingleR and browseVignettes('SingleR') for documentation</span>
+<span class="co">#&gt; see ?celldex and browseVignettes('celldex') for documentation</span>
+<span class="co">#&gt; downloading 1 resources</span>
+<span class="co">#&gt; retrieving 1 resource</span>
 <span class="co">#&gt; loading from cache</span>
 
-<span class="no">singler_results_blueprintencode_main</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/SingleR/man/SingleR.html">SingleR</a></span>(
-  <span class="kw">test</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/GetAssayData.html">GetAssayData</a></span>(<span class="no">seurat</span>, <span class="kw">assay</span> <span class="kw">=</span> <span class="st">'RNA'</span>, <span class="kw">slot</span> <span class="kw">=</span> <span class="st">'data'</span>),
-  <span class="kw">ref</span> <span class="kw">=</span> <span class="no">singler_ref</span>,
-  <span class="kw">labels</span> <span class="kw">=</span> <span class="no">singler_ref</span>@<span class="kw">colData</span>@<span class="kw">listData</span>$<span class="no">label.main</span>
-)
+<span class="va">singler_results_blueprintencode_main</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/SingleR/man/SingleR.html">SingleR</a></span><span class="op">(</span>
+  test <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/GetAssayData.html">GetAssayData</a></span><span class="op">(</span><span class="va">seurat</span>, assay <span class="op">=</span> <span class="st">'RNA'</span>, slot <span class="op">=</span> <span class="st">'data'</span><span class="op">)</span>,
+  ref <span class="op">=</span> <span class="va">singler_ref</span>,
+  labels <span class="op">=</span> <span class="va">singler_ref</span><span class="op">@</span><span class="va">colData</span><span class="op">@</span><span class="va">listData</span><span class="op">$</span><span class="va">label.main</span>
+<span class="op">)</span>
 
-<span class="no">seurat</span>@<span class="kw">meta.data</span>$<span class="no">cell_type_singler_blueprintencode_main</span> <span class="kw">&lt;-</span> <span class="no">singler_results_blueprintencode_main</span>@<span class="kw">listData</span>$<span class="no">labels</span>
+<span class="va">seurat</span><span class="op">@</span><span class="va">meta.data</span><span class="op">$</span><span class="va">cell_type_singler_blueprintencode_main</span> <span class="op">&lt;-</span> <span class="va">singler_results_blueprintencode_main</span><span class="op">@</span><span class="va">listData</span><span class="op">$</span><span class="va">labels</span>
 
-<span class="no">singler_scores</span> <span class="kw">&lt;-</span> <span class="no">singler_results_blueprintencode_main</span>@<span class="kw">listData</span>$<span class="no">scores</span> <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/reexports.html">as_tibble</a></span>() <span class="kw">%&gt;%</span>
-  <span class="kw pkg">dplyr</span><span class="kw ns">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="kw">assigned_score</span> <span class="kw">=</span> <span class="fl">NA</span>)
+<span class="va">singler_scores</span> <span class="op">&lt;-</span> <span class="va">singler_results_blueprintencode_main</span><span class="op">@</span><span class="va">listData</span><span class="op">$</span><span class="va">scores</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html">as_tibble</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>assigned_score <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span>
 
-<span class="kw">for</span> ( <span class="no">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_len</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">singler_scores</span>)) ) {
-  <span class="no">singler_scores</span>$<span class="no">assigned_score</span>[<span class="no">i</span>] <span class="kw">&lt;-</span> <span class="no">singler_scores</span><span class="kw">[[</span><span class="no">singler_results_blueprintencode_main</span>@<span class="kw">listData</span>$<span class="no">labels</span>[<span class="no">i</span>]]][<span class="no">i</span>]
-}
+<span class="kw">for</span> <span class="op">(</span> <span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">singler_scores</span><span class="op">)</span><span class="op">)</span> <span class="op">)</span> <span class="op">{</span>
+  <span class="va">singler_scores</span><span class="op">$</span><span class="va">assigned_score</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">singler_scores</span><span class="op">[[</span><span class="va">singler_results_blueprintencode_main</span><span class="op">@</span><span class="va">listData</span><span class="op">$</span><span class="va">labels</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>
+<span class="op">}</span>
 
-<span class="no">seurat</span>@<span class="kw">meta.data</span>$<span class="no">cell_type_singler_blueprintencode_main_score</span> <span class="kw">&lt;-</span> <span class="no">singler_scores</span>$<span class="no">assigned_score</span></pre></body></html></div>
+<span class="va">seurat</span><span class="op">@</span><span class="va">meta.data</span><span class="op">$</span><span class="va">cell_type_singler_blueprintencode_main_score</span> <span class="op">&lt;-</span> <span class="va">singler_scores</span><span class="op">$</span><span class="va">assigned_score</span></code></pre></div>
 </div>
 <div id="calculate-relationship-trees" class="section level1">
 <h1 class="hasAnchor">
@@ -348,26 +362,28 @@
 <div id="clusters" class="section level2">
 <h2 class="hasAnchor">
 <a href="#clusters" class="anchor"></a>Clusters</h2>
-<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/Idents.html">Idents</a></span>(<span class="no">seurat</span>) <span class="kw">&lt;-</span> <span class="st">"seurat_clusters"</span>
-<span class="no">seurat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/BuildClusterTree.html">BuildClusterTree</a></span>(
-  <span class="no">seurat</span>,
-  <span class="kw">dims</span> <span class="kw">=</span> <span class="fl">1</span>:<span class="fl">30</span>,
-  <span class="kw">reorder</span> <span class="kw">=</span> <span class="fl">FALSE</span>,
-  <span class="kw">reorder.numeric</span> <span class="kw">=</span> <span class="fl">FALSE</span>
-)
-<span class="no">seurat</span>@<span class="kw">misc</span>$<span class="no">trees</span>$<span class="no">seurat_clusters</span> <span class="kw">&lt;-</span> <span class="no">seurat</span>@<span class="kw">tools</span>$<span class="no">BuildClusterTree</span></pre></body></html></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://satijalab.org/seurat/reference/Idents.html">Idents</a></span><span class="op">(</span><span class="va">seurat</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"seurat_clusters"</span>
+<span class="va">seurat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/BuildClusterTree.html">BuildClusterTree</a></span><span class="op">(</span>
+  <span class="va">seurat</span>,
+  dims <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">30</span>,
+  reorder <span class="op">=</span> <span class="cn">FALSE</span>,
+  reorder.numeric <span class="op">=</span> <span class="cn">FALSE</span>
+<span class="op">)</span>
+<span class="va">seurat</span><span class="op">@</span><span class="va">misc</span><span class="op">$</span><span class="va">trees</span><span class="op">$</span><span class="va">seurat_clusters</span> <span class="op">&lt;-</span> <span class="va">seurat</span><span class="op">@</span><span class="va">tools</span><span class="op">$</span><span class="va">BuildClusterTree</span></code></pre></div>
 </div>
 <div id="cell-types" class="section level2">
 <h2 class="hasAnchor">
 <a href="#cell-types" class="anchor"></a>Cell types</h2>
-<div class="sourceCode" id="cb11"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/Idents.html">Idents</a></span>(<span class="no">seurat</span>) <span class="kw">&lt;-</span> <span class="st">"cell_type_singler_blueprintencode_main"</span>
-<span class="no">seurat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Seurat/man/BuildClusterTree.html">BuildClusterTree</a></span>(
-  <span class="no">seurat</span>,
-  <span class="kw">dims</span> <span class="kw">=</span> <span class="fl">1</span>:<span class="fl">30</span>,
-  <span class="kw">reorder</span> <span class="kw">=</span> <span class="fl">FALSE</span>,
-  <span class="kw">reorder.numeric</span> <span class="kw">=</span> <span class="fl">FALSE</span>
-)
-<span class="no">seurat</span>@<span class="kw">misc</span>$<span class="no">trees</span>$<span class="no">cell_type_singler_blueprintencode_main</span> <span class="kw">&lt;-</span> <span class="no">seurat</span>@<span class="kw">tools</span>$<span class="no">BuildClusterTree</span></pre></body></html></div>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://satijalab.org/seurat/reference/Idents.html">Idents</a></span><span class="op">(</span><span class="va">seurat</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"cell_type_singler_blueprintencode_main"</span>
+<span class="va">seurat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/BuildClusterTree.html">BuildClusterTree</a></span><span class="op">(</span>
+  <span class="va">seurat</span>,
+  dims <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">30</span>,
+  reorder <span class="op">=</span> <span class="cn">FALSE</span>,
+  reorder.numeric <span class="op">=</span> <span class="cn">FALSE</span>
+<span class="op">)</span>
+<span class="va">seurat</span><span class="op">@</span><span class="va">misc</span><span class="op">$</span><span class="va">trees</span><span class="op">$</span><span class="va">cell_type_singler_blueprintencode_main</span> <span class="op">&lt;-</span> <span class="va">seurat</span><span class="op">@</span><span class="va">tools</span><span class="op">$</span><span class="va">BuildClusterTree</span></code></pre></div>
 </div>
 </div>
 <div id="cerebroapp-functions" class="section level1">
@@ -378,44 +394,47 @@
 <h2 class="hasAnchor">
 <a href="#calculate-percentage-of-mitochondrial-and-ribosomal-transcripts" class="anchor"></a>Calculate percentage of mitochondrial and ribosomal transcripts</h2>
 <p>First, for every cell we calculate the percentage of mitochondrial and ribosomal transcripts of all transcripts using the <code><a href="../reference/addPercentMtRibo.html">addPercentMtRibo()</a></code> function.</p>
-<div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="no">seurat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/addPercentMtRibo.html">addPercentMtRibo</a></span>(
-  <span class="no">seurat</span>,
-  <span class="kw">organism</span> <span class="kw">=</span> <span class="st">'hg'</span>,
-  <span class="kw">gene_nomenclature</span> <span class="kw">=</span> <span class="st">'name'</span>
-)
-<span class="co">#&gt; [12:38:02] No mitochondrial genes found in data set.</span>
-<span class="co">#&gt; [12:38:02] Calculate percentage of 1 ribosomal transcript(s) present in the data set...</span></pre></body></html></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">seurat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/addPercentMtRibo.html">addPercentMtRibo</a></span><span class="op">(</span>
+  <span class="va">seurat</span>,
+  organism <span class="op">=</span> <span class="st">'hg'</span>,
+  gene_nomenclature <span class="op">=</span> <span class="st">'name'</span>
+<span class="op">)</span>
+<span class="co">#&gt; [17:55:31] No mitochondrial genes found in data set.</span>
+<span class="co">#&gt; [17:55:31] Calculate percentage of 1 ribosomal transcript(s) present in the data set...</span></code></pre></div>
 </div>
 <div id="get-most-expressed-genes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#get-most-expressed-genes" class="anchor"></a>Get most expressed genes</h2>
 <p>Another interesting perspective is to look at the 100 most expressed genes across all cells and for every cluster and cell type. This can help in understanding the transcriptional activity of a given cell population.</p>
-<div class="sourceCode" id="cb13"><html><body><pre class="r"><span class="no">seurat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/getMostExpressedGenes.html">getMostExpressedGenes</a></span>(
-  <span class="no">seurat</span>,
-  <span class="kw">assay</span> <span class="kw">=</span> <span class="st">'RNA'</span>,
-  <span class="kw">groups</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'sample'</span>,<span class="st">'seurat_clusters'</span>,<span class="st">'cell_type_singler_blueprintencode_main'</span>)
-)
-<span class="co">#&gt; [12:38:02] Group `sample` contains only one subgroup. Will calculate most expressed genes across all cells of this group...</span>
-<span class="co">#&gt; [12:38:02] Get most expressed genes for 2 groups in `seurat_clusters`...</span>
-<span class="co">#&gt; [12:38:02] Get most expressed genes for 8 groups in `cell_type_singler_blueprintencode_main`...</span></pre></body></html></div>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">seurat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getMostExpressedGenes.html">getMostExpressedGenes</a></span><span class="op">(</span>
+  <span class="va">seurat</span>,
+  assay <span class="op">=</span> <span class="st">'RNA'</span>,
+  groups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'sample'</span>,<span class="st">'seurat_clusters'</span>,<span class="st">'cell_type_singler_blueprintencode_main'</span><span class="op">)</span>
+<span class="op">)</span>
+<span class="co">#&gt; [17:55:31] Group `sample` contains only one subgroup. Will calculate most expressed genes across all cells of this group...</span>
+<span class="co">#&gt; [17:55:31] Get most expressed genes for 2 groups in `seurat_clusters`...</span>
+<span class="co">#&gt; [17:55:31] Get most expressed genes for 8 groups in `cell_type_singler_blueprintencode_main`...</span></code></pre></div>
 </div>
 <div id="identify-marker-genes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#identify-marker-genes" class="anchor"></a>Identify marker genes</h2>
-<p>Marker genes are genes which are particularly strongly or weakly expressed in a given cell population, e.g. a cluster. This information can help to distinguish the role of different cell groups in the data set. We can identify marker genes using the <code><a href="../reference/getMarkerGenes.html">getMarkerGenes()</a></code> function which internally uses the <code><a href="https://rdrr.io/pkg/Seurat/man/FindAllMarkers.html">Seurat::FindAllMarkers()</a></code> function but also stores the results in the Seurat object under the <code>misc</code> slot.</p>
-<div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="no">seurat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/getMarkerGenes.html">getMarkerGenes</a></span>(
-  <span class="no">seurat</span>,
-  <span class="kw">assay</span> <span class="kw">=</span> <span class="st">'RNA'</span>,
-  <span class="kw">organism</span> <span class="kw">=</span> <span class="st">'hg'</span>,
-  <span class="kw">groups</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'seurat_clusters'</span>,<span class="st">'cell_type_singler_blueprintencode_main'</span>),
-  <span class="kw">name</span> <span class="kw">=</span> <span class="st">'cerebro_seurat'</span>,
-  <span class="kw">only_pos</span> <span class="kw">=</span> <span class="fl">TRUE</span>
-)
-<span class="co">#&gt; Cache found</span>
-<span class="co">#&gt; [12:38:09] Get marker genes for 2 groups in `seurat_clusters`...</span>
+<p>Marker genes are genes which are particularly strongly or weakly expressed in a given cell population, e.g. a cluster. This information can help to distinguish the role of different cell groups in the data set. We can identify marker genes using the <code><a href="../reference/getMarkerGenes.html">getMarkerGenes()</a></code> function which internally uses the <code><a href="https://satijalab.org/seurat/reference/FindAllMarkers.html">Seurat::FindAllMarkers()</a></code> function but also stores the results in the Seurat object under the <code>misc</code> slot.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">seurat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getMarkerGenes.html">getMarkerGenes</a></span><span class="op">(</span>
+  <span class="va">seurat</span>,
+  assay <span class="op">=</span> <span class="st">'RNA'</span>,
+  organism <span class="op">=</span> <span class="st">'hg'</span>,
+  groups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'seurat_clusters'</span>,<span class="st">'cell_type_singler_blueprintencode_main'</span><span class="op">)</span>,
+  name <span class="op">=</span> <span class="st">'cerebro_seurat'</span>,
+  only_pos <span class="op">=</span> <span class="cn">TRUE</span>
+<span class="op">)</span>
+<span class="co">#&gt; Ensembl site unresponsive, trying uswest mirror</span>
+<span class="co">#&gt; [17:56:26] Get marker genes for 2 groups in `seurat_clusters`...</span>
 <span class="co">#&gt; Calculating cluster 0</span>
 <span class="co">#&gt; Calculating cluster 1</span>
-<span class="co">#&gt; [12:38:09] Get marker genes for 8 groups in `cell_type_singler_blueprintencode_main`...</span>
+<span class="co">#&gt; [17:56:26] Get marker genes for 8 groups in `cell_type_singler_blueprintencode_main`...</span>
 <span class="co">#&gt; Calculating cluster CD4+ T-cells</span>
 <span class="co">#&gt; Calculating cluster CD8+ T-cells</span>
 <span class="co">#&gt; Calculating cluster B-cells</span>
@@ -423,83 +442,320 @@
 <span class="co">#&gt; Calculating cluster NK cells</span>
 <span class="co">#&gt; Calculating cluster Erythrocytes</span>
 <span class="co">#&gt; Calculating cluster Endothelial cells</span>
-<span class="co">#&gt; Calculating cluster Fibroblasts</span></pre></body></html></div>
+<span class="co">#&gt; Calculating cluster Fibroblasts</span></code></pre></div>
 </div>
 <div id="perform-pathway-enrichment-on-marker-genes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#perform-pathway-enrichment-on-marker-genes" class="anchor"></a>Perform pathway enrichment on marker genes</h2>
 <p>Using the previously identified marker genes, we can perform a pathway enrichmeny analysis using the <code><a href="../reference/getEnrichedPathways.html">getEnrichedPathways()</a></code> function. The function will internally use the <a href="https://amp.pharm.mssm.edu/Enrichr/">Enrichr</a> API and store the results in the Seurat object under the <code>misc</code> slot. All we have to do is provide the name that we specified in <code><a href="../reference/getMarkerGenes.html">getMarkerGenes()</a></code>.</p>
-<div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="no">seurat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/getEnrichedPathways.html">getEnrichedPathways</a></span>(
-  <span class="no">seurat</span>,
-  <span class="kw">marker_genes_input</span> <span class="kw">=</span> <span class="st">'cerebro_seurat'</span>,
-  <span class="kw">adj_p_cutoff</span> <span class="kw">=</span> <span class="fl">0.01</span>,
-  <span class="kw">max_terms</span> <span class="kw">=</span> <span class="fl">100</span>
-)
-<span class="co">#&gt; [12:38:09] Found 2 groups: seurat_clusters, cell_type_singler_blueprintencode_main</span>
-<span class="co">#&gt; [12:38:09] Get enriched pathways for group `seurat_clusters`...</span>
-<span class="co">#&gt; [12:38:12] 16 pathways passed the thresholds across all group levels and databases.</span>
-<span class="co">#&gt; [12:38:12] Get enriched pathways for group `cell_type_singler_blueprintencode_main`...</span>
-<span class="co">#&gt; [12:38:27] 192 pathways passed the thresholds across all group levels and databases.</span></pre></body></html></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">seurat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/getEnrichedPathways.html">getEnrichedPathways</a></span><span class="op">(</span>
+  <span class="va">seurat</span>,
+  marker_genes_input <span class="op">=</span> <span class="st">'cerebro_seurat'</span>,
+  adj_p_cutoff <span class="op">=</span> <span class="fl">0.01</span>,
+  max_terms <span class="op">=</span> <span class="fl">100</span>
+<span class="op">)</span>
+<span class="co">#&gt; [17:56:26] Found 2 groups: seurat_clusters, cell_type_singler_blueprintencode_main</span>
+<span class="co">#&gt; [17:56:26] Get enriched pathways for group `seurat_clusters`...</span>
+<span class="co">#&gt; [17:56:30] 47 pathways passed the thresholds across all group levels and databases.</span>
+<span class="co">#&gt; [17:56:30] Get enriched pathways for group `cell_type_singler_blueprintencode_main`...</span>
+<span class="co">#&gt; [17:56:46] 311 pathways passed the thresholds across all group levels and databases.</span></code></pre></div>
 </div>
 <div id="gene-set-enrichment" class="section level2">
 <h2 class="hasAnchor">
 <a href="#gene-set-enrichment" class="anchor"></a>Gene set enrichment</h2>
 <p>On top of querying the databases of the <a href="https://amp.pharm.mssm.edu/Enrichr/">Enrichr</a> service, one can also perform gene set enrichment analysis on gene sets provided as a <code>.gmt</code> file, e.g. from the <a href="https://www.gsea-msigdb.org/gsea/msigdb/index.jsp">MSigDB</a>. The <code><a href="../reference/performGeneSetEnrichmentAnalysis.html">performGeneSetEnrichmentAnalysis()</a></code> function uses the <a href="https://bioconductor.org/packages/release/bioc/html/GSVA.html">GSVA</a> method in combination with additional statistics as published by <a href="https://f1000research.com/articles/8-296">Diaz-Mejia et. al.</a>.</p>
-<div class="sourceCode" id="cb16"><html><body><pre class="r"><span class="no">example_gene_set</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata/example_gene_set.gmt"</span>, <span class="kw">package</span> <span class="kw">=</span> <span class="st">"cerebroApp"</span>)
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">example_gene_set</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata/example_gene_set.gmt"</span>, package <span class="op">=</span> <span class="st">"cerebroApp"</span><span class="op">)</span>
 
-<span class="no">seurat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/performGeneSetEnrichmentAnalysis.html">performGeneSetEnrichmentAnalysis</a></span>(
-  <span class="no">seurat</span>,
-  <span class="kw">assay</span> <span class="kw">=</span> <span class="st">'RNA'</span>,
-  <span class="kw">GMT_file</span> <span class="kw">=</span> <span class="no">example_gene_set</span>,
-  <span class="kw">groups</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'seurat_clusters'</span>,<span class="st">'cell_type_singler_blueprintencode_main'</span>)
-)</pre></body></html></div>
+<span class="va">seurat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/performGeneSetEnrichmentAnalysis.html">performGeneSetEnrichmentAnalysis</a></span><span class="op">(</span>
+  <span class="va">seurat</span>,
+  assay <span class="op">=</span> <span class="st">'RNA'</span>,
+  GMT_file <span class="op">=</span> <span class="va">example_gene_set</span>,
+  groups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'seurat_clusters'</span>,<span class="st">'cell_type_singler_blueprintencode_main'</span><span class="op">)</span>
+<span class="op">)</span></code></pre></div>
 </div>
 </div>
 <div id="trajectory-analysis-with-monocle-optional" class="section level1">
 <h1 class="hasAnchor">
 <a href="#trajectory-analysis-with-monocle-optional" class="anchor"></a>Trajectory analysis with Monocle (optional)</h1>
 <p>Then, we perform trajectory analysis with <a href="https://cole-trapnell-lab.github.io/monocle-release/">Monocle v2</a> using the previously identified highly variable genes. We extract the trajectory from the generated Monocle object with the <code><a href="../reference/extractMonocleTrajectory.html">extractMonocleTrajectory()</a></code> function of cerebroApp and attach it to our Seurat object.</p>
-<div class="sourceCode" id="cb17"><html><body><pre class="r"><span class="no">monocle</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/monocle/man/newCellDataSet.html">newCellDataSet</a></span>(
-  <span class="no">seurat</span>@<span class="kw">assays</span>$<span class="no">RNA</span>@<span class="kw">counts</span>,
-  <span class="kw">phenoData</span> <span class="kw">=</span> <span class="fu">new</span>(<span class="st">'AnnotatedDataFrame'</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">seurat</span>@<span class="kw">meta.data</span>),
-  <span class="kw">featureData</span> <span class="kw">=</span> <span class="fu">new</span>(<span class="st">'AnnotatedDataFrame'</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(
-    <span class="kw">gene_short_name</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="no">seurat</span>@<span class="kw">assays</span>$<span class="no">RNA</span>@<span class="kw">counts</span>),
-    <span class="kw">row.names</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span>(<span class="no">seurat</span>@<span class="kw">assays</span>$<span class="no">RNA</span>@<span class="kw">counts</span>))
-  )
-)
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">monocle</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/monocle/man/newCellDataSet.html">newCellDataSet</a></span><span class="op">(</span>
+  <span class="va">seurat</span><span class="op">@</span><span class="va">assays</span><span class="op">$</span><span class="va">RNA</span><span class="op">@</span><span class="va">counts</span>,
+  phenoData <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="st">'AnnotatedDataFrame'</span>, data <span class="op">=</span> <span class="va">seurat</span><span class="op">@</span><span class="va">meta.data</span><span class="op">)</span>,
+  featureData <span class="op">=</span> <span class="fu">new</span><span class="op">(</span><span class="st">'AnnotatedDataFrame'</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>
+    gene_short_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="va">seurat</span><span class="op">@</span><span class="va">assays</span><span class="op">$</span><span class="va">RNA</span><span class="op">@</span><span class="va">counts</span><span class="op">)</span>,
+    row.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="va">seurat</span><span class="op">@</span><span class="va">assays</span><span class="op">$</span><span class="va">RNA</span><span class="op">@</span><span class="va">counts</span><span class="op">)</span><span class="op">)</span>
+  <span class="op">)</span>
+<span class="op">)</span>
 
-<span class="no">monocle</span> <span class="kw">&lt;-</span> <span class="fu">estimateSizeFactors</span>(<span class="no">monocle</span>)
-<span class="no">monocle</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/monocle/man/setOrderingFilter.html">setOrderingFilter</a></span>(<span class="no">monocle</span>, <span class="no">seurat</span>@<span class="kw">assays</span>$<span class="no">RNA</span>@<span class="kw">var.features</span>)
-<span class="no">monocle</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/monocle/man/reduceDimension.html">reduceDimension</a></span>(<span class="no">monocle</span>, <span class="kw">max_components</span> <span class="kw">=</span> <span class="fl">2</span>, <span class="kw">method</span> <span class="kw">=</span> <span class="st">'DDRTree'</span>)
-<span class="no">monocle</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/monocle/man/orderCells.html">orderCells</a></span>(<span class="no">monocle</span>)
+<span class="va">monocle</span> <span class="op">&lt;-</span> <span class="fu">estimateSizeFactors</span><span class="op">(</span><span class="va">monocle</span><span class="op">)</span>
+<span class="va">monocle</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/monocle/man/setOrderingFilter.html">setOrderingFilter</a></span><span class="op">(</span><span class="va">monocle</span>, <span class="va">seurat</span><span class="op">@</span><span class="va">assays</span><span class="op">$</span><span class="va">RNA</span><span class="op">@</span><span class="va">var.features</span><span class="op">)</span>
+<span class="va">monocle</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/monocle/man/reduceDimension.html">reduceDimension</a></span><span class="op">(</span><span class="va">monocle</span>, max_components <span class="op">=</span> <span class="fl">2</span>, method <span class="op">=</span> <span class="st">'DDRTree'</span><span class="op">)</span>
+<span class="va">monocle</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/monocle/man/orderCells.html">orderCells</a></span><span class="op">(</span><span class="va">monocle</span><span class="op">)</span>
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
 
-<span class="no">seurat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/extractMonocleTrajectory.html">extractMonocleTrajectory</a></span>(<span class="no">monocle</span>, <span class="no">seurat</span>, <span class="st">'highly_variable_genes'</span>)</pre></body></html></div>
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="co">#&gt; Warning in if (class(projection) != "matrix") projection &lt;- as.matrix(projection): the condition has</span>
+<span class="co">#&gt; length &gt; 1 and only the first element will be used</span>
+
+<span class="va">seurat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extractMonocleTrajectory.html">extractMonocleTrajectory</a></span><span class="op">(</span><span class="va">monocle</span>, <span class="va">seurat</span>, <span class="st">'highly_variable_genes'</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="export-to-cerebro-format" class="section level1">
 <h1 class="hasAnchor">
 <a href="#export-to-cerebro-format" class="anchor"></a>Export to Cerebro format</h1>
 <p>Finally, we use the <code><a href="../reference/exportFromSeurat.html">exportFromSeurat()</a></code> function of cerebroApp to export our Seurat object to a <code>.crb</code> file which can be loaded into Cerebro.</p>
-<div class="sourceCode" id="cb18"><html><body><pre class="r"><span class="fu"><a href="../reference/exportFromSeurat.html">exportFromSeurat</a></span>(
-  <span class="no">seurat</span>,
-  <span class="kw">assay</span> <span class="kw">=</span> <span class="st">'RNA'</span>,
-  <span class="kw">slot</span> <span class="kw">=</span> <span class="st">'data'</span>,
-  <span class="kw">file</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">'cerebro_pbmc_seurat_'</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.Date</a></span>(), <span class="st">'.crb'</span>),
-  <span class="kw">experiment_name</span> <span class="kw">=</span> <span class="st">'pbmc'</span>,
-  <span class="kw">organism</span> <span class="kw">=</span> <span class="st">'hg'</span>,
-  <span class="kw">groups</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'sample'</span>,<span class="st">'seurat_clusters'</span>,<span class="st">'cell_type_singler_blueprintencode_main'</span>),
-  <span class="kw">nUMI</span> <span class="kw">=</span> <span class="st">'nCount_RNA'</span>,
-  <span class="kw">nGene</span> <span class="kw">=</span> <span class="st">'nFeature_RNA'</span>,
-  <span class="kw">add_all_meta_data</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
-  <span class="kw">verbose</span> <span class="kw">=</span> <span class="fl">FALSE</span>
-)
-<span class="co">#&gt; [12:38:28] Start collecting data...</span>
-<span class="co">#&gt; [12:38:28] Overview of Cerebro object:</span>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/exportFromSeurat.html">exportFromSeurat</a></span><span class="op">(</span>
+  <span class="va">seurat</span>,
+  assay <span class="op">=</span> <span class="st">'RNA'</span>,
+  slot <span class="op">=</span> <span class="st">'data'</span>,
+  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">'cerebro_pbmc_seurat_'</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html">Sys.Date</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">'.crb'</span><span class="op">)</span>,
+  experiment_name <span class="op">=</span> <span class="st">'pbmc'</span>,
+  organism <span class="op">=</span> <span class="st">'hg'</span>,
+  groups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'sample'</span>,<span class="st">'seurat_clusters'</span>,<span class="st">'cell_type_singler_blueprintencode_main'</span><span class="op">)</span>,
+  nUMI <span class="op">=</span> <span class="st">'nCount_RNA'</span>,
+  nGene <span class="op">=</span> <span class="st">'nFeature_RNA'</span>,
+  add_all_meta_data <span class="op">=</span> <span class="cn">TRUE</span>,
+  verbose <span class="op">=</span> <span class="cn">FALSE</span>
+<span class="op">)</span>
+<span class="co">#&gt; [17:56:48] Start collecting data...</span>
+<span class="co">#&gt; [17:56:48] Overview of Cerebro object:</span>
 <span class="co">#&gt; class: Cerebro_v1.3</span>
-<span class="co">#&gt; cerebroApp version: 1.3.0</span>
+<span class="co">#&gt; cerebroApp version: 1.3.1</span>
 <span class="co">#&gt; experiment name: pbmc</span>
 <span class="co">#&gt; organism: hg</span>
-<span class="co">#&gt; date of analysis: 2020-09-25</span>
-<span class="co">#&gt; date of export: 2020-09-25</span>
+<span class="co">#&gt; date of analysis: 2021-03-12</span>
+<span class="co">#&gt; date of export: 2021-03-12</span>
 <span class="co">#&gt; number of cells: 78</span>
 <span class="co">#&gt; number of genes: 220</span>
 <span class="co">#&gt; grouping variables (3): sample, seurat_clusters, cell_type_singler_blueprintencode_main</span>
@@ -514,21 +770,22 @@
 <span class="co">#&gt; trajectories:</span>
 <span class="co">#&gt;   - monocle2 (1): highly_variable_genes</span>
 <span class="co">#&gt; extra material:</span>
-<span class="co">#&gt; [12:38:28] Saving Cerebro object to: cerebro_pbmc_seurat_2020-09-25.crb</span>
-<span class="co">#&gt; [12:38:28] Done!</span></pre></body></html></div>
+<span class="co">#&gt; [17:56:48] Saving Cerebro object to: cerebro_pbmc_seurat_2021-03-12.crb</span>
+<span class="co">#&gt; [17:56:48] Done!</span></code></pre></div>
 <p>The Cerebro use interface can be launched using the <code><a href="../reference/launchCerebro.html">launchCerebro()</a></code> function.</p>
 </div>
 <div id="session-info" class="section level1">
 <h1 class="hasAnchor">
 <a href="#session-info" class="anchor"></a>Session info</h1>
-<div class="sourceCode" id="cb19"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span>()
-<span class="co">#&gt; R version 3.6.3 (2020-02-29)</span>
-<span class="co">#&gt; Platform: x86_64-apple-darwin15.6.0 (64-bit)</span>
-<span class="co">#&gt; Running under: macOS Catalina 10.15.6</span>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; R version 4.0.3 (2020-10-10)</span>
+<span class="co">#&gt; Platform: x86_64-apple-darwin17.0 (64-bit)</span>
+<span class="co">#&gt; Running under: macOS Big Sur 10.16</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Matrix products: default</span>
-<span class="co">#&gt; BLAS:   /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRblas.0.dylib</span>
-<span class="co">#&gt; LAPACK: /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRlapack.dylib</span>
+<span class="co">#&gt; BLAS:   /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRblas.dylib</span>
+<span class="co">#&gt; LAPACK: /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRlapack.dylib</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; locale:</span>
 <span class="co">#&gt; [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8</span>
@@ -538,72 +795,75 @@
 <span class="co">#&gt; [10] base     </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; other attached packages:</span>
-<span class="co">#&gt;  [1] cerebroApp_1.3.0            monocle_2.14.0              DDRTree_0.1.5              </span>
-<span class="co">#&gt;  [4] irlba_2.3.3                 VGAM_1.1-3                  ggplot2_3.3.2              </span>
-<span class="co">#&gt;  [7] Matrix_1.2-18               SingleR_1.0.6               SummarizedExperiment_1.16.1</span>
-<span class="co">#&gt; [10] DelayedArray_0.12.2         BiocParallel_1.20.1         matrixStats_0.56.0         </span>
-<span class="co">#&gt; [13] Biobase_2.46.0              GenomicRanges_1.38.0        GenomeInfoDb_1.22.0        </span>
-<span class="co">#&gt; [16] IRanges_2.20.2              S4Vectors_0.24.3            BiocGenerics_0.32.0        </span>
-<span class="co">#&gt; [19] Seurat_3.2.0                dplyr_1.0.1                 BiocManager_1.30.10        </span>
+<span class="co">#&gt;  [1] celldex_1.0.0               cerebroApp_1.3.1            monocle_2.18.0             </span>
+<span class="co">#&gt;  [4] DDRTree_0.1.5               irlba_2.3.3                 VGAM_1.1-5                 </span>
+<span class="co">#&gt;  [7] ggplot2_3.3.2               Matrix_1.3-0                SingleR_1.4.1              </span>
+<span class="co">#&gt; [10] SummarizedExperiment_1.20.0 Biobase_2.50.0              GenomicRanges_1.42.0       </span>
+<span class="co">#&gt; [13] GenomeInfoDb_1.26.2         IRanges_2.24.1              S4Vectors_0.28.1           </span>
+<span class="co">#&gt; [16] BiocGenerics_0.36.0         MatrixGenerics_1.2.0        matrixStats_0.57.0         </span>
+<span class="co">#&gt; [19] Seurat_3.2.3                dplyr_1.0.2                 BiocManager_1.30.10        </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; loaded via a namespace (and not attached):</span>
-<span class="co">#&gt;   [1] shinydashboard_0.7.1          reticulate_1.16               tidyselect_1.1.0             </span>
-<span class="co">#&gt;   [4] RSQLite_2.2.0                 AnnotationDbi_1.48.0          htmlwidgets_1.5.1            </span>
-<span class="co">#&gt;   [7] grid_3.6.3                    combinat_0.0-8                docopt_0.7.1                 </span>
-<span class="co">#&gt;  [10] Rtsne_0.15                    devtools_2.3.1                munsell_0.5.0                </span>
-<span class="co">#&gt;  [13] codetools_0.2-16              ica_1.0-2                     DT_0.14.3                    </span>
-<span class="co">#&gt;  [16] future_1.18.0                 miniUI_0.1.1.1                withr_2.2.0                  </span>
-<span class="co">#&gt;  [19] colorspace_1.4-1              fastICA_1.2-2                 knitr_1.29                   </span>
-<span class="co">#&gt;  [22] ROCR_1.0-11                   tensor_1.5                    shinyWidgets_0.5.3           </span>
-<span class="co">#&gt;  [25] listenv_0.8.0                 slam_0.1-47                   GenomeInfoDbData_1.2.2       </span>
-<span class="co">#&gt;  [28] polyclip_1.10-0               bit64_4.0.2                   pheatmap_1.0.12              </span>
-<span class="co">#&gt;  [31] rprojroot_1.3-2               vctrs_0.3.2                   generics_0.0.2               </span>
-<span class="co">#&gt;  [34] xfun_0.16                     BiocFileCache_1.10.2          R6_2.4.1                     </span>
-<span class="co">#&gt;  [37] rsvd_1.0.3                    msigdbr_7.1.1                 bitops_1.0-6                 </span>
-<span class="co">#&gt;  [40] spatstat.utils_1.17-0         assertthat_0.2.1              shinycssloaders_1.0.0        </span>
-<span class="co">#&gt;  [43] promises_1.1.1                scales_1.1.1                  gtable_0.3.0                 </span>
-<span class="co">#&gt;  [46] globals_0.12.5                processx_3.4.3                goftest_1.2-2                </span>
-<span class="co">#&gt;  [49] rlang_0.4.7                   lazyeval_0.2.2                yaml_2.2.1                   </span>
-<span class="co">#&gt;  [52] reshape2_1.4.4                abind_1.4-5                   backports_1.1.8              </span>
-<span class="co">#&gt;  [55] httpuv_1.5.4                  qvalue_2.18.0                 usethis_1.6.1                </span>
-<span class="co">#&gt;  [58] tools_3.6.3                   ellipsis_0.3.1                RColorBrewer_1.1-2           </span>
-<span class="co">#&gt;  [61] proxy_0.4-24                  sessioninfo_1.1.1             ggridges_0.5.2               </span>
-<span class="co">#&gt;  [64] Rcpp_1.0.5                    plyr_1.8.6                    progress_1.2.2               </span>
-<span class="co">#&gt;  [67] zlibbioc_1.32.0               purrr_0.3.4                   RCurl_1.98-1.2               </span>
-<span class="co">#&gt;  [70] densityClust_0.3              ps_1.3.3                      prettyunits_1.1.1            </span>
-<span class="co">#&gt;  [73] openssl_1.4.2                 rpart_4.1-15                  deldir_0.1-28                </span>
-<span class="co">#&gt;  [76] pbapply_1.4-2                 viridis_0.5.1                 cowplot_1.0.0                </span>
-<span class="co">#&gt;  [79] zoo_1.8-8                     ggrepel_0.9.0                 cluster_2.1.0                </span>
-<span class="co">#&gt;  [82] fs_1.5.0                      magrittr_1.5                  RSpectra_0.16-0              </span>
-<span class="co">#&gt;  [85] data.table_1.12.8             colourpicker_1.0              lmtest_0.9-37                </span>
-<span class="co">#&gt;  [88] RANN_2.6.1                    fitdistrplus_1.1-1            pkgload_1.1.0                </span>
-<span class="co">#&gt;  [91] shinyjs_1.1                   hms_0.5.3                     patchwork_1.0.1              </span>
-<span class="co">#&gt;  [94] mime_0.9                      evaluate_0.14                 GSVA_1.34.0                  </span>
-<span class="co">#&gt;  [97] xtable_1.8-4                  XML_3.99-0.3                  sparsesvd_0.2                </span>
-<span class="co">#&gt; [100] gridExtra_2.3                 testthat_2.3.2                HSMMSingleCell_1.6.0         </span>
-<span class="co">#&gt; [103] compiler_3.6.3                biomaRt_2.42.1                tibble_3.0.3                 </span>
-<span class="co">#&gt; [106] KernSmooth_2.23-17            crayon_1.3.4                  htmltools_0.5.0              </span>
-<span class="co">#&gt; [109] mgcv_1.8-31                   later_1.1.0.1                 tidyr_1.1.2                  </span>
-<span class="co">#&gt; [112] geneplotter_1.64.0            DBI_1.1.0                     ExperimentHub_1.12.0         </span>
-<span class="co">#&gt; [115] dbplyr_1.4.4                  MASS_7.3-51.6                 rappdirs_0.3.1               </span>
-<span class="co">#&gt; [118] readr_1.3.1                   cli_2.0.2                     igraph_1.2.5                 </span>
-<span class="co">#&gt; [121] pkgconfig_2.0.3               pkgdown_1.5.1                 plotly_4.9.2.1               </span>
-<span class="co">#&gt; [124] annotate_1.64.0               XVector_0.26.0                callr_3.4.3                  </span>
-<span class="co">#&gt; [127] stringr_1.4.0                 digest_0.6.25                 sctransform_0.2.1            </span>
-<span class="co">#&gt; [130] RcppAnnoy_0.0.16              graph_1.64.0                  spatstat.data_1.4-3          </span>
-<span class="co">#&gt; [133] rmarkdown_2.3                 leiden_0.3.3                  uwot_0.1.8                   </span>
-<span class="co">#&gt; [136] DelayedMatrixStats_1.8.0      GSEABase_1.48.0               curl_4.3                     </span>
-<span class="co">#&gt; [139] shiny_1.5.0                   lifecycle_0.2.0               nlme_3.1-148                 </span>
-<span class="co">#&gt; [142] jsonlite_1.7.0                BiocNeighbors_1.4.2           fansi_0.4.1                  </span>
-<span class="co">#&gt; [145] askpass_1.1                   desc_1.2.0                    viridisLite_0.3.0            </span>
-<span class="co">#&gt; [148] limma_3.42.2                  pillar_1.4.6                  shinyFiles_0.8.0             </span>
-<span class="co">#&gt; [151] lattice_0.20-41               pkgbuild_1.1.0                fastmap_1.0.1                </span>
-<span class="co">#&gt; [154] httr_1.4.2                    survival_3.2-3                remotes_2.2.0                </span>
-<span class="co">#&gt; [157] interactiveDisplayBase_1.24.0 glue_1.4.1                    qlcMatrix_0.9.7              </span>
-<span class="co">#&gt; [160] FNN_1.1.3                     spatstat_1.64-1               png_0.1-7                    </span>
-<span class="co">#&gt; [163] shinythemes_1.1.2             BiocVersion_3.10.1            bit_4.0.3                    </span>
-<span class="co">#&gt; [166] stringi_1.4.6                 blob_1.2.1                    AnnotationHub_2.18.0         </span>
-<span class="co">#&gt; [169] memoise_1.1.0                 future.apply_1.6.0            ape_5.4</span></pre></body></html></div>
+<span class="co">#&gt;   [1] rappdirs_0.3.1                scattermore_0.7               ragg_1.1.0                   </span>
+<span class="co">#&gt;   [4] tidyr_1.1.2                   bit64_4.0.5                   knitr_1.30                   </span>
+<span class="co">#&gt;   [7] DelayedArray_0.16.1           data.table_1.13.4             rpart_4.1-15                 </span>
+<span class="co">#&gt;  [10] RCurl_1.98-1.2                generics_0.1.0                callr_3.5.1                  </span>
+<span class="co">#&gt;  [13] cowplot_1.1.1                 usethis_2.0.0                 RSQLite_2.2.1                </span>
+<span class="co">#&gt;  [16] RANN_2.6.1                    combinat_0.0-8                proxy_0.4-25                 </span>
+<span class="co">#&gt;  [19] future_1.21.0                 bit_4.0.4                     spatstat.data_2.0-0          </span>
+<span class="co">#&gt;  [22] xml2_1.3.2                    httpuv_1.5.4                  assertthat_0.2.1             </span>
+<span class="co">#&gt;  [25] viridis_0.5.1                 xfun_0.19                     hms_0.5.3                    </span>
+<span class="co">#&gt;  [28] evaluate_0.14                 promises_1.1.1                fansi_0.4.1                  </span>
+<span class="co">#&gt;  [31] progress_1.2.2                dbplyr_2.0.0                  igraph_1.2.6                 </span>
+<span class="co">#&gt;  [34] DBI_1.1.0                     htmlwidgets_1.5.3             sparsesvd_0.2                </span>
+<span class="co">#&gt;  [37] purrr_0.3.4                   ellipsis_0.3.1                RSpectra_0.16-0              </span>
+<span class="co">#&gt;  [40] annotate_1.68.0               biomaRt_2.46.0                deldir_0.2-10                </span>
+<span class="co">#&gt;  [43] sparseMatrixStats_1.2.1       vctrs_0.3.6                   remotes_2.2.0                </span>
+<span class="co">#&gt;  [46] ROCR_1.0-11                   abind_1.4-5                   withr_2.3.0                  </span>
+<span class="co">#&gt;  [49] sctransform_0.3.2             prettyunits_1.1.1             goftest_1.2-2                </span>
+<span class="co">#&gt;  [52] cluster_2.1.0                 ExperimentHub_1.16.0          ape_5.4-1                    </span>
+<span class="co">#&gt;  [55] lazyeval_0.2.2                crayon_1.3.4                  pkgconfig_2.0.3              </span>
+<span class="co">#&gt;  [58] slam_0.1-48                   nlme_3.1-151                  pkgload_1.1.0                </span>
+<span class="co">#&gt;  [61] devtools_2.3.2                rlang_0.4.9                   globals_0.14.0               </span>
+<span class="co">#&gt;  [64] lifecycle_0.2.0               miniUI_0.1.1.1                colourpicker_1.1.0           </span>
+<span class="co">#&gt;  [67] BiocFileCache_1.14.0          rsvd_1.0.3                    AnnotationHub_2.22.0         </span>
+<span class="co">#&gt;  [70] rprojroot_2.0.2               polyclip_1.10-0               GSVA_1.38.0                  </span>
+<span class="co">#&gt;  [73] lmtest_0.9-38                 shinyFiles_0.9.0              graph_1.68.0                 </span>
+<span class="co">#&gt;  [76] zoo_1.8-8                     ggridges_0.5.3                processx_3.4.5               </span>
+<span class="co">#&gt;  [79] pheatmap_1.0.12               png_0.1-7                     viridisLite_0.3.0            </span>
+<span class="co">#&gt;  [82] bitops_1.0-6                  shinydashboard_0.7.1          KernSmooth_2.23-18           </span>
+<span class="co">#&gt;  [85] blob_1.2.1                    DelayedMatrixStats_1.12.3     stringr_1.4.0                </span>
+<span class="co">#&gt;  [88] qvalue_2.22.0                 parallelly_1.22.0             readr_1.4.0                  </span>
+<span class="co">#&gt;  [91] beachmat_2.6.4                scales_1.1.1                  memoise_1.1.0                </span>
+<span class="co">#&gt;  [94] GSEABase_1.52.1               magrittr_2.0.1                plyr_1.8.6                   </span>
+<span class="co">#&gt;  [97] ica_1.0-2                     zlibbioc_1.36.0               compiler_4.0.3               </span>
+<span class="co">#&gt; [100] HSMMSingleCell_1.10.0         RColorBrewer_1.1-2            fitdistrplus_1.1-3           </span>
+<span class="co">#&gt; [103] cli_2.2.0                     XVector_0.30.0                listenv_0.8.0                </span>
+<span class="co">#&gt; [106] patchwork_1.1.1               pbapply_1.4-3                 ps_1.5.0                     </span>
+<span class="co">#&gt; [109] MASS_7.3-53                   mgcv_1.8-33                   tidyselect_1.1.0             </span>
+<span class="co">#&gt; [112] stringi_1.5.3                 textshaping_0.3.0             densityClust_0.3             </span>
+<span class="co">#&gt; [115] yaml_2.2.1                    BiocSingular_1.6.0            askpass_1.1                  </span>
+<span class="co">#&gt; [118] ggrepel_0.9.1                 grid_4.0.3                    tools_4.0.3                  </span>
+<span class="co">#&gt; [121] future.apply_1.6.0            gridExtra_2.3                 Rtsne_0.15                   </span>
+<span class="co">#&gt; [124] digest_0.6.27                 FNN_1.1.3                     shiny_1.5.0                  </span>
+<span class="co">#&gt; [127] qlcMatrix_0.9.7               Rcpp_1.0.5                    BiocVersion_3.12.0           </span>
+<span class="co">#&gt; [130] later_1.1.0.1                 RcppAnnoy_0.0.18              shinyWidgets_0.5.4           </span>
+<span class="co">#&gt; [133] httr_1.4.2                    AnnotationDbi_1.52.0          colorspace_2.0-0             </span>
+<span class="co">#&gt; [136] XML_3.99-0.5                  fs_1.5.0                      tensor_1.5                   </span>
+<span class="co">#&gt; [139] reticulate_1.18               uwot_0.1.10                   spatstat.utils_2.0-0         </span>
+<span class="co">#&gt; [142] pkgdown_1.6.1                 plotly_4.9.2.2                sessioninfo_1.1.1            </span>
+<span class="co">#&gt; [145] systemfonts_1.0.1             xtable_1.8-4                  jsonlite_1.7.2               </span>
+<span class="co">#&gt; [148] spatstat_1.64-1               testthat_3.0.1                R6_2.5.0                     </span>
+<span class="co">#&gt; [151] pillar_1.4.7                  htmltools_0.5.1.1             mime_0.9                     </span>
+<span class="co">#&gt; [154] glue_1.4.2                    fastmap_1.0.1                 DT_0.16                      </span>
+<span class="co">#&gt; [157] BiocParallel_1.24.1           BiocNeighbors_1.8.2           interactiveDisplayBase_1.28.0</span>
+<span class="co">#&gt; [160] codetools_0.2-18              pkgbuild_1.2.0                lattice_0.20-41              </span>
+<span class="co">#&gt; [163] tibble_3.0.4                  curl_4.3                      leiden_0.3.7                 </span>
+<span class="co">#&gt; [166] shinyjs_2.0.0                 openssl_1.4.3                 survival_3.2-7               </span>
+<span class="co">#&gt; [169] limma_3.46.0                  rmarkdown_2.6                 docopt_0.7.1                 </span>
+<span class="co">#&gt; [172] desc_1.2.0                    fastICA_1.2-2                 munsell_0.5.0                </span>
+<span class="co">#&gt; [175] GenomeInfoDbData_1.2.4        reshape2_1.4.4                gtable_0.3.0                 </span>
+<span class="co">#&gt; [178] shinycssloaders_1.0.0         msigdbr_7.2.1</span></code></pre></div>
 </div>
   </div>
 
@@ -622,7 +882,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

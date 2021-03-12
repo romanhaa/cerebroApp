@@ -73,7 +73,7 @@ the meta data of the provided Seurat object." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">cerebroApp</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.1</span>
       </span>
     </div>
 
@@ -81,7 +81,7 @@ the meta data of the provided Seurat object." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -145,13 +145,13 @@ the meta data of the provided Seurat object." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/romanhaa/cerebroApp/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
 <li>
   <a href="https://twitter.com/fakechek1">
-    <span class="fab fa fab fa-twitter fa-lg"></span>
+    <span class="fab fa-twitter fa-lg"></span>
      
   </a>
 </li>
@@ -178,20 +178,20 @@ the meta data of the provided Seurat object." />
 the meta data of the provided Seurat object.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>getMarkerGenes</span>(
-  <span class='no'>object</span>,
-  <span class='kw'>assay</span> <span class='kw'>=</span> <span class='st'>"RNA"</span>,
-  <span class='kw'>organism</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>groups</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"cerebro_seurat"</span>,
-  <span class='kw'>only_pos</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>min_pct</span> <span class='kw'>=</span> <span class='fl'>0.7</span>,
-  <span class='kw'>thresh_logFC</span> <span class='kw'>=</span> <span class='fl'>0.25</span>,
-  <span class='kw'>thresh_p_val</span> <span class='kw'>=</span> <span class='fl'>0.01</span>,
-  <span class='kw'>test</span> <span class='kw'>=</span> <span class='st'>"wilcox"</span>,
-  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='no'>...</span>
-)</pre>
+    <pre class="usage"><span class='fu'>getMarkerGenes</span><span class='op'>(</span>
+  <span class='va'>object</span>,
+  assay <span class='op'>=</span> <span class='st'>"RNA"</span>,
+  organism <span class='op'>=</span> <span class='cn'>NULL</span>,
+  groups <span class='op'>=</span> <span class='cn'>NULL</span>,
+  name <span class='op'>=</span> <span class='st'>"cerebro_seurat"</span>,
+  only_pos <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  min_pct <span class='op'>=</span> <span class='fl'>0.7</span>,
+  thresh_logFC <span class='op'>=</span> <span class='fl'>0.25</span>,
+  thresh_p_val <span class='op'>=</span> <span class='fl'>0.01</span>,
+  test <span class='op'>=</span> <span class='st'>"wilcox"</span>,
+  verbose <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -259,29 +259,23 @@ Seurat::FindAllMakers().</p></td>
 stored in <code>object@misc$marker_genes</code>.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"extdata/v1.3/pbmc_seurat.rds"</span>,
-  <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"cerebroApp"</span>))
-<span class='no'>pbmc</span> <span class='kw'>&lt;-</span> <span class='fu'>getMarkerGenes</span>(
-  <span class='kw'>object</span> <span class='kw'>=</span> <span class='no'>pbmc</span>,
-  <span class='kw'>assay</span> <span class='kw'>=</span> <span class='st'>'RNA'</span>,
-  <span class='kw'>organism</span> <span class='kw'>=</span> <span class='st'>'hg'</span>,
-  <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>'sample'</span>,<span class='st'>'seurat_clusters'</span>),
-  <span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>'cerebro_seurat'</span>,
-  <span class='kw'>only_pos</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>min_pct</span> <span class='kw'>=</span> <span class='fl'>0.7</span>,
-  <span class='kw'>thresh_logFC</span> <span class='kw'>=</span> <span class='fl'>0.25</span>,
-  <span class='kw'>thresh_p_val</span> <span class='kw'>=</span> <span class='fl'>0.01</span>,
-  <span class='kw'>test</span> <span class='kw'>=</span> <span class='st'>'wilcox'</span>,
-  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
-)</div><div class='output co'>#&gt; <span class='warning'>Warning: `select_()` is deprecated as of dplyr 0.7.0.</span>
-#&gt; <span class='warning'>Please use `select()` instead.</span>
-#&gt; <span class='warning'><span style='color: #555555;'>This warning is displayed once every 8 hours.</span><span></span>
-#&gt; <span class='warning'></span><span style='color: #555555;'>Call `lifecycle::last_warnings()` to see where this warning was generated.</span><span></span></div><div class='output co'>#&gt; <span class='warning'>Warning: `filter_()` is deprecated as of dplyr 0.7.0.</span>
-#&gt; <span class='warning'>Please use `filter()` instead.</span>
-#&gt; <span class='warning'>See vignette('programming') for more help</span>
-#&gt; <span class='warning'></span><span style='color: #555555;'>This warning is displayed once every 8 hours.</span><span></span>
-#&gt; <span class='warning'></span><span style='color: #555555;'>Call `lifecycle::last_warnings()` to see where this warning was generated.</span><span></span></div><div class='output co'>#&gt; <span class='message'>Cache found</span></div><div class='output co'>#&gt; <span class='message'>[12:37:22] Get marker genes for 2 groups in `sample`...</span></div><div class='output co'>#&gt; <span class='message'>Calculating cluster pbmc_1</span></div><div class='output co'>#&gt; <span class='message'>Calculating cluster pbmc_2</span></div><div class='output co'>#&gt; <span class='message'>[12:37:23] Get marker genes for 3 groups in `seurat_clusters`...</span></div><div class='output co'>#&gt; <span class='message'>Calculating cluster 0</span></div><div class='output co'>#&gt; <span class='message'>Calculating cluster 1</span></div><div class='output co'>#&gt; <span class='message'>Calculating cluster 2</span></div><div class='input'>
-</div></span></pre>
+    <pre class="examples"><div class='input'><span class='va'>pbmc</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>readRDS</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata/v1.3/pbmc_seurat.rds"</span>,
+  package <span class='op'>=</span> <span class='st'>"cerebroApp"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>pbmc</span> <span class='op'>&lt;-</span> <span class='fu'>getMarkerGenes</span><span class='op'>(</span>
+  object <span class='op'>=</span> <span class='va'>pbmc</span>,
+  assay <span class='op'>=</span> <span class='st'>'RNA'</span>,
+  organism <span class='op'>=</span> <span class='st'>'hg'</span>,
+  groups <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>'sample'</span>,<span class='st'>'seurat_clusters'</span><span class='op'>)</span>,
+  name <span class='op'>=</span> <span class='st'>'cerebro_seurat'</span>,
+  only_pos <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  min_pct <span class='op'>=</span> <span class='fl'>0.7</span>,
+  thresh_logFC <span class='op'>=</span> <span class='fl'>0.25</span>,
+  thresh_p_val <span class='op'>=</span> <span class='fl'>0.01</span>,
+  test <span class='op'>=</span> <span class='st'>'wilcox'</span>,
+  verbose <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='message'>[17:53:52] Get marker genes for 2 groups in `sample`...</span></div><div class='output co'>#&gt; <span class='message'>Calculating cluster pbmc_1</span></div><div class='output co'>#&gt; <span class='message'>Calculating cluster pbmc_2</span></div><div class='output co'>#&gt; <span class='message'>[17:53:53] Get marker genes for 3 groups in `seurat_clusters`...</span></div><div class='output co'>#&gt; <span class='message'>Calculating cluster 0</span></div><div class='output co'>#&gt; <span class='message'>Calculating cluster 1</span></div><div class='output co'>#&gt; <span class='message'>Calculating cluster 2</span></div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -297,7 +291,7 @@ stored in <code>object@misc$marker_genes</code>.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
