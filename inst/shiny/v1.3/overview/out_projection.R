@@ -25,7 +25,7 @@ output[["overview_projection"]] <- renderPlot({
       geom_scattermore(
         pointsize = plot_parameters[["point_size"]]/2,
         alpha = plot_parameters[["point_opacity"]],
-        pixels = c(700,700)
+        pixels = c(1024,1024)
       ) +
       coord_cartesian(
         xlim = overview_projection_ranges$x,
