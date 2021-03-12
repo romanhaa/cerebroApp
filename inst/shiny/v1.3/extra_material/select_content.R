@@ -1,6 +1,4 @@
 ##----------------------------------------------------------------------------##
-## Tab: Extra material
-##
 ## Select category and content.
 ##----------------------------------------------------------------------------##
 
@@ -8,7 +6,6 @@
 ## UI element to set layout for selection of category and specific content,
 ## which are split because the content depends on which category is selected.
 ##----------------------------------------------------------------------------##
-
 output[["extra_material_select_category_and_content_UI"]] <- renderUI({
   tagList(
     fluidRow(
@@ -27,7 +24,6 @@ output[["extra_material_select_category_and_content_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 ## UI element to select from which category the content should be shown.
 ##----------------------------------------------------------------------------##
-
 output[["extra_material_selected_category_UI"]] <- renderUI({
   tagList(
     div(
@@ -51,20 +47,13 @@ output[["extra_material_selected_category_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 ## UI element to select which content should be shown.
 ##----------------------------------------------------------------------------##
-
 output[["extra_material_selected_content_UI"]] <- renderUI({
-
-  ##
-  req(
-    input[["extra_material_selected_category"]]
-  )
-
+  req(input[["extra_material_selected_category"]])
   ## if selected category is `tables`
   if (
     input[["extra_material_selected_category"]] == 'tables' &&
     checkForExtraTables() == TRUE
   ) {
-
     ##
     tagList(
       div(
@@ -83,13 +72,11 @@ output[["extra_material_selected_content_UI"]] <- renderUI({
         column(2)
       )
     )
-
   ## if selected category is `plots`
   } else if (
     input[["extra_material_selected_category"]] == 'plots' &&
     checkForExtraPlots() == TRUE
   ) {
-
     ##
     tagList(
       div(

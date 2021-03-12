@@ -1,23 +1,14 @@
 ##----------------------------------------------------------------------------##
-## Tab: Extra material
-##
 ## Show content or info text when data is missing.
 ##----------------------------------------------------------------------------##
 
 ##----------------------------------------------------------------------------##
 ## UI element for output.
-##----------------------------------------------------------------------------##
-
+##----------------------------------------------------------------------------#
 output[["extra_material_content_UI"]] <- renderUI({
-
-  ##
-  req(
-    input[["extra_material_selected_category"]]
-  )
-
+  req(input[["extra_material_selected_category"]])
   ## if selected category is `tables`
   if ( input[["extra_material_selected_category"]] == 'tables' ) {
-
     ##
     fluidRow(
       cerebroBox(
@@ -48,10 +39,8 @@ output[["extra_material_content_UI"]] <- renderUI({
         )
       )
     )
-
   ## if selected category is `plots`
   } else if ( input[["extra_material_selected_category"]] == 'plots' ) {
-
     ##
     fluidRow(
       cerebroBox(
@@ -81,35 +70,24 @@ output[["extra_material_content_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 ## Table.
 ##----------------------------------------------------------------------------##
-
-output[["extra_material_table"]] <- DT::renderDataTable(server = FALSE, {
-
-  ##
+output[["extra_material_table"]] <- DT::renderDataTable({
   req(
     input[["extra_material_selected_category"]],
     input[["extra_material_selected_content"]]
   )
-
   ## fetch results
   results_df <- getExtraTable(input[["extra_material_selected_content"]])
-
   ## don't proceed if input is not a data frame
-  req(
-    is.data.frame(results_df)
-  )
-
+  req(is.data.frame(results_df))
   ## if the table is empty, skip the processing and show and empty table
   ## (otherwise the procedure would result in an error)
   if ( nrow(results_df) == 0 ) {
-
     results_df %>%
     as.data.frame() %>%
     dplyr::slice(0) %>%
     prepareEmptyTable()
-
   ## if there is at least 1 row, create proper table
   } else {
-
     prettifyTable(
       results_df,
       filter = list(position = "top", clear = TRUE),
@@ -137,14 +115,8 @@ output[["extra_material_table"]] <- DT::renderDataTable(server = FALSE, {
 ## UI element that contains interactive or plain version of plot, depending on
 ## switch status
 ##----------------------------------------------------------------------------##
-
 output[["extra_material_plot_UI"]] <- renderUI({
-
-  ##
-  req(
-    !is.null(input[["extra_material_plot_interactive_switch"]])
-  )
-
+  req(!is.null(input[["extra_material_plot_interactive_switch"]]))
   if ( input[["extra_material_plot_interactive_switch"]] == TRUE ) {
     plotly::plotlyOutput(
       "extra_material_plot_interactive",
@@ -163,26 +135,17 @@ output[["extra_material_plot_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 ## UI element that contains interactive version of plot
 ##----------------------------------------------------------------------------##
-
 output[["extra_material_plot_interactive"]] <- plotly::renderPlotly({
-
-  ##
   req(
     input[["extra_material_selected_category"]],
     input[["extra_material_selected_content"]]
   )
-
   ## fetch results
   plot <- getExtraPlot(input[["extra_material_selected_content"]])
-
   ## don't proceed if input is not of class "ggplot"
-  req(
-    "ggplot" %in% class(plot)
-  )
-
+  req("ggplot" %in% class(plot))
   ## convert to plotly
   plot <- plotly::ggplotly(plot)
-
   ## return plot either with WebGL or without, depending on setting
   if ( preferences$use_webgl == TRUE ) {
     plot %>% plotly::toWebGL()
@@ -194,31 +157,21 @@ output[["extra_material_plot_interactive"]] <- plotly::renderPlotly({
 ##----------------------------------------------------------------------------##
 ## UI element that contains plain version of plot
 ##----------------------------------------------------------------------------##
-
 output[["extra_material_plot_plain"]] <- renderPlot({
-
-  ##
   req(
     input[["extra_material_selected_category"]],
     input[["extra_material_selected_content"]]
   )
-
   ## fetch results
   plot <- getExtraPlot(input[["extra_material_selected_content"]])
-
   ## don't proceed if input is not of class "ggplot"
-  req(
-    "ggplot" %in% class(plot)
-  )
-
-  ##
+  req("ggplot" %in% class(plot))
   return(plot)
 })
 
 ##----------------------------------------------------------------------------##
 ## Info box that gets shown when pressing the "info" button.
 ##----------------------------------------------------------------------------##
-
 observeEvent(input[["extra_material_info"]], {
   showModal(
     modalDialog(
@@ -234,7 +187,6 @@ observeEvent(input[["extra_material_info"]], {
 ##----------------------------------------------------------------------------##
 ## Text in info box.
 ##----------------------------------------------------------------------------##
-
 extra_material_info <- list(
   title = "Extra material",
   text = HTML("

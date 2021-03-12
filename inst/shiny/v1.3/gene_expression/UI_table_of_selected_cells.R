@@ -1,6 +1,4 @@
 ##----------------------------------------------------------------------------##
-## Tab: Gene (set) expression
-##
 ## Table for details of selected cells.
 ##----------------------------------------------------------------------------##
 
@@ -8,7 +6,6 @@
 ## UI element with toggle switches (for automatic number formatting and
 ## coloring) and table.
 ##----------------------------------------------------------------------------##
-
 output[["expression_details_selected_cells_UI"]] <- renderUI({
   fluidRow(
     cerebroBox(
@@ -40,65 +37,53 @@ output[["expression_details_selected_cells_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 ## Table with results.
 ##----------------------------------------------------------------------------##
-
-output[["expression_details_selected_cells"]] <- DT::renderDataTable(server = FALSE, {
-
-  ## don't proceed without these inputs
+output[["expression_details_selected_cells"]] <- DT::renderDataTable({
   req(
-    input[["expression_projection_to_display"]],
-    input[["expression_projection_point_size"]],
-    input[["expression_projection_point_opacity"]],
-    input[["expression_projection_color_scale"]],
-    input[["expression_projection_color_scale_range"]],
-    input[["expression_projection_scale_x_manual_range"]],
-    input[["expression_projection_scale_y_manual_range"]],
-    gene_expression_plot_data()
+    expression_projection_data(),
+    expression_projection_coordinates(),
+    expression_projection_expression_levels()
   )
-
+  selected_cells <- expression_projection_selected_cells()
   ## check selection
-  ## ... selection has not been made or there is not cell in it
-  if (
-    is.null(plotly::event_data("plotly_selected", source = "expression_projection")) ||
-    length(plotly::event_data("plotly_selected", source = "expression_projection")) == 0
-  ) {
-
+  ## ... selection has not been made or there is no cell in it
+  if ( is.null(selected_cells) ) {
     ## prepare empty table
     getMetaData() %>%
     dplyr::slice(0) %>%
     prepareEmptyTable()
-
   ## ... selection has been made and at least 1 cell is in it
   } else {
-
-    ## get info of selected cells and create identifier from X-Y coordinates
-    selected_cells <- plotly::event_data("plotly_selected", source = "expression_projection") %>%
-      dplyr::mutate(identifier = paste0(x, '-', y))
-
+    cells_df <- bind_cols(
+      expression_projection_coordinates(),
+      expression_projection_data()
+    )
+    if (is.list(expression_projection_expression_levels())) {
+      cells_df$level <- do.call(cbind, expression_projection_expression_levels()) %>%
+        Matrix::rowMeans()
+    } else {
+      cells_df$level <- expression_projection_expression_levels()
+    }
     ## filter out non-selected cells with X-Y identifier and select some meta
     ## data
-    table <- gene_expression_plot_data() %>%
+    cells_df <- cells_df %>%
       dplyr::rename(X1 = 1, X2 = 2) %>%
       dplyr::mutate(identifier = paste0(X1, '-', X2)) %>%
       dplyr::filter(identifier %in% selected_cells$identifier) %>%
       dplyr::select(-c(X1, X2, identifier)) %>%
       dplyr::rename(expression_level = level) %>%
       dplyr::select(cell_barcode, expression_level, everything())
-
     ## check how many cells are left after filtering
     ## ... no cells are left
-    if ( nrow(table) == 0 ) {
-
+    if ( nrow(cells_df) == 0 ) {
       ## prepare empty table
       getMetaData() %>%
       dplyr::slice(0) %>%
       prepareEmptyTable()
-
     ## ... at least 1 cell is left
     } else {
-
       ## prepare proper table
       prettifyTable(
-        table,
+        cells_df,
         filter = list(position = "top", clear = TRUE),
         dom = "Brtlip",
         show_buttons = TRUE,
@@ -114,7 +99,6 @@ output[["expression_details_selected_cells"]] <- DT::renderDataTable(server = FA
 ##----------------------------------------------------------------------------##
 ## Info box that gets shown when pressing the "info" button.
 ##----------------------------------------------------------------------------##
-
 observeEvent(input[["expression_details_selected_cells_info"]], {
   showModal(
     modalDialog(
@@ -130,7 +114,6 @@ observeEvent(input[["expression_details_selected_cells_info"]], {
 ##----------------------------------------------------------------------------##
 ## Text in info box.
 ##----------------------------------------------------------------------------##
-
 expression_details_selected_cells_info <- list(
   title = "Details of selected cells",
   text = HTML("

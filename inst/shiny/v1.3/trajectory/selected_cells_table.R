@@ -46,7 +46,7 @@ output[["trajectory_selected_cells_table_UI"]] <- renderUI({
 ## Table.
 ##----------------------------------------------------------------------------##
 
-output[["trajectory_details_selected_cells_table"]] <- DT::renderDataTable(server = FALSE, {
+output[["trajectory_details_selected_cells_table"]] <- DT::renderDataTable({
 
   ## don't do anything before these inputs are selected
   req(
@@ -65,7 +65,7 @@ output[["trajectory_details_selected_cells_table"]] <- DT::renderDataTable(serve
   )
 
   ## check selection
-  ## ... selection has not been made or there is not cell in it
+  ## ... selection has not been made or there is no cell in it
   if (
     is.null(plotly::event_data("plotly_selected", source = "trajectory_projection")) ||
     length(plotly::event_data("plotly_selected", source = "trajectory_projection")) == 0

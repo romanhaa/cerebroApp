@@ -1,13 +1,10 @@
 ##----------------------------------------------------------------------------##
-## Tab: Groups
-##
 ## Composition by cell cycle.
 ##----------------------------------------------------------------------------##
 
 ##----------------------------------------------------------------------------##
 ## UI element for output.
 ##----------------------------------------------------------------------------##
-
 output[["groups_cell_cycle_UI"]] <- renderUI({
   fluidRow(
     cerebroBox(
@@ -27,7 +24,6 @@ output[["groups_cell_cycle_UI"]] <- renderUI({
 ## UI element that either shows buttons or a text message if data is not
 ## available.
 ##----------------------------------------------------------------------------##
-
 output[["groups_by_cell_cycle_UI_buttons"]] <- renderUI({
   if ( length(getCellCycle()) > 0 ) {
     tagList(
@@ -75,7 +71,6 @@ output[["groups_by_cell_cycle_UI_buttons"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 ## UI element that either shows the plot (and a table if selected) or nothing.
 ##----------------------------------------------------------------------------##
-
 output[["groups_by_cell_cycle_UI_rest"]] <- renderUI({
   if ( length(getCellCycle()) > 0 ) {
     tagList(
@@ -92,19 +87,13 @@ output[["groups_by_cell_cycle_UI_rest"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 ## Bar plot.
 ##----------------------------------------------------------------------------##
-
 output[["groups_by_cell_cycle_plot"]] <- plotly::renderPlotly({
-
-  ##
   req(
-    input[["groups_selected_group"]],
-    input[["groups_by_cell_cycle_column"]],
+    input[["groups_selected_group"]] %in% getGroups(),
+    input[["groups_by_cell_cycle_column"]] %in% getCellCycle(),
     input[["groups_by_cell_cycle_plot_type"]]
   )
-
-  ##
   if ( input[["groups_by_cell_cycle_plot_type"]] == "Bar chart" ) {
-
     ## calculate table
     composition_df <- calculateTableAB(
       getMetaData(),
@@ -113,7 +102,6 @@ output[["groups_by_cell_cycle_plot"]] <- plotly::renderPlotly({
       mode = "long",
       percent = input[["groups_by_cell_cycle_show_as_percent"]]
     )
-
     ## generate plot
     plotlyBarChart(
       table = composition_df,
@@ -122,10 +110,8 @@ output[["groups_by_cell_cycle_plot"]] <- plotly::renderPlotly({
       colors = reactive_colors()[[ input[[ "groups_by_cell_cycle_column" ]] ]],
       percent = input[["groups_by_cell_cycle_show_as_percent"]]
     )
-
   ##
   } else if ( input[["groups_by_cell_cycle_plot_type"]] == "Sankey plot" ) {
-
     ## calculate table
     composition_df <- calculateTableAB(
       getMetaData(),
@@ -134,13 +120,11 @@ output[["groups_by_cell_cycle_plot"]] <- plotly::renderPlotly({
       mode = "long",
       percent = FALSE
     )
-
     ## get color code for all group levels (from both groups)
     colors_for_groups <- c(
       assignColorsToGroups(composition_df, input[[ "groups_selected_group" ]]),
       assignColorsToGroups(composition_df, input[[ "groups_by_cell_cycle_column" ]])
     )
-
     ## generate plot
     plotlySankeyPlot(
       table = composition_df,
@@ -156,13 +140,11 @@ output[["groups_by_cell_cycle_plot"]] <- plotly::renderPlotly({
 ##----------------------------------------------------------------------------##
 
 output[["groups_by_cell_cycle_table"]] <- DT::renderDataTable({
-
   ##
   req(
-    input[["groups_selected_group"]],
-    input[["groups_by_cell_cycle_column"]],
+    input[["groups_selected_group"]] %in% getGroups(),
+    input[["groups_by_cell_cycle_column"]] %in% getCellCycle(),
   )
-
   ##
   composition_df <- calculateTableAB(
     getMetaData(),
@@ -171,14 +153,12 @@ output[["groups_by_cell_cycle_table"]] <- DT::renderDataTable({
     mode = "wide",
     percent = input[["groups_by_cell_cycle_show_as_percent"]]
   )
-
   ## get indices of columns that should be formatted as percent
   if ( input[["groups_by_cell_cycle_show_as_percent"]] == TRUE ) {
     columns_percentage <- c(3:ncol(composition_df))
   } else {
     columns_percentage <- NULL
   }
-
   ##
   composition_df %>%
   dplyr::rename("# of cells" = total_cell_count) %>%
@@ -196,7 +176,6 @@ output[["groups_by_cell_cycle_table"]] <- DT::renderDataTable({
 ##----------------------------------------------------------------------------##
 ## Alternative text message if data is missing.
 ##----------------------------------------------------------------------------##
-
 output[["groups_by_cell_cycle_text"]] <- renderText({
   "No cell cycle assignments available."
 })
@@ -204,7 +183,6 @@ output[["groups_by_cell_cycle_text"]] <- renderText({
 ##----------------------------------------------------------------------------##
 ## Info box that gets shown when pressing the "info" button.
 ##----------------------------------------------------------------------------##
-
 observeEvent(input[["groups_by_cell_cycle_info"]], {
   showModal(
     modalDialog(
@@ -220,7 +198,6 @@ observeEvent(input[["groups_by_cell_cycle_info"]], {
 ##----------------------------------------------------------------------------##
 ## Text in info box.
 ##----------------------------------------------------------------------------##
-
 groups_by_cell_cycle_info <- list(
   title = "Cell cycle analysis",
   text = p("Shown here is the relationship between the subpopulations of the selected grouping variable and the selected cell cycle assignments. If these assignments were generated with the method embedded in the Seurat framework, for each cell, a score is calculated for both G2M and S phase based on lists of genes (see 'Analysis info' tab on the left). The cell cycle phase is then assigned on the basis of these scores.")

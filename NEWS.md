@@ -1,3 +1,31 @@
+# cerebroApp 1.3.1
+
+Despite the minor version bump, this update contains substantial performance improvements in the Shiny app, specifically in the projections.
+
+## Major changes
+
+- Projections in the "Overview" and "Gene (set) expression" are now updated using the `Plotly.react()` Javascript function instead of redrawn from scratch inside R when changing the input variables. For the user, that means that (1) plots are drawn much quicker and (2) the current zoom/pan settings are maintained when switching plot parameters (coloring variable, point size/opacity, etc).
+
+## Minor changes
+
+- It is now possible to define several settings related to the projections shown in the "Overview" and "Gene (set) expression" tabs. For example, you can change the default point size and opacity, the default percentage of cells to show, and whether or not hover info should be activated in the projections. These settings are optional but useful when hosting a known data sets in `closed` mode, e.g. because you want to decrease the point size in a large data set. The respective parameters can be found in the description of the `launchCerebroV1.3()` function.
+- Hover/tooltip info for cells in projections can be deactivated through a checkbox on the "About" tab. Deactivating hover info increases performance of projections.
+- Hover/tooltip info for cells in the gene expression projection no longer contain the gene expression value. This is because preparing the hover info is an expensive computation with little return. As a result of removing the gene expression value, the hover info does not need to be recalculated every time a gene is added to or removed from the list of genes to show expression for. For the same reason, when plotting a trajectory, the state and pseudotime are not added to the hover info either.
+- Internally, data for plotting in projections is rearranged, stored in different variables, and the final output is debounced to avoid unnecessary redrawing of the projections on initialization.
+- The feature to show expression of multiple genes in separate panels has been matured. Up to 9 genes can be shown in a 3x3 panel matrix but all share the same color scale. While cells can be selected in any of the panels, the expression levels shown in the other UI element, e.g. table of selected cells or expression by group, refers to the mean expression of all selected genes (not just the one the cells were selected in).
+- When coloring cells in projections by a caterogical variable, e.g. cell type, the dots in the legend are now larger and independent from the selected point size.
+- Tables are now rendered server-side to improve performance for large tables.
+- Cellular barcodes in tables of selected cells are formatted in monospace font.
+- Columns in meta data tables, e.g. table of cells selected in projections, which are identified to contain percentage on a 0-100 scale are changed to a 0-1 scale to prevent non-sensical values such as 500%.
+- Add comma to Y axis and hover info in bar chart of selected cells in projection ("Overview" tab).
+- The `crb_file_to_load` parameter of the `launchCerebroV1.3()` function (or as part of `Cerebro.options`) can now be set to the name of a `Cerebro_v1.3` object. That means you can load the data set before launching Cerebro (with `readRDS()`) and make Cerebro initialize itself with it. This is particularly useful when hosting Cerebro in `closed` mode, preventing that each user session has to read the data set from disk.
+- Update author info in "About" tab.
+
+## Fixes
+
+- Colors assigned to groups in bar chart of selected cells in projection ("Overview" tab) sometimes did not match those shown in the projection. This only applied to categorical grouping variables that are not registered as grouping variables.
+- Update Enrichr API for `getEnrichedPathways()` function. Make it configurable in case of further changes to the API.
+
 # cerebroApp 1.3.0
 
 Because this is a relatively big release, I have prepared a dedicated article with release notes for cerebroApp v1.3 that you can find in the navigation bar.

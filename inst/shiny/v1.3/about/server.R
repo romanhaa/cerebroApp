@@ -2,6 +2,7 @@
 ## Tab: About.
 ##----------------------------------------------------------------------------##
 
+##
 output[["about"]] <- renderText({
   paste0(
     '<b>Version of cerebroApp</b><br>
@@ -9,8 +10,6 @@ output[["about"]] <- renderText({
     <br>
     <b>Author</b><br>
     Roman Hillje<br>
-    Department of Experimental Oncology<br>
-    IEO, European Institute of Oncology IRCCS, Milan<br>
     <br>
     <b>Links</b><br>
     <ul>
@@ -25,9 +24,6 @@ output[["about"]] <- renderText({
     <br>
     Roman Hillje, Pier Giuseppe Pelicci, Lucilla Luzi, Cerebro: Interactive visualization of scRNA-seq data, Bioinformatics, btz877, <a href=https://doi.org/10.1093/bioinformatics/btz877 title="DOI" target="_blank">https://doi.org/10.1093/bioinformatics/btz877</a><br>
     <br>
-    <b>Contact</b><br>
-    <a href="mailto:roman.hillje@ieo.it?subject=Cerebro">roman.hillje@ieo.it</a><br>
-    <br>
     <b>License</b><br>
     Cerebro is distributed under the terms of the <a href=https://github.com/romanhaa/Cerebro/blob/master/LICENSE.md title="MIT license" target="_blank">MIT license.</a><br>
     <br>
@@ -40,21 +36,48 @@ output[["about"]] <- renderText({
   )
 })
 
+##
 output[["preferences"]] <- renderUI({
   tagList(
-    checkboxInput("webgl_checkbox", label = "Use WebGL", value = TRUE)
+    tags$div(
+      title = "Using WebGL is best for performance but might not be compatible with every browser.",
+      checkboxInput(
+        "webgl_checkbox",
+        label = "Use WebGL",
+        value = TRUE
+      )
+    ),
+    tags$div(
+      title = "Switching off hover info in projections improves performance.",
+      checkboxInput(
+        "hover_info_in_projections_checkbox",
+        label = "Show hover info in projections",
+        value = Cerebro.options[['projections_show_hover_info']]
+      )
+    )
   )
 })
 
+##
 observeEvent(input[["webgl_checkbox"]], {
-  preferences$use_webgl <- input[["webgl_checkbox"]]
-  print(paste0("WebGL status is now: ", preferences$use_webgl))
+  preferences[["use_webgl"]] <- input[["webgl_checkbox"]]
+  print(glue::glue("[{Sys.time()}] WebGL status: {preferences[['use_webgl']]}"))
 })
 
-observeEvent(input[["browser"]], {
-  browser()
+##
+observeEvent(input[["hover_info_in_projections_checkbox"]], {
+  preferences[["show_hover_info_in_projections"]] <- input[["hover_info_in_projections_checkbox"]]
+  print(glue::glue("[{Sys.time()}] Show hover info status: {preferences[['show_hover_info_in_projections']]}"))
 })
 
+##
+outputOptions(
+  output,
+  "preferences",
+  suspendWhenHidden = FALSE
+)
+
+##
 output[["logo_Cerebro"]] <- renderImage({
   list(
     src = paste0(Cerebro.options$cerebro_root, '/extdata/logo_Cerebro.png'),
@@ -67,6 +90,7 @@ output[["logo_Cerebro"]] <- renderImage({
   deleteFile = FALSE
 )
 
+##
 output[["about_footer"]] <- renderText({
   paste0(
     '<br>
@@ -79,11 +103,3 @@ output[["about_footer"]] <- renderText({
     </div>'
   )
 })
-
-
-
-
-
-
-
-

@@ -9,6 +9,10 @@ launchCerebroV1.3(
   maxFileSize = 800,
   crb_file_to_load = NULL,
   welcome_message = NULL,
+  projections_default_point_size = 5,
+  projections_default_point_opacity = 1,
+  projections_default_percentage_cells_to_show = 100,
+  projections_show_hover_info = TRUE,
   ...
 )
 }
@@ -28,6 +32,18 @@ Cerebro. Useful when using/hosting Cerebro in \code{closed} mode. Defaults to
 \item{welcome_message}{\code{string} with custom welcome message to display
 in the "Load data" tab. Can contain HTML formatting, e.g.
 \code{'<h3>Hi!</h3>'}. Defaults to \code{NULL}.}
+
+\item{projections_default_point_size}{Default point size in projections. This
+value can be changed in the UI; defaults to 5.}
+
+\item{projections_default_point_opacity}{Default point opacity in
+projections. This value can be changed in the UI; defaults to 1.0.}
+
+\item{projections_default_percentage_cells_to_show}{Default percentage of
+cells to show in projections. This value can be changed in the UI; defaults
+to 100.}
+
+\item{projections_show_hover_info}{Show hover infos in projections. This}
 
 \item{...}{Further parameters that are used by \code{shiny::runApp}, e.g.
 \code{host} or \code{port}.}

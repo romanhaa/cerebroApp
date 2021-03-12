@@ -5,3 +5,5 @@ cerebroApp_*.tar.gz
 vignettes/*.crb
 docs
 tests
+.Rproj.user
+*.Rproj

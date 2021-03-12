@@ -23,7 +23,7 @@ findColumnsPercentage <- function(df) {
       any(is.na(df[[i]])) == FALSE &&
       is.numeric(df[[i]]) &&
       min(df[[i]], na.rm = TRUE) >= 0 &&
-      max(df[[i]], na.rm = TRUE)
+      max(df[[i]], na.rm = TRUE) <= 100
     ) {
       columns_indices <- c(columns_indices, i)
     }
@@ -40,7 +40,7 @@ findColumnsPValues <- function(df) {
       any(is.na(df[[i]])) == FALSE &&
       is.numeric(df[[i]]) &&
       min(df[[i]], na.rm = TRUE) >= 0 &&
-      max(df[[i]], na.rm = TRUE)
+      max(df[[i]], na.rm = TRUE) <= 1
     ) {
       columns_indices <- c(columns_indices, i)
     }
@@ -125,6 +125,17 @@ prettifyTable <- function(
   ## add manually specified column types
   if ( is.null(columns_percentage) == FALSE ) {
     columns_percent <- c(columns_percent, columns_percentage)
+  }
+
+  ## check whether percentage values were given on a 0-100 scale and convert
+  ## them to 0-1 if so
+  if (number_formatting == TRUE && length(columns_percent) > 0) {
+    for (col in columns_percent) {
+      col_name <- colnames(table)[col]
+      if (max(table[,col_name] > 1)) {
+        table[,col] <- table[,col] / 100
+      }
+    }
   }
 
   ## add manually specified columns to hide
@@ -216,6 +227,15 @@ prettifyTable <- function(
       columns = c(columns_numeric, columns_p_value),
       textAlign = 'right'
     )
+
+  # show cellular barcodes in monospace font
+  if ('cell_barcode' %in% colnames(table_original)) {
+    table <- table %>%
+      DT::formatStyle(
+        columns = which(colnames(table_original)=='cell_barcode'),
+        target="cell", fontFamily="courier"
+      )
+  }
 
   ## if automatic number formatting is on...
   ## - remove decimals from integers
@@ -641,38 +661,19 @@ assignColorsToGroups <- function(table, grouping_variable) {
 ## Build hover info for projections.
 ##----------------------------------------------------------------------------##
 buildHoverInfoForProjections <- function(table) {
-
-  # ## put together cell ID, number of transcripts and number of expressed genes
-  # hover_info <- glue::glue(
-  #   "<b>Cell</b>: {table[[ 'cell_barcode' ]]}
-  #   <b>Transcripts</b>: {formatC(table[[ 'nUMI' ]], format = 'f', big.mark = ',', digits = 0)}
-  #   <b>Expressed genes</b>: {formatC(table[[ 'nGene' ]], format = 'f', big.mark = ',', digits = 0)}"
-  # )
-
-  # ## add info for known grouping variables
-  # for ( group in getGroups() ) {
-  #   hover_info <- glue::glue(
-  #     "{hover_info}
-  #     <b>{group}</b>: {table[[ group ]]}"
-  #   )
-  # }
-
   ## put together cell ID, number of transcripts and number of expressed genes
   hover_info <- glue::glue(
-    "<b>Cell</b>: {table[[ 'cell_barcode' ]]}
-    <b>Transcripts</b>: {table[[ 'nUMI' ]]}
-    <b>Expressed genes</b>: {table[[ 'nGene' ]]}"
+    "<b>Cell</b>: {table[[ 'cell_barcode' ]]}<br>",
+    "<b>Transcripts</b>: {formatC(table[[ 'nUMI' ]], format = 'f', big.mark = ',', digits = 0)}<br>",
+    "<b>Expressed genes</b>: {formatC(table[[ 'nGene' ]], format = 'f', big.mark = ',', digits = 0)}"
   )
-
   ## add info for known grouping variables
   for ( group in getGroups() ) {
     hover_info <- glue::glue(
-      "{hover_info}
-      <b>{group}</b>: {table[[ group ]]}"
+      "{hover_info}<br>",
+      "<b>{group}</b>: {table[[ group ]]}"
     )
   }
-
-  ##
   return(hover_info)
 }
 
@@ -680,26 +681,19 @@ buildHoverInfoForProjections <- function(table) {
 ## Randomly subset cells in data frame, if necessary.
 ##----------------------------------------------------------------------------##
 randomlySubsetCells <- function(table, percentage) {
-
   ## check if subsetting is necessary
   ## ... percentage is less than 100
   if ( percentage < 100 ) {
-
     ## calculate how many cells should be left after subsetting
     size_of_subset <- ceiling(percentage / 100 * nrow(table))
-
     ## get IDs of all cells
     cell_ids <- rownames(table)
-
     ## subset cell IDs
     subset_of_cell_ids <- cell_ids[ sample(seq_along(cell_ids), size_of_subset) ]
-
     ## subset table and return
     return(table[subset_of_cell_ids,])
-
   ## ... percentage is 100 -> no subsetting needed
   } else {
-
     ## return original table
     return(table)
   }
@@ -711,15 +705,14 @@ randomlySubsetCells <- function(table, percentage) {
 getXYranges <- function(table) {
   ranges <- list(
     x = list(
-      min = table[,1] %>% min() %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round(),
-      max = table[,1] %>% max() %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
+      min = table[,1] %>% min(na.rm=TRUE) %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round(),
+      max = table[,1] %>% max(na.rm=TRUE) %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
     ),
     y = list(
-      min = table[,2] %>% min() %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round(),
-      max = table[,2] %>% max() %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
+      min = table[,2] %>% min(na.rm=TRUE) %>% "*"(ifelse(.<0, 1.1, 0.9)) %>% round(),
+      max = table[,2] %>% max(na.rm=TRUE) %>% "*"(ifelse(.<0, 0.9, 1.1)) %>% round()
     )
   )
-
   return(ranges)
 }
 
@@ -766,6 +759,61 @@ getGenesForGeneSet <- function(gene_set) {
   dplyr::pull(gene_symbol) %>%
   unique() %>%
   sort()
+}
+
+##----------------------------------------------------------------------------##
+## Function to calculate center of groups in projections/trajectories.
+##----------------------------------------------------------------------------##
+centerOfGroups <- function(coordinates, df, n_dimensions, group) {
+  ## check number of dimenions in projection
+  ## ... 2 dimensions
+  if ( n_dimensions == 2 ) {
+    ## calculate center for groups and return
+    tidyr::tibble(
+      x = coordinates[[1]],
+      y = coordinates[[2]],
+      group = df[[ group ]]
+    ) %>%
+    dplyr::group_by(group) %>%
+    dplyr::summarise(
+      x_median = median(x),
+      y_median = median(y),
+      .groups = 'drop_last'
+    ) %>%
+    dplyr::ungroup() %>%
+    return()
+  ## ... 3 dimensions
+  } else if ( n_dimensions == 3 && is.numeric(coordinates[,3]) ) {
+    ## calculate center for groups and return
+    tidyr::tibble(
+      x = coordinates[[1]],
+      y = coordinates[[2]],
+      z = coordinates[[3]],
+      group = df[[ group ]]
+    ) %>%
+    dplyr::group_by(group) %>%
+    dplyr::summarise(
+      x_median = median(x),
+      y_median = median(y),
+      z_median = median(z),
+      .groups = 'drop_last'
+    ) %>%
+    dplyr::ungroup() %>%
+    return()
+  }
+}
+
+##----------------------------------------------------------------------------##
+## Set order of rows in data frame.
+##----------------------------------------------------------------------------##
+setRowOrder <- function(df, order) {
+  if ( order == 'Random' ) {
+    return(df[ sample(1:nrow(df)) , ])
+  } else if ( order == "Highest expression on top" ) {
+    return(dplyr::arrange(df, level))
+  } else {
+    return(df)
+  }
 }
 
 ##----------------------------------------------------------------------------##
@@ -910,7 +958,7 @@ getTrajectory <- function(method, name) {
 }
 getExtraMaterialCategories <- function() {
   if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
-   return(data_set()$getExtraMaterialCategories())
+    return(data_set()$getExtraMaterialCategories())
   }
 }
 checkForExtraTables <- function() {

@@ -1,11 +1,6 @@
 ##----------------------------------------------------------------------------##
-## Tab: Gene ID/symbol conversion
-##----------------------------------------------------------------------------##
-
-##----------------------------------------------------------------------------##
 ## Table of gene IDs and symbols.
 ##----------------------------------------------------------------------------##
-
 output[["gene_info"]] <- DT::renderDataTable({
   if ( input[["geneIdConversion_organism"]] == "mouse" ) {
     conversion_table <- read.table(
@@ -37,7 +32,6 @@ output[["gene_info"]] <- DT::renderDataTable({
 ##----------------------------------------------------------------------------##
 ## Info box that gets shown when pressing the "info" button.
 ##----------------------------------------------------------------------------##
-
 observeEvent(input[["geneIdConversion_info"]], {
   showModal(
     modalDialog(
@@ -53,7 +47,6 @@ observeEvent(input[["geneIdConversion_info"]], {
 ##----------------------------------------------------------------------------##
 ## Text in info box.
 ##----------------------------------------------------------------------------##
-
 geneIdConversion_info <- list(
   title = "Gene ID/symbol conversion",
   text = p("Conversion table containing Gencode identifiers, Ensembl identifiers, Havana identifiers, gene symbol and gene type for mouse (version M16) and human (version 27).")

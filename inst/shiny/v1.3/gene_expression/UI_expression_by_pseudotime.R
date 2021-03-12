@@ -1,29 +1,21 @@
 ##----------------------------------------------------------------------------##
-## Tab: Gene (set) expression
-##
 ## Expression by pseudotime.
 ##----------------------------------------------------------------------------##
 
 ##----------------------------------------------------------------------------##
 ## UI element for plot.
 ##----------------------------------------------------------------------------##
-
 output[["expression_by_pseudotime_UI"]] <- renderUI({
-
-  ## proceed only if selection is not a projection
   req(
     input[["expression_projection_to_display"]] %in% availableProjections() == FALSE
   )
-
   ## split selection into method and name
   selection <- strsplit(input[["expression_projection_to_display"]], split = ' // ')[[1]]
-
   ## check if method and name exist and don't proceed if not
   req(
     selection[1] %in% getMethodsForTrajectories(),
     selection[2] %in% getNamesOfTrajectories(selection[1])
   )
-
   fluidRow(
     cerebroBox(
       title = tagList(
@@ -73,48 +65,36 @@ output[["expression_by_pseudotime_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 ## Plot.
 ##----------------------------------------------------------------------------##
-
 output[["expression_by_pseudotime"]] <- plotly::renderPlotly({
-
-  ## don't proceed without these inputs
   req(
     input[["expression_projection_to_display"]],
     input[["expression_projection_point_size"]],
     input[["expression_projection_point_opacity"]],
     input[["expression_projection_color_scale"]],
-    input[["expression_projection_color_scale_range"]],
+    input[["expression_projection_color_range"]],
     !is.null(input[["expression_by_pseudotime_show_trend_line"]]),
     input[["expression_by_pseudotime_trend_line_bandwidth"]],
     input[["expression_by_pseudotime_trend_line_width"]],
-    gene_expression_plot_data()
+    expression_projection_data(),
+    "pseudotime" %in% colnames(expression_projection_data())
   )
-
-  req(
-    "pseudotime" %in% colnames(gene_expression_plot_data())
-  )
-
-  cells_df <- gene_expression_plot_data()
-
+  cells_df <- expression_projection_data()
   ## prepare hover info
   hover_info <- buildHoverInfoForProjections(cells_df)
-
   ## add expression levels to hover info
   hover_info <- glue::glue(
     "{hover_info}
     <b>Pseudotime</b>: {formatC(cells_df[[ 'pseudotime' ]], format = 'f', digits = 2)}
     <b>State</b>: {cells_df[[ 'state' ]]}"
   )
-
   ## check selected color scale
   ## ... selected color scale is "viridis"
   if ( input[["expression_projection_color_scale"]] == 'viridis' ) {
     color_scale <- 'Viridis'
-
   ## ... selected color scale is anything else than "viridis"
   } else {
     color_scale <- input[["expression_projection_color_scale"]]
   }
-
   ## prepare plot
   plot <- plotly::plot_ly() %>%
     plotly::add_trace(
@@ -131,8 +111,8 @@ output[["expression_by_pseudotime"]] <- plotly::renderPlotly({
         opacity = input[["expression_projection_point_opacity"]],
         colorscale = color_scale,
         cauto = FALSE,
-        cmin = input[["expression_projection_color_scale_range"]][1],
-        cmax = input[["expression_projection_color_scale_range"]][2],
+        cmin = input[["expression_projection_color_range"]][1],
+        cmax = input[["expression_projection_color_range"]][2],
         reversescale = TRUE,
         line = list(
           color = "rgb(196,196,196)",
@@ -165,10 +145,8 @@ output[["expression_by_pseudotime"]] <- plotly::renderPlotly({
         bgcolor = "lightgrey"
       )
     )
-
   ## add trend line if activated
   if ( input[["expression_by_pseudotime_show_trend_line"]] == TRUE ) {
-
     ## calculate smoothened trend line
     trend_line = stats::ksmooth(
       cells_df$pseudotime,
@@ -177,7 +155,6 @@ output[["expression_by_pseudotime"]] <- plotly::renderPlotly({
       input[["expression_by_pseudotime_trend_line_bandwidth"]],
       x.points = cells_df$pseudotime
     )
-
     ## add trend line to plot
     plot <- plotly::add_trace(
       plot,
@@ -200,7 +177,6 @@ output[["expression_by_pseudotime"]] <- plotly::renderPlotly({
       showlegend = FALSE
     )
   }
-
   ## if set in options, return plot with WebGL
   if ( preferences$use_webgl == TRUE ) {
     plotly::toWebGL(plot)
@@ -212,7 +188,6 @@ output[["expression_by_pseudotime"]] <- plotly::renderPlotly({
 ##----------------------------------------------------------------------------##
 ## Info box that gets shown when pressing the "info" button.
 ##----------------------------------------------------------------------------##
-
 observeEvent(input[["expression_by_pseudotime_info"]], {
   showModal(
     modalDialog(
@@ -228,7 +203,6 @@ observeEvent(input[["expression_by_pseudotime_info"]], {
 ##----------------------------------------------------------------------------##
 ## Text in info box.
 ##----------------------------------------------------------------------------##
-
 expression_by_pseudotime_info <- list(
   title = "Expression levels by pseudotime",
   text = HTML("
