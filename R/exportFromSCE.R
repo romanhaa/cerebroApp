@@ -16,7 +16,7 @@
 #' @param groups Names of grouping variables in meta data
 #' (\code{colData(object)}), e.g. \code{c("sample","cluster")}; at least one
 #' must be provided; defaults to \code{NULL}.
-#' @param cell_cycle Names of columns in meta data (\code{colData(object)}) that#
+#' @param cell_cycle Names of columns in meta data (\code{colData(object)}) that
 #' contain cell cycle information, e.g. \code{c("Phase")}; defaults to
 #' \code{NULL}.
 #' @param nUMI Column in \code{colData(object)} that contains information about
