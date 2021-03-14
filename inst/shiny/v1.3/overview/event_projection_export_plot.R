@@ -59,7 +59,7 @@ observeEvent(input[["overview_projection_export"]], {
     ) {
       ## add color assignments
       plot <- plot + scale_color_manual(values = color_assignments) +
-        guides(color = guide_legend(override.aes = list(size=4)))
+        guides(color = guide_legend(override.aes = list(size=4, alpha=1)))
       ## check if group labels should be plotted and, if so, add them
       if ( plot_parameters[["group_labels"]] == TRUE ) {
         ## calculate group level centers
