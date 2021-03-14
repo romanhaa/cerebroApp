@@ -8,7 +8,8 @@ output[["overview_details_selected_cells_plot"]] <- plotly::renderPlotly({
   req(
     input[["overview_projection_to_display"]],
     input[["overview_projection_to_display"]] %in% availableProjections(),
-    input[["overview_selected_cells_plot_select_variable"]]
+    input[["overview_selected_cells_plot_select_variable"]],
+    overview_projection_selected_cells()
   )
   ## check selection
   ## ... selection has not been made or there is no cell in it

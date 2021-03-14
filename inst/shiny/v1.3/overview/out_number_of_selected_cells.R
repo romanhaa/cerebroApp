@@ -2,6 +2,7 @@
 ## Text showing the number of selected cells.
 ##----------------------------------------------------------------------------##
 output[["overview_number_of_selected_cells"]] <- renderText({
+  req(overview_projection_selected_cells())
   ## check selection
   ## ... selection has not been made or there is no cell in it
   if ( nrow(overview_projection_selected_cells())==0 ) {

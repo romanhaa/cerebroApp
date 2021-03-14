@@ -5,7 +5,8 @@ output[["overview_details_selected_cells_table"]] <- DT::renderDataTable({
   ## don't proceed without these inputs
   req(
     input[["overview_projection_to_display"]],
-    input[["overview_projection_to_display"]] %in% availableProjections()
+    input[["overview_projection_to_display"]] %in% availableProjections(),
+    overview_projection_selected_cells()
   )
   ## check selection
   ## ... selection has not been made or there is no cell in it
