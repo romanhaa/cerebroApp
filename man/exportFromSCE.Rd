@@ -37,7 +37,7 @@ slot) to avoid performance bottlenecks in the Cerebro interface.}
 (\code{colData(object)}), e.g. \code{c("sample","cluster")}; at least one
 must be provided; defaults to \code{NULL}.}
 
-\item{cell_cycle}{Names of columns in meta data (\code{colData(object)}) that#
+\item{cell_cycle}{Names of columns in meta data (\code{colData(object)}) that
 contain cell cycle information, e.g. \code{c("Phase")}; defaults to
 \code{NULL}.}
 
