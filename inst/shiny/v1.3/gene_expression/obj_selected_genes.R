@@ -5,7 +5,7 @@
 ## with button press so plot doesn't initialize at all
 expression_selected_genes <- reactive({
   req(input[["expression_analysis_mode"]])
-  # message('--> trigger "expression_selected_genes"')
+  debug_log('--> trigger "expression_selected_genes"', 'v')
   ## prepare empty list for data
   gene_sets <- list(
     "genes_to_display" = character(),
@@ -41,6 +41,6 @@ expression_selected_genes <- reactive({
   gene_sets[["genes_to_display_present"]] <- na.omit(genes_to_display_here)
   ## get names of provided genes that are not in the data set
   gene_sets[["genes_to_display_missing"]] <- gene_sets[["genes_to_display"]][ which(is.na(genes_to_display_here)) ]
-  # message(str(gene_sets))
+  debug_log(str(gene_sets), 'vv')
   return(gene_sets)
 })

@@ -6,7 +6,7 @@ expression_projection_expression_levels <- reactive({
     expression_projection_data(),
     expression_selected_genes()
   )
-  # message('--> trigger "expression_projection_expression_levels"')
+  debug_log('--> trigger "expression_projection_expression_levels"', 'v')
   if ( length(expression_selected_genes()$genes_to_display_present) == 0 ) {
     expression_levels <- rep(0, nrow(expression_projection_data()))
   } else {
@@ -33,6 +33,6 @@ expression_projection_expression_levels <- reactive({
       ))
     }
   }
-  # message(str(expression_levels))
+  debug_log(str(expression_levels), 'vv')
   return(expression_levels)
 })

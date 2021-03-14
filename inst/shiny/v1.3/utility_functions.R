@@ -817,6 +817,15 @@ setRowOrder <- function(df, order) {
 }
 
 ##----------------------------------------------------------------------------##
+## Print log message if appropriate debugging mode is set.
+##----------------------------------------------------------------------------##
+debug_log <- function(message, level) {
+  if (exists('mode_debugging') && grepl(level, mode_debugging)) {
+    message(message)
+  }
+}
+
+##----------------------------------------------------------------------------##
 ## Functions to interact with data set.
 ##
 ## Never directly interact with data set: data_set()

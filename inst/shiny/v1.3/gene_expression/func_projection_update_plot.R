@@ -1,7 +1,7 @@
 ## function to be executed to update figure
 expression_projection_update_plot <- function(input) {
   # process input parameters and give to JavaScript function to update plot
-  # message('update plot')
+  debug_log('--> update plot', 'v')
   coordinates <- input[['coordinates']]
   reset_axes <- input[['reset_axes']]
   expression_levels <- input[['expression_levels']]

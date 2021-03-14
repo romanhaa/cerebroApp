@@ -3,8 +3,8 @@
 ##----------------------------------------------------------------------------##
 overview_projection_data <- reactive({
   req(overview_projection_cells_to_show())
-  # message('--> trigger "overview_projection_data"')
+  debug_log('--> trigger "overview_projection_data"', 'v')
   cells_df <- getMetaData()[overview_projection_cells_to_show(),]
-  # message(str(cells_df))
+  debug_log(str(cells_df), 'vv')
   return(cells_df)
 })

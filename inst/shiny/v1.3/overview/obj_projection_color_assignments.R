@@ -6,11 +6,11 @@ overview_projection_color_assignments <- reactive({
     overview_projection_data(),
     overview_projection_parameters_plot()
   )
-  # message('--> trigger "overview_projection_color_assignments"')
+  debug_log('--> trigger "overview_projection_color_assignments"', 'v')
   colors <- assignColorsToGroups(
     overview_projection_data(),
     overview_projection_parameters_plot()[['color_variable']]
   )
-  # message(str(colors))
+  debug_log(str(colors), 'vv')
   return(colors)
 })

@@ -3,6 +3,7 @@
 ##----------------------------------------------------------------------------##
 observeEvent(input[["overview_projection_export"]], {
   req(overview_projection_data_to_plot())
+  debug_log('--> export plot', 'v')
   input_data <- overview_projection_data_to_plot()
   cells_df <- input_data[['cells_df']]
   coordinates <- input_data[['coordinates']]

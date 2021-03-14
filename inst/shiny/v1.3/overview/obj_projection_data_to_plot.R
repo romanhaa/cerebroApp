@@ -10,7 +10,7 @@ overview_projection_data_to_plot_raw <- reactive({
     overview_projection_hover_info(),
     nrow(overview_projection_data()) == length(overview_projection_hover_info()) || overview_projection_hover_info() == "none"
   )
-  # message('--> trigger "overview_projection_data_to_plot"')
+  debug_log('--> trigger "overview_projection_data_to_plot"', 'v')
   ## get colors for groups (if applicable)
   if ( is.numeric(overview_projection_parameters_plot()[['color_variable']]) ) {
     color_assignments <- NA
@@ -51,7 +51,7 @@ overview_projection_data_to_plot_raw <- reactive({
     color_assignments = color_assignments,
     hover_info = overview_projection_hover_info()
   )
-  # message(str(to_return))
+  debug_log(str(to_return), 'vv')
   return(to_return)
 })
 

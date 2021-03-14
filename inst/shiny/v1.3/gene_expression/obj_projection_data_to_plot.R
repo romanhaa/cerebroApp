@@ -13,7 +13,7 @@ expression_projection_data_to_plot_raw <- reactive({
     nrow(expression_projection_coordinates()) == length(expression_projection_hover_info()) || expression_projection_hover_info() == "none",
     !is.null(input[["expression_projection_genes_in_separate_panels"]])
   )
-  # message('--> trigger "expression_projection_data_to_plot"')
+  debug_log('--> trigger "expression_projection_data_to_plot"', 'v')
   parameters <- expression_projection_parameters_plot()
   if (parameters[['is_trajectory']]) {
     req(nrow(expression_projection_coordinates()) ==
@@ -30,7 +30,7 @@ expression_projection_data_to_plot_raw <- reactive({
     trajectory = expression_projection_trajectory(),
     separate_panels = input[["expression_projection_genes_in_separate_panels"]]
   )
-  # message(str(to_return))
+  debug_log(str(to_return), 'vv')
   return(to_return)
 })
 

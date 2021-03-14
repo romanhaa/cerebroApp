@@ -124,6 +124,7 @@ server <- function(input, output, session) {
   # list of available trajectories
   available_trajectories <- reactive({
     req(!is.null(data_set()))
+    debug_log('--> trigger "available_trajectories"', 'v')
     ## collect available trajectories across all methods and create selectable
     ## options
     available_trajectories <- c()
@@ -150,13 +151,13 @@ server <- function(input, output, session) {
         }
       }
     }
-    # message(str(available_trajectories))
+    debug_log(str(available_trajectories), 'vv')
     return(available_trajectories)
   })
 
   # hover info for projection
   hover_info_projections <- reactive({
-    # message('--> trigger "hover_info_projections"')
+    debug_log('--> trigger "hover_info_projections"', 'v')
     if (
       !is.null(preferences[["show_hover_info_in_projections"]]) &&
       preferences[['show_hover_info_in_projections']] == TRUE
@@ -167,7 +168,7 @@ server <- function(input, output, session) {
     } else {
       hover_info <- 'none'
     }
-    # message(str(hover_info))
+    debug_log(str(hover_info), 'vv')
     return(hover_info)
   })
 

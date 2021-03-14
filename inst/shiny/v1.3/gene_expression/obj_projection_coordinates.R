@@ -6,7 +6,7 @@ expression_projection_coordinates <- reactive({
     expression_projection_parameters_plot(),
     expression_projection_cells_to_show()
   )
-  # message('--> trigger "expression_projection_coordinates"')
+  debug_log('--> trigger "expression_projection_coordinates"', 'v')
   parameters <- expression_projection_parameters_plot()
   cells_to_show <- expression_projection_cells_to_show()
   req(
@@ -23,6 +23,6 @@ expression_projection_coordinates <- reactive({
     )
     coordinates <- getTrajectory(selection[1], selection[2])[['meta']][cells_to_show,c(1,2)]
   }
-#   message(str(coordinates))
+  debug_log(str(coordinates), 'vv')
   return(coordinates)
 })

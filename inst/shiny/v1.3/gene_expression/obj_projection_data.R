@@ -3,8 +3,8 @@
 ##----------------------------------------------------------------------------##
 expression_projection_data <- reactive({
   req(expression_projection_cells_to_show())
-  # message('--> trigger "expression_projection_data"')
+  debug_log('--> trigger "expression_projection_data"', 'v')
   cells_df <- getMetaData()[expression_projection_cells_to_show(),]
-  # message(str(cells_df))
+  debug_log(str(cells_df), 'vv')
   return(cells_df)
 })

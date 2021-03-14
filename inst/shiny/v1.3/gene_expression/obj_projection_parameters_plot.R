@@ -15,7 +15,7 @@ expression_projection_parameters_plot_raw <- reactive({
     input[["expression_projection_to_display"]] %in% availableProjections() ||
     input[["expression_projection_to_display"]] %in% available_trajectories()
   )
-  # message('--> trigger "expression_projection_parameters_plot_raw"')
+  debug_log('--> trigger "expression_projection_parameters_plot_raw"', 'v')
   if ( input[["expression_projection_to_display"]] %in% availableProjections() ) {
     is_trajectory = FALSE
     n_dimensions = ncol(getProjection(input[["expression_projection_to_display"]]))
@@ -37,7 +37,7 @@ expression_projection_parameters_plot_raw <- reactive({
     webgl = preferences[["use_webgl"]],
     hover_info = preferences[["show_hover_info_in_projections"]]
   )
-  # message(str(parameters))
+  debug_log(str(parameters), 'vv')
   return(parameters)
 })
 
@@ -50,6 +50,6 @@ expression_projection_parameters_other <- reactiveValues(
 
 ##
 observeEvent(input[['expression_projection_to_display']], {
-  # message('--> set "gene expression: reset_axes"')
+  debug_log('--> set "gene expression: reset_axes"', 'v')
   expression_projection_parameters_other[['reset_axes']] <- TRUE
 })
