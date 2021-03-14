@@ -30,6 +30,7 @@ Imports:
   ggplot2 (>= 3.2.1),
   glue (>= 1.4.0),
   GSVA (>= 1.30.0),
+  HDF5Array (>= 1.18.1),
   httr (>= 1.4.0),
   igraph,
   Matrix (>= 1.2),

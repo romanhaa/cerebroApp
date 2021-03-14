@@ -1,0 +1,127 @@
+---
+title: "Create expression matrix in h5 format"
+author: "Roman Hillje"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    toc: true
+    number_sections: true
+    self_contained: yes
+    mode: selfcontained
+vignette: >
+  %\VignetteIndexEntry{Create expression matrix in h5 format}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Overview
+
+In this vignette, I explain how you can save the expression matrix of your data set in `.h5`/`TENxMatrix` format and use it in Cerebro.
+Using the `.h5`/`TENxMatrix` format results in a very low memory footprint of the application because expression values for specific genes are directly read from disk instead of having to load the entire matrix into memory.
+Moreover, depending on its size, the time it takes to load your data set into Cerebro may be greatly reduced because only meta data and tables must be loaded, which are usually very small compared to the expression matrix.
+The catch: Reading data from the disk tends to be slower than reading it from memory, but this is not always noticeable and may be a compromise worth making.
+
+# Setup
+
+Make sure that the `Matrix`, `HDF5Array` and `cerebroApp` packages are installed.
+
+```{r message=FALSE}
+if ( 'Matrix' %in% installed.packages() == FALSE ) install.packages('Matrix')
+if ( 'HDF5Array' %in% installed.packages() == FALSE ) install.packages('HDF5Array')
+if ( 'cerebroApp' %in% installed.packages() == FALSE ) install.packages('cerebroApp')
+
+library(HDF5Array)
+```
+
+For this example, we will store the output in a temporary directory.
+
+```{r}
+output_dir <- tempdir()
+```
+
+# Load existing `.crb` file
+
+Assuming that you have already exported your data set to a `.crb` file using the `exportFromSeurat()` or `exportFromSCE()` functions, we are first going to load that file.
+Here, we use the example data set in the `cerebroApp` package:
+
+```{r}
+crb_input <- system.file('extdata', 'v1.3', 'example.crb', package = 'cerebroApp')
+crb <- readRDS(crb_input)
+```
+
+The expression matrix should look similar to this:
+
+```{r}
+str(crb$expression)
+```
+
+# Create `.h5` file
+
+Instead of storing the matrix in its current (conventional) format with rows representing genes and columns representing cells, we will first have to transpose it.
+That means, rows (genes) become columns, and columns (cells) become rows.
+We do this because the way that the matrix is indexed greatly favors the extraction of columns rather than rows.
+In Cerebro, all we do is extract expression values of genes, which is why we should rotate the matrix.
+Importantly, Cerebro expects to find the matrix in the `expression` group of the `.h5` file, so make sure to specify that in the call to the `HDF5Array::writeTENxMatrix()` function.
+
+```{r}
+writeTENxMatrix(
+  Matrix::t(crb$expression),
+  glue::glue('{output_dir}/example_expression.h5'),
+  group = 'expression'
+)
+```
+
+Creating a connection to the file is as easy as this:
+
+```{r}
+h5_output <- glue::glue('{output_dir}/example_expression.h5')
+expression_matrix_h5 <- TENxMatrix(h5_output, group='expression')
+str(expression_matrix_h5)
+```
+
+Looks very similar to the matrix that we started with.
+
+# Remove matrix from `.crb` object
+
+To actually gain any benefit from using the `.h5`/`TENxMatrix` format, we need to remove the original matrix from the `.crb` object.
+Otherwise, the attached matrix will be loaded into memory anyway.
+
+```{r}
+crb$expression <- NULL
+crb_output <- glue::glue('{output_dir}/example.crb')
+saveRDS(crb, crb_output)
+```
+
+You can compare the size of the `.crb` before and after removing the expression matrix like this:
+
+```{r}
+glue::glue("crb input file: {file.info(crb_input)$size/1000} KB")
+glue::glue("crb output file: {file.info(crb_output)$size/1000} KB")
+glue::glue("h5 output file: {file.info(h5_output)$size/1000} KB")
+```
+
+Since this is a very small data set, the difference between the input and output `.crb` files is not large and irrelevant in practice.
+For larger data sets, however, this can reduce the size by a factor of 100.
+Notably, the `.h5` file is larger than the original matrix we created it from, explaining why the new total size of the data set (`.crb` without expression matrix + `.h5` file) is (significantly) larger than the initial `.crb` file.
+
+# Launch Cerebro
+
+With the updated `.crb` file and `.h5` file in place, we can launch Cerebro and use it as with any other format of the expression matrix.
+
+```{r eval=FALSE}
+cerebroApp::launchCerebroV1.3(
+  crb_file_to_load = crb_output,
+  expression_matrix_h5 = h5_output
+)
+```
+
+# See also
+
+* [Launch Cerebro with pre-loaded data set](launch_cerebro_with_pre-loaded_data_set.html)

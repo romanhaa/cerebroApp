@@ -841,26 +841,6 @@ getGeneLists <- function() {
     return(data_set()$getGeneLists())
   }
 }
-getMeanExpressionForGenes <- function(genes) {
-  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
-    return(data_set()$getMeanExpressionForGenes(genes))
-  }
-}
-getMeanExpressionForCells <- function(cells, genes) {
-  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
-    return(data_set()$getMeanExpressionForCells(cells, genes))
-  }
-}
-getExpressionMatrix <- function(...) {
-  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
-    return(data_set()$getExpressionMatrix(...))
-  }
-}
-getCellNames <- function() {
-  if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
-    return(data_set()$getCellNames())
-  }
-}
 getGeneNames <- function() {
   if ( 'Cerebro_v1.3' %in% class(data_set()) ) {
     return(data_set()$getGeneNames())

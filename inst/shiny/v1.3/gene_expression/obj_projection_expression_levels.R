@@ -17,20 +17,22 @@ expression_projection_expression_levels <- reactive({
       length(expression_selected_genes()$genes_to_display_present) >= 2 &&
       length(expression_selected_genes()$genes_to_display_present) <= 9
     ) {
-      expression_matrix <- getExpressionMatrix(
-          cells = expression_projection_data()$cell_barcode,
-          genes = expression_selected_genes()$genes_to_display_present
-        ) %>%
-        Matrix::t()
+      expression_matrix <- data_set()$expression[expression_selected_genes()$genes_to_display_present, , drop=FALSE]
+      expression_matrix <- Matrix::t(expression_matrix)
       expression_levels <- list()
       for (i in 1:ncol(expression_matrix)) {
         expression_levels[[colnames(expression_matrix)[i]]] <- as.vector(expression_matrix[,i])
       }
-    } else {
-      expression_levels <- unname(getMeanExpressionForCells(
-        cells = expression_projection_data()$cell_barcode,
-        genes = expression_selected_genes()$genes_to_display_present
-      ))
+    } else if (length(expression_selected_genes()$genes_to_display_present) == 1) {
+      expression_levels <- data_set()$expression[expression_selected_genes()$genes_to_display_present,]
+      expression_levels <- unname(expression_levels)
+      expression_levels <- expression_levels[isolate(expression_projection_cells_to_show())]
+    } else if (length(expression_selected_genes()$genes_to_display_present) >= 2) {
+      expression_levels <- data_set()$expression[expression_selected_genes()$genes_to_display_present,]
+      expression_levels <- as.matrix(expression_levels)
+      expression_levels <- colMeans(expression_levels)
+      expression_levels <- unname(expression_levels)
+      expression_levels <- expression_levels[isolate(expression_projection_cells_to_show())]
     }
   }
   # message(str(expression_levels))

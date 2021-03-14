@@ -13,6 +13,21 @@
 #' @param crb_file_to_load Path to \code{.crb} file to load on launch of
 #' Cerebro. Useful when using/hosting Cerebro in \code{closed} mode. Defaults to
 #' \code{NULL}.
+#' @param expression_matrix_h5 Path to \code{.h5} file containing an expression
+#' matrix created with \code{HDF5Array::writeTENxMatrix()}, with genes as
+#' columns and cells as rows, contrary to the conventional format of genes as
+#' rows and cells as columns. This format greatly favors performance for
+#' extracting expression values for a gene (column), rather than a cell (row),
+#' which is the primary action in Cerebro. Importantly, the matrix should be 
+#' stored with "expression" as group name (see parameters of the
+#' \code{HDF5Array::writeTENxMatrix()} function). Saving the expression matrix
+#' in \code{TENxMatrix} format has the benefit of a low memory footprint since
+#' the expression values are directly read from disk. This is particularly
+#' useful when working with very large data sets and/or when startup of the
+#' Cerebro app is a priority (which is shorter because only the rest of the data
+#' that needs to be loaded tends to be very small). By default, this value is
+#' set to \code{NULL}, meaning that the expression matrix is expected to be part
+#' of the \code{.crb} file.
 #' @param welcome_message \code{string} with custom welcome message to display
 #' in the "Load data" tab. Can contain HTML formatting, e.g.
 #' \code{'<h3>Hi!</h3>'}. Defaults to \code{NULL}.
@@ -67,6 +82,7 @@ launchCerebroV1.3 <- function(
   mode = "open",
   maxFileSize = 800,
   crb_file_to_load = NULL,
+  expression_matrix_h5 = NULL,
   welcome_message = NULL,
   projections_default_point_size = 5,
   projections_default_point_opacity = 1.0,
@@ -125,6 +141,7 @@ launchCerebroV1.3 <- function(
   Cerebro.options <<- list(
     "mode" = mode,
     "crb_file_to_load" = crb_file_to_load,
+    "expression_matrix_h5" = expression_matrix_h5,
     "welcome_message" = welcome_message,
     "cerebro_root" = system.file(package = "cerebroApp"),
     "projections_default_point_size" = projections_default_point_size,

@@ -35,8 +35,13 @@ output[["expression_by_gene"]] <- plotly::renderPlotly({
     ## - calculate mean expression for every gene across all cells
     ## - sort genes by mean expression from high to low
     ## - show only first 50 genes if more are available
-    expression_levels <- getMeanExpressionForGenes(expression_selected_genes()$genes_to_display_present) %>%
-    dplyr::slice_max(expression, n = 50)
+    expression_levels <- data_set()$expression[expression_selected_genes()$genes_to_display_present, , drop=FALSE]
+    expression_levels <- Matrix::rowMeans(expression_levels)
+    expression_levels <- data.frame(
+        gene = expression_selected_genes()$genes_to_display_present,
+        expression = expression_levels
+      ) %>%
+      dplyr::slice_max(expression, n = 50)
   }
   ## prepare color scale, either "viridis" or other
   ## ...

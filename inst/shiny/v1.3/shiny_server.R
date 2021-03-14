@@ -102,13 +102,38 @@ server <- function(input, output, session) {
   data_set <- reactive({
     dataset_to_load <- data_to_load$path
     if (exists(dataset_to_load)) {
-      print(glue::glue("[{Sys.time()}] Load from variable: {dataset_to_load}"))
+      print(glue::glue("[{Sys.time()}] Load data set from variable: {dataset_to_load}"))
       data <- get(dataset_to_load)
     } else {
       ## log message
-      print(glue::glue("[{Sys.time()}] File to load: {dataset_to_load}"))
+      print(glue::glue("[{Sys.time()}] Load data set from file: {dataset_to_load}"))
       ## read the file
       data <- readRDS(dataset_to_load)
+      if(
+        exists('Cerebro.options') &&
+        !is.null(Cerebro.options[['expression_matrix_h5']]) &&
+        file.exists(Cerebro.options[['expression_matrix_h5']])
+      ) {
+        print(glue::glue("[{Sys.time()}] Loading expression matrix from: {Cerebro.options[['expression_matrix_h5']]}"))
+        expression_matrix <- t(HDF5Array::TENxMatrix(Cerebro.options[['expression_matrix_h5']], group='expression'))
+        if (nrow(data$meta_data)!=ncol(expression_matrix)) {
+          shinyWidgets::sendSweetAlert(
+            session = session,
+            title = "Error!",
+            text = HTML(glue::glue(
+              "The number of cells in the meta data ",
+              "({format(nrow(data$meta_data), big.mark=',')}) does not match ",
+              "the number of cells in the provided expression matrix ",
+              "({format(ncol(expression_matrix), big.mark=',')}).<br><br>",
+              "Until fixed, the 'Gene (set) expression' tab will not work."
+            )),
+            type = "error",
+            html = TRUE
+          )
+        } else {
+          data$expression <- expression_matrix
+        }
+      }
     }
     ## log message
     message(data$print())
@@ -152,6 +177,12 @@ server <- function(input, output, session) {
     }
     # message(str(available_trajectories))
     return(available_trajectories)
+  })
+
+  # available genes
+  list_of_genes <- reactive({
+    req(data_set())
+    rownames(data_set()$expression)
   })
 
   # hover info for projection
