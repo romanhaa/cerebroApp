@@ -55,8 +55,8 @@ user_credentials <- tibble::tribble(
 Within the definition of the `server` function, right at the top, add this:
 
 ```{r eval=FALSE}
-res_auth <- shinymanager::secure_server(
-  check_credentials = shinymanager::check_credentials(user_credentials)
+res_auth <- secure_server(
+  check_credentials = check_credentials(user_credentials)
 )
 ```
 
@@ -85,7 +85,7 @@ server <- function(input, output, session) {
 At the end of the file, after the definition of the `ui` function, add this:
 
 ```{r eval=FALSE}
-ui <- shinymanager::secure_app(ui)
+ui <- secure_app(ui)
 ```
 
 # Usage
