@@ -109,29 +109,44 @@ server <- function(input, output, session) {
       print(glue::glue("[{Sys.time()}] Load data set from file: {dataset_to_load}"))
       ## read the file
       data <- readRDS(dataset_to_load)
-      if(
+      if (
         exists('Cerebro.options') &&
-        !is.null(Cerebro.options[['expression_matrix_h5']]) &&
-        file.exists(Cerebro.options[['expression_matrix_h5']])
+        !is.null(Cerebro.options[['expression_matrix_h5']])
       ) {
-        print(glue::glue("[{Sys.time()}] Loading expression matrix from: {Cerebro.options[['expression_matrix_h5']]}"))
-        expression_matrix <- t(HDF5Array::TENxMatrix(Cerebro.options[['expression_matrix_h5']], group='expression'))
-        if (nrow(data$meta_data)!=ncol(expression_matrix)) {
+        if (!file.exists(Cerebro.options[['expression_matrix_h5']])) {
           shinyWidgets::sendSweetAlert(
             session = session,
             title = "Error!",
             text = HTML(glue::glue(
-              "The number of cells in the meta data ",
-              "({format(nrow(data$meta_data), big.mark=',')}) does not match ",
-              "the number of cells in the provided expression matrix ",
-              "({format(ncol(expression_matrix), big.mark=',')}).<br><br>",
-              "Until fixed, the 'Gene (set) expression' tab will not work."
+              "Specified expression matrix in h5 format could not be found at:",
+              "<br><br>",
+              "{Cerebro.options[['expression_matrix_h5']]}",
+              "<br><br>",
+              "Please check the path."
             )),
             type = "error",
             html = TRUE
           )
         } else {
-          data$expression <- expression_matrix
+          print(glue::glue("[{Sys.time()}] Loading expression matrix from: {Cerebro.options[['expression_matrix_h5']]}"))
+          expression_matrix <- Matrix::t(HDF5Array::TENxMatrix(Cerebro.options[['expression_matrix_h5']], group='expression'))
+          if (nrow(data$meta_data)!=ncol(expression_matrix)) {
+            shinyWidgets::sendSweetAlert(
+              session = session,
+              title = "Error!",
+              text = HTML(glue::glue(
+                "The number of cells in the meta data ",
+                "({format(nrow(data$meta_data), big.mark=',')}) does not match ",
+                "the number of cells in the provided expression matrix ",
+                "({format(ncol(expression_matrix), big.mark=',')}).<br><br>",
+                "Until fixed, the 'Gene (set) expression' tab will not work."
+              )),
+              type = "error",
+              html = TRUE
+            )
+          } else {
+            data$expression <- expression_matrix
+          }
         }
       }
     }
