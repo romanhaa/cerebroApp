@@ -418,7 +418,7 @@ Cerebro.options <- list(
 ```{r eval=FALSE}
 Cerebro.options <- list(
   "mode" = "open",
-  "cerebro_root" = "~/Research/GitHub/cerebroApp_v1.3/inst"
+  "cerebro_root" = "~/GitHub/cerebroApp_dev_refactor_overview/inst"
 )
 ```
 
@@ -429,8 +429,8 @@ Cerebro.options <- list(
 ```{r eval=FALSE}
 options(shiny.maxRequestSize = 800 * 1024^2)
 
-source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/shiny_UI.R")
-source("~/Research/GitHub/cerebroApp_v1.3/inst/shiny/v1.3/shiny_server.R")
+source("~/GitHub/cerebroApp_dev_refactor_overview/inst/shiny/v1.3/shiny_UI.R")
+source("~/GitHub/cerebroApp_dev_refactor_overview/inst/shiny/v1.3/shiny_server.R")
 
 shiny::shinyApp(ui = ui, server = server)
 ```

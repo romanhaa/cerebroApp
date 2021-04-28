@@ -85,11 +85,14 @@ output[["extra_material_table"]] <- DT::renderDataTable({
     results_df %>%
     as.data.frame() %>%
     dplyr::slice(0) %>%
-    prepareEmptyTable()
+    .prepareEmptyTable()
   ## if there is at least 1 row, create proper table
   } else {
-    prettifyTable(
+    .prettifyTable(
       results_df,
+      getGroups(),
+      getCellCycle(),
+      reactive_colors(),
       filter = list(position = "top", clear = TRUE),
       dom = "Bfrtlip",
       show_buttons = TRUE,

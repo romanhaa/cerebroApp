@@ -118,7 +118,7 @@ output[["states_by_group_plot"]] <- plotly::renderPlotly({
     ##
     composition_df <- cells_df %>%
       dplyr::filter(!is.na(pseudotime)) %>%
-      calculateTableAB(
+      .calculateTableAB(
         "state",
         grouping_variable,
         mode = "long",
@@ -126,7 +126,7 @@ output[["states_by_group_plot"]] <- plotly::renderPlotly({
       )
 
     ## get colors for groups
-    colors_for_groups <- assignColorsToGroups(composition_df, grouping_variable)
+    colors_for_groups <- .assignColorsToGroups(composition_df, grouping_variable, reactive_colors())
 
     ## generate plot
     plotlyBarChart(
@@ -143,7 +143,7 @@ output[["states_by_group_plot"]] <- plotly::renderPlotly({
     ##
     composition_df <- cells_df %>%
       dplyr::filter(!is.na(pseudotime)) %>%
-      calculateTableAB(
+      .calculateTableAB(
         "state",
         grouping_variable,
         mode = "long",
@@ -152,8 +152,8 @@ output[["states_by_group_plot"]] <- plotly::renderPlotly({
 
     ## get color code for all group levels (from both groups)
     colors_for_groups <- c(
-      assignColorsToGroups(composition_df, "state"),
-      assignColorsToGroups(composition_df, grouping_variable)
+      .assignColorsToGroups(composition_df, "state", reactive_colors()),
+      .assignColorsToGroups(composition_df, grouping_variable, reactive_colors())
     )
 
     ## generate plot
@@ -194,7 +194,7 @@ output[["states_by_group_table"]] <- DT::renderDataTable({
   ## generate table
   composition_df <- cells_df %>%
     dplyr::filter(!is.na(pseudotime)) %>%
-    calculateTableAB(
+    .calculateTableAB(
       "state",
       grouping_variable,
       mode = "wide",
@@ -210,7 +210,10 @@ output[["states_by_group_table"]] <- DT::renderDataTable({
 
   composition_df %>%
   dplyr::rename("# of cells" = total_cell_count) %>%
-  prettifyTable(
+  .prettifyTable(
+    getGroups(),
+    getCellCycle(),
+    reactive_colors(),
     filter = "none",
     dom = "Brtlip",
     show_buttons = FALSE,

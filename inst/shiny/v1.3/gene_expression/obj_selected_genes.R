@@ -36,7 +36,7 @@ expression_selected_genes <- reactive({
   ## ...
   } else if ( input[["expression_analysis_mode"]] == "Gene set" ) {
     req(input[["expression_select_gene_set"]])
-    gene_sets[["genes_to_display"]] <- getGenesForGeneSet(input[["expression_select_gene_set"]])
+    gene_sets[["genes_to_display"]] <- .getGenesForGeneSet(input[["expression_select_gene_set"]], getExperiment()$organism)
   }
   ## check which are available in the data set
   genes_to_display_here <- list_of_genes()[ match(tolower(gene_sets[["genes_to_display"]]), tolower(list_of_genes())) ]

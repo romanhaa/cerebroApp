@@ -74,7 +74,7 @@ output[["trajectory_details_selected_cells_table"]] <- DT::renderDataTable({
     ## prepare empty table
     getMetaData() %>%
     dplyr::slice(0) %>%
-    prepareEmptyTable()
+    .prepareEmptyTable()
 
   ## ... selection has been made and at least 1 cell is in it
   } else {
@@ -102,14 +102,17 @@ output[["trajectory_details_selected_cells_table"]] <- DT::renderDataTable({
       ## prepare empty table
       getMetaData() %>%
       dplyr::slice(0) %>%
-      prepareEmptyTable()
+      .prepareEmptyTable()
 
     ## ... at least 1 cell is left
     } else {
 
       ## prepare proper table
-      prettifyTable(
+      .prettifyTable(
         cells_df,
+        getGroups(),
+        getCellCycle(),
+        reactive_colors(),
         filter = list(position = "top", clear = TRUE),
         dom = "Brtlip",
         show_buttons = TRUE,

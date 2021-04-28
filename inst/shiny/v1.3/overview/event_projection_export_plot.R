@@ -67,7 +67,7 @@ observeEvent(input[["overview_projection_export"]], {
       ## check if group labels should be plotted and, if so, add them
       if ( plot_parameters[["group_labels"]] == TRUE ) {
         ## calculate group level centers
-        group_labels <- centerOfGroups(coordinates, cells_df, 2, variable_to_color_cells)
+        group_labels <- .centerOfGroups(coordinates, cells_df, 2, variable_to_color_cells)
         ## add group level labels at center of respective groups
         plot <- plot +
           geom_label(

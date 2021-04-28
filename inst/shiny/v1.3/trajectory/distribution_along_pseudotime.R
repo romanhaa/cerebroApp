@@ -119,7 +119,7 @@ output[["trajectory_distribution_along_pseudotime_plot"]] <- plotly::renderPlotl
   ) {
 
     ## get colors for groups
-    colors_for_groups <- assignColorsToGroups(cells_df, color_variable)
+    colors_for_groups <- .assignColorsToGroups(cells_df, color_variable, reactive_colors())
 
     ## get group levels
     if ( is.factor(cells_df[[ color_variable ]]) ) {
@@ -208,7 +208,7 @@ output[["trajectory_distribution_along_pseudotime_plot"]] <- plotly::renderPlotl
   } else {
 
     ## get colors for states
-    colors_for_groups <- assignColorsToGroups(trajectory_data[["meta"]], "state")
+    colors_for_groups <- .assignColorsToGroups(trajectory_data[["meta"]], "state", reactive_colors())
 
     ## prepare hover info
     hover_info <- buildHoverInfoForProjections(cells_df)

@@ -7,9 +7,10 @@ overview_projection_color_assignments <- reactive({
     overview_projection_parameters_plot()
   )
   # message('--> trigger "overview_projection_color_assignments"')
-  colors <- assignColorsToGroups(
+  colors <- .assignColorsToGroups(
     overview_projection_data(),
-    overview_projection_parameters_plot()[['color_variable']]
+    overview_projection_parameters_plot()[['color_variable']],
+    reactive_colors()
   )
   # message(str(colors))
   return(colors)

@@ -27,7 +27,7 @@ expression_projection_cells_to_show <- reactive({
   cells_df <- cells_df %>%
     dplyr::select(cell_barcode, row_id)
   ## randomly remove cells (if necessary)
-  cells_df <- randomlySubsetCells(cells_df, pct_cells)
+  cells_df <- .randomlySubsetCells(cells_df, pct_cells)
   ## put rows in random order
   cells_df <- cells_df[sample(1:nrow(cells_df)),]
   cells_to_show <- cells_df$row_id

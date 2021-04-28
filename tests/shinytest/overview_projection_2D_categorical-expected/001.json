@@ -1,0 +1,1459 @@
+{
+  "input": {
+    ".clientValue-default-plotlyCrosstalkOpts": {
+      "on": "plotly_click",
+      "persistent": false,
+      "dynamic": false,
+      "selectize": false,
+      "opacityDim": 0.2,
+      "selected": {
+        "opacity": 1
+      },
+      "debounce": 0,
+      "color": [
+
+      ]
+    },
+    "browser": 0,
+    "drop569489812": 0,
+    "geneIdConversion_info": 0,
+    "geneIdConversion_organism": "mouse",
+    "hover_info_in_projections_checkbox": true,
+    "input_file": null,
+    "overview_details_selected_cells_plot_info": 0,
+    "overview_details_selected_cells_table_cell_clicked": {
+
+    },
+    "overview_details_selected_cells_table_cells_selected": [
+
+    ],
+    "overview_details_selected_cells_table_color_highlighting": true,
+    "overview_details_selected_cells_table_columns_selected": null,
+    "overview_details_selected_cells_table_info": 0,
+    "overview_details_selected_cells_table_number_formatting": true,
+    "overview_details_selected_cells_table_rows_all": null,
+    "overview_details_selected_cells_table_rows_current": null,
+    "overview_details_selected_cells_table_rows_selected": null,
+    "overview_details_selected_cells_table_search": "",
+    "overview_details_selected_cells_table_state": null,
+    "overview_projection_additional_parameters_info": 0,
+    "overview_projection_export": 0,
+    "overview_projection_group_filter_cell_type_singler_blueprintencode_main": [
+      "B-cells",
+      "CD4+ T-cells",
+      "CD8+ T-cells",
+      "Erythrocytes",
+      "HSC",
+      "Monocytes",
+      "NK cells"
+    ],
+    "overview_projection_group_filter_sample": [
+      "pbmc_10k_v3_rep1",
+      "pbmc_10k_v3_rep2",
+      "pbmc_10k_v3_rep3"
+    ],
+    "overview_projection_group_filter_seurat_clusters": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5"
+    ],
+    "overview_projection_group_filters_info": 0,
+    "overview_projection_info": 0,
+    "overview_projection_main_parameters_info": 0,
+    "overview_projection_percentage_cells_to_show": 100,
+    "overview_projection_point_border": false,
+    "overview_projection_point_color": "sample",
+    "overview_projection_point_opacity": 1,
+    "overview_projection_point_size": 5,
+    "overview_projection_scale_x_manual_range": [
+      -18,
+      19
+    ],
+    "overview_projection_scale_y_manual_range": [
+      -19,
+      22
+    ],
+    "overview_projection_show_group_label": true,
+    "overview_projection_to_display": "tSNE",
+    "overview_selected_cells_plot_select_variable": "sample",
+    "plotly_afterplot-overview_projection": "\"overview_projection\"",
+    "plotly_afterplot-subset": "\"overview_details_selected_cells_plot\"",
+    "select_from_available_datasets": "",
+    "sidebar": "overview",
+    "sidebarCollapsed": false,
+    "sidebarItemExpanded": null,
+    "webgl_checkbox": true
+  },
+  "output": {
+    "expression_projection_additional_parameters_UI": {
+      "html": "<div class=\"form-group shiny-input-container\">\n  <label class=\"control-label\" for=\"expression_projection_plotting_order\">Plotting order<\/label>\n  <div>\n    <select id=\"expression_projection_plotting_order\"><option value=\"Random\" selected>Random<\/option>\n<option value=\"Highest expression on top\">Highest expression on top<\/option><\/select>\n    <script type=\"application/json\" data-for=\"expression_projection_plotting_order\" data-nonempty=\"\">{}<\/script>\n  <\/div>\n<\/div>\n<div class=\"form-group shiny-input-container\">\n  <label class=\"control-label\" for=\"expression_projection_point_size\">Point size<\/label>\n  <input class=\"js-range-slider\" id=\"expression_projection_point_size\" data-min=\"1\" data-max=\"20\" data-from=\"5\" data-step=\"1\" data-grid=\"true\" data-grid-num=\"9.5\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n<\/div>\n<div class=\"form-group shiny-input-container\">\n  <label class=\"control-label\" for=\"expression_projection_point_opacity\">Point opacity<\/label>\n  <input class=\"js-range-slider\" id=\"expression_projection_point_opacity\" data-min=\"0.1\" data-max=\"1\" data-from=\"1\" data-step=\"0.1\" data-grid=\"true\" data-grid-num=\"9\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n<\/div>\n<div class=\"form-group shiny-input-container\">\n  <label class=\"control-label\" for=\"expression_projection_percentage_cells_to_show\">Show % of cells<\/label>\n  <input class=\"js-range-slider\" id=\"expression_projection_percentage_cells_to_show\" data-min=\"10\" data-max=\"100\" data-from=\"100\" data-step=\"10\" data-grid=\"true\" data-grid-num=\"9\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n<\/div>",
+      "deps": [
+        {
+          "name": "selectize",
+          "version": "0.11.2",
+          "src": {
+            "href": "shared/selectize"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": "css/selectize.bootstrap3.css",
+          "head": "<!--[if lt IE 9]>\n<script src=\"shared/selectize/js/es5-shim.min.js\"><\/script>\n<![endif]-->\n<script src=\"shared/selectize/js/selectize.min.js\"><\/script>",
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        },
+        {
+          "name": "ionrangeslider",
+          "version": "2.1.6",
+          "src": {
+            "href": "shared/ionrangeslider"
+          },
+          "meta": null,
+          "script": "js/ion.rangeSlider.min.js",
+          "stylesheet": [
+            "css/ion.rangeSlider.css",
+            "css/ion.rangeSlider.skinShiny.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        },
+        {
+          "name": "strftime",
+          "version": "0.9.2",
+          "src": {
+            "href": "shared/strftime"
+          },
+          "meta": null,
+          "script": "strftime-min.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        }
+      ]
+    },
+    "expression_projection_color_scale_range_UI": {
+      "message": "",
+      "call": "NULL",
+      "type": [
+        "shiny.silent.error",
+        "validation"
+      ]
+    },
+    "expression_projection_color_scale_UI": {
+      "html": "<div class=\"form-group shiny-input-container\">\n  <label class=\"control-label\" for=\"expression_projection_color_scale\">Color scale<\/label>\n  <div>\n    <select id=\"expression_projection_color_scale\"><option value=\"YlGnBu\" selected>YlGnBu<\/option>\n<option value=\"YlOrRd\">YlOrRd<\/option>\n<option value=\"Blues\">Blues<\/option>\n<option value=\"Greens\">Greens<\/option>\n<option value=\"Reds\">Reds<\/option>\n<option value=\"RdBu\">RdBu<\/option>\n<option value=\"Viridis\">Viridis<\/option><\/select>\n    <script type=\"application/json\" data-for=\"expression_projection_color_scale\" data-nonempty=\"\">{}<\/script>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "selectize",
+          "version": "0.11.2",
+          "src": {
+            "href": "shared/selectize"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": "css/selectize.bootstrap3.css",
+          "head": "<!--[if lt IE 9]>\n<script src=\"shared/selectize/js/es5-shim.min.js\"><\/script>\n<![endif]-->\n<script src=\"shared/selectize/js/selectize.min.js\"><\/script>",
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        }
+      ]
+    },
+    "expression_projection_genes_in_separate_panels_UI": {
+      "html": "<div class=\"form-group shiny-input-container\">\n  <div class=\"awesome-checkbox checkbox-primary\">\n    <input id=\"expression_projection_genes_in_separate_panels\" type=\"checkbox\"/>\n    <label style=\"cursor: pointer;\" for=\"expression_projection_genes_in_separate_panels\">Show genes in separate panels<br>(experimental)<\/label>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "shinyWidgets",
+          "version": "0.5.4",
+          "src": {
+            "href": "shinyWidgets"
+          },
+          "meta": null,
+          "script": "shinyWidgets-bindings.min.js",
+          "stylesheet": "shinyWidgets.min.css",
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        },
+        {
+          "name": "awesome-bootstrap",
+          "version": "0.3.7",
+          "src": {
+            "href": "shinyWidgets/awesome-bootstrap-checkbox"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": "awesome-bootstrap-checkbox.min.css",
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        },
+        {
+          "name": "font-awesome",
+          "version": "5.13.0",
+          "src": {
+            "href": "font-awesome-5.13.0"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": [
+            "css/all.min.css",
+            "css/v4-shims.min.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        }
+      ]
+    },
+    "expression_projection_group_filters_UI": {
+      "html": "<div class=\"form-group shiny-input-container\">\n  <label class=\"control-label\" for=\"expression_projection_group_filter_sample\">sample<\/label>\n  <select data-actions-box=\"true\" id=\"expression_projection_group_filter_sample\" class=\"selectpicker form-control\" multiple=\"multiple\"><option value=\"pbmc_10k_v3_rep1\" selected>pbmc_10k_v3_rep1<\/option>\n<option value=\"pbmc_10k_v3_rep2\" selected>pbmc_10k_v3_rep2<\/option>\n<option value=\"pbmc_10k_v3_rep3\" selected>pbmc_10k_v3_rep3<\/option><\/select>\n<\/div>\n<div class=\"form-group shiny-input-container\">\n  <label class=\"control-label\" for=\"expression_projection_group_filter_seurat_clusters\">seurat_clusters<\/label>\n  <select data-actions-box=\"true\" id=\"expression_projection_group_filter_seurat_clusters\" class=\"selectpicker form-control\" multiple=\"multiple\"><option value=\"0\" selected>0<\/option>\n<option value=\"1\" selected>1<\/option>\n<option value=\"2\" selected>2<\/option>\n<option value=\"3\" selected>3<\/option>\n<option value=\"4\" selected>4<\/option>\n<option value=\"5\" selected>5<\/option><\/select>\n<\/div>\n<div class=\"form-group shiny-input-container\">\n  <label class=\"control-label\" for=\"expression_projection_group_filter_cell_type_singler_blueprintencode_main\">cell_type_singler_blueprintencode_main<\/label>\n  <select data-actions-box=\"true\" id=\"expression_projection_group_filter_cell_type_singler_blueprintencode_main\" class=\"selectpicker form-control\" multiple=\"multiple\"><option value=\"B-cells\" selected>B-cells<\/option>\n<option value=\"CD4+ T-cells\" selected>CD4+ T-cells<\/option>\n<option value=\"CD8+ T-cells\" selected>CD8+ T-cells<\/option>\n<option value=\"Erythrocytes\" selected>Erythrocytes<\/option>\n<option value=\"HSC\" selected>HSC<\/option>\n<option value=\"Monocytes\" selected>Monocytes<\/option>\n<option value=\"NK cells\" selected>NK cells<\/option><\/select>\n<\/div>",
+      "deps": [
+        {
+          "name": "shinyWidgets",
+          "version": "0.5.4",
+          "src": {
+            "href": "shinyWidgets"
+          },
+          "meta": null,
+          "script": "shinyWidgets-bindings.min.js",
+          "stylesheet": "shinyWidgets.min.css",
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        },
+        {
+          "name": "bootstrap-select",
+          "version": "1.13.18",
+          "src": {
+            "href": "shinyWidgets/bootstrap-select"
+          },
+          "meta": null,
+          "script": "js/bootstrap-select.min.js",
+          "stylesheet": "css/bootstrap-select.min.css",
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        }
+      ]
+    },
+    "expression_projection_point_border_UI": {
+      "html": "<div class=\"form-group shiny-input-container\">\n  <div class=\"awesome-checkbox checkbox-primary\">\n    <input id=\"expression_projection_point_border\" type=\"checkbox\"/>\n    <label style=\"cursor: pointer;\" for=\"expression_projection_point_border\">Draw border around cells<\/label>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "shinyWidgets",
+          "version": "0.5.4",
+          "src": {
+            "href": "shinyWidgets"
+          },
+          "meta": null,
+          "script": "shinyWidgets-bindings.min.js",
+          "stylesheet": "shinyWidgets.min.css",
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        },
+        {
+          "name": "awesome-bootstrap",
+          "version": "0.3.7",
+          "src": {
+            "href": "shinyWidgets/awesome-bootstrap-checkbox"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": "awesome-bootstrap-checkbox.min.css",
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        },
+        {
+          "name": "font-awesome",
+          "version": "5.13.0",
+          "src": {
+            "href": "font-awesome-5.13.0"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": [
+            "css/all.min.css",
+            "css/v4-shims.min.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        }
+      ]
+    },
+    "expression_projection_scales_UI": {
+      "message": "",
+      "call": "NULL",
+      "type": [
+        "shiny.silent.error",
+        "validation"
+      ]
+    },
+    "load_data_sample_info_UI": {
+      "html": "<div class=\"row\">\n  <div class=\"shiny-html-output col-sm-4\" id=\"load_data_experiment_name\"><\/div>\n  <div class=\"shiny-html-output col-sm-4\" id=\"load_data_number_of_cells\"><\/div>\n  <div class=\"shiny-html-output col-sm-4\" id=\"load_data_number_of_grouping_variables\"><\/div>\n<\/div>\n<div class=\"row\">\n  <div class=\"shiny-html-output col-sm-4\" id=\"load_data_organism\"><\/div>\n  <div class=\"shiny-html-output col-sm-4\" id=\"load_data_date_of_analysis\"><\/div>\n  <div class=\"shiny-html-output col-sm-4\" id=\"load_data_date_of_export\"><\/div>\n<\/div>",
+      "deps": [
+
+      ]
+    },
+    "load_data_select_file_UI": {
+      "html": "<div class=\"row\">\n  <div id=\"load_data_mode_open\" class=\"shiny-html-output\"><\/div>\n<\/div>\n<div class=\"row\">\n  <div class=\"col-sm-6\">\n    <head>\n      <title>Load data<\/title>\n    <\/head>\n    <h2>Load data<\/h2>\n    <div class=\"form-group shiny-input-container\" style=\"width: 350px;\">\n      <label class=\"control-label\" for=\"input_file\">Select input data (.crb or .rds file)<\/label>\n      <div class=\"input-group\">\n        <label class=\"input-group-btn input-group-prepend\">\n          <span class=\"btn btn-default btn-file\">\n            Browse...\n            <input id=\"input_file\" name=\"input_file\" type=\"file\" style=\"display: none;\" accept=\".rds,.crb,.cerebro\"/>\n          <\/span>\n        <\/label>\n        <input type=\"text\" class=\"form-control\" placeholder=\"No file selected\" readonly=\"readonly\"/>\n      <\/div>\n      <div id=\"input_file_progress\" class=\"progress active shiny-file-input-progress\">\n        <div class=\"progress-bar\"><\/div>\n      <\/div>\n    <\/div>\n    <div class=\"form-group shiny-input-container\">\n      <label class=\"control-label\" for=\"select_from_available_datasets\">Available datasets<\/label>\n      <div>\n        <select id=\"select_from_available_datasets\" class=\"form-control\"><option value=\"Small samples (500 cells)\" selected>Small samples (500 cells)<\/option>\n<option value=\"Large sample (80k cells)\">Large sample (80k cells)<\/option><\/select>\n        <script type=\"application/json\" data-for=\"select_from_available_datasets\" data-eval=\"[&quot;onInitialize&quot;]\">{\"placeholder\":\"Please select an option below\",\"onInitialize\":\"function() { this.setValue(\\\"\\\"); }\"}<\/script>\n      <\/div>\n    <\/div>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "selectize",
+          "version": "0.11.2",
+          "src": {
+            "href": "shared/selectize"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": "css/selectize.bootstrap3.css",
+          "head": "<!--[if lt IE 9]>\n<script src=\"shared/selectize/js/es5-shim.min.js\"><\/script>\n<![endif]-->\n<script src=\"shared/selectize/js/selectize.min.js\"><\/script>",
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        }
+      ]
+    },
+    "overview_details_selected_cells_plot": {
+      "x": {
+        "layout": {
+          "margin": {
+            "b": 40,
+            "l": 60,
+            "t": 25,
+            "r": 10
+          },
+          "title": "",
+          "xaxis": {
+            "domain": [
+              0,
+              1
+            ],
+            "automargin": true,
+            "title": "",
+            "mirror": true,
+            "showline": true,
+            "type": "category",
+            "categoryorder": "array",
+            "categoryarray": [
+              "pbmc_10k_v3_rep1",
+              "pbmc_10k_v3_rep2",
+              "pbmc_10k_v3_rep3"
+            ]
+          },
+          "yaxis": {
+            "domain": [
+              0,
+              1
+            ],
+            "automargin": true,
+            "title": "Number of cells",
+            "hoverformat": ".0f",
+            "mirror": true,
+            "showline": true
+          },
+          "dragmode": "select",
+          "hovermode": "compare",
+          "showlegend": false
+        },
+        "source": "subset",
+        "config": {
+          "showSendToCloud": false
+        },
+        "data": [
+          {
+            "x": "pbmc_10k_v3_rep1",
+            "y": 0,
+            "showlegend": false,
+            "hoverinfo": "y",
+            "type": "bar",
+            "name": "pbmc_10k_v3_rep1",
+            "marker": {
+              "color": "rgba(255,195,18,1)",
+              "line": {
+                "color": "rgba(255,195,18,1)"
+              }
+            },
+            "textfont": {
+              "color": "rgba(255,195,18,1)"
+            },
+            "error_y": {
+              "color": "rgba(255,195,18,1)"
+            },
+            "error_x": {
+              "color": "rgba(255,195,18,1)"
+            },
+            "xaxis": "x",
+            "yaxis": "y",
+            "frame": null
+          },
+          {
+            "x": "pbmc_10k_v3_rep2",
+            "y": 0,
+            "showlegend": false,
+            "hoverinfo": "y",
+            "type": "bar",
+            "name": "pbmc_10k_v3_rep2",
+            "marker": {
+              "color": "rgba(196,229,56,1)",
+              "line": {
+                "color": "rgba(196,229,56,1)"
+              }
+            },
+            "textfont": {
+              "color": "rgba(196,229,56,1)"
+            },
+            "error_y": {
+              "color": "rgba(196,229,56,1)"
+            },
+            "error_x": {
+              "color": "rgba(196,229,56,1)"
+            },
+            "xaxis": "x",
+            "yaxis": "y",
+            "frame": null
+          },
+          {
+            "x": "pbmc_10k_v3_rep3",
+            "y": 0,
+            "showlegend": false,
+            "hoverinfo": "y",
+            "type": "bar",
+            "name": "pbmc_10k_v3_rep3",
+            "marker": {
+              "color": "rgba(18,203,196,1)",
+              "line": {
+                "color": "rgba(18,203,196,1)"
+              }
+            },
+            "textfont": {
+              "color": "rgba(18,203,196,1)"
+            },
+            "error_y": {
+              "color": "rgba(18,203,196,1)"
+            },
+            "error_x": {
+              "color": "rgba(18,203,196,1)"
+            },
+            "xaxis": "x",
+            "yaxis": "y",
+            "frame": null
+          }
+        ],
+        "highlight": {
+          "on": "plotly_click",
+          "persistent": false,
+          "dynamic": false,
+          "selectize": false,
+          "opacityDim": 0.2,
+          "selected": {
+            "opacity": 1
+          },
+          "debounce": 0
+        },
+        "shinyEvents": [
+          "plotly_hover",
+          "plotly_click",
+          "plotly_selected",
+          "plotly_relayout",
+          "plotly_brushed",
+          "plotly_brushing",
+          "plotly_clickannotation",
+          "plotly_doubleclick",
+          "plotly_deselect",
+          "plotly_afterplot",
+          "plotly_sunburstclick"
+        ],
+        "base_url": "https://plot.ly"
+      },
+      "evals": [
+
+      ],
+      "jsHooks": [
+
+      ],
+      "deps": [
+        {
+          "name": "setprototypeof",
+          "version": "0.1",
+          "src": {
+            "href": "setprototypeof-0.1"
+          },
+          "meta": null,
+          "script": "setprototypeof.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        },
+        {
+          "name": "typedarray",
+          "version": "0.1",
+          "src": {
+            "href": "typedarray-0.1"
+          },
+          "meta": null,
+          "script": "typedarray.min.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        },
+        {
+          "name": "jquery",
+          "version": "1.11.3",
+          "src": {
+            "href": "jquery-1.11.3"
+          },
+          "meta": null,
+          "script": "jquery.min.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        },
+        {
+          "name": "crosstalk",
+          "version": "1.1.0.1",
+          "src": {
+            "href": "crosstalk-1.1.0.1"
+          },
+          "meta": null,
+          "script": "js/crosstalk.min.js",
+          "stylesheet": "css/crosstalk.css",
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        },
+        {
+          "name": "plotly-htmlwidgets-css",
+          "version": "1.52.2",
+          "src": {
+            "href": "plotly-htmlwidgets-css-1.52.2"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": "plotly-htmlwidgets.css",
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        },
+        {
+          "name": "plotly-main",
+          "version": "1.52.2",
+          "src": {
+            "href": "plotly-main-1.52.2"
+          },
+          "meta": null,
+          "script": "plotly-latest.min.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        }
+      ]
+    },
+    "overview_details_selected_cells_table": {
+      "x": {
+        "style": "bootstrap",
+        "filter": "none",
+        "autoHideNavigation": true,
+        "data": [
+          [
+
+          ],
+          [
+
+          ],
+          [
+
+          ],
+          [
+
+          ],
+          [
+
+          ],
+          [
+
+          ],
+          [
+
+          ],
+          [
+
+          ],
+          [
+
+          ],
+          [
+
+          ],
+          [
+
+          ],
+          [
+
+          ],
+          [
+
+          ]
+        ],
+        "container": "<table class=\"table table-striped table-bordered table-condensed\">\n  <thead>\n    <tr>\n      <th>cell_barcode<\/th>\n      <th>sample<\/th>\n      <th>seurat_clusters<\/th>\n      <th>cell_type_singler_blueprintencode_main<\/th>\n      <th>nUMI<\/th>\n      <th>nGene<\/th>\n      <th>Phase<\/th>\n      <th>orig.ident<\/th>\n      <th>S.Score<\/th>\n      <th>G2M.Score<\/th>\n      <th>cell_type_singler_blueprintencode_main_score<\/th>\n      <th>percent_mt<\/th>\n      <th>percent_ribo<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>",
+        "options": {
+          "buttons": [
+
+          ],
+          "dom": "Brtip",
+          "lengthMenu": [
+            20,
+            50,
+            100
+          ],
+          "pageLength": 20,
+          "scrollX": true,
+          "columnDefs": [
+            {
+              "className": "dt-right",
+              "targets": [
+                4,
+                5,
+                8,
+                9,
+                10,
+                11,
+                12
+              ]
+            }
+          ],
+          "order": [
+
+          ],
+          "autoWidth": false,
+          "orderClasses": false
+        },
+        "selection": {
+          "mode": "none",
+          "selected": null,
+          "target": "row",
+          "selectable": null
+        }
+      },
+      "evals": [
+
+      ],
+      "jsHooks": [
+
+      ],
+      "deps": [
+        {
+          "name": "dt-core-bootstrap",
+          "version": "1.10.20",
+          "src": {
+            "href": "dt-core-bootstrap-1.10.20"
+          },
+          "meta": null,
+          "script": [
+            "js/jquery.dataTables.min.js",
+            "js/dataTables.bootstrap.min.js"
+          ],
+          "stylesheet": [
+            "css/dataTables.bootstrap.min.css",
+            "css/dataTables.bootstrap.extra.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": false
+        },
+        {
+          "name": "jquery",
+          "version": "1.11.3",
+          "src": {
+            "href": "jquery-1.11.3"
+          },
+          "meta": null,
+          "script": "jquery.min.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        },
+        {
+          "name": "crosstalk",
+          "version": "1.1.0.1",
+          "src": {
+            "href": "crosstalk-1.1.0.1"
+          },
+          "meta": null,
+          "script": "js/crosstalk.min.js",
+          "stylesheet": "css/crosstalk.css",
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        }
+      ]
+    },
+    "overview_number_of_selected_cells": "<b>Number of selected cells<\/b>: 0",
+    "overview_projection": {
+      "x": {
+        "layout": {
+          "margin": {
+            "b": 40,
+            "l": 60,
+            "t": 25,
+            "r": 10
+          },
+          "xaxis": {
+            "domain": [
+              0,
+              1
+            ],
+            "automargin": true,
+            "autorange": true,
+            "mirror": true,
+            "showline": true,
+            "zeroline": false
+          },
+          "yaxis": {
+            "domain": [
+              0,
+              1
+            ],
+            "automargin": true,
+            "autorange": true,
+            "mirror": true,
+            "showline": true,
+            "zeroline": false
+          },
+          "hovermode": "closest",
+          "showlegend": false
+        },
+        "source": "overview_projection",
+        "config": {
+          "showSendToCloud": false
+        },
+        "data": [
+          {
+            "mode": "markers",
+            "type": "scattergl",
+            "marker": {
+              "color": "rgba(31,119,180,1)",
+              "line": {
+                "color": "rgba(31,119,180,1)"
+              }
+            },
+            "error_y": {
+              "color": "rgba(31,119,180,1)"
+            },
+            "error_x": {
+              "color": "rgba(31,119,180,1)"
+            },
+            "line": {
+              "color": "rgba(31,119,180,1)"
+            },
+            "xaxis": "x",
+            "yaxis": "y",
+            "frame": null
+          }
+        ],
+        "highlight": {
+          "on": "plotly_click",
+          "persistent": false,
+          "dynamic": false,
+          "selectize": false,
+          "opacityDim": 0.2,
+          "selected": {
+            "opacity": 1
+          },
+          "debounce": 0
+        },
+        "shinyEvents": [
+          "plotly_hover",
+          "plotly_click",
+          "plotly_selected",
+          "plotly_relayout",
+          "plotly_brushed",
+          "plotly_brushing",
+          "plotly_clickannotation",
+          "plotly_doubleclick",
+          "plotly_deselect",
+          "plotly_afterplot",
+          "plotly_sunburstclick"
+        ],
+        "base_url": "https://plot.ly"
+      },
+      "evals": [
+
+      ],
+      "jsHooks": [
+
+      ],
+      "deps": [
+        {
+          "name": "setprototypeof",
+          "version": "0.1",
+          "src": {
+            "href": "setprototypeof-0.1"
+          },
+          "meta": null,
+          "script": "setprototypeof.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        },
+        {
+          "name": "typedarray",
+          "version": "0.1",
+          "src": {
+            "href": "typedarray-0.1"
+          },
+          "meta": null,
+          "script": "typedarray.min.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        },
+        {
+          "name": "jquery",
+          "version": "1.11.3",
+          "src": {
+            "href": "jquery-1.11.3"
+          },
+          "meta": null,
+          "script": "jquery.min.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        },
+        {
+          "name": "crosstalk",
+          "version": "1.1.0.1",
+          "src": {
+            "href": "crosstalk-1.1.0.1"
+          },
+          "meta": null,
+          "script": "js/crosstalk.min.js",
+          "stylesheet": "css/crosstalk.css",
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        },
+        {
+          "name": "plotly-htmlwidgets-css",
+          "version": "1.52.2",
+          "src": {
+            "href": "plotly-htmlwidgets-css-1.52.2"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": "plotly-htmlwidgets.css",
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        },
+        {
+          "name": "plotly-main",
+          "version": "1.52.2",
+          "src": {
+            "href": "plotly-main-1.52.2"
+          },
+          "meta": null,
+          "script": "plotly-latest.min.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        }
+      ]
+    },
+    "overview_projection_additional_parameters_UI": {
+      "html": "<div class=\"form-group shiny-input-container\">\n  <label class=\"control-label\" for=\"overview_projection_point_size\">Point size<\/label>\n  <input class=\"js-range-slider\" id=\"overview_projection_point_size\" data-min=\"1\" data-max=\"20\" data-from=\"5\" data-step=\"1\" data-grid=\"true\" data-grid-num=\"9.5\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n<\/div>\n<div class=\"form-group shiny-input-container\">\n  <label class=\"control-label\" for=\"overview_projection_point_opacity\">Point opacity<\/label>\n  <input class=\"js-range-slider\" id=\"overview_projection_point_opacity\" data-min=\"0.1\" data-max=\"1\" data-from=\"1\" data-step=\"0.1\" data-grid=\"true\" data-grid-num=\"9\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n<\/div>\n<div class=\"form-group shiny-input-container\">\n  <label class=\"control-label\" for=\"overview_projection_percentage_cells_to_show\">Show % of cells<\/label>\n  <input class=\"js-range-slider\" id=\"overview_projection_percentage_cells_to_show\" data-min=\"10\" data-max=\"100\" data-from=\"100\" data-step=\"10\" data-grid=\"true\" data-grid-num=\"9\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n<\/div>",
+      "deps": [
+        {
+          "name": "ionrangeslider",
+          "version": "2.1.6",
+          "src": {
+            "href": "shared/ionrangeslider"
+          },
+          "meta": null,
+          "script": "js/ion.rangeSlider.min.js",
+          "stylesheet": [
+            "css/ion.rangeSlider.css",
+            "css/ion.rangeSlider.skinShiny.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        },
+        {
+          "name": "strftime",
+          "version": "0.9.2",
+          "src": {
+            "href": "shared/strftime"
+          },
+          "meta": null,
+          "script": "strftime-min.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        }
+      ]
+    },
+    "overview_projection_group_filters_UI": {
+      "html": "<div class=\"form-group shiny-input-container\">\n  <label class=\"control-label\" for=\"overview_projection_group_filter_sample\">sample<\/label>\n  <select data-actions-box=\"true\" id=\"overview_projection_group_filter_sample\" class=\"selectpicker form-control\" multiple=\"multiple\"><option value=\"pbmc_10k_v3_rep1\" selected>pbmc_10k_v3_rep1<\/option>\n<option value=\"pbmc_10k_v3_rep2\" selected>pbmc_10k_v3_rep2<\/option>\n<option value=\"pbmc_10k_v3_rep3\" selected>pbmc_10k_v3_rep3<\/option><\/select>\n<\/div>\n<div class=\"form-group shiny-input-container\">\n  <label class=\"control-label\" for=\"overview_projection_group_filter_seurat_clusters\">seurat_clusters<\/label>\n  <select data-actions-box=\"true\" id=\"overview_projection_group_filter_seurat_clusters\" class=\"selectpicker form-control\" multiple=\"multiple\"><option value=\"0\" selected>0<\/option>\n<option value=\"1\" selected>1<\/option>\n<option value=\"2\" selected>2<\/option>\n<option value=\"3\" selected>3<\/option>\n<option value=\"4\" selected>4<\/option>\n<option value=\"5\" selected>5<\/option><\/select>\n<\/div>\n<div class=\"form-group shiny-input-container\">\n  <label class=\"control-label\" for=\"overview_projection_group_filter_cell_type_singler_blueprintencode_main\">cell_type_singler_blueprintencode_main<\/label>\n  <select data-actions-box=\"true\" id=\"overview_projection_group_filter_cell_type_singler_blueprintencode_main\" class=\"selectpicker form-control\" multiple=\"multiple\"><option value=\"B-cells\" selected>B-cells<\/option>\n<option value=\"CD4+ T-cells\" selected>CD4+ T-cells<\/option>\n<option value=\"CD8+ T-cells\" selected>CD8+ T-cells<\/option>\n<option value=\"Erythrocytes\" selected>Erythrocytes<\/option>\n<option value=\"HSC\" selected>HSC<\/option>\n<option value=\"Monocytes\" selected>Monocytes<\/option>\n<option value=\"NK cells\" selected>NK cells<\/option><\/select>\n<\/div>",
+      "deps": [
+        {
+          "name": "shinyWidgets",
+          "version": "0.5.4",
+          "src": {
+            "href": "shinyWidgets"
+          },
+          "meta": null,
+          "script": "shinyWidgets-bindings.min.js",
+          "stylesheet": "shinyWidgets.min.css",
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        },
+        {
+          "name": "bootstrap-select",
+          "version": "1.13.18",
+          "src": {
+            "href": "shinyWidgets/bootstrap-select"
+          },
+          "meta": null,
+          "script": "js/bootstrap-select.min.js",
+          "stylesheet": "css/bootstrap-select.min.css",
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        }
+      ]
+    },
+    "overview_projection_main_parameters_UI": {
+      "html": "<div class=\"form-group shiny-input-container\">\n  <label class=\"control-label\" for=\"overview_projection_to_display\">Projection<\/label>\n  <div>\n    <select id=\"overview_projection_to_display\"><option value=\"tSNE\" selected>tSNE<\/option>\n<option value=\"tSNE_3D\">tSNE_3D<\/option>\n<option value=\"UMAP\">UMAP<\/option>\n<option value=\"UMAP_3D\">UMAP_3D<\/option><\/select>\n    <script type=\"application/json\" data-for=\"overview_projection_to_display\" data-nonempty=\"\">{}<\/script>\n  <\/div>\n<\/div>\n<div class=\"form-group shiny-input-container\">\n  <label class=\"control-label\" for=\"overview_projection_point_color\">Color cells by<\/label>\n  <div>\n    <select id=\"overview_projection_point_color\"><option value=\"sample\" selected>sample<\/option>\n<option value=\"seurat_clusters\">seurat_clusters<\/option>\n<option value=\"cell_type_singler_blueprintencode_main\">cell_type_singler_blueprintencode_main<\/option>\n<option value=\"nUMI\">nUMI<\/option>\n<option value=\"nGene\">nGene<\/option>\n<option value=\"Phase\">Phase<\/option>\n<option value=\"orig.ident\">orig.ident<\/option>\n<option value=\"S.Score\">S.Score<\/option>\n<option value=\"G2M.Score\">G2M.Score<\/option>\n<option value=\"cell_type_singler_blueprintencode_main_score\">cell_type_singler_blueprintencode_main_score<\/option>\n<option value=\"percent_mt\">percent_mt<\/option>\n<option value=\"percent_ribo\">percent_ribo<\/option><\/select>\n    <script type=\"application/json\" data-for=\"overview_projection_point_color\" data-nonempty=\"\">{}<\/script>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "selectize",
+          "version": "0.11.2",
+          "src": {
+            "href": "shared/selectize"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": "css/selectize.bootstrap3.css",
+          "head": "<!--[if lt IE 9]>\n<script src=\"shared/selectize/js/es5-shim.min.js\"><\/script>\n<![endif]-->\n<script src=\"shared/selectize/js/selectize.min.js\"><\/script>",
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        }
+      ]
+    },
+    "overview_projection_point_border_UI": {
+      "html": "<div class=\"form-group shiny-input-container\">\n  <div class=\"awesome-checkbox checkbox-primary\">\n    <input id=\"overview_projection_point_border\" type=\"checkbox\"/>\n    <label style=\"cursor: pointer;\" for=\"overview_projection_point_border\">Draw border around cells<\/label>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "shinyWidgets",
+          "version": "0.5.4",
+          "src": {
+            "href": "shinyWidgets"
+          },
+          "meta": null,
+          "script": "shinyWidgets-bindings.min.js",
+          "stylesheet": "shinyWidgets.min.css",
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        },
+        {
+          "name": "awesome-bootstrap",
+          "version": "0.3.7",
+          "src": {
+            "href": "shinyWidgets/awesome-bootstrap-checkbox"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": "awesome-bootstrap-checkbox.min.css",
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        },
+        {
+          "name": "font-awesome",
+          "version": "5.13.0",
+          "src": {
+            "href": "font-awesome-5.13.0"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": [
+            "css/all.min.css",
+            "css/v4-shims.min.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        }
+      ]
+    },
+    "overview_projection_scales_UI": {
+      "html": "<div class=\"form-group shiny-input-container\">\n  <label class=\"control-label\" for=\"overview_projection_scale_x_manual_range\">Range of X axis<\/label>\n  <input class=\"js-range-slider\" id=\"overview_projection_scale_x_manual_range\" data-type=\"double\" data-min=\"-18\" data-max=\"19\" data-from=\"-18\" data-to=\"19\" data-step=\"1\" data-grid=\"true\" data-grid-num=\"9.25\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-drag-interval=\"true\" data-data-type=\"number\"/>\n<\/div>\n<div class=\"form-group shiny-input-container\">\n  <label class=\"control-label\" for=\"overview_projection_scale_y_manual_range\">Range of Y axis<\/label>\n  <input class=\"js-range-slider\" id=\"overview_projection_scale_y_manual_range\" data-type=\"double\" data-min=\"-19\" data-max=\"22\" data-from=\"-19\" data-to=\"22\" data-step=\"1\" data-grid=\"true\" data-grid-num=\"8.2\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-drag-interval=\"true\" data-data-type=\"number\"/>\n<\/div>",
+      "deps": [
+        {
+          "name": "ionrangeslider",
+          "version": "2.1.6",
+          "src": {
+            "href": "shared/ionrangeslider"
+          },
+          "meta": null,
+          "script": "js/ion.rangeSlider.min.js",
+          "stylesheet": [
+            "css/ion.rangeSlider.css",
+            "css/ion.rangeSlider.skinShiny.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        },
+        {
+          "name": "strftime",
+          "version": "0.9.2",
+          "src": {
+            "href": "shared/strftime"
+          },
+          "meta": null,
+          "script": "strftime-min.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        }
+      ]
+    },
+    "overview_projection_show_group_label_UI": {
+      "html": "<div class=\"form-group shiny-input-container\">\n  <div class=\"awesome-checkbox checkbox-primary\">\n    <input id=\"overview_projection_show_group_label\" type=\"checkbox\" checked=\"checked\"/>\n    <label style=\"cursor: pointer;\" for=\"overview_projection_show_group_label\">Plot group labels in exported PDF<\/label>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "shinyWidgets",
+          "version": "0.5.4",
+          "src": {
+            "href": "shinyWidgets"
+          },
+          "meta": null,
+          "script": "shinyWidgets-bindings.min.js",
+          "stylesheet": "shinyWidgets.min.css",
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        },
+        {
+          "name": "awesome-bootstrap",
+          "version": "0.3.7",
+          "src": {
+            "href": "shinyWidgets/awesome-bootstrap-checkbox"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": "awesome-bootstrap-checkbox.min.css",
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        },
+        {
+          "name": "font-awesome",
+          "version": "5.13.0",
+          "src": {
+            "href": "font-awesome-5.13.0"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": [
+            "css/all.min.css",
+            "css/v4-shims.min.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        }
+      ]
+    },
+    "overview_projection_UI": {
+      "html": "<div class=\"row\">\n  <div class=\"col-sm-3\" style=\"padding: 0px;\">\n    <div class=\"col-sm-12\">\n      <div class=\"box box-solid box-primary\">\n        <div class=\"box-header\">\n          <h3 class=\"box-title\">\n            Main parameters\n            <button class=\"btn btn-default action-button btn-xs\" id=\"overview_projection_main_parameters_info\" style=\"margin-left: 5px\" title=\"Show additional information for this panel.\" type=\"button\">info<\/button>\n          <\/h3>\n          <div class=\"box-tools pull-right\">\n            <button class=\"btn btn-box-tool\" data-widget=\"collapse\">\n              <i class=\"fa fa-minus\"><\/i>\n            <\/button>\n          <\/div>\n        <\/div>\n        <div class=\"box-body\">\n          <div id=\"overview_projection_main_parameters_UI\" class=\"shiny-html-output\"><\/div>\n        <\/div>\n      <\/div>\n    <\/div>\n    <div class=\"col-sm-12\">\n      <div class=\"box box-solid box-primary collapsed-box\">\n        <div class=\"box-header\">\n          <h3 class=\"box-title\">\n            Additional parameters\n            <button class=\"btn btn-default action-button btn-xs\" id=\"overview_projection_additional_parameters_info\" style=\"margin-left: 5px\" title=\"Show additional information for this panel.\" type=\"button\">info<\/button>\n          <\/h3>\n          <div class=\"box-tools pull-right\">\n            <button class=\"btn btn-box-tool\" data-widget=\"collapse\">\n              <i class=\"fa fa-plus\"><\/i>\n            <\/button>\n          <\/div>\n        <\/div>\n        <div class=\"box-body\">\n          <div id=\"overview_projection_additional_parameters_UI\" class=\"shiny-html-output\"><\/div>\n        <\/div>\n      <\/div>\n    <\/div>\n    <div class=\"col-sm-12\">\n      <div class=\"box box-solid box-primary collapsed-box\">\n        <div class=\"box-header\">\n          <h3 class=\"box-title\">\n            Group filters\n            <button class=\"btn btn-default action-button btn-xs\" id=\"overview_projection_group_filters_info\" style=\"margin-left: 5px\" title=\"Show additional information for this panel.\" type=\"button\">info<\/button>\n          <\/h3>\n          <div class=\"box-tools pull-right\">\n            <button class=\"btn btn-box-tool\" data-widget=\"collapse\">\n              <i class=\"fa fa-plus\"><\/i>\n            <\/button>\n          <\/div>\n        <\/div>\n        <div class=\"box-body\">\n          <div id=\"overview_projection_group_filters_UI\" class=\"shiny-html-output\"><\/div>\n        <\/div>\n      <\/div>\n    <\/div>\n  <\/div>\n  <div class=\"col-sm-9\" style=\"padding: 0px;\">\n    <div class=\"col-sm-12\">\n      <div class=\"box box-solid box-primary\">\n        <div class=\"box-header\">\n          <h3 class=\"box-title\">\n            <p style=\"padding-right: 5px; display: inline\">Dimensional reduction<\/p>\n            <button class=\"btn btn-default action-button btn-xs\" id=\"overview_projection_info\" style=\"margin-right: 3px\" title=\"Show additional information for this panel.\" type=\"button\">info<\/button>\n            <!--SHINY.SINGLETON[9e34be8a683ff60410a425b5e4e06b78e409e342]-->\n            <head>\n              <script src=\"sF/shinyFiles.js\"><\/script>\n              <link rel=\"stylesheet\" type=\"text/css\" href=\"sF/styles.css\"/>\n              <link rel=\"stylesheet\" type=\"text/css\" href=\"sF/fileIcons.css\"/>\n            <\/head>\n            <!--/SHINY.SINGLETON[9e34be8a683ff60410a425b5e4e06b78e409e342]-->\n            <button id=\"overview_projection_export\" type=\"button\" class=\"shinySave btn btn-default btn-xs action-button\" style=\"margin-right: 3px\" data-title=\"Export dimensional reduction to PDF file.\" data-filetype=\"[{&quot;name&quot;:{},&quot;ext&quot;:[&quot;pdf&quot;]}]\" data-filename=\"\" data-view=\"sF-btn-icon\">export to PDF<\/button>\n            <span class=\"dropdown btn-dropdown-input\" id=\"drop569489812_state\">\n              <button aria-expanded=\"true\" aria-haspopup=\"true\" class=\"btn btn-default action-button dropdown-toggle  btn-xs\" data-toggle=\"dropdown\" id=\"drop569489812\" type=\"button\">\n                <i class=\"fa fa-cog\"><\/i>\n                <span class=\"caret\"><\/span>\n              <\/button>\n              <ul aria-labelledby=\"drop569489812\" class=\"dropdown-menu  dropdown-shinyWidgets\" id=\"dropdown-menu-drop569489812\">\n                <li style=\"margin-left: 10px; margin-right: 10px;\">\n                  <div style=\"color: black !important;\">\n                    <div id=\"overview_projection_show_group_label_UI\" class=\"shiny-html-output\"><\/div>\n                    <div id=\"overview_projection_point_border_UI\" class=\"shiny-html-output\"><\/div>\n                    <div id=\"overview_projection_scales_UI\" class=\"shiny-html-output\"><\/div>\n                  <\/div>\n                <\/li>\n              <\/ul>\n              \n            <\/span>\n          <\/h3>\n          <div class=\"box-tools pull-right\">\n            <button class=\"btn btn-box-tool\" data-widget=\"collapse\">\n              <i class=\"fa fa-minus\"><\/i>\n            <\/button>\n          <\/div>\n        <\/div>\n        <div class=\"box-body\">\n          <!--SHINY.SINGLETON[3891ac171834ed25f436995ba40a47edd74e5169]-->\n          <head>\n            <link rel=\"stylesheet\" href=\"shinycssloaders-assets/spinner.css\"/>\n            <script src=\"shinycssloaders-assets/spinner.js\"><\/script>\n          <\/head>\n          <!--/SHINY.SINGLETON[3891ac171834ed25f436995ba40a47edd74e5169]-->\n          <!--SHINY.SINGLETON[45534f2c59c7069db5da7f5118dc12c792e86de5]-->\n          <head>\n            <link rel=\"stylesheet\" href=\"shinycssloaders-assets/css-loaders.css\"/>\n          <\/head>\n          <!--/SHINY.SINGLETON[45534f2c59c7069db5da7f5118dc12c792e86de5]-->\n          <head>\n            <style>#spinner-8cfaebd911840794776a42074f628a64 {   border-top: 1.1em solid rgba(2,117,216, 0.2);   border-right: 1.1em solid rgba(2,117,216, 0.2);   border-bottom: 1.1em solid rgba(2,117,216, 0.2);   border-left: 1.1em solid #0275D8; } #spinner-8cfaebd911840794776a42074f628a64 { font-size: 8px; }<\/style>\n          <\/head>\n          <div class=\"shiny-spinner-output-container  \">\n            <div class=\"load-container shiny-spinner-hidden load8\">\n              <div id=\"spinner-8cfaebd911840794776a42074f628a64\" class=\"loader\">Loading...<\/div>\n            <\/div>\n            <div id=\"overview_projection\" style=\"width:auto; height:85vh; \" class=\"plotly html-widget html-widget-output shiny-report-size\"><\/div>\n          <\/div>\n          <br/>\n          <div id=\"overview_number_of_selected_cells\" class=\"shiny-html-output\"><\/div>\n        <\/div>\n      <\/div>\n    <\/div>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "font-awesome",
+          "version": "5.13.0",
+          "src": {
+            "href": "font-awesome-5.13.0"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": [
+            "css/all.min.css",
+            "css/v4-shims.min.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        },
+        {
+          "name": "shinyWidgets",
+          "version": "0.5.4",
+          "src": {
+            "href": "shinyWidgets"
+          },
+          "meta": null,
+          "script": "shinyWidgets-bindings.min.js",
+          "stylesheet": "shinyWidgets.min.css",
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        },
+        {
+          "name": "dropdown-patch",
+          "version": "0.5.4",
+          "src": {
+            "href": "shinyWidgets/dropdown"
+          },
+          "meta": null,
+          "script": "dropdown-click.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        },
+        {
+          "name": "htmlwidgets",
+          "version": "1.5.3",
+          "src": {
+            "href": "htmlwidgets-1.5.3"
+          },
+          "meta": null,
+          "script": "htmlwidgets.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        },
+        {
+          "name": "plotly-binding",
+          "version": "4.9.2.2",
+          "src": {
+            "href": "plotly-binding-4.9.2.2"
+          },
+          "meta": null,
+          "script": "plotly.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": false
+        }
+      ]
+    },
+    "overview_selected_cells_plot_UI": {
+      "html": "<div class=\"row\">\n  <div class=\"col-sm-12\">\n    <div class=\"box box-solid box-primary\">\n      <div class=\"box-header\">\n        <h3 class=\"box-title\">\n          <p style=\"padding-right: 5px; display: inline\">Plot of selected cells<\/p>\n          <button class=\"btn btn-default action-button btn-xs\" id=\"overview_details_selected_cells_plot_info\" title=\"Show additional information for this panel.\" type=\"button\">info<\/button>\n        <\/h3>\n        <div class=\"box-tools pull-right\">\n          <button class=\"btn btn-box-tool\" data-widget=\"collapse\">\n            <i class=\"fa fa-minus\"><\/i>\n          <\/button>\n        <\/div>\n      <\/div>\n      <div class=\"box-body\">\n        <div class=\"form-group shiny-input-container\">\n          <label class=\"control-label\" for=\"overview_selected_cells_plot_select_variable\">Variable to compare:<\/label>\n          <div>\n            <select id=\"overview_selected_cells_plot_select_variable\"><option value=\"sample\" selected>sample<\/option>\n<option value=\"seurat_clusters\">seurat_clusters<\/option>\n<option value=\"cell_type_singler_blueprintencode_main\">cell_type_singler_blueprintencode_main<\/option>\n<option value=\"nUMI\">nUMI<\/option>\n<option value=\"nGene\">nGene<\/option>\n<option value=\"Phase\">Phase<\/option>\n<option value=\"orig.ident\">orig.ident<\/option>\n<option value=\"S.Score\">S.Score<\/option>\n<option value=\"G2M.Score\">G2M.Score<\/option>\n<option value=\"cell_type_singler_blueprintencode_main_score\">cell_type_singler_blueprintencode_main_score<\/option>\n<option value=\"percent_mt\">percent_mt<\/option>\n<option value=\"percent_ribo\">percent_ribo<\/option><\/select>\n            <script type=\"application/json\" data-for=\"overview_selected_cells_plot_select_variable\" data-nonempty=\"\">{}<\/script>\n          <\/div>\n        <\/div>\n        <div id=\"overview_details_selected_cells_plot\" style=\"width:100%; height:400px; \" class=\"plotly html-widget html-widget-output shiny-report-size\"><\/div>\n      <\/div>\n    <\/div>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "font-awesome",
+          "version": "5.13.0",
+          "src": {
+            "href": "font-awesome-5.13.0"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": [
+            "css/all.min.css",
+            "css/v4-shims.min.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        },
+        {
+          "name": "selectize",
+          "version": "0.11.2",
+          "src": {
+            "href": "shared/selectize"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": "css/selectize.bootstrap3.css",
+          "head": "<!--[if lt IE 9]>\n<script src=\"shared/selectize/js/es5-shim.min.js\"><\/script>\n<![endif]-->\n<script src=\"shared/selectize/js/selectize.min.js\"><\/script>",
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        },
+        {
+          "name": "htmlwidgets",
+          "version": "1.5.3",
+          "src": {
+            "href": "htmlwidgets-1.5.3"
+          },
+          "meta": null,
+          "script": "htmlwidgets.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        },
+        {
+          "name": "plotly-binding",
+          "version": "4.9.2.2",
+          "src": {
+            "href": "plotly-binding-4.9.2.2"
+          },
+          "meta": null,
+          "script": "plotly.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": false
+        }
+      ]
+    },
+    "overview_selected_cells_table_UI": {
+      "html": "<div class=\"row\">\n  <div class=\"col-sm-12\">\n    <div class=\"box box-solid box-primary\">\n      <div class=\"box-header\">\n        <h3 class=\"box-title\">\n          <p style=\"padding-right: 5px; display: inline\">Table of selected cells<\/p>\n          <button class=\"btn btn-default action-button btn-xs\" id=\"overview_details_selected_cells_table_info\" title=\"Show additional information for this panel.\" type=\"button\">info<\/button>\n        <\/h3>\n        <div class=\"box-tools pull-right\">\n          <button class=\"btn btn-box-tool\" data-widget=\"collapse\">\n            <i class=\"fa fa-minus\"><\/i>\n          <\/button>\n        <\/div>\n      <\/div>\n      <div class=\"box-body\">\n        <div class=\"form-group shiny-input-container shiny-input-container-inline\" style=\"display: inline-block; margin-right: 10px;\">\n          <div class=\"material-switch\">\n            <span style=\"padding-right: 10px;\">Automatically format numbers:<\/span>\n            <input id=\"overview_details_selected_cells_table_number_formatting\" type=\"checkbox\" checked=\"checked\"/>\n            <label for=\"overview_details_selected_cells_table_number_formatting\" class=\"label-primary\"><\/label>\n          <\/div>\n        <\/div>\n        <div class=\"form-group shiny-input-container shiny-input-container-inline\" style=\"display: inline-block; margin-right: 10px;\">\n          <div class=\"material-switch\">\n            <span style=\"padding-right: 10px;\">Highlight values with colors:<\/span>\n            <input id=\"overview_details_selected_cells_table_color_highlighting\" type=\"checkbox\" checked=\"checked\"/>\n            <label for=\"overview_details_selected_cells_table_color_highlighting\" class=\"label-primary\"><\/label>\n          <\/div>\n        <\/div>\n        <div id=\"overview_details_selected_cells_table\" style=\"width:100%; height:auto; \" class=\"datatables html-widget html-widget-output\"><\/div>\n      <\/div>\n    <\/div>\n  <\/div>\n<\/div>",
+      "deps": [
+        {
+          "name": "font-awesome",
+          "version": "5.13.0",
+          "src": {
+            "href": "font-awesome-5.13.0"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": [
+            "css/all.min.css",
+            "css/v4-shims.min.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        },
+        {
+          "name": "shinyWidgets",
+          "version": "0.5.4",
+          "src": {
+            "href": "shinyWidgets"
+          },
+          "meta": null,
+          "script": "shinyWidgets-bindings.min.js",
+          "stylesheet": "shinyWidgets.min.css",
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        },
+        {
+          "name": "htmlwidgets",
+          "version": "1.5.3",
+          "src": {
+            "href": "htmlwidgets-1.5.3"
+          },
+          "meta": null,
+          "script": "htmlwidgets.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        },
+        {
+          "name": "jquery",
+          "version": "1.12.4",
+          "src": {
+            "href": "jquery-1.12.4"
+          },
+          "meta": null,
+          "script": "jquery.min.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        },
+        {
+          "name": "datatables-css",
+          "version": "0.0.0",
+          "src": {
+            "href": "datatables-css-0.0.0"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": "datatables-crosstalk.css",
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        },
+        {
+          "name": "datatables-binding",
+          "version": "0.16",
+          "src": {
+            "href": "datatables-binding-0.16"
+          },
+          "meta": null,
+          "script": "datatables.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": false
+        },
+        {
+          "name": "crosstalk",
+          "version": "1.1.0.1",
+          "src": {
+            "href": "crosstalk-1.1.0.1"
+          },
+          "meta": null,
+          "script": "js/crosstalk.min.js",
+          "stylesheet": "css/crosstalk.css",
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        }
+      ]
+    },
+    "preferences": {
+      "html": "<div title=\"Using WebGL is best for performance but might not be compatible with every browser.\">\n  <div class=\"form-group shiny-input-container\">\n    <div class=\"checkbox\">\n      <label>\n        <input id=\"webgl_checkbox\" type=\"checkbox\" checked=\"checked\"/>\n        <span>Use WebGL<\/span>\n      <\/label>\n    <\/div>\n  <\/div>\n<\/div>\n<div title=\"Switching off hover info in projections improves performance.\">\n  <div class=\"form-group shiny-input-container\">\n    <div class=\"checkbox\">\n      <label>\n        <input id=\"hover_info_in_projections_checkbox\" type=\"checkbox\" checked=\"checked\"/>\n        <span>Show hover info in projections<\/span>\n      <\/label>\n    <\/div>\n  <\/div>\n<\/div>",
+      "deps": [
+
+      ]
+    },
+    "sidebar_item_extra_material": {
+      "html": "<li>\n  <a href=\"#shiny-tab-extra_material\" data-toggle=\"tab\" data-value=\"extra_material\">\n    <i class=\"fa fa-gift\"><\/i>\n    <span>Extra material<\/span>\n  <\/a>\n<\/li>",
+      "deps": [
+        {
+          "name": "font-awesome",
+          "version": "5.13.0",
+          "src": {
+            "href": "font-awesome-5.13.0"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": [
+            "css/all.min.css",
+            "css/v4-shims.min.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        }
+      ]
+    },
+    "sidebar_item_trajectory": {
+      "html": "<li>\n  <a href=\"#shiny-tab-trajectory\" data-toggle=\"tab\" data-value=\"trajectory\">\n    <i class=\"fa fa-random\"><\/i>\n    <span>Trajectory<\/span>\n  <\/a>\n<\/li>",
+      "deps": [
+        {
+          "name": "font-awesome",
+          "version": "5.13.0",
+          "src": {
+            "href": "font-awesome-5.13.0"
+          },
+          "meta": null,
+          "script": null,
+          "stylesheet": [
+            "css/all.min.css",
+            "css/v4-shims.min.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        }
+      ]
+    },
+    "trajectory_projection_additional_parameters_UI": {
+      "html": "<div class=\"form-group shiny-input-container\">\n  <label class=\"control-label\" for=\"trajectory_point_size\">Point size<\/label>\n  <input class=\"js-range-slider\" id=\"trajectory_point_size\" data-min=\"1\" data-max=\"20\" data-from=\"5\" data-step=\"1\" data-grid=\"true\" data-grid-num=\"9.5\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n<\/div>\n<div class=\"form-group shiny-input-container\">\n  <label class=\"control-label\" for=\"trajectory_point_opacity\">Point opacity<\/label>\n  <input class=\"js-range-slider\" id=\"trajectory_point_opacity\" data-min=\"0.1\" data-max=\"1\" data-from=\"1\" data-step=\"0.1\" data-grid=\"true\" data-grid-num=\"9\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n<\/div>\n<div class=\"form-group shiny-input-container\">\n  <label class=\"control-label\" for=\"trajectory_percentage_cells_to_show\">Show % of cells<\/label>\n  <input class=\"js-range-slider\" id=\"trajectory_percentage_cells_to_show\" data-min=\"10\" data-max=\"100\" data-from=\"100\" data-step=\"10\" data-grid=\"true\" data-grid-num=\"9\" data-grid-snap=\"false\" data-prettify-separator=\",\" data-prettify-enabled=\"true\" data-keyboard=\"true\" data-data-type=\"number\"/>\n<\/div>",
+      "deps": [
+        {
+          "name": "ionrangeslider",
+          "version": "2.1.6",
+          "src": {
+            "href": "shared/ionrangeslider"
+          },
+          "meta": null,
+          "script": "js/ion.rangeSlider.min.js",
+          "stylesheet": [
+            "css/ion.rangeSlider.css",
+            "css/ion.rangeSlider.skinShiny.css"
+          ],
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        },
+        {
+          "name": "strftime",
+          "version": "0.9.2",
+          "src": {
+            "href": "shared/strftime"
+          },
+          "meta": null,
+          "script": "strftime-min.js",
+          "stylesheet": null,
+          "head": null,
+          "attachment": null,
+          "package": null,
+          "all_files": true
+        }
+      ]
+    },
+    "trajectory_projection_group_filters_UI": {
+      "html": "<div class=\"form-group shiny-input-container\">\n  <label class=\"control-label\" for=\"trajectory_projection_group_filter_sample\">sample<\/label>\n  <select data-actions-box=\"true\" id=\"trajectory_projection_group_filter_sample\" class=\"selectpicker form-control\" multiple=\"multiple\"><option value=\"pbmc_10k_v3_rep1\" selected>pbmc_10k_v3_rep1<\/option>\n<option value=\"pbmc_10k_v3_rep2\" selected>pbmc_10k_v3_rep2<\/option>\n<option value=\"pbmc_10k_v3_rep3\" selected>pbmc_10k_v3_rep3<\/option><\/select>\n<\/div>\n<div class=\"form-group shiny-input-container\">\n  <label class=\"control-label\" for=\"trajectory_projection_group_filter_seurat_clusters\">seurat_clusters<\/label>\n  <select data-actions-box=\"true\" id=\"trajectory_projection_group_filter_seurat_clusters\" class=\"selectpicker form-control\" multiple=\"multiple\"><option value=\"0\" selected>0<\/option>\n<option value=\"1\" selected>1<\/option>\n<option value=\"2\" selected>2<\/option>\n<option value=\"3\" selected>3<\/option>\n<option value=\"4\" selected>4<\/option>\n<option value=\"5\" selected>5<\/option><\/select>\n<\/div>\n<div class=\"form-group shiny-input-container\">\n  <label class=\"control-label\" for=\"trajectory_projection_group_filter_cell_type_singler_blueprintencode_main\">cell_type_singler_blueprintencode_main<\/label>\n  <select data-actions-box=\"true\" id=\"trajectory_projection_group_filter_cell_type_singler_blueprintencode_main\" class=\"selectpicker form-control\" multiple=\"multiple\"><option value=\"B-cells\" selected>B-cells<\/option>\n<option value=\"CD4+ T-cells\" selected>CD4+ T-cells<\/option>\n<option value=\"CD8+ T-cells\" selected>CD8+ T-cells<\/option>\n<option value=\"Erythrocytes\" selected>Erythrocytes<\/option>\n<option value=\"HSC\" selected>HSC<\/option>\n<option value=\"Monocytes\" selected>Monocytes<\/option>\n<option value=\"NK cells\" selected>NK cells<\/option><\/select>\n<\/div>",
+      "deps": [
+        {
+          "name": "shinyWidgets",
+          "version": "0.5.4",
+          "src": {
+            "href": "shinyWidgets"
+          },
+          "meta": null,
+          "script": "shinyWidgets-bindings.min.js",
+          "stylesheet": "shinyWidgets.min.css",
+          "head": null,
+          "attachment": null,
+          "all_files": false
+        },
+        {
+          "name": "bootstrap-select",
+          "version": "1.13.18",
+          "src": {
+            "href": "shinyWidgets/bootstrap-select"
+          },
+          "meta": null,
+          "script": "js/bootstrap-select.min.js",
+          "stylesheet": "css/bootstrap-select.min.css",
+          "head": null,
+          "attachment": null,
+          "all_files": true
+        }
+      ]
+    }
+  },
+  "export": {
+
+  }
+}

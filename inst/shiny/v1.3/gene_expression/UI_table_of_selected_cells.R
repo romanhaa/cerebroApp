@@ -50,7 +50,7 @@ output[["expression_details_selected_cells"]] <- DT::renderDataTable({
     ## prepare empty table
     getMetaData() %>%
     dplyr::slice(0) %>%
-    prepareEmptyTable()
+    .prepareEmptyTable()
   ## ... selection has been made and at least 1 cell is in it
   } else {
     cells_df <- bind_cols(
@@ -78,12 +78,15 @@ output[["expression_details_selected_cells"]] <- DT::renderDataTable({
       ## prepare empty table
       getMetaData() %>%
       dplyr::slice(0) %>%
-      prepareEmptyTable()
+      .prepareEmptyTable()
     ## ... at least 1 cell is left
     } else {
       ## prepare proper table
-      prettifyTable(
+      .prettifyTable(
         cells_df,
+        getGroups(),
+        getCellCycle(),
+        reactive_colors(),
         filter = list(position = "top", clear = TRUE),
         dom = "Brtlip",
         show_buttons = TRUE,

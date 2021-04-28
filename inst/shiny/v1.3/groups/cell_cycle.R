@@ -95,7 +95,7 @@ output[["groups_by_cell_cycle_plot"]] <- plotly::renderPlotly({
   )
   if ( input[["groups_by_cell_cycle_plot_type"]] == "Bar chart" ) {
     ## calculate table
-    composition_df <- calculateTableAB(
+    composition_df <- .calculateTableAB(
       getMetaData(),
       input[[ "groups_selected_group" ]],
       input[[ "groups_by_cell_cycle_column" ]],
@@ -113,7 +113,7 @@ output[["groups_by_cell_cycle_plot"]] <- plotly::renderPlotly({
   ##
   } else if ( input[["groups_by_cell_cycle_plot_type"]] == "Sankey plot" ) {
     ## calculate table
-    composition_df <- calculateTableAB(
+    composition_df <- .calculateTableAB(
       getMetaData(),
       input[[ "groups_selected_group" ]],
       input[[ "groups_by_cell_cycle_column" ]],
@@ -122,8 +122,8 @@ output[["groups_by_cell_cycle_plot"]] <- plotly::renderPlotly({
     )
     ## get color code for all group levels (from both groups)
     colors_for_groups <- c(
-      assignColorsToGroups(composition_df, input[[ "groups_selected_group" ]]),
-      assignColorsToGroups(composition_df, input[[ "groups_by_cell_cycle_column" ]])
+      .assignColorsToGroups(composition_df, input[[ "groups_selected_group" ]], reactive_colors()),
+      .assignColorsToGroups(composition_df, input[[ "groups_by_cell_cycle_column" ]], reactive_colors())
     )
     ## generate plot
     plotlySankeyPlot(
@@ -146,7 +146,7 @@ output[["groups_by_cell_cycle_table"]] <- DT::renderDataTable({
     input[["groups_by_cell_cycle_column"]] %in% getCellCycle(),
   )
   ##
-  composition_df <- calculateTableAB(
+  composition_df <- .calculateTableAB(
     getMetaData(),
     input[["groups_selected_group"]],
     input[["groups_by_cell_cycle_column"]],
@@ -162,7 +162,10 @@ output[["groups_by_cell_cycle_table"]] <- DT::renderDataTable({
   ##
   composition_df %>%
   dplyr::rename("# of cells" = total_cell_count) %>%
-  prettifyTable(
+  .prettifyTable(
+    getGroups(),
+    getCellCycle(),
+    reactive_colors(),
     filter = "none",
     dom = "Brtlip",
     show_buttons = FALSE,

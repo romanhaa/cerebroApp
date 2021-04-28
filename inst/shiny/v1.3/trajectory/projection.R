@@ -315,7 +315,7 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
   }
 
   ## randomly remove cells (if necessary)
-  cells_df <- randomlySubsetCells(cells_df, input[["trajectory_percentage_cells_to_show"]])
+  cells_df <- .randomlySubsetCells(cells_df, input[["trajectory_percentage_cells_to_show"]])
 
   ## put rows in random order
   cells_df <- cells_df[ sample(1:nrow(cells_df)) , ]
@@ -354,7 +354,7 @@ output[["trajectory_projection"]] <- plotly::renderPlotly({
   ) {
 
     ## get colors for groups
-    colors_for_groups <- assignColorsToGroups(cells_df, input[["trajectory_point_color"]])
+    colors_for_groups <- .assignColorsToGroups(cells_df, input[["trajectory_point_color"]], reactive_colors())
 
     ##
     plot <- plotly::plot_ly(
@@ -551,7 +551,7 @@ observeEvent(input[["trajectory_projection_export"]], {
       dplyr::filter(!is.na(pseudotime))
 
     ## randomly remove cells (if necessary)
-    cells_df <- randomlySubsetCells(cells_df, input[["trajectory_percentage_cells_to_show"]])
+    cells_df <- .randomlySubsetCells(cells_df, input[["trajectory_percentage_cells_to_show"]])
 
     ## put rows in random order
     cells_df <- cells_df[ sample(1:nrow(cells_df)) , ]
@@ -591,7 +591,7 @@ observeEvent(input[["trajectory_projection_export"]], {
     ) {
 
       ## get colors for groups
-      colors_for_groups <- assignColorsToGroups(cells_df, input[["trajectory_point_color"]])
+      colors_for_groups <- .assignColorsToGroups(cells_df, input[["trajectory_point_color"]], reactive_colors())
 
       ## add color assignments
       plot <- plot + scale_fill_manual(values = colors_for_groups)

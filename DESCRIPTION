@@ -62,5 +62,7 @@ Suggests:
   monocle (>= 2.10),
   reshape2 (>= 1.4.3),
   rmarkdown,
-  Seurat (>= 3.0.0)
+  Seurat (>= 3.0.0),
+  testthat (>= 3.0.0)
 VignetteBuilder: knitr
+Config/testthat/edition: 3

@@ -15,9 +15,10 @@ overview_projection_data_to_plot_raw <- reactive({
   if ( is.numeric(overview_projection_parameters_plot()[['color_variable']]) ) {
     color_assignments <- NA
   } else {
-    color_assignments <- assignColorsToGroups(
+    color_assignments <- .assignColorsToGroups(
       overview_projection_data(),
-      overview_projection_parameters_plot()[['color_variable']]
+      overview_projection_parameters_plot()[['color_variable']],
+      reactive_colors()
     )
   }
   ## print details for debugging purposes

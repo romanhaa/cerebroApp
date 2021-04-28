@@ -15,7 +15,7 @@ output[["expression_projection_scales_UI"]] <- renderUI({
   ## check if projection or trajectory should be shown
   ## ... projection
   if ( input[["expression_projection_to_display"]] %in% availableProjections() ) {
-    XYranges <- getXYranges(getProjection(input[["expression_projection_to_display"]]))
+    XYranges <- .getXYranges(getProjection(input[["expression_projection_to_display"]]))
   ## ... trajectory
   } else {
     ## split selection into method and name
@@ -30,7 +30,7 @@ output[["expression_projection_scales_UI"]] <- renderUI({
       selection[1],
       selection[2]
     )
-    XYranges <- getXYranges(trajectory_data[["meta"]])
+    XYranges <- .getXYranges(trajectory_data[["meta"]])
   }
   tagList(
     sliderInput(

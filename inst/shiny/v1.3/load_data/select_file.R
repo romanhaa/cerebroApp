@@ -1,13 +1,10 @@
 ##----------------------------------------------------------------------------##
-## Tab: Load data
-##
 ## Select file.
 ##----------------------------------------------------------------------------##
 
 ##----------------------------------------------------------------------------##
 ## UI element to select data to load into Cerebro.
 ##----------------------------------------------------------------------------##
-
 output[["load_data_select_file_UI"]] <- renderUI({
   if (
     exists('Cerebro.options') &&
@@ -19,7 +16,7 @@ output[["load_data_select_file_UI"]] <- renderUI({
         htmlOutput("load_data_mode_open")
       ),
       fluidRow(
-        column(12,
+        column(6,
           titlePanel("Load data"),
           fileInput(
             inputId = "input_file",
@@ -29,6 +26,14 @@ output[["load_data_select_file_UI"]] <- renderUI({
             width = '350px',
             buttonLabel = "Browse...",
             placeholder = "No file selected"
+          ),
+          selectizeInput(
+            'select_from_available_datasets', 'Available datasets',
+            choices = c('Small samples (500 cells)', 'Large sample (80k cells)'),
+            options = list(
+              placeholder = 'Please select an option below',
+              onInitialize = I('function() { this.setValue(""); }')
+            )
           )
         )
       )
@@ -43,7 +48,6 @@ output[["load_data_select_file_UI"]] <- renderUI({
 ##----------------------------------------------------------------------------##
 ## Text message if Cerebro was launched in "open" mode.
 ##----------------------------------------------------------------------------##
-
 output[["load_data_mode_open"]] <- renderText({
   if (
     exists('Cerebro.options') &&
@@ -61,7 +65,6 @@ output[["load_data_mode_open"]] <- renderText({
 ##----------------------------------------------------------------------------##
 ## Text message if Cerebro was launched in "closed" mode.
 ##----------------------------------------------------------------------------##
-
 output[["load_data_mode_closed"]] <- renderText({
   if (
     exists('Cerebro.options') &&
@@ -74,5 +77,14 @@ output[["load_data_mode_closed"]] <- renderText({
       <p style='text-align: center'>Cerebro was launched in 'closed' mode, which means you cannot load your own data set. Instead, take a look at the pre-loaded data.</p>
       <br>"
     )
+  }
+})
+
+observeEvent(input[['select_from_available_datasets']], {
+  selected_dataset <- input[['select_from_available_datasets']]
+  if (selected_dataset == 'Small samples (500 cells)') {
+    data_to_load$path <- "/Users/roman/GitHub/cerebroApp_dev_refactor_overview/inst/extdata/v1.3/example.crb"
+  } else if (selected_dataset == 'Large sample (80k cells)') {
+    data_to_load$path <- "/Users/roman/Downloads/sc_merge_cerebro_delayed.crb"
   }
 })

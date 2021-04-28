@@ -110,7 +110,7 @@ overview_projection_update_plot <- function(input) {
         }
         i <- i + 1
       }
-      group_centers_df <- centerOfGroups(coordinates, cells_df, 2, plot_parameters[['color_variable']])
+      group_centers_df <- .centerOfGroups(coordinates, cells_df, 2, plot_parameters[['color_variable']])
       output_group_centers <- list(
         group = group_centers_df[['group']],
         x = group_centers_df[['x_median']],
@@ -140,7 +140,7 @@ overview_projection_update_plot <- function(input) {
         }
         i <- i + 1
       }
-      group_centers_df <- centerOfGroups(coordinates, cells_df, 3, plot_parameters[['color_variable']])
+      group_centers_df <- .centerOfGroups(coordinates, cells_df, 3, plot_parameters[['color_variable']])
       output_group_centers <- list(
         group = group_centers_df[['group']],
         x = group_centers_df[['x_median']],

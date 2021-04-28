@@ -124,12 +124,15 @@ output[["most_expressed_genes_table"]] <- DT::renderDataTable({
     results_df %>%
     as.data.frame() %>%
     dplyr::slice(0) %>%
-    prepareEmptyTable()
+    .prepareEmptyTable()
   ## if there is at least 1 row in the table, create proper table
   } else {
     results_df %>%
     dplyr::rename("% of total expression" = pct) %>%
-    prettifyTable(
+    .prettifyTable(
+      getGroups(),
+      getCellCycle(),
+      reactive_colors(),
       filter = list(position = "top", clear = TRUE),
       dom = "Bfrtlip",
       show_buttons = TRUE,

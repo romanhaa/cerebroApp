@@ -12,7 +12,7 @@ output[["overview_projection_scales_UI"]] <- renderUI({
     projection_to_display <- input[["overview_projection_to_display"]]
   }
   ##
-  XYranges <- getXYranges(getProjection(projection_to_display))
+  XYranges <- .getXYranges(getProjection(projection_to_display))
   ##
   tagList(
     sliderInput(

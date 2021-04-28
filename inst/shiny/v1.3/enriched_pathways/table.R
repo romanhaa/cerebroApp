@@ -211,7 +211,7 @@ output[["enriched_pathways_table"]] <- DT::renderDataTable({
     results_df %>%
     as.data.frame() %>%
     dplyr::slice(0) %>%
-    prepareEmptyTable()
+    .prepareEmptyTable()
 
   ## ... if there is at least 1 row, create proper table
   } else if ( nrow(results_df) > 0 ) {
@@ -228,8 +228,11 @@ output[["enriched_pathways_table"]] <- DT::renderDataTable({
       columns_hide <- c(columns_hide, grep(colnames(results_df), pattern = "Old.Adjusted.P.value"))
     }
 
-    prettifyTable(
+    .prettifyTable(
       results_df,
+      getGroups(),
+      getCellCycle(),
+      reactive_colors(),
       filter = list(position = "top", clear = TRUE),
       dom = "Bfrtlip",
       show_buttons = TRUE,

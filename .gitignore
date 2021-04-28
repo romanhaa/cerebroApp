@@ -4,6 +4,5 @@ cerebroApp_*.tar.gz
 .Rhistory
 vignettes/*.crb
 docs
-tests
 .Rproj.user
 *.Rproj
