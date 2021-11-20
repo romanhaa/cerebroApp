@@ -37,7 +37,7 @@ Of course, we also need the cerebroApp package.
 
 ```{r eval=FALSE}
 if ( 'rsconnect' %in% installed.packages() == FALSE ) install.packages('rsconnect')
-if ( 'cerebroApp' %in% installed.packages() == FALSE ) install.packages('cerebroApp')
+if ( 'cerebroApp' %in% installed.packages() == FALSE ) install.packages('romanhaa/cerebroApp')
 
 library(rsconnect)
 ```

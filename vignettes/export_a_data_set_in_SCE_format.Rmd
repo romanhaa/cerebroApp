@@ -38,7 +38,7 @@ if ( 'BiocManager' %in% installed.packages() == FALSE ) install.packages('BiocMa
 
 library(BiocManager)
 
-if ( 'cerebroApp' %in% installed.packages() == FALSE ) install('cerebroApp')
+if ( 'cerebroApp' %in% installed.packages() == FALSE ) install('romanhaa/cerebroApp')
 if ( 'scran' %in% installed.packages() == FALSE ) install('scran')
 if ( 'scater' %in% installed.packages() == FALSE ) install('scater')
 if ( 'SingleR' %in% installed.packages() == FALSE ) install('SingleR')

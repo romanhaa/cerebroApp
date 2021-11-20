@@ -48,7 +48,7 @@ if ( 'BiocManager' %in% installed.packages() == FALSE ) install.packages('BiocMa
 
 library(BiocManager)
 
-if ( 'cerebroApp' %in% installed.packages() == FALSE ) install('cerebroApp')
+if ( 'cerebroApp' %in% installed.packages() == FALSE ) install('romanhaa/cerebroApp')
 if ( 'Seurat' %in% installed.packages() == FALSE ) install('Seurat')
 if ( 'SingleR' %in% installed.packages() == FALSE ) install('SingleR')
 if ( 'monocle' %in% installed.packages() == FALSE ) install('monocle')
